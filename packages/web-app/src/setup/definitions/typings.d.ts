@@ -1,4 +1,4 @@
-//ATTENTION: These should be defined in a dependency, not in the project itself
+//ATTENTION: These can now be moved to the monorepo root, but I'm leaving them here for now for reference
 
 export interface Message {
     timestamp: Firestore.Timestamp; //ATTENTION: corrupted type    
