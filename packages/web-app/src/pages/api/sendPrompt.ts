@@ -1,6 +1,6 @@
 import admin from "firebase-admin";
 import dbAdmin from "../../setup/firebaseAdmin";
-import { Message } from "../../setup/definitions/typings";
+import { Message } from "shared/typings";
 import query from "../../lib/query";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";

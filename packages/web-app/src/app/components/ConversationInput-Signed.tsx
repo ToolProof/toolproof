@@ -6,7 +6,7 @@ import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { doc, } from "firebase/firestore";
-import { Message } from "../../setup/definitions/typings";
+import { Message } from "shared/typings";
 import { useAlfa } from "./AlfaProvider";
 import { db } from "../../setup/firebaseClient";
 import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";

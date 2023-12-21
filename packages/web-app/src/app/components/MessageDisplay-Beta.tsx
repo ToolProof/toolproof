@@ -1,4 +1,4 @@
-import { Message } from "../../setup/definitions/typings";
+import { Message } from "shared/typings";
 
 type Props = {
   message: Message;

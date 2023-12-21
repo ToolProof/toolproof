@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Message } from "../../setup/definitions/typings";
+import { Message } from "shared/typings";
 
 type Props = {
   message: Message;

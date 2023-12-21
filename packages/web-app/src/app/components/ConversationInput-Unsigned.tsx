@@ -7,7 +7,7 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../setup/firebaseClient";
 import { doc } from "firebase/firestore";
-import { Message } from "../../setup/definitions/typings";
+import { Message } from "shared/typings";
 import { MutationSendPromptArgs, PromptResponse } from "../../setup/generated/typesClient";
 import { gql } from "@apollo/client";
 import { client } from "../../setup/apolloClient";

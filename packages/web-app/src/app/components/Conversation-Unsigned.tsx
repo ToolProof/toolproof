@@ -3,7 +3,7 @@ import { collection, query, orderBy, doc, updateDoc } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "../../setup/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import { Message } from "../../setup/definitions/typings";
+import { Message } from "shared/typings";
 import MessageDisplay from "./MessageDisplay-Beta";
 import { useEffect } from "react";
 
