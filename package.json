@@ -1,0 +1,16 @@
+{
+  "name": "typescript-repo",
+  "workspaces": [
+    "packages/web-app",
+    "packages/space-xyz",
+    "packages/debate-importer"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "push": "git add . && git commit -m '-' && git push origin master"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "turbo": "^1.11.2"
+  }
+}
