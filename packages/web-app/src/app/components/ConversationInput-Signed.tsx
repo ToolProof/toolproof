@@ -6,7 +6,7 @@ import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { doc, } from "firebase/firestore";
-import { Message } from "shared/typings";
+import { MessageWrite } from "shared/typings";
 import { useAlfa } from "./AlfaProvider";
 import { db } from "../../setup/firebaseClient";
 import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";
@@ -35,7 +35,7 @@ export default function ConversationInput({ conversationId }: Props) {
     async function sendMessage(content: string) {
         try {
             // Adding the message to Firestore
-            const message: Message = {
+            const message: MessageWrite = {
                 timestamp: serverTimestamp(),
                 userId: "René",
                 content: content,

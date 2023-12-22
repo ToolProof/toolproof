@@ -3,7 +3,7 @@ import { collection, query, orderBy, doc, updateDoc } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "../../setup/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import { Message } from "shared/typings";
+import { MessageRead } from "shared/typings";
 import MessageDisplay from "./MessageDisplay-Beta";
 import { useEffect } from "react";
 
@@ -50,7 +50,7 @@ function Conversation({conversationId}: Props) {
             </div>
         )}
             {messages?.docs.map((messageDoc) => {
-                const message = messageDoc.data() as Message;
+                const message = messageDoc.data() as MessageRead;
                 const isNew = isNewMessage(message.timestamp);
                 return <MessageDisplay key={messageDoc.id} message={message} isNew={isNew} />
             })}

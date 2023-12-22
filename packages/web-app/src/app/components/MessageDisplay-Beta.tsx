@@ -1,7 +1,7 @@
-import { Message } from "shared/typings";
+import { MessageRead } from "shared/typings";
 
 type Props = {
-  message: Message;
+  message: MessageRead;
   isNew: boolean;
 };
 

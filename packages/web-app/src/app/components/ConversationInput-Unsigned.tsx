@@ -7,7 +7,7 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../setup/firebaseClient";
 import { doc } from "firebase/firestore";
-import { Message } from "shared/typings";
+import { MessageWrite } from "shared/typings";
 import { MutationSendPromptArgs, PromptResponse } from "../../setup/generated/typesClient";
 import { gql } from "@apollo/client";
 import { client } from "../../setup/apolloClient";
@@ -67,7 +67,7 @@ function ConversationInput({conversationId}: Props) {
 
         try {
             // Adding the message to Firestore
-            const message: Message = {
+            const message: MessageWrite = {
                 timestamp: serverTimestamp(),
                 userId: session?.user?.name || "Peter",
                 content,

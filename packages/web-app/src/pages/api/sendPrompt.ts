@@ -1,6 +1,6 @@
 import admin from "firebase-admin";
 import dbAdmin from "../../setup/firebaseAdmin";
-import { Message } from "shared/typings";
+import { MessageWrite } from "shared/typings";
 import query from "../../lib/query";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
@@ -22,7 +22,7 @@ const updateTurnState = async (conversationId: string, code: number) => {
 };
 
 async function sendMessage(content: string, conversationId: string) {
-  const message: Message = {
+  const message: MessageWrite = {
     timestamp: admin.firestore.Timestamp.now(),
     userId: "ChatGPT",
     content: content || "ChatGPT was unable to respond!",

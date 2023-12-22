@@ -5,7 +5,7 @@ import { collection, query, orderBy } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "../../setup/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import { Message } from "shared/typings";
+import { MessageRead } from "shared/typings";
 import { useAlfa } from "./AlfaProvider";
 import MessageDisplayAlfa from "./MessageDisplay-Alfa";
 import MessageDisplayBeta from "./MessageDisplay-Beta";
@@ -76,7 +76,7 @@ function Conversation({ conversationId }: Props) {
             {messages?.docs.map((messageDoc, index) => {
                 const data = messageDoc.data();
                 const isNew = isNewMessage(data.timestamp, index, messages.docs.length);
-                const message = data as Message;
+                const message = data as MessageRead;
                 
                 return isAlfa ? (
                     <MessageDisplayAlfa key={messageDoc.id} message={message} isNew={isNew} />
