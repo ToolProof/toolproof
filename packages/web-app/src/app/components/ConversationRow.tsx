@@ -5,7 +5,7 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";   
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../setup/firebaseClient";
+import { db } from "shared/firebaseClient";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 

@@ -1,0 +1,8 @@
+{
+  "name": "transformer",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --loader ts-node/esm index.ts"
+  }
+}

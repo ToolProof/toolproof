@@ -5,7 +5,7 @@ import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useAlfa } from "./components/AlfaProvider";
-import { createNewConversation } from "../lib/utils";
+import { createConversationInFirestore } from "../lib/utils";
 
 
 export default function Home() {
@@ -42,7 +42,7 @@ function AlfaMode({ session }: ModeProps) {
   const router = useRouter();
 
   const handleClick = async () => {
-    const conversationId = await createNewConversation(session, "base", 1);
+    const conversationId = await createConversationInFirestore(session, "base", 1);
     if (conversationId) {
       router.push(`/conversation/${conversationId}`);
     }
@@ -89,7 +89,7 @@ function BetaMode({ session }: ModeProps) {
 
   const handleClick = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const conversationId = await createNewConversation(session, "base", 2);
+    const conversationId = await createConversationInFirestore(session, "base", 2);
     if (conversationId) {
       const invitationLink = `https://www.toolproof.com/conversation/invitee/${conversationId}`;
       await sendInvitation(input, invitationLink);

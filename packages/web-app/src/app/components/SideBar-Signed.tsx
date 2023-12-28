@@ -2,7 +2,7 @@
 import { useSession, signOut } from "next-auth/react"
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query, where, orderBy } from "firebase/firestore";
-import { db } from "../../setup/firebaseClient";
+import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
 import { useAlfa } from "./AlfaProvider";
 import { useRouter } from "next/navigation";

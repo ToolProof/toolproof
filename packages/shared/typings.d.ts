@@ -1,20 +1,32 @@
 import { Timestamp, FieldValue } from "firebase/firestore";
 
 export interface MessageWrite {
-    timestamp: FieldValue;  //ATTENTION: possibly corrupted type    
+    timestamp: FieldValue;     
     userId: string;
     content: string;
 }
 
 export interface MessageRead {
-    timestamp: Timestamp;  //ATTENTION: possibly corrupted type    
+    timestamp: Timestamp;  
     userId: string;
     content: string;
 }
 
-export interface Conversation {
-    timestamp: Timestamp | FieldValue; //ATTENTION: possibly corrupted type    
+export interface ConversationWrite {
+    timestamp: FieldValue;   
     userId: string;
+    parentId: string;
     turnState: number;
+    y: number;
     z: number;
 }
+
+export interface ConversationRead {
+    timestamp: Timestamp;    
+    userId: string;
+    parentId: string;
+    turnState: number;
+    y: number;
+    z: number;
+}
+

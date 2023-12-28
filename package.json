@@ -2,6 +2,7 @@
   "name": "typescript-repo",
   "workspaces": [
     "packages/web-app",
+    "packages/transformer",
     "packages/space-xyz",
     "packages/debate-importer"
   ],

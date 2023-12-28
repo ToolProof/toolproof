@@ -1,7 +1,7 @@
 "use client"
 import { useDocument } from "react-firebase-hooks/firestore";
 import { doc } from "firebase/firestore";
-import { db } from "../../setup/firebaseClient";
+import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
 import { usePathname } from "next/navigation";
 

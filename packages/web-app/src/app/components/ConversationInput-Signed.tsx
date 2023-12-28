@@ -8,11 +8,11 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { doc, } from "firebase/firestore";
 import { MessageWrite } from "shared/typings";
 import { useAlfa } from "./AlfaProvider";
-import { db } from "../../setup/firebaseClient";
+import { db } from "shared/firebaseClient";
 import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";
 import { gql } from "@apollo/client";
 import { client } from "../../setup/apolloClient";
-import { createNewConversation } from "../../lib/utils";
+import { createConversationInFirestore } from "../../lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import * as Constants from "../../setup/definitions/constants"
@@ -80,7 +80,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     console.log("action", data.sendPrompt.action);
                     if (data.sendPrompt.action === Constants.create_new_conversation) {
                         if (session) {
-                            const newConversationId = await createNewConversation(session, conversationId, 1);
+                            const newConversationId = await createConversationInFirestore(session, conversationId, 1);
                             if (newConversationId) {
                                 router.push(`/conversation/${newConversationId}`);
                             }

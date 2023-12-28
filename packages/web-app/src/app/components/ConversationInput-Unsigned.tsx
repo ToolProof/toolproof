@@ -5,7 +5,7 @@ import { useDocument } from "react-firebase-hooks/firestore";
 import { useSession } from "next-auth/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../../setup/firebaseClient";
+import { db } from "shared/firebaseClient";
 import { doc } from "firebase/firestore";
 import { MessageWrite } from "shared/typings";
 import { MutationSendPromptArgs, PromptResponse } from "../../setup/generated/typesClient";

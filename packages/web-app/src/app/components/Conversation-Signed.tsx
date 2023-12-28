@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { collection, query, orderBy } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { db } from "../../setup/firebaseClient";
+import { db } from "shared/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import { MessageRead } from "shared/typings";
 import { useAlfa } from "./AlfaProvider";
