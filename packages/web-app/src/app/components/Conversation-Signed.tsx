@@ -28,10 +28,19 @@ function Conversation({ conversationId }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
     useEffect(() => {
+        const observer = new MutationObserver(() => {
+            if (displayareaRef.current) {
+                displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
+            }
+        });
+    
         if (displayareaRef.current) {
-            displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
+            observer.observe(displayareaRef.current, { childList: true });
         }
-    }, [messages]); 
+    
+        return () => observer.disconnect();
+    }, []);
+     
 
     useEffect(() => {
         const handleVisibilityChange = () => {
