@@ -36,8 +36,8 @@ function MessageDisplay({ message, isNew }: Props) {
   }, [message, isNew]);
 
   return (
-    <div className={`py-5 text-black ${message.userId === "ChatGPT" ? "bg-[#fee054]" : ""}`}>
-      <div className={`flex space-x-5 px-10 max-w-2xl mx-auto ${message.userId === "foo" ? "text-right" : ""}`}>
+    <div className="py-5 text-black">
+      <div className="flex space-x-5 px-10 max-w-2xl mx-auto">
         <img src={imageSource} alt="" className="h-8 w-8"/>
         <p className="pt-1 text-sm break-words whitespace-normal max-w-full">
           {displayedText}

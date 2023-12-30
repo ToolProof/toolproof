@@ -64,7 +64,7 @@ function Conversation({ conversationId }: Props) {
     };
     
     return (
-        <div className="baseBackground flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
             {messages?.empty && (
                 <div>
                     <p className="mt-10 text-center text-black">

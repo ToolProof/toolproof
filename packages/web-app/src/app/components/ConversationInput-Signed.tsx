@@ -138,7 +138,7 @@ export default function ConversationInput({ conversationId }: Props) {
 
     const renderHelper = (criterion: boolean) => {
         return (
-            <form onSubmit={handleSubmit} className="flex flex-col justify-center relative rounded-lg bg-red-700/50 text-black text-sm mx-4 mb-4 p-5">
+            <form onSubmit={handleSubmit} className="flex flex-col justify-center relative rounded-lg bg-white text-black text-sm mx-4 mb-4 p-5 border-2 border-gray-300">
                 <textarea
                     ref={textareaRef}
                     className="bg-transparent focus:outline-none w-full disabled:cursor-not-allowed placeholder:text-gray-300 max-h-[10em] overflow-auto resize-none pr-20"

@@ -37,11 +37,11 @@ function ConversationRow({conversationId, isSigned}: Props) {
     return (
         <Link
             href={href}
-            className={`conversationRow justify-center ${active && "bg-green-100/50"} ${!active && "hover:bg-gray-700/70"}`}
+            className={`conversationRow justify-center ${active && ""} ${!active && "hover:bg-gray-700/70"}`}
         >
             <div className="flex space-x-10">
                 <ChatBubbleLeftIcon className="h-6 w-6 hover:opacity-50"/>
-                <p className="flex-1 hidden md:inline-flex truncate">
+                <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
                     {messages?.docs[0]?.data().content.slice(0, 20) + "..." || "Empty Conversation"}
                 </p>
                 <TrashIcon 
