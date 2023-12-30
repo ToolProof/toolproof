@@ -29,7 +29,7 @@ export default function Home() {
     const foo = async () => {
       console.log("session: ", session);
       console.log("isLoading: ", isLoading);
-      console.log("conversations-length: ", conversations?.docs.length);
+      console.log("conversations: ", conversations);
       if (session && !isLoading && conversations?.docs.length === 0) {
         const conversationId = await createConversationInFirestore(session, "base", 1);
         if (conversationId) {
