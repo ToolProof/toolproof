@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { collection, query, orderBy } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
@@ -18,6 +18,7 @@ type Props = {
 function Conversation({ conversationId }: Props) {
     const { data: session } = useSession();
     const { isAlfa } = useGlobalContext();
+    const displayareaRef = useRef<HTMLDivElement | null>(null);
     const [messages] = useCollection(session && (
         query(
             collection(db, "conversations", conversationId, "messages"),
@@ -25,6 +26,12 @@ function Conversation({ conversationId }: Props) {
         )
     ));
     const [componentMountTime, setComponentMountTime] = useState(new Date());
+
+    useEffect(() => {
+        if (displayareaRef.current) {
+            displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
+        }
+    }, [messages]); 
 
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -64,7 +71,7 @@ function Conversation({ conversationId }: Props) {
     };
     
     return (
-        <div className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
+        <div ref={displayareaRef} className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
             {messages?.empty && (
                 <div>
                     <p className="mt-10 text-center text-black">
