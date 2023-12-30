@@ -5,7 +5,7 @@ import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
 import { usePathname } from "next/navigation";
 
-function SideBarUnsigned() {
+function SideBar() {
     const pathName = usePathname();
     const conversationId = pathName?.split("/").pop() || ""; // Assuming the last segment is the conversationId
 
@@ -26,7 +26,7 @@ function SideBarUnsigned() {
         <div className="p-d flex flex-col h-screen">
             <div className="flex-1">
                 {conversationData && (
-                    <ConversationRow key={conversationId} conversationId={conversationId} isAccepted={conversationData.turnState !== 0} isSigned={false}/>
+                    <ConversationRow key={conversationId} conversationId={conversationId} isSigned={false}/>
                 )}
             </div>
             {/* Other UI elements as needed */}
@@ -34,4 +34,4 @@ function SideBarUnsigned() {
     );
 }
 
-export default SideBarUnsigned;
+export default SideBar;

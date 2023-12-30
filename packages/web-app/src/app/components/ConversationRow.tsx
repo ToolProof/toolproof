@@ -11,11 +11,10 @@ import { useState, useEffect } from "react";
 
 type Props = {
     conversationId: string;
-    isAccepted: boolean;
     isSigned: boolean;
 }
 
-function ConversationRow({conversationId, isAccepted, isSigned}: Props) {
+function ConversationRow({conversationId, isSigned}: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const { data: session } = useSession();
@@ -42,7 +41,7 @@ function ConversationRow({conversationId, isAccepted, isSigned}: Props) {
         >
             <div className="flex space-x-10">
                 <ChatBubbleLeftIcon className="h-6 w-6 hover:opacity-50"/>
-                <p className={`flex-1 hidden md:inline-flex truncate ${isAccepted ? "font-bold" : ""}`}>
+                <p className="flex-1 hidden md:inline-flex truncate">
                     {messages?.docs[0]?.data().content.slice(0, 20) + "..." || "Empty Conversation"}
                 </p>
                 <TrashIcon 
