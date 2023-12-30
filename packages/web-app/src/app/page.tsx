@@ -27,6 +27,8 @@ export default function Home() {
 
   useEffect(() => {
     const foo = async () => {
+      console.log("session: ", session);
+      console.log("conversations-length: ", conversations?.docs.length);
       if (session && conversations?.docs.length === 0) {
         const conversationId = await createConversationInFirestore(session, "base", 1);
         if (conversationId) {
