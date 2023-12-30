@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { collection, query, orderBy } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
@@ -27,19 +27,11 @@ function Conversation({ conversationId }: Props) {
     ));
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
-    useEffect(() => {
-        const observer = new MutationObserver(() => {
-            if (displayareaRef.current) {
-                displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
-            }
-        });
-    
+    useLayoutEffect(() => {
         if (displayareaRef.current) {
-            observer.observe(displayareaRef.current, { childList: true });
+            displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
         }
-    
-        return () => observer.disconnect();
-    }, []);
+    }, [messages]);    
      
 
     useEffect(() => {
