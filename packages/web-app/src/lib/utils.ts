@@ -16,7 +16,7 @@ export const createConversationInFirestore = async (session: Session, parentId: 
   }
 };
 
-//
+
 const createConversationWrite = (userId: string, timestamp: FieldValue, parentId: string, turnState: number, y: number, z: number) => {
   const conversation: ConversationWrite = {
     userId: userId,

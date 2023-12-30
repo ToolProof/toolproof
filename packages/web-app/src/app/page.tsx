@@ -22,14 +22,14 @@ export default function Home() {
     where("userId", "==", userEmail),
     orderBy("timestamp", "asc")
   ) : null;
-  const [conversations] = useCollection(conversationsQuery);
+  const [conversations, isLoading ] = useCollection(conversationsQuery);
 
 
   useEffect(() => {
     const foo = async () => {
       console.log("session: ", session);
       console.log("conversations-length: ", conversations?.docs.length);
-      if (session && conversations?.docs.length === 0) {
+      if (session && isLoading && conversations?.docs.length === 0) {
         const conversationId = await createConversationInFirestore(session, "base", 1);
         if (conversationId) {
           router.push(`/conversation/${conversationId}`);
@@ -37,7 +37,7 @@ export default function Home() {
       }
     }
     foo();
-  }, [session, router, conversations]);
+  }, [session, router, isLoading, conversations]);
 
   return (
     <div className="baseBackground flex flex-col items-center justify-center h-screen">
