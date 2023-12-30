@@ -5,7 +5,6 @@ import { ConversationWrite } from "shared/typings";
 
 
 export const createConversationInFirestore = async (session: Session, parentId: string, y: number) => {
-  console.log("createConversationInFirestore");
   try {
     const conversation = createConversationWrite(session?.user?.email || "", serverTimestamp(), parentId, 0, y, -1);
     const docRef = await addDoc(collection(db, "conversations"), conversation);

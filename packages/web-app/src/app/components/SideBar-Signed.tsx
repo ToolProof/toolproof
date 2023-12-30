@@ -17,7 +17,8 @@ function SideBar() {
     ) : null;    
 
     const [conversations, isLoading] = useCollection(conversationsQuery);
-   
+    console.log("isLoading: ", isLoading); // Debug line
+    console.log("conversations: ", conversations); // Debug line
     return (
         <div className="p-d flex flex-col h-screen">
             <div className="flex-1">
