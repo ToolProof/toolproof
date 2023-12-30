@@ -30,7 +30,7 @@ export default function Home() {
       console.log("session: ", session);
       console.log("isLoading: ", isLoading);
       console.log("conversations: ", conversations);
-      if (session && !isLoading && conversations?.docs.length === 0) {
+      if (session && !isLoading) {
         const conversationId = await createConversationInFirestore(session, "base", 1);
         if (conversationId) {
           router.push(`/conversation/${conversationId}`);
