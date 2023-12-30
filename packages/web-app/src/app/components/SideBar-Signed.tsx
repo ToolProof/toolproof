@@ -4,13 +4,13 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
-import { useAlfa } from "./AlfaProvider";
+import { useGlobalContext } from "./GlobalContextProvider";
 import { useRouter } from "next/navigation";
 
 function SideBar() {
     const { data: session } = useSession()
     const router = useRouter();
-    const { isAlfa, setIsAlfa } = useAlfa();   
+    const { isAlfa, setIsAlfa } = useGlobalContext();   
 
     const userEmail = session?.user?.email;
 

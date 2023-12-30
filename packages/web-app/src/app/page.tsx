@@ -4,13 +4,13 @@ import { useState } from "react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useAlfa } from "./components/AlfaProvider";
+import { useGlobalContext } from "./components/GlobalContextProvider";
 import { createConversationInFirestore } from "../lib/utils";
 
 
 export default function Home() {
   const { data: session } = useSession();
-  const { isAlfa } = useAlfa();
+  const { isAlfa } = useGlobalContext();
 
   return (
     <div className="baseBackground flex flex-col items-center justify-center h-screen">

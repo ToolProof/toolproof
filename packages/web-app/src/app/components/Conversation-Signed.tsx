@@ -6,7 +6,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "shared/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import { MessageRead } from "shared/typings";
-import { useAlfa } from "./AlfaProvider";
+import { useGlobalContext } from "./GlobalContextProvider";
 import MessageDisplayAlfa from "./MessageDisplay-Alfa";
 import MessageDisplayBeta from "./MessageDisplay-Beta";
 
@@ -17,7 +17,7 @@ type Props = {
 
 function Conversation({ conversationId }: Props) {
     const { data: session } = useSession();
-    const { isAlfa } = useAlfa();
+    const { isAlfa } = useGlobalContext();
     const [messages] = useCollection(session && (
         query(
             collection(db, "conversations", conversationId, "messages"),

@@ -1,2 +1,2 @@
+import dbAdmin from "shared/firebaseAdmin";
 
-console.log("Hello from the transformer package!");

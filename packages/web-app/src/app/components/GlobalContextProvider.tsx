@@ -1,28 +1,28 @@
 "use client";
 import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 
-interface AlfaContextType {
+interface GlobalContextType {
     isAlfa: boolean;
     setIsAlfa: Dispatch<SetStateAction<boolean>>;
 }
 
-const AlfaContext = createContext<AlfaContextType>({
+const GlobalContext = createContext<GlobalContextType>({
     isAlfa: true, // Default value for isAlfa
     setIsAlfa: (value: boolean | ((prevState: boolean) => boolean)) => {
         console.log("value: ", value);
     }, // Default value for setIsAlfa
 });
 
-export const useAlfa = () => useContext(AlfaContext);
+export const useGlobalContext = () => useContext(GlobalContext);
 
-export const AlfaProvider = ({ children }: {
+export const GlobalContextProvider = ({ children }: {
     children: React.ReactNode
 }) => {
-    const [isAlfa, setIsAlfa] = useState(true);
+    const [isAlfaLocal, setIsAlfaLocal] = useState(true);
 
     return (
-        <AlfaContext.Provider value={{ isAlfa, setIsAlfa }}>
+        <GlobalContext.Provider value={{ isAlfa: isAlfaLocal, setIsAlfa: setIsAlfaLocal }}>
             {children}
-        </AlfaContext.Provider>
+        </GlobalContext.Provider>
     );
 };
