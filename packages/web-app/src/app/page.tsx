@@ -29,6 +29,10 @@ export default function Home() {
           if (conversationId) {
             router.push(`/conversation/${conversationId}`);
           }
+        } else {
+          // Conversation exists, redirect to the existing conversation
+          const existingConversationId = querySnapshot.docs[0].id;
+          router.push(`/conversation/${existingConversationId}`);
         }
       }
     };
