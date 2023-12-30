@@ -28,10 +28,15 @@ function Conversation({ conversationId }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
     useLayoutEffect(() => {
-        if (displayareaRef.current) {
-            displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
-        }
-    }, [messages]);    
+        const timer = setTimeout(() => {
+            if (displayareaRef.current) {
+                displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
+            }
+        }, 500); // Adjust the timeout as needed for testing
+    
+        return () => clearTimeout(timer);
+    }, [messages]);
+      
      
 
     useEffect(() => {
