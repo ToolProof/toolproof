@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { collection, query, orderBy } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
@@ -18,7 +18,7 @@ type Props = {
 function Conversation({ conversationId }: Props) {
     const { data: session } = useSession();
     const { isAlfa } = useGlobalContext();
-    const displayareaRef = useRef<HTMLDivElement | null>(null);
+    const lastMessageRef = useRef<HTMLDivElement | null>(null);
     const [messages] = useCollection(session && (
         query(
             collection(db, "conversations", conversationId, "messages"),
@@ -27,16 +27,12 @@ function Conversation({ conversationId }: Props) {
     ));
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
-    useLayoutEffect(() => {
-        const timer = setTimeout(() => {
-            if (displayareaRef.current) {
-                displayareaRef.current.scrollTop = displayareaRef.current.scrollHeight;
-            }
-        }, 500); // Adjust the timeout as needed for testing
+    useEffect(() => {
+        if (lastMessageRef.current) {
+            lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, []); // Dependency on the current property of the ref
     
-        return () => clearTimeout(timer);
-    }, [messages]);
-      
      
 
     useEffect(() => {
@@ -77,7 +73,7 @@ function Conversation({ conversationId }: Props) {
     };
     
     return (
-        <div ref={displayareaRef} className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
             {messages?.empty && (
                 <div>
                     <p className="mt-10 text-center text-black">
@@ -90,12 +86,18 @@ function Conversation({ conversationId }: Props) {
                 const data = messageDoc.data();
                 const isNew = isNewMessage(data.timestamp, index, messages.docs.length);
                 const message = data as MessageRead;
-                
-                return isAlfa ? (
+
+                const messageComponent = isAlfa ? (
                     <MessageDisplayAlfa key={messageDoc.id} message={message} isNew={isNew} />
                 ) : (
                     <MessageDisplayBeta key={messageDoc.id} message={message} isNew={isNew} />
                 );
+
+                if (index === messages.docs.length - 1) {
+                    return <div ref={lastMessageRef} key={messageDoc.id}>{messageComponent}</div>;
+                } else {
+                    return messageComponent;
+                }
             })}
         </div>
     );
