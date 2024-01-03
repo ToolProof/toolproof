@@ -19,7 +19,7 @@ function Conversation({ conversationId }: Props) {
     const { data: session } = useSession();
     const { isAlfa } = useGlobalContext();
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
-    const [messages] = useCollection(session && (
+    const [messages] = useCollection(session && ( //ATTENTION_
         query(
             collection(db, "conversations", conversationId, "messages"),
             orderBy("timestamp", "asc"),
@@ -31,9 +31,7 @@ function Conversation({ conversationId }: Props) {
         if (lastMessageRef.current) {
             lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, []); // Dependency on the current property of the ref
-    
-     
+    }, []); 
 
     useEffect(() => {
         const handleVisibilityChange = () => {

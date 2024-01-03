@@ -40,7 +40,7 @@ export default function ConversationInput({ conversationId }: Props) {
                 userId: "René",
                 content: content,
             };
-            await addDoc(collection(db, "conversations", conversationId, "messages"), message);
+            await addDoc(collection(db, "conversations", conversationId, "messages"), message); //ATTENTION_
         } catch (error) {
             console.error("Error:", error);
             toast.error("An error occurred while sending the message.");

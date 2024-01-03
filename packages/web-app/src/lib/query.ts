@@ -74,7 +74,7 @@ const query = async (prompt: string, user: string, conversationId: string, isAlf
     // Check if a new conversation has started or the existing one continues
     if (currentConversationId !== conversationId) {
       /*
-      const messagesSnapshot = await dbAdmin
+      const messagesSnapshot = await dbAdmin //ATTENTION_
         .collection("conversations")
         .doc(conversationId)
         .collection("messages")

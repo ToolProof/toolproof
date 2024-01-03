@@ -72,7 +72,7 @@ function ConversationInput({conversationId}: Props) {
                 userId: session?.user?.name || "Peter",
                 content,
             };
-            await addDoc(collection(db, "conversations", conversationId, "messages"), message);
+            await addDoc(collection(db, "conversations", conversationId, "messages"), message); //ATTENTION_
 
             // Execute the GraphQL mutation
             const { data } = await client.mutate<PromptResponse>({

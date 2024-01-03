@@ -1,7 +1,7 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, query, where, orderBy } from "firebase/firestore";
+import { query, collection, where, orderBy } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
 
@@ -16,7 +16,7 @@ function SideBar() {
         orderBy("timestamp", "asc")
     ) : null;    
 
-    const [conversations, isLoading] = useCollection(conversationsQuery);
+    const [conversations, isLoading] = useCollection(conversationsQuery); //ATTENTION_
     console.log("isLoading: ", isLoading); // Debug line
     console.log("conversations: ", conversations); // Debug line
     return (

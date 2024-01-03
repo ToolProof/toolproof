@@ -12,7 +12,7 @@ type Props = {
 }
 
 function Conversation({conversationId}: Props) {
-    const [ messages ] = useCollection(query(
+    const [ messages ] = useCollection(query( //ATTENTION_
         collection(db, "conversations", conversationId, "messages"),
         orderBy("timestamp", "asc"),
     ))

@@ -12,7 +12,7 @@ import path from "path";
 const updateTurnState = async (conversationId: string, code: number) => {
   try {
     const conversationRef = dbAdmin.collection("conversations").doc(conversationId);
-    await conversationRef.update({
+    await conversationRef.update({ //ATTENTION_
       turnState: code
     });
   } catch (error) {
@@ -28,7 +28,7 @@ async function sendMessage(content: string, conversationId: string) {
     content: content || "ChatGPT was unable to respond!",
   };
 
-  await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message);
+  await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
 }
 
 const sendPromptResolver: MutationResolvers["sendPrompt"] = async (_, { conversationId, prompt, user, isAlfa }) => {
