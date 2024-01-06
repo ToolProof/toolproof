@@ -1,14 +1,16 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
-import { useCollection } from "react-firebase-hooks/firestore";
+/* import { useCollection } from "react-firebase-hooks/firestore";
 import { query, collection, where, orderBy } from "firebase/firestore";
-import { db } from "shared/firebaseClient";
+import { db } from "shared/firebaseClient"; */
 import ConversationRow from "./ConversationRow";
+import { useFetchConversationsQuery } from "@/services/conversationsApi";
 
 function SideBar() {
-    const { data: session } = useSession();   
+    const { data: session } = useSession(); 
+    const { data: conversations, isLoading } = useFetchConversationsQuery(session?.user?.email || "", { skip: !session?.user?.email });  
 
-    const userEmail = session?.user?.email;
+    /* const userEmail = session?.user?.email;
 
     const conversationsQuery = userEmail ? query(
         collection(db, "conversations"),
@@ -18,7 +20,7 @@ function SideBar() {
 
     const [conversations, isLoading] = useCollection(conversationsQuery); //ATTENTION_
     console.log("isLoading: ", isLoading); // Debug line
-    console.log("conversations: ", conversations); // Debug line
+    console.log("conversations: ", conversations); // Debug line */
     return (
         <div className="p-d flex flex-col h-screen">
             <div className="flex-1">
