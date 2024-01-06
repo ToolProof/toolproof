@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import { SessionProvider } from "./components/SessionProvider"
 import ClientProvider from "./components/ClientProvider"
-import { GlobalContextProvider } from "./components/GlobalContextProvider"
+
 
 export const metadata: Metadata = {
   title: Constants.TITLE,
@@ -25,23 +25,23 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider session={session}> {/*ATTENTION: how come we have access to useContext on the server?*/}
-          <GlobalContextProvider>
-            <div className="flex">
-              <div className="bg-[#202123] max-w-xs h-screen overflow-y-auto md:min-w-[20rem]">
-                {
-                  session ? (
-                    <SideBarSigned />
-                  ) : (
-                    <SideBarUnsigned />
-                  )
-                }
-              </div>
-              <ClientProvider />
-              <div className="bg-[#343531] flex-1">
-                {children}
-              </div>
+
+          <div className="flex">
+            <div className="bg-[#202123] max-w-xs h-screen overflow-y-auto md:min-w-[20rem]">
+              {
+                session ? (
+                  <SideBarSigned />
+                ) : (
+                  <SideBarUnsigned />
+                )
+              }
             </div>
-          </GlobalContextProvider>
+            <ClientProvider />
+            <div className="bg-[#343531] flex-1">
+              {children}
+            </div>
+          </div>
+
         </SessionProvider>
       </body>
     </html>

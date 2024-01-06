@@ -1,4 +1,4 @@
-"use client";
+/* "use client"; //ATTENTION: Won't this cause the whole tree to be rendered on the client?
 import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 
 interface GlobalContextType {
@@ -25,4 +25,4 @@ export const GlobalContextProvider = ({ children }: {
             {children}
         </GlobalContext.Provider>
     );
-};
+}; */
