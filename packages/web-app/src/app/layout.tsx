@@ -7,7 +7,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import { SessionProvider } from "./components/SessionProvider"
 import ClientProvider from "./components/ClientProvider"
-
+import { Provider } from "react-redux";
+import { store } from "../store"
 
 export const metadata: Metadata = {
   title: Constants.TITLE,
@@ -25,23 +26,23 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider session={session}> {/*ATTENTION: how come we have access to useContext on the server?*/}
-
-          <div className="flex">
-            <div className="bg-[#202123] max-w-xs h-screen overflow-y-auto md:min-w-[20rem]">
-              {
-                session ? (
-                  <SideBarSigned />
-                ) : (
-                  <SideBarUnsigned />
-                )
-              }
+          <Provider store={store}>
+            <div className="flex">
+              <div className="bg-[#202123] max-w-xs h-screen overflow-y-auto md:min-w-[20rem]">
+                {
+                  session ? (
+                    <SideBarSigned />
+                  ) : (
+                    <SideBarUnsigned />
+                  )
+                }
+              </div>
+              <ClientProvider />
+              <div className="bg-[#343531] flex-1">
+                {children}
+              </div>
             </div>
-            <ClientProvider />
-            <div className="bg-[#343531] flex-1">
-              {children}
-            </div>
-          </div>
-
+          </Provider>
         </SessionProvider>
       </body>
     </html>
