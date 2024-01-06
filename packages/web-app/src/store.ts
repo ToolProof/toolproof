@@ -1,3 +1,4 @@
+"use client";
 import { configureStore } from "@reduxjs/toolkit";
 import { conversationsApi } from "./services/conversationsApi";
 import { setupListeners } from "@reduxjs/toolkit/query";
