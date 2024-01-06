@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react"
 import { query, collection, where, orderBy } from "firebase/firestore";
 import { db } from "shared/firebaseClient"; */
 import ConversationRow from "./ConversationRow";
-import { useFetchConversationsQuery } from "@/services/conversationsApi";
+import { useFetchConversationsQuery } from "@/redux/features/conversationsApi";
 
 function SideBar() {
     const { data: session } = useSession(); 
