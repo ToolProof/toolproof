@@ -7,7 +7,7 @@ import { StopIcon } from "@heroicons/react/24/solid";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { doc, } from "firebase/firestore";
 import { MessageWrite } from "shared/typings";
-import { useGlobalContext } from "./GlobalContextProvider";
+//import { useGlobalContext } from "./GlobalContextProvider";
 import { db } from "shared/firebaseClient";
 import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";
 import { gql } from "@apollo/client";
@@ -22,7 +22,7 @@ type Props = {
 };
 
 export default function ConversationInput({ conversationId }: Props) {
-    const { isAlfa } = useGlobalContext();
+    const isAlfa = true;
     const [input, setInput] = useState("");
     const conversationRef = doc(db, "conversations", conversationId);
     const [conversationSnapshot] = useDocument(conversationRef);
