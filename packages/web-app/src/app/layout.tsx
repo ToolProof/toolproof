@@ -1,8 +1,7 @@
 import "../setup/definitions/globals.css"
 import * as Constants from "../setup/definitions/constants"
 import type { Metadata } from "next"
-import SideBarSigned from "./components/SideBar"
-import SideBarUnsigned from "./components/SideBar-Unsigned"
+import SideBar from "./components/SideBar"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import { SessionProvider } from "./components/SessionProvider"
@@ -28,13 +27,7 @@ export default async function RootLayout({
           <StoreProvider>
             <div className="flex">
               <div className="bg-[#202123] max-w-xs h-screen overflow-y-auto md:min-w-[20rem]">
-                {
-                  session ? (
-                    <SideBarSigned />
-                  ) : (
-                    <SideBarUnsigned />
-                  )
-                }
+                <SideBar />
               </div>
               <ClientProvider />
               <div className="bg-[#343531] flex-1">
