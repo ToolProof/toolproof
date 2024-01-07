@@ -4,10 +4,9 @@ import { toast } from "react-hot-toast";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+//import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { doc, } from "firebase/firestore";
-import { MessageWrite } from "shared/typings";
-//import { useGlobalContext } from "./GlobalContextProvider";
+//import { MessageWrite } from "shared/typings";
 import { db } from "shared/firebaseClient";
 import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";
 import { gql } from "@apollo/client";
@@ -16,6 +15,7 @@ import { createConversationInFirestore } from "../../lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import * as Constants from "../../setup/definitions/constants"
+import { useAddMessageMutation } from "@/redux/features/conversationsApi";
 
 type Props = {
     conversationId: string;
@@ -30,17 +30,19 @@ export default function ConversationInput({ conversationId }: Props) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     const router = useRouter();
+    const [ addMessage ] = useAddMessageMutation();
 
 
     async function sendMessage(content: string) {
         try {
             // Adding the message to Firestore
-            const message: MessageWrite = {
+            /* const message: MessageWrite = {
                 timestamp: serverTimestamp(),
                 userId: "René",
                 content: content,
             };
-            await addDoc(collection(db, "conversations", conversationId, "messages"), message); //ATTENTION_
+            await addDoc(collection(db, "conversations", conversationId, "messages"), message); //ATTENTION_ */
+            await addMessage({conversationId, message: {userId: "René", content: content}});
         } catch (error) {
             console.error("Error:", error);
             toast.error("An error occurred while sending the message.");

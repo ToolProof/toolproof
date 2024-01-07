@@ -1,11 +1,6 @@
 "use client"
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  //addDoc,
-  collection,
-  getDocs,
-//   serverTimestamp,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs, serverTimestamp,} from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 //import { ConversationRead } from "shared/typings";
 //import { DocumentData } from "firebase/firestore";
@@ -14,7 +9,7 @@ import { db } from "shared/firebaseClient";
 export const conversationsApi = createApi({
   reducerPath: "conversationsApi",
   baseQuery: fakeBaseQuery(),
-  //tagTypes: ["Blog"],
+  //tagTypes: ["Conversation"],
   endpoints: (builder) => ({
     fetchConversations: builder.query({
       async queryFn() {
@@ -32,26 +27,41 @@ export const conversationsApi = createApi({
       },
       //providesTags: ["Conversation"],
     }),
-    /* addBlog: builder.mutation({
-      async queryFn(data) {
+    addConversation: builder.mutation({
+      async queryFn(conversation) {
         try {
-          await addDoc(collection(db, "blogs"), {
-            ...data,
+          await addDoc(collection(db, "conversations"), {
+            ...conversation,
             timestamp: serverTimestamp(),
           });
           return { data: "ok" };
         } catch (err) {
           return { error: err };
         }
-      }, 
+      },
       //invalidatesTags: ["Conversation"],
     }),
-    */
-    
+    addMessage: builder.mutation({
+      async queryFn(conversationId, message) {
+        try {
+          await addDoc(collection(db, "conversations", conversationId, "messages"), {
+            ...message,
+            timestamp: serverTimestamp(),
+          });
+          return { data: "ok" };
+        } catch (err) {
+          return { error: err };
+        }
+      },
+      //invalidatesTags: ["Conversation"],
+    }),
+
+
   }),
 });
 
 export const {
   useFetchConversationsQuery,
-//   useAddBlogMutation,
+  useAddConversationMutation,
+  useAddMessageMutation,
 } = conversationsApi;
