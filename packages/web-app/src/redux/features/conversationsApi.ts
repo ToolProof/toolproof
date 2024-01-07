@@ -1,6 +1,6 @@
 "use client"
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { addDoc, collection, getDocs, serverTimestamp,} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp,} from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 //import { ConversationRead } from "shared/typings";
 //import { DocumentData } from "firebase/firestore";
@@ -11,22 +11,6 @@ export const conversationsApi = createApi({
   baseQuery: fakeBaseQuery(),
   //tagTypes: ["Conversation"],
   endpoints: (builder) => ({
-    fetchConversations: builder.query({
-      async queryFn() {
-        try {
-          const conversationsRef = collection(db, "conversations");
-          const querySnapshot = await getDocs(conversationsRef);
-          /* const conversations: QueryDocumentSnapshot<DocumentData, DocumentData>[] = [];
-          querySnapshot?.forEach((doc) => {
-            conversations.push(doc);
-          }); */
-          return { data: querySnapshot };
-        } catch (err) {
-          return { error: err };
-        }
-      },
-      //providesTags: ["Conversation"],
-    }),
     addConversation: builder.mutation({
       async queryFn(conversation) {
         try {
@@ -42,7 +26,7 @@ export const conversationsApi = createApi({
       //invalidatesTags: ["Conversation"],
     }),
     addMessage: builder.mutation({
-      async queryFn(conversationId, message) {
+      async queryFn({conversationId, message}) {
         try {
           await addDoc(collection(db, "conversations", conversationId, "messages"), {
             ...message,
@@ -61,7 +45,6 @@ export const conversationsApi = createApi({
 });
 
 export const {
-  useFetchConversationsQuery,
   useAddConversationMutation,
   useAddMessageMutation,
 } = conversationsApi;
