@@ -1,43 +1,36 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
-//import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, onSnapshot} from "firebase/firestore";
+import { query, collection, onSnapshot, where, orderBy } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
 import { useEffect } from "react";
-import { updateConversations } from "@/redux/features/conversationsSlice";
+import { updateConversations } from "@/redux/features/mainSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useAppSelector } from "@/redux/hooks";
 
 function SideBar() {
-    const { data: session } = useSession(); 
+    const { data: session } = useSession();
     const dispatch = useAppDispatch();
-    // Using useSelector for data managed by traditional Redux slices
     const conversations = useAppSelector((state) => state.conversations.conversations);
     const isLoading = false; // TODO: Implement loading state
 
-    /* const userEmail = session?.user?.email;
-
-    const conversationsQuery = userEmail ? query(
-        collection(db, "conversations"),
-        where("userId", "==", userEmail),
-        orderBy("timestamp", "asc")
-    ) : null;    
-
-    const [conversations, isLoading] = useCollection(conversationsQuery); //ATTENTION_
-    console.log("isLoading: ", isLoading); // Debug line
-    console.log("conversations: ", conversations); // Debug line */
+    const userEmail = session?.user?.email;
 
     useEffect(() => {
-        if (session?.user?.email) {
-          const unsubscribe = onSnapshot(collection(db, "conversations"), (snapshot) => {
-            //const updatedData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            dispatch(updateConversations(snapshot));
-          });
-    
-          return () => unsubscribe();
+        if (userEmail) {
+            const conversationsQuery = query(
+                collection(db, "conversations"),
+                where("userId", "==", userEmail),
+                orderBy("timestamp", "asc")
+            );
+            const unsubscribe = onSnapshot(conversationsQuery, (snapshot) => { //ATTENTION_
+                //const updatedData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                dispatch(updateConversations(snapshot));
+            });
+
+            return () => unsubscribe();
         }
-      }, [session?.user?.email, dispatch]);
+    }, [userEmail, dispatch]);
 
 
     return (
@@ -50,7 +43,7 @@ function SideBar() {
                         }
                         {/* Map through the conversation rows */}
                         {conversations?.docs.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversationId={conversation.id} isSigned={true} /> 
+                            return <ConversationRow key={conversation.id} conversationId={conversation.id} isSigned={true} />
                         })}
                     </div>
                 </div>

@@ -15,7 +15,7 @@ import { createConversationInFirestore } from "../../lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import * as Constants from "../../setup/definitions/constants"
-import { useAddMessageMutation } from "@/redux/features/conversationsApi";
+import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 
 type Props = {
     conversationId: string;

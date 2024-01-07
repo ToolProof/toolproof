@@ -6,10 +6,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "shared/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import { MessageRead } from "shared/typings";
-//import { useGlobalContext } from "./GlobalContextProvider";
-import MessageDisplayAlfa from "./MessageDisplay-Alfa";
-import MessageDisplayBeta from "./MessageDisplay-Beta";
-
+import MessageDisplay from "./MessageDisplay";
 
 type Props = {
     conversationId: string;
@@ -17,7 +14,6 @@ type Props = {
 
 function Conversation({ conversationId }: Props) {
     const { data: session } = useSession();
-    const isAlfa = true;
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
     const [messages] = useCollection(session && ( //ATTENTION_
         query(
@@ -85,11 +81,7 @@ function Conversation({ conversationId }: Props) {
                 const isNew = isNewMessage(data.timestamp, index, messages.docs.length);
                 const message = data as MessageRead;
 
-                const messageComponent = isAlfa ? (
-                    <MessageDisplayAlfa key={messageDoc.id} message={message} isNew={isNew} />
-                ) : (
-                    <MessageDisplayBeta key={messageDoc.id} message={message} isNew={isNew} />
-                );
+                const messageComponent = <MessageDisplay key={messageDoc.id} message={message} isNew={isNew} />
 
                 if (index === messages.docs.length - 1) {
                     return <div ref={lastMessageRef} key={messageDoc.id}>{messageComponent}</div>;

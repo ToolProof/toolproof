@@ -1,7 +1,7 @@
 import "../setup/definitions/globals.css"
 import * as Constants from "../setup/definitions/constants"
 import type { Metadata } from "next"
-import SideBarSigned from "./components/SideBar-Signed"
+import SideBarSigned from "./components/SideBar"
 import SideBarUnsigned from "./components/SideBar-Unsigned"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/pages/api/auth/[...nextauth]"

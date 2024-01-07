@@ -1,6 +1,6 @@
 "use client";
-import Conversation from "../../components/Conversation-Signed";
-import ConversationInput from "../../components/ConversationInput-Signed";
+import Conversation from "../../components/Conversation";
+import ConversationInput from "../../components/ConversationInput";
 
 type Props = {
     params: {

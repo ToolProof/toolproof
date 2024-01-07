@@ -6,8 +6,8 @@ import { db } from "shared/firebaseClient";
 //import { DocumentData } from "firebase/firestore";
 //import { QueryDocumentSnapshot } from "firebase/firestore";
 
-export const conversationsApi = createApi({
-  reducerPath: "conversationsApi",
+export const rtkQuerySlice = createApi({
+  reducerPath: "rtkQuerySlice",
   baseQuery: fakeBaseQuery(),
   //tagTypes: ["Conversation"],
   endpoints: (builder) => ({
@@ -47,4 +47,4 @@ export const conversationsApi = createApi({
 export const {
   useAddConversationMutation,
   useAddMessageMutation,
-} = conversationsApi;
+} = rtkQuerySlice;

@@ -10,7 +10,7 @@ const initialState: ConversationsState = {
   conversations: null,
 };
 
-const conversationsSlice = createSlice({
+const mainSlice = createSlice({
   name: "conversations",
   initialState,
   reducers: {
@@ -21,5 +21,5 @@ const conversationsSlice = createSlice({
   },
 });
 
-export const { updateConversations } = conversationsSlice.actions;
-export default conversationsSlice.reducer;
+export const { updateConversations } = mainSlice.actions;
+export default mainSlice.reducer;
