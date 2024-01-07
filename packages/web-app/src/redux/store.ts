@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit"
 import { conversationsApi } from "./features/conversationsApi"
+import conversationsReducer from "./features/conversationsSlice"
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       [conversationsApi.reducerPath]: conversationsApi.reducer,
+      conversations: conversationsReducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

@@ -1,14 +1,20 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
-/* import { useCollection } from "react-firebase-hooks/firestore";
-import { query, collection, where, orderBy } from "firebase/firestore";
-import { db } from "shared/firebaseClient"; */
+//import { useCollection } from "react-firebase-hooks/firestore";
+import { collection, onSnapshot} from "firebase/firestore";
+import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
-import { useFetchConversationsQuery } from "@/redux/features/conversationsApi";
+import { useEffect } from "react";
+import { updateConversations } from "@/redux/features/conversationsSlice";
+import { useAppDispatch } from "@/redux/hooks";
+import { useAppSelector } from "@/redux/hooks";
 
 function SideBar() {
     const { data: session } = useSession(); 
-    const { data: conversations, isLoading } = useFetchConversationsQuery(session?.user?.email || "", { skip: !session?.user?.email });  
+    const dispatch = useAppDispatch();
+    // Using useSelector for data managed by traditional Redux slices
+    const conversations = useAppSelector((state) => state.conversations.conversations);
+    const isLoading = false; // TODO: Implement loading state
 
     /* const userEmail = session?.user?.email;
 
@@ -21,6 +27,19 @@ function SideBar() {
     const [conversations, isLoading] = useCollection(conversationsQuery); //ATTENTION_
     console.log("isLoading: ", isLoading); // Debug line
     console.log("conversations: ", conversations); // Debug line */
+
+    useEffect(() => {
+        if (session?.user?.email) {
+          const unsubscribe = onSnapshot(collection(db, "conversations"), (snapshot) => {
+            //const updatedData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            dispatch(updateConversations(snapshot));
+          });
+    
+          return () => unsubscribe();
+        }
+      }, [session?.user?.email, dispatch]);
+
+
     return (
         <div className="p-d flex flex-col h-screen">
             <div className="flex-1">
