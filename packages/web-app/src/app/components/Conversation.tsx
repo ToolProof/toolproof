@@ -1,50 +1,40 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { collection, query, orderBy } from "firebase/firestore";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { db } from "shared/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import { Message } from "shared/typings";
 import MessageDisplay from "./MessageDisplay";
+import { useAppSelector } from "@/redux/hooks";
 
 type Props = {
     conversationId: string;
 }
 
 function Conversation({ conversationId }: Props) {
-    const { data: session } = useSession();
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
-    const [messages] = useCollection(session && ( //ATTENTION_
-        query(
-            collection(db, "conversations", conversationId, "messages"),
-            orderBy("timestamp", "asc"),
-        )
-    ));
+    const messages = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId)?.messages);
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
     useEffect(() => {
         if (lastMessageRef.current) {
             lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, []); 
+    }, []);
 
     useEffect(() => {
         const handleVisibilityChange = () => {
-          if (document.visibilityState === "visible") {
-            setComponentMountTime(new Date());
-          }
+            if (document.visibilityState === "visible") {
+                setComponentMountTime(new Date());
+            }
         };
-      
+
         // Add event listener
         document.addEventListener("visibilitychange", handleVisibilityChange);
-      
+
         // Cleanup
         return () => {
-          document.removeEventListener("visibilitychange", handleVisibilityChange);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
-      }, []); // Empty dependency array ensures this runs only once on mount
-      
+    }, []); // Empty dependency array ensures this runs only once on mount
+
 
     function isNewMessage(messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) {
 
@@ -57,18 +47,18 @@ function Conversation({ conversationId }: Props) {
             // Handle the case where timestamp is null or not a Firestore Timestamp
             return false;
         }
-    
+
         const messageCreationTime = messageTimestamp.toDate();
         const currentTime = new Date();
         const timeSinceMessageCreation = (currentTime.getTime() - messageCreationTime.getTime()) / 1000;
         const timeBetweenMessageCreationAndComponentMount = (componentMountTime.getTime() - messageCreationTime.getTime()) / 1000;
-       
-        return timeBetweenMessageCreationAndComponentMount < 0 && timeSinceMessageCreation < 30; 
+
+        return timeBetweenMessageCreationAndComponentMount < 0 && timeSinceMessageCreation < 30;
     };
-    
+
     return (
         <div className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
-            {messages?.empty && (
+            {messages && messages.length === 0 && (
                 <div>
                     <p className="mt-10 text-center text-black">
                         Type a prompt to start a conversation!
@@ -76,21 +66,20 @@ function Conversation({ conversationId }: Props) {
                     <ArrowDownCircleIcon className="h-10 w-10 mx-auto mt-5 text-black animate-bounce" />
                 </div>
             )}
-            {messages?.docs.map((messageDoc, index) => {
-                const data = messageDoc.data();
-                const isNew = isNewMessage(data.timestamp, index, messages.docs.length);
-                const message = data as Message;
+            {messages?.map((message, index) => {
+                const isNew = isNewMessage(message.timestamp, index, messages.length);
 
-                const messageComponent = <MessageDisplay key={messageDoc.id} message={message} isNew={isNew} />
+                const messageComponent = <MessageDisplay key={message.id} message={message} isNew={isNew} />
 
-                if (index === messages.docs.length - 1) {
-                    return <div ref={lastMessageRef} key={messageDoc.id}>{messageComponent}</div>;
+                if (index === messages.length - 1) {
+                    return <div ref={lastMessageRef} key={message.id}>{messageComponent}</div>;
                 } else {
                     return messageComponent;
                 }
             })}
         </div>
     );
+
 }
 
 export default Conversation;

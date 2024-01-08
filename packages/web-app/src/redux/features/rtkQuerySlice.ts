@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { addDoc, collection, serverTimestamp,} from "firebase/firestore";
+import { addDoc, deleteDoc, doc, collection, serverTimestamp, } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 
 export const rtkQuerySlice = createApi({
@@ -19,9 +19,9 @@ export const rtkQuerySlice = createApi({
           return { error: err };
         }
       },
-    }),    
+    }),
     addMessage: builder.mutation({
-      async queryFn({conversationId, message}) {
+      async queryFn({ conversationId, message }) {
         try {
           await addDoc(collection(db, "conversations", conversationId, "messages"), {
             ...message,
@@ -34,12 +34,21 @@ export const rtkQuerySlice = createApi({
       },
       //invalidatesTags: ["Conversation"],
     }),
-
-
+    deleteConversation: builder.mutation({
+      async queryFn(conversationId) {
+        try {
+          await deleteDoc(doc(db, "conversations", conversationId));
+          return { data: "ok" }; // Indicate successful deletion
+        } catch (err) {
+          return { error: err };
+        }
+      },
+    }),
   }),
 });
 
 export const {
   useAddConversationMutation,
   useAddMessageMutation,
+  useDeleteConversationMutation,
 } = rtkQuerySlice;

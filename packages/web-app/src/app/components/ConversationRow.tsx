@@ -3,12 +3,10 @@ import Link from "next/link";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, deleteDoc, doc } from "firebase/firestore";
-import { db } from "shared/firebaseClient";
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { Conversation } from "shared/typings";
+import { useAppSelector } from "@/redux/hooks";
+import { useDeleteConversationMutation } from "@/redux/features/rtkQuerySlice";
 
 type Props = {
     conversation: Conversation;
@@ -17,22 +15,27 @@ type Props = {
 function ConversationRow({ conversation }: Props) {
     const pathName = usePathname();
     const router = useRouter();
-    const { data: session } = useSession();
     const [active, setActive] = useState(false);
     const href = `/conversation/${conversation.id}`;
-    const [messages] = useCollection( //ATTENTION_
-        session && collection(db, "conversations", conversation.id, "messages") 
-    )
+    const messages = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversation.id)?.messages);
+    const [deleteConversation] = useDeleteConversationMutation();
 
     useEffect(() => {
         if (!pathName) return;
         setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
     }, [pathName, conversation.id]);
 
-    const deleteConversation = async () => {
-        await deleteDoc(doc(db, "conversations", conversation.id)) //ATTENTION_
-        router.replace("/");
-    }
+    const handleDeleteConversation = async () => {
+        try {
+            if (conversation.parentId !== "base") {
+                // Delete the conversation
+                await deleteConversation(conversation.id).unwrap();
+                router.replace("/"); // Redirect after deletion
+            }
+        } catch (err) {
+            console.error("Failed to delete conversation", err);
+        }
+    };
 
     return (
         <Link
@@ -42,10 +45,12 @@ function ConversationRow({ conversation }: Props) {
             <div className="flex space-x-10">
                 <ChatBubbleLeftIcon className="h-6 w-6 hover:opacity-50" />
                 <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
-                    {messages?.docs[0]?.data().content.slice(0, 20) + "..." || "Empty Conversation"}
+                    {messages && messages.length > 0 ?
+                        `${messages[0].content.slice(0, 20)}...` :
+                        "Empty Conversation"}
                 </p>
                 <TrashIcon
-                    onClick={deleteConversation}
+                    onClick={handleDeleteConversation}
                     className="h-6 w-6 text-gray-700 hover:text-red-700"
                 />
             </div>
