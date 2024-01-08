@@ -18,54 +18,46 @@ function SideBar() {
     const userEmail = session?.user?.email;
 
     useEffect(() => {
+        let unsubscribeConversations: Unsubscribe;
         const unsubscribeMessagesFunctions: Unsubscribe[] = [];
-        let allInitialMessagesFetched = false;
-
+      
         if (userEmail) {
-            const unsubscribeConversations = onSnapshot(
-                query(
-                    collection(db, "conversations"),
-                    where("userId", "==", userEmail),
-                    orderBy("timestamp", "asc")
-                ),
-                (conversationsSnapshot) => {
-                    const conversations = conversationsSnapshot.docs.map(doc => (
-                        { id: doc.id, ...doc.data(), messages: [] as Message[] } as Conversation
-                    ));
-                    dispatch(updateConversations(conversations));
-
-                    let fetchedMessagesCount = 0;
-                    conversations.forEach((conversation) => {
-                        const unsubscribeMessages = onSnapshot(
-                            collection(db, "conversations", conversation.id, "messages"),
-                            (messagesSnapshot) => {
-                                const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
-                                dispatch(updateMessages({ conversationId: conversation.id, messages }));
-                                fetchedMessagesCount++;
-                                if (fetchedMessagesCount === conversations.length) {
-                                    allInitialMessagesFetched = true;
-                                    checkAndSetFetched();
-                                }
-                            }
-                        );
-
-                        unsubscribeMessagesFunctions.push(unsubscribeMessages);
-                    });
-                }
-            );
-
-            return () => {
-                unsubscribeConversations();
-                unsubscribeMessagesFunctions.forEach(unsubscribe => unsubscribe());
-            };
-        }
-
-        function checkAndSetFetched() {
-            if (allInitialMessagesFetched) {
-                dispatch(setIsFetched(true));
+          unsubscribeConversations = onSnapshot(
+            query(
+              collection(db, "conversations"),
+              where("userId", "==", userEmail),
+              orderBy("timestamp", "asc")
+            ),
+            (conversationsSnapshot) => {
+              const conversations = conversationsSnapshot.docs.map(doc => (
+                { id: doc.id, ...doc.data(), messages: [] as Message[] } as Conversation
+              ));
+              dispatch(updateConversations(conversations));
+      
+              if (conversations.length === 0) {
+                dispatch(setIsFetched(true));  // No conversations, so fetching is complete
+              } else {
+                conversations.forEach((conversation) => {
+                  const unsubscribeMessages = onSnapshot(
+                    collection(db, "conversations", conversation.id, "messages"),
+                    (messagesSnapshot) => {
+                      const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
+                      dispatch(updateMessages({ conversationId: conversation.id, messages }));
+                    }
+                  );
+                  unsubscribeMessagesFunctions.push(unsubscribeMessages);
+                });
+                dispatch(setIsFetched(true));  // Listeners are set up, consider fetching complete
+              }
             }
+          );
+      
+          return () => {
+            if (unsubscribeConversations) unsubscribeConversations();
+            unsubscribeMessagesFunctions.forEach(unsubscribe => unsubscribe());
+          };
         }
-    }, [userEmail, dispatch]);
+      }, [userEmail, dispatch]);      
 
 
     return (
