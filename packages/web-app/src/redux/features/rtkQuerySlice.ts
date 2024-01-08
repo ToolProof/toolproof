@@ -1,4 +1,3 @@
-"use client"
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { addDoc, collection, serverTimestamp,} from "firebase/firestore";
 import { db } from "shared/firebaseClient";
