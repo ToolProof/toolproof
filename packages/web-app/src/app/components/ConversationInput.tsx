@@ -1,17 +1,15 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
-import { useDocument } from "react-firebase-hooks/firestore";
 import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
-import { doc, } from "firebase/firestore";
-import { db } from "shared/firebaseClient";
 import sendPrompt from "../../lib/sendPrompt";
 import * as Constants from "../../setup/definitions/constants"
 import { createConversationInFirestore } from "../../lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
+import { useAppSelector } from "@/redux/hooks";
 
 type Props = {
     conversationId: string;
@@ -19,9 +17,8 @@ type Props = {
 
 export default function ConversationInput({ conversationId }: Props) {
     const [input, setInput] = useState("");
-    const conversationRef = doc(db, "conversations", conversationId);
-    const [conversationSnapshot] = useDocument(conversationRef);
-    const turnState = conversationSnapshot?.data()?.turnState;
+    const conversation = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId));
+    const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     const router = useRouter();
@@ -54,7 +51,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     }
                 }
             } else if (data.sendPrompt.action === Constants.back_to_parent) {
-                const parentId = conversationSnapshot?.data()?.parentId; //ATTENTION: what if parentId is "base"?
+                const parentId = conversation?.parentId; //ATTENTION: what if parentId is "base"?
                 router.push(`/conversation/${parentId}`);
             }
         }

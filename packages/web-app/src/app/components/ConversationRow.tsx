@@ -4,32 +4,32 @@ import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Conversation } from "shared/typings";
 import { useAppSelector } from "@/redux/hooks";
 import { useDeleteConversationMutation } from "@/redux/features/rtkQuerySlice";
 
 type Props = {
-    conversation: Conversation;
+    conversationId: string;
 }
 
-function ConversationRow({ conversation }: Props) {
+function ConversationRow({ conversationId }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/conversation/${conversation.id}`;
-    const messages = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversation.id)?.messages);
+    const href = `/conversation/${conversationId}`;
+    const conversation = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId));
+    const messages = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId)?.messages);
     const [deleteConversation] = useDeleteConversationMutation();
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
-    }, [pathName, conversation.id]);
+        setActive(pathName.includes(conversationId)); //ATTENTION: what if one id contains another id?
+    }, [pathName, conversationId]);
 
     const handleDeleteConversation = async () => {
         try {
-            if (conversation.parentId !== "base") {
+            if (conversation?.parentId !== "base") {
                 // Delete the conversation
-                await deleteConversation(conversation.id).unwrap();
+                await deleteConversation(conversationId).unwrap();
                 router.replace("/"); // Redirect after deletion
             }
         } catch (err) {

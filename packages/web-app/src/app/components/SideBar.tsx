@@ -12,9 +12,8 @@ import { Conversation, Message } from "shared/typings";
 function SideBar() {
     const { data: session } = useSession();
     const dispatch = useAppDispatch();
-    const conversations = useAppSelector((state) => state.conversations.conversations);
-    const isLoading = false; // TODO: Implement loading state
-
+    const conversations = useAppSelector((state) => state.conversations.conversations); //ATTENTION: could we load only the ids here?
+    const isFetched = useAppSelector((state) => state.conversations.isFetched);
     const userEmail = session?.user?.email;
 
     useEffect(() => {
@@ -68,12 +67,12 @@ function SideBar() {
             <div className="flex-1">
                 <div>
                     <div className="flex flex-col space-y-2">
-                        {isLoading &&
+                        {!isFetched &&
                             <div className="animate-pulse text-center text-white">Loading...</div>
                         }
                         {/* Map through the conversation rows */}
                         {conversations?.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversation={conversation} />
+                            return <ConversationRow key={conversation.id} conversationId={conversation.id} />
                         })}
                     </div>
                 </div>
