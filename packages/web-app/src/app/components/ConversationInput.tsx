@@ -4,9 +4,7 @@ import { toast } from "react-hot-toast";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
-//import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { doc, } from "firebase/firestore";
-//import { MessageWrite } from "shared/typings";
 import { db } from "shared/firebaseClient";
 import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";
 import { gql } from "@apollo/client";
@@ -35,14 +33,7 @@ export default function ConversationInput({ conversationId }: Props) {
 
     async function sendMessage(content: string) {
         try {
-            // Adding the message to Firestore
-            /* const message: MessageWrite = {
-                timestamp: serverTimestamp(),
-                userId: "René",
-                content: content,
-            };
-            await addDoc(collection(db, "conversations", conversationId, "messages"), message); //ATTENTION_ */
-            await addMessage({conversationId, message: {userId: "René", content: content}});
+            await addMessage({conversationId, message: {userId: "René", content: content}}); //ATTENTION_
         } catch (error) {
             console.error("Error:", error);
             toast.error("An error occurred while sending the message.");
