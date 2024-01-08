@@ -1,12 +1,13 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
-import { query, collection, onSnapshot, where, orderBy } from "firebase/firestore";
+import { query, collection, onSnapshot, where, orderBy, Unsubscribe } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
 import { useEffect } from "react";
-import { updateConversations } from "@/redux/features/mainSlice";
+import { updateConversations, updateMessages, setIsFetched } from "@/redux/features/mainSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useAppSelector } from "@/redux/hooks";
+import { Conversation, Message } from "shared/typings";
 
 function SideBar() {
     const { data: session } = useSession();
@@ -17,18 +18,52 @@ function SideBar() {
     const userEmail = session?.user?.email;
 
     useEffect(() => {
-        if (userEmail) {
-            const conversationsQuery = query(
-                collection(db, "conversations"),
-                where("userId", "==", userEmail),
-                orderBy("timestamp", "asc")
-            );
-            const unsubscribe = onSnapshot(conversationsQuery, (snapshot) => { //ATTENTION_
-                //const updatedData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                dispatch(updateConversations(snapshot));
-            });
+        const unsubscribeMessagesFunctions: Unsubscribe[] = [];
+        let allInitialMessagesFetched = false;
 
-            return () => unsubscribe();
+        if (userEmail) {
+            const unsubscribeConversations = onSnapshot(
+                query(
+                    collection(db, "conversations"),
+                    where("userId", "==", userEmail),
+                    orderBy("timestamp", "asc")
+                ),
+                (conversationsSnapshot) => {
+                    const conversations = conversationsSnapshot.docs.map(doc => (
+                        { id: doc.id, ...doc.data(), messages: [] as Message[] } as Conversation
+                    ));
+                    dispatch(updateConversations(conversations));
+
+                    let fetchedMessagesCount = 0;
+                    conversations.forEach((conversation) => {
+                        const unsubscribeMessages = onSnapshot(
+                            collection(db, "conversations", conversation.id, "messages"),
+                            (messagesSnapshot) => {
+                                const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
+                                dispatch(updateMessages({ conversationId: conversation.id, messages }));
+                                fetchedMessagesCount++;
+                                if (fetchedMessagesCount === conversations.length) {
+                                    allInitialMessagesFetched = true;
+                                    checkAndSetFetched();
+                                }
+                            }
+                        );
+
+                        unsubscribeMessagesFunctions.push(unsubscribeMessages);
+                    });
+                }
+            );
+
+            return () => {
+                unsubscribeConversations();
+                unsubscribeMessagesFunctions.forEach(unsubscribe => unsubscribe());
+            };
+        }
+
+        function checkAndSetFetched() {
+            if (allInitialMessagesFetched) {
+                dispatch(setIsFetched(true));
+            }
         }
     }, [userEmail, dispatch]);
 
@@ -42,8 +77,8 @@ function SideBar() {
                             <div className="animate-pulse text-center text-white">Loading...</div>
                         }
                         {/* Map through the conversation rows */}
-                        {conversations?.docs.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversationId={conversation.id} isSigned={true} />
+                        {conversations?.map((conversation) => {
+                            return <ConversationRow key={conversation.id} conversation={conversation} />
                         })}
                     </div>
                 </div>

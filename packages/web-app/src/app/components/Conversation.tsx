@@ -5,7 +5,7 @@ import { collection, query, orderBy } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "shared/firebaseClient";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import { MessageRead } from "shared/typings";
+import { Message } from "shared/typings";
 import MessageDisplay from "./MessageDisplay";
 
 type Props = {
@@ -79,7 +79,7 @@ function Conversation({ conversationId }: Props) {
             {messages?.docs.map((messageDoc, index) => {
                 const data = messageDoc.data();
                 const isNew = isNewMessage(data.timestamp, index, messages.docs.length);
-                const message = data as MessageRead;
+                const message = data as Message;
 
                 const messageComponent = <MessageDisplay key={messageDoc.id} message={message} isNew={isNew} />
 

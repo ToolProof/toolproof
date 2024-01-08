@@ -8,30 +8,30 @@ import { collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { Conversation } from "shared/typings";
 
 type Props = {
-    conversationId: string;
-    isSigned: boolean;
+    conversation: Conversation;
 }
 
-function ConversationRow({ conversationId, isSigned }: Props) {
+function ConversationRow({ conversation }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const { data: session } = useSession();
     const [active, setActive] = useState(false);
-    const href = isSigned ? `/conversation/${conversationId}` : `/conversation/invitee/${conversationId}`;
+    const href = `/conversation/${conversation.id}`;
     const [messages] = useCollection( //ATTENTION_
-        session && collection(db, "conversations", conversationId, "messages") 
+        session && collection(db, "conversations", conversation.id, "messages") 
     )
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(conversationId)); //ATTENTION: what if one id contains another id?
-    }, [pathName, conversationId]);
+        setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
+    }, [pathName, conversation.id]);
 
     const deleteConversation = async () => {
-        await deleteDoc(doc(db, "conversations", conversationId)) //ATTENTION_
-        router.replace("/")
+        await deleteDoc(doc(db, "conversations", conversation.id)) //ATTENTION_
+        router.replace("/");
     }
 
     return (

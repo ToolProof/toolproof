@@ -1,44 +1,49 @@
-"use client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { createConversationInFirestore } from "../lib/utils";
-import { getDocs, query, where, collection, orderBy, limit } from "firebase/firestore";
-import { db } from "shared/firebaseClient";
+import { useAppSelector } from "@/redux/hooks";
+import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
 
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
   const userEmail = session?.user?.email;
+  const isFetched = useAppSelector((state) => state.conversations.isFetched);
+  const conversations = useAppSelector((state) => state.conversations.conversations);
+  const [addConversation] = useAddConversationMutation();
 
   useEffect(() => {
-    const checkAndCreateConversation = async () => {
-      if (userEmail) {
-        const q = query(
-          collection(db, "conversations"),
-          where("userId", "==", userEmail),
-          orderBy("timestamp", "asc"),
-          limit(1)
-        );
-
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-          // Create conversation only if none exists
-          const conversationId = await createConversationInFirestore(session, "base", 1);
-          if (conversationId) {
-            router.push(`/conversation/${conversationId}`);
+    const checkAndHandleConversation = async () => {
+      if (userEmail && isFetched) {
+        if (conversations.length === 0) {
+          // Create a new conversation
+          try {
+            const newConversation = {
+              userId: userEmail,
+              parentId: "base",
+              turnState: 0,
+            };
+            const result = await addConversation(newConversation).unwrap();
+            // Assuming the new conversation ID is returned from the mutation
+            if (result && result.conversationId) {
+              router.push(`/conversation/${result.conversationId}`);
+            } else {
+              console.error("Conversation creation did not return a valid ID");
+            }
+          } catch (err) {
+            console.error("Failed to create conversation", err);
           }
         } else {
-          // Conversation exists, redirect to the existing conversation
-          const existingConversationId = querySnapshot.docs[0].id;
+          // Redirect to the first conversation
+          const existingConversationId = conversations[0].id;
           router.push(`/conversation/${existingConversationId}`);
         }
       }
     };
 
-    checkAndCreateConversation();
-  }, [userEmail, session, router]);
+    checkAndHandleConversation();
+  }, [userEmail, isFetched, conversations, addConversation, router]);
 
   return (
     <div className="baseBackground flex flex-col items-center justify-center h-screen">

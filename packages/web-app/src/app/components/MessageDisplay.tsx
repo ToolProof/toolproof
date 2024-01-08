@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { MessageRead } from "shared/typings";
+import { Message } from "shared/typings";
 
 type Props = {
-  message: MessageRead;
+  message: Message;
   isNew: boolean;
 };
 

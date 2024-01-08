@@ -2,9 +2,6 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { addDoc, collection, serverTimestamp,} from "firebase/firestore";
 import { db } from "shared/firebaseClient";
-//import { ConversationRead } from "shared/typings";
-//import { DocumentData } from "firebase/firestore";
-//import { QueryDocumentSnapshot } from "firebase/firestore";
 
 export const rtkQuerySlice = createApi({
   reducerPath: "rtkQuerySlice",
@@ -14,17 +11,16 @@ export const rtkQuerySlice = createApi({
     addConversation: builder.mutation({
       async queryFn(conversation) {
         try {
-          await addDoc(collection(db, "conversations"), {
+          const docRef = await addDoc(collection(db, "conversations"), {
             ...conversation,
             timestamp: serverTimestamp(),
           });
-          return { data: "ok" };
+          return { data: { conversationId: docRef.id } }; // Return the conversation ID
         } catch (err) {
           return { error: err };
         }
       },
-      //invalidatesTags: ["Conversation"],
-    }),
+    }),    
     addMessage: builder.mutation({
       async queryFn({conversationId, message}) {
         try {
