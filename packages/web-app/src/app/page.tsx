@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
+import addConversationWrapper from "@/lib/addConversationWrapper";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -20,13 +21,8 @@ export default function Home() {
         if (conversations.length === 0) {
           // Create a new conversation
           try {
-            const newConversation = {
-              userId: userEmail,
-              parentId: "base",
-              turnState: 0,
-            };
+            const newConversation = addConversationWrapper(userEmail, "base");
             const result = await addConversation(newConversation).unwrap();
-            // Assuming the new conversation ID is returned from the mutation
             if (result && result.conversationId) {
               router.push(`/conversation/${result.conversationId}`);
             } else {

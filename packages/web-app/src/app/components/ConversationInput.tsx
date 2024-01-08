@@ -4,12 +4,13 @@ import { toast } from "react-hot-toast";
 import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
 import sendPrompt from "../../lib/sendPrompt";
-import * as Constants from "../../setup/definitions/constants"
-import { createConversationInFirestore } from "../../lib/utils";
+import * as Constants from "../../setup/definitions/constants";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 import { useAppSelector } from "@/redux/hooks";
+import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
+import addConversationWrapper from "@/lib/addConversationWrapper";
 
 type Props = {
     conversationId: string;
@@ -24,6 +25,8 @@ export default function ConversationInput({ conversationId }: Props) {
     const router = useRouter();
     const toastIdRef = useRef<string | undefined>(undefined);
     const [addMessage] = useAddMessageMutation();
+    const [addConversation] = useAddConversationMutation();
+    const userEmail = session?.user?.email;
 
     async function addMessageWrapper(content: string) {
         try {
@@ -45,9 +48,19 @@ export default function ConversationInput({ conversationId }: Props) {
             console.log("action", data.sendPrompt.action);
             if (data.sendPrompt.action === Constants.create_new_conversation) {
                 if (session) {
-                    const newConversationId = await createConversationInFirestore(session, conversationId, 1);
-                    if (newConversationId) {
-                        router.push(`/conversation/${newConversationId}`);
+                    // Create a new conversation
+                    try {
+                        if (userEmail) {
+                            const newConversation = addConversationWrapper(userEmail, conversationId);
+                            const result = await addConversation(newConversation).unwrap();
+                            if (result && result.conversationId) {
+                                router.push(`/conversation/${result.conversationId}`);
+                            } else {
+                                console.error("Conversation creation did not return a valid ID");
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Failed to create conversation", err);
                     }
                 }
             } else if (data.sendPrompt.action === Constants.back_to_parent) {
