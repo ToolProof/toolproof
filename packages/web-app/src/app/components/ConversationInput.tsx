@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
-import addConversationWrapper from "@/lib/addConversationWrapper";
+import addConversationHelper from "@/lib/addConversationHelper";
 
 type Props = {
     conversationId: string;
@@ -51,7 +51,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const newConversation = addConversationWrapper(userEmail, conversationId);
+                            const newConversation = addConversationHelper(userEmail, conversationId);
                             const result = await addConversation(newConversation).unwrap();
                             if (result && result.conversationId) {
                                 router.push(`/conversation/${result.conversationId}`);
