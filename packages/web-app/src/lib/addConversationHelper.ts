@@ -1,5 +1,5 @@
 
-export default async function addConversationHelper(userId: string, parentId: string) {
+export default function addConversationHelper(userId: string, parentId: string) {
     const newConversation = {
         userId: userId,
         parentId: parentId,
