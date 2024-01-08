@@ -6,13 +6,11 @@ import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
 import { doc, } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
-import { MutationSendPromptArgs, Mutation } from "../../setup/generated/typesClient";
-import { gql } from "@apollo/client";
-import { client } from "../../setup/apolloClient";
+import sendPrompt from "../../lib/sendPrompt";
+import * as Constants from "../../setup/definitions/constants"
 import { createConversationInFirestore } from "../../lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import * as Constants from "../../setup/definitions/constants"
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 
 type Props = {
@@ -20,7 +18,6 @@ type Props = {
 };
 
 export default function ConversationInput({ conversationId }: Props) {
-    const isAlfa = true;
     const [input, setInput] = useState("");
     const conversationRef = doc(db, "conversations", conversationId);
     const [conversationSnapshot] = useDocument(conversationRef);
@@ -28,12 +25,12 @@ export default function ConversationInput({ conversationId }: Props) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     const router = useRouter();
-    const [ addMessage ] = useAddMessageMutation();
+    const toastIdRef = useRef<string | undefined>(undefined);
+    const [addMessage] = useAddMessageMutation();
 
-
-    async function sendMessage(content: string) {
+    async function addMessageWrapper(content: string) {
         try {
-            await addMessage({conversationId, message: {userId: "René", content: content}}); //ATTENTION_
+            await addMessage({ conversationId, message: { userId: "René", content: content } }); //ATTENTION_
         } catch (error) {
             console.error("Error:", error);
             toast.error("An error occurred while sending the message.");
@@ -41,57 +38,32 @@ export default function ConversationInput({ conversationId }: Props) {
         }
     }
 
-    async function sendPrompt(content: string) {
-
-        const variables: MutationSendPromptArgs = {
-            conversationId,
-            prompt: content,
-            user: "René",
-            isAlfa: isAlfa,
-        };
-
-        // Define your GraphQL mutation
-        const SEND_PROMPT_MUTATION = gql`
-          mutation SendPrompt($conversationId: String!, $prompt: String!, $user: String!, $isAlfa: Boolean!) {
-            sendPrompt(conversationId: $conversationId, prompt: $prompt, user: $user, isAlfa: $isAlfa) {
-              action
-            }
-          }
-        `;
-
-        try {
-            // Execute the mutation
-            const response = await client.mutate<Mutation>({
-                mutation: SEND_PROMPT_MUTATION,
-                variables,
-            });
-            // Check if the data property exists and is not null
-            if (response.data) {
-                const data: Mutation = response.data;
-                // Check if the sendPrompt property exists and is not null
-                if (data.sendPrompt) {
-                    console.log("action", data.sendPrompt.action);
-                    if (data.sendPrompt.action === Constants.create_new_conversation) {
-                        if (session) {
-                            const newConversationId = await createConversationInFirestore(session, conversationId, 1);
-                            if (newConversationId) {
-                                router.push(`/conversation/${newConversationId}`);
-                            }
-                        }
-                    } else if (data.sendPrompt.action === Constants.back_to_parent) {
-                        const parentId = conversationSnapshot?.data()?.parentId; //ATTENTION: what if parentId is "base"?
-                        router.push(`/conversation/${parentId}`);
+    const submissionHelper = async () => {
+        const content = input.trim();
+        setInput("");
+        await addMessageWrapper(content);
+        const data = await sendPrompt(conversationId, content);
+        // Check if the sendPrompt property exists and is not null
+        if (data && data.sendPrompt) {
+            console.log("action", data.sendPrompt.action);
+            if (data.sendPrompt.action === Constants.create_new_conversation) {
+                if (session) {
+                    const newConversationId = await createConversationInFirestore(session, conversationId, 1);
+                    if (newConversationId) {
+                        router.push(`/conversation/${newConversationId}`);
                     }
                 }
-            } else {
-                // Handle the case where data is null or undefined
-                console.log("No data returned from server.");
+            } else if (data.sendPrompt.action === Constants.back_to_parent) {
+                const parentId = conversationSnapshot?.data()?.parentId; //ATTENTION: what if parentId is "base"?
+                router.push(`/conversation/${parentId}`);
             }
-        } catch (error) {
-            console.error("Error:", error);
-            toast.error("An error occurred during the request.");
         }
     }
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        submissionHelper();
+    };
 
     const updateInputHeight = () => {
         const textarea = textareaRef.current;
@@ -115,19 +87,21 @@ export default function ConversationInput({ conversationId }: Props) {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        submissionHelper();
-    }
-
-
-    const submissionHelper = async () => {
-        const content = input.trim();
-        setInput("");
-        await sendMessage(content);
-        await sendPrompt(content);
-    }
-
+    useEffect(() => {
+        if (turnState === -1) {
+            toastIdRef.current = toast.loading("ChatGPT is thinking...");
+        } else {
+            if (toastIdRef.current) {
+                toast.dismiss(toastIdRef.current);
+            }
+            textareaRef.current?.focus();
+        }
+        return () => {
+            if (toastIdRef.current) {
+                toast.dismiss(toastIdRef.current);
+            }
+        };
+    }, [turnState, textareaRef]); //ATTENTION: textareaRef should maybe be an effect-dependency
 
     const renderHelper = (criterion: boolean) => {
         return (
@@ -161,86 +135,8 @@ export default function ConversationInput({ conversationId }: Props) {
     return (
         <div>
             {
-                isAlfa ? (
-                    <AlfaMode
-                        turnState={turnState}
-                        textareaRef={textareaRef}
-                        renderHelper={renderHelper}
-                    />
-                )
-                    : (
-                        <BetaMode
-                            turnState={turnState}
-                            textareaRef={textareaRef}
-                            renderHelper={renderHelper}
-                        />
-                    )
+                renderHelper(turnState === -1)
             }
         </div>
-    );
-}
-
-
-type ModeProps = {
-    turnState: number;
-    textareaRef: React.RefObject<HTMLTextAreaElement>;
-    renderHelper: (criterion: boolean) => JSX.Element;
-};
-
-
-function AlfaMode({ turnState, textareaRef, renderHelper }: ModeProps) {
-    const toastIdRef = useRef<string | undefined>(undefined);
-
-    useEffect(() => {
-        if (turnState === -1) {
-            toastIdRef.current = toast.loading("ChatGPT is thinking...");
-        } else {
-            if (toastIdRef.current) {
-                toast.dismiss(toastIdRef.current);
-            }
-            textareaRef.current?.focus();
-        }
-        return () => {
-            if (toastIdRef.current) {
-                toast.dismiss(toastIdRef.current);
-            }
-        };
-    }, [turnState, textareaRef]); //ATTENTION: textareaRef should maybe be an effect-dependency
-
-    return (
-        <>
-            {renderHelper(turnState === -1)}
-        </>
-    );
-}
-
-
-function BetaMode({ turnState, renderHelper: renderHelper }: ModeProps) {
-    const toastIdRef = useRef<string | undefined>(undefined);
-
-    useEffect(() => {
-        if (turnState > 1 || turnState < 0) {
-            if (turnState === -1) {
-                toastIdRef.current = toast.loading("ChatGPT is thinking...");
-            } else if (turnState === -2) {
-                toastIdRef.current = toast.loading("ChatGPT is thinking...");
-            } else if (turnState === 2) {
-                toastIdRef.current = toast.loading("Waiting for your partner to respond...");
-            }
-        } else if (toastIdRef.current) {
-            toast.dismiss(toastIdRef.current);
-        }
-
-        return () => {
-            if (toastIdRef.current) {
-                toast.dismiss(toastIdRef.current);
-            }
-        };
-    }, [turnState]);
-
-    return (
-        <>
-            {renderHelper(turnState > 1 || turnState < 0)}
-        </>
     );
 }

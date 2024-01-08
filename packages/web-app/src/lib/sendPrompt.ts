@@ -1,0 +1,40 @@
+import { gql } from "@apollo/client";
+import { client } from "../setup/apolloClient";
+import { MutationSendPromptArgs, Mutation } from "../setup/generated/typesClient";
+
+export default async function sendPrompt(conversationId: string, content: string) {
+
+    const variables: MutationSendPromptArgs = {
+        conversationId,
+        prompt: content,
+        user: "René",
+        isAlfa: true,
+    };
+
+    // Define your GraphQL mutation
+    const SEND_PROMPT_MUTATION = gql`
+      mutation SendPrompt($conversationId: String!, $prompt: String!, $user: String!, $isAlfa: Boolean!) {
+        sendPrompt(conversationId: $conversationId, prompt: $prompt, user: $user, isAlfa: $isAlfa) {
+          action
+        }
+      }
+    `;
+
+    try {
+        // Execute the mutation
+        const response = await client.mutate<Mutation>({
+            mutation: SEND_PROMPT_MUTATION,
+            variables,
+        });
+        // Check if the data property exists and is not null
+        if (response.data) {
+            const data: Mutation = response.data;
+            return data;
+        } else {
+            // Handle the case where data is null or undefined
+            console.log("No data returned from server.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}

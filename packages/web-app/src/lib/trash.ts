@@ -131,3 +131,35 @@ const functionSchemaBeta = [
   );
 } */
 
+
+/* function BetaMode({ turnState, renderHelper: renderHelper }: ModeProps) {
+  const toastIdRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+      if (turnState > 1 || turnState < 0) {
+          if (turnState === -1) {
+              toastIdRef.current = toast.loading("ChatGPT is thinking...");
+          } else if (turnState === -2) {
+              toastIdRef.current = toast.loading("ChatGPT is thinking...");
+          } else if (turnState === 2) {
+              toastIdRef.current = toast.loading("Waiting for your partner to respond...");
+          }
+      } else if (toastIdRef.current) {
+          toast.dismiss(toastIdRef.current);
+      }
+
+      return () => {
+          if (toastIdRef.current) {
+              toast.dismiss(toastIdRef.current);
+          }
+      };
+  }, [turnState]);
+
+  return (
+      <>
+          {renderHelper(turnState > 1 || turnState < 0)}
+      </>
+  );
+} */
+
+
