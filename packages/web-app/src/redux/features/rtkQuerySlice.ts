@@ -5,7 +5,7 @@ import { db } from "shared/firebaseClient";
 export const rtkQuerySlice = createApi({
   reducerPath: "rtkQuerySlice",
   baseQuery: fakeBaseQuery(),
-  //tagTypes: ["Conversation"],
+  //tagTypes: [],
   endpoints: (builder) => ({
     addConversation: builder.mutation({
       async queryFn(conversation) {
@@ -32,13 +32,12 @@ export const rtkQuerySlice = createApi({
           return { error: err };
         }
       },
-      //invalidatesTags: ["Conversation"],
     }),
     deleteConversation: builder.mutation({
       async queryFn(conversationId) {
         try {
           await deleteDoc(doc(db, "conversations", conversationId));
-          return { data: "ok" }; // Indicate successful deletion
+          return { data: "ok" };
         } catch (err) {
           return { error: err };
         }

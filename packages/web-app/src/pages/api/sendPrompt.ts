@@ -21,7 +21,7 @@ const updateTurnState = async (conversationId: string, code: number) => {
   }
 };
 
-async function sendMessage(content: string, conversationId: string) {
+async function sendMessageToFirestore(content: string, conversationId: string) {
   const message: MessageWrite = {
     timestamp: admin.firestore.Timestamp.now(),
     userId: "ChatGPT",
@@ -31,7 +31,7 @@ async function sendMessage(content: string, conversationId: string) {
   await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
 }
 
-const sendPromptResolver: MutationResolvers["sendPrompt"] = async (_, { conversationId, prompt, user, isAlfa }) => {
+const sendPromptResolver: MutationResolvers["sendPrompt"] = async (_, { conversationId, prompt, user }) => {
   if (!prompt) {
     throw new Error("Prompt is required");
   }
@@ -41,24 +41,16 @@ const sendPromptResolver: MutationResolvers["sendPrompt"] = async (_, { conversa
 
   try {
     await updateTurnState(conversationId, -1);
-    const response = await query(prompt, user, conversationId, isAlfa);
+    const response = await query(prompt, user, conversationId);
     let content = "";
     let action = "";
-    if (isAlfa) {
-      if (response) {
-        content = response.modelResponse;
-        action = response.action;
-        await updateTurnState(conversationId, 1);
-      }
-    } else {
-      if (response) {
-        /* content = response.moderatorSummaryAndPrompt;
-        action = response.nextSpeaker;
-        action === "René" ? await updateTurnState(conversationId, 1) : await updateTurnState(conversationId, 2); */
-      }
+    if (response) {
+      content = response.modelResponse;
+      action = response.action;
+      await updateTurnState(conversationId, 1);
     }
 
-    await sendMessage(content, conversationId);
+    await sendMessageToFirestore(content, conversationId);
 
     return {
       action: action,

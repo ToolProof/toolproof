@@ -2,19 +2,17 @@ import { gql } from "@apollo/client";
 import { client } from "../setup/apolloClient";
 import { MutationSendPromptArgs, Mutation } from "../setup/generated/typesClient";
 
-export default async function sendPrompt(conversationId: string, content: string) {
-
+export default async function sendPromptHelper(conversationId: string, content: string) {
     const variables: MutationSendPromptArgs = {
         conversationId,
         prompt: content,
         user: "René",
-        isAlfa: true,
     };
 
     // Define your GraphQL mutation
     const SEND_PROMPT_MUTATION = gql`
-      mutation SendPrompt($conversationId: String!, $prompt: String!, $user: String!, $isAlfa: Boolean!) {
-        sendPrompt(conversationId: $conversationId, prompt: $prompt, user: $user, isAlfa: $isAlfa) {
+      mutation SendPrompt($conversationId: String!, $prompt: String!, $user: String!) {
+        sendPrompt(conversationId: $conversationId, prompt: $prompt, user: $user) {
           action
         }
       }

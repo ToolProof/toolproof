@@ -24,7 +24,6 @@ export type Mutation = {
 
 export type MutationSendPromptArgs = {
   conversationId: Scalars['String']['input'];
-  isAlfa: Scalars['Boolean']['input'];
   prompt: Scalars['String']['input'];
   user: Scalars['String']['input'];
 };
@@ -128,7 +127,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  sendPrompt?: Resolver<Maybe<ResolversTypes['PromptResponse']>, ParentType, ContextType, RequireFields<MutationSendPromptArgs, 'conversationId' | 'isAlfa' | 'prompt' | 'user'>>;
+  sendPrompt?: Resolver<Maybe<ResolversTypes['PromptResponse']>, ParentType, ContextType, RequireFields<MutationSendPromptArgs, 'conversationId' | 'prompt' | 'user'>>;
 }>;
 
 export type PromptResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['PromptResponse'] = ResolversParentTypes['PromptResponse']> = ResolversObject<{

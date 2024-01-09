@@ -23,7 +23,6 @@ export type Mutation = {
 
 export type MutationSendPromptArgs = {
   conversationId: Scalars['String']['input'];
-  isAlfa: Scalars['Boolean']['input'];
   prompt: Scalars['String']['input'];
   user: Scalars['String']['input'];
 };

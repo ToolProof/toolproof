@@ -68,7 +68,7 @@ const chain = RunnableSequence.from([
 
 
 
-const query = async (prompt: string, user: string, conversationId: string, isAlfa: boolean) => {
+const query = async (prompt: string, user: string, conversationId: string) => {
 
   try {
     // Check if a new conversation has started or the existing one continues
@@ -106,40 +106,38 @@ const query = async (prompt: string, user: string, conversationId: string, isAlf
       //speaker: user,
     };
 
-    if (isAlfa) {
-      const response = await chain.invoke(inputs);
+    const response = await chain.invoke(inputs);
 
-      // It's important to check if the response is successful before attempting to save the context
-      if (response && response.additional_kwargs && response.additional_kwargs.function_call) {
+    // It's important to check if the response is successful before attempting to save the context
+    if (response && response.additional_kwargs && response.additional_kwargs.function_call) {
 
-        const argsString = response.additional_kwargs.function_call.arguments;
-        const argsInsecure = JSON.parse(argsString);
-        let modelResponse = argsInsecure.modelResponse;
-        const action = argsInsecure.action;
+      const argsString = response.additional_kwargs.function_call.arguments;
+      const argsInsecure = JSON.parse(argsString);
+      let modelResponse = argsInsecure.modelResponse;
+      const action = argsInsecure.action;
 
-        if (!modelResponse || action !== Constants.continue_conversation) {
-          console.log("modelResponse", modelResponse);
-          console.log("action", action);
-          modelResponse = action;
-        }
-
-        await memory.saveContext(
-          {
-            input: prompt,
-          }, { //ATTENTION
-          output: modelResponse,
-        });
-
-        const argsSecure = {
-          modelResponse: modelResponse,
-          action: action,
-        };
-
-        return argsSecure;
-      } else {
-        // Handle the case when response is not as expected
-        throw new Error("Received an unexpected response format from the chain invocation.");
+      if (!modelResponse || action !== Constants.continue_conversation) {
+        console.log("modelResponse", modelResponse);
+        console.log("action", action);
+        modelResponse = action;
       }
+
+      await memory.saveContext(
+        {
+          input: prompt,
+        }, { //ATTENTION
+        output: modelResponse,
+      });
+
+      const argsSecure = {
+        modelResponse: modelResponse,
+        action: action,
+      };
+
+      return argsSecure;
+    } else {
+      // Handle the case when response is not as expected
+      throw new Error("Received an unexpected response format from the chain invocation.");
     }
   } catch (error) {
     // Log the error or handle it as needed

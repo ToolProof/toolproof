@@ -4,7 +4,7 @@ type Query {
 }
 
 type Mutation {
-  sendPrompt(conversationId: String!, prompt: String!, user: String!, isAlfa: Boolean!): PromptResponse
+  sendPrompt(conversationId: String!, prompt: String!, user: String!): PromptResponse
 }
 
 type PromptResponse {
