@@ -1,6 +1,7 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { addDoc, deleteDoc, doc, collection, serverTimestamp, } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
+//import { ConversationWrite, MessageWrite } from "shared/typings";
 
 export const rtkQuerySlice = createApi({
   reducerPath: "rtkQuerySlice",

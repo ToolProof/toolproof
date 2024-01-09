@@ -22,7 +22,6 @@ export default function Home() {
           // Create a new conversation
           try {
             const newConversation = addConversationHelper(userEmail, "base");
-            console.log("newConversation_beta", newConversation);
             const result = await addConversation(newConversation).unwrap();
             if (result && result.conversationId) {
               router.push(`/conversation/${result.conversationId}`);

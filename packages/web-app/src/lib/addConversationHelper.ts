@@ -5,6 +5,5 @@ export default function addConversationHelper(userId: string, parentId: string) 
         parentId: parentId,
         turnState: 0,
     };
-    console.log("newConversation_alfa", newConversation);
     return newConversation;
 }

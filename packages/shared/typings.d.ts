@@ -22,12 +22,11 @@ export interface MessageWrite {
     content: string;
 }
 
-export interface ConversationWrite {
-    timestamp: FieldValue;
-    userId: string;
+export interface Conversation {
     parentId: string;
+    userId: string;
+    timestamp: FieldValue;
     turnState: number;
-    y: number;
-    z: number;
+    messages: Message[];
 }
 
