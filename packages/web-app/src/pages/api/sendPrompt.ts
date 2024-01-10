@@ -1,4 +1,3 @@
-import admin from "firebase-admin";
 import dbAdmin from "shared/firebaseAdmin";
 import { createMessageForWrite } from "../../lib/factory";
 import query from "../../lib/query";
