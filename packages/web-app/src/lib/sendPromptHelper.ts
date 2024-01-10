@@ -29,8 +29,7 @@ export default async function sendPromptHelper(conversationId: string, content: 
             const data: Mutation = response.data;
             return data;
         } else {
-            // Handle the case where data is null or undefined
-            console.log("No data returned from server.");
+            return null;
         }
     } catch (error) {
         console.error("Error:", error);
