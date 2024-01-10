@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
-import addConversationHelper from "@/lib/addConversationHelper";
+import { createConversationForWrite, createMessageForWrite } from "@/lib/factory";
 
 type Props = {
     conversationId: string;
@@ -30,7 +30,8 @@ export default function ConversationInput({ conversationId }: Props) {
 
     async function addMessageWrapper(content: string) {
         try {
-            await addMessage({ conversationId, message: { userId: "René", content: content } }); //ATTENTION_
+            const message = createMessageForWrite("René", content); //ATTENTION: hard-coded name
+            await addMessage({ conversationId, message }); //ATTENTION_
         } catch (error) {
             console.error("Error:", error);
             toast.error("An error occurred while sending the message.");
@@ -51,7 +52,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const newConversation = addConversationHelper(userEmail, conversationId);
+                            const newConversation = createConversationForWrite(userEmail, conversationId, 0);
                             const result = await addConversation(newConversation).unwrap();
                             if (result && result.conversationId) {
                                 router.push(`/conversation/${result.conversationId}`);

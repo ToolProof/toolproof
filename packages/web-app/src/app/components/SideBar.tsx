@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { updateConversations, updateMessages, setIsFetched } from "@/redux/features/mainSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useAppSelector } from "@/redux/hooks";
-import { Conversation, Message } from "shared/typings";
+import { createConversationForRead, createMessageForRead } from "@/lib/factory";
 
 function SideBar() {
     const { data: session } = useSession();
@@ -28,26 +28,32 @@ function SideBar() {
                     orderBy("timestamp", "asc")
                 ),
                 (conversationsSnapshot) => {
-                    const conversations = conversationsSnapshot.docs.map(doc => (
-                        { id: doc.id, ...doc.data(), messages: [] as Message[] } as Conversation
-                    ));
+                    const conversations = conversationsSnapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return createConversationForRead(doc.id, data.parentId, data.userId, data.turnState, data.timestamp.toDate(), []);
+                    });
                     dispatch(updateConversations(conversations));
 
                     if (conversations.length === 0) {
                         dispatch(setIsFetched(true));  // No conversations, so fetching is complete
                     } else {
                         conversations.forEach((conversation) => {
-                            const unsubscribeMessages = onSnapshot(
-                                query(
-                                    collection(db, "conversations", conversation.id, "messages"),
-                                    orderBy("timestamp", "asc")
-                                ),
-                                (messagesSnapshot) => {
-                                    const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
-                                    dispatch(updateMessages({ conversationId: conversation.id, messages }));
-                                }
-                            );
-                            unsubscribeMessagesFunctions.push(unsubscribeMessages);
+                            if (conversation.id) {
+                                const unsubscribeMessages = onSnapshot(
+                                    query(
+                                        collection(db, "conversations", conversation.id, "messages"),
+                                        orderBy("timestamp", "asc")
+                                    ),
+                                    (messagesSnapshot) => {
+                                        const messages = messagesSnapshot.docs.map(doc => {
+                                            const msgData = doc.data();
+                                            return createMessageForRead(doc.id, msgData.userId, msgData.content, msgData.timestamp.toDate());
+                                        });
+                                        dispatch(updateMessages({ conversationId: conversation.id as string, messages }));
+                                    }
+                                );
+                                unsubscribeMessagesFunctions.push(unsubscribeMessages);
+                            }
                         });
                         dispatch(setIsFetched(true));  // Listeners are set up, consider fetching complete
                     }
@@ -72,7 +78,7 @@ function SideBar() {
                         }
                         {/* Map through the conversation rows */}
                         {conversations?.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversationId={conversation.id} />
+                            return <ConversationRow key={conversation.id} conversationId={conversation.id as string} />
                         })}
                     </div>
                 </div>

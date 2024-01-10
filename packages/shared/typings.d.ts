@@ -1,32 +1,17 @@
 import { Timestamp, FieldValue } from "firebase/firestore";
 
-export interface Message {
-    id: string;
+export interface Message<TimestampType = Timestamp | FieldValue> {
+    id?: string;
     userId: string;
-    timestamp: Timestamp;
+    timestamp: TimestampType;
     content: string;
 }
 
-export interface Conversation {
-    id: string;
+export interface Conversation<TimestampType = Timestamp | FieldValue> {
+    id?: string;
     parentId: string;
     userId: string;
-    timestamp: Timestamp;
+    timestamp: TimestampType;
     turnState: number;
-    messages: Message[];
+    messages: Message<TimestampType>[];
 }
-
-export interface MessageWrite {
-    timestamp: FieldValue;
-    userId: string;
-    content: string;
-}
-
-export interface Conversation {
-    parentId: string;
-    userId: string;
-    timestamp: FieldValue;
-    turnState: number;
-    messages: Message[];
-}
-

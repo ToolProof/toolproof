@@ -6,7 +6,7 @@ export default async function sendPromptHelper(conversationId: string, content: 
     const variables: MutationSendPromptArgs = {
         conversationId,
         prompt: content,
-        user: "René",
+        user: "René", //ATTENTION: hard-coded name
     };
 
     // Define your GraphQL mutation
