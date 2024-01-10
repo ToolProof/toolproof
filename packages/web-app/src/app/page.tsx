@@ -20,7 +20,7 @@ export default function Home() {
       if (userEmail && isFetched) {
         if (conversations.length === 0) {
           try {
-            const newConversation = createConversationWrite(userEmail, "base", 0);
+            const newConversation = createConversationWrite({ parentId: "base", userId: userEmail, turnState: 0 });
             const result = await addConversation(newConversation).unwrap();
             if (result && result.conversationId) {
               router.push(`/conversation/${result.conversationId}`);

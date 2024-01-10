@@ -30,7 +30,7 @@ export default function ConversationInput({ conversationId }: Props) {
 
     async function addMessageWrapper(content: string) {
         try {
-            const message = createMessageWrite("René", content); //ATTENTION: hard-coded name
+            const message = createMessageWrite({ userId: "René", content: content }); //ATTENTION: hard-coded name
             await addMessage({ conversationId, message }); //ATTENTION_
         } catch (error) {
             console.error("Error:", error);
@@ -52,7 +52,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const newConversation = createConversationWrite(userEmail, conversationId, 0);
+                            const newConversation = createConversationWrite({ parentId: conversationId, userId: userEmail, turnState: 0 });
                             const result = await addConversation(newConversation).unwrap();
                             if (result && result.conversationId) {
                                 router.push(`/conversation/${result.conversationId}`);

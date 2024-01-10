@@ -21,7 +21,7 @@ const updateTurnState = async (conversationId: string, code: number) => {
 };
 
 async function sendMessageToFirestore(content: string, conversationId: string) {
-  const message = createMessageWrite("ChatGPT", content || "ChatGPT was unable to respond!");
+  const message = createMessageWrite({ userId:"ChatGPT", content: content || "ChatGPT was unable to respond!" });
   await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
 }
 
