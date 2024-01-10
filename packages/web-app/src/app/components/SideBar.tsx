@@ -29,7 +29,7 @@ function SideBar() {
                 ),
                 (conversationsSnapshot) => {
                     const conversations = conversationsSnapshot.docs.map(doc => {
-                        return  { id: doc.id, ...doc.data(), messages: [] as MessageRead[] } as ConversationRead; //ATTENTION: should use factory here
+                        return  { id: doc.id, ...doc.data() } as ConversationRead; //ATTENTION: should use factory here
                     });
                     dispatch(updateConversations(conversations));
 
