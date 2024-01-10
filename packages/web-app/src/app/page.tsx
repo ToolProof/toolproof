@@ -19,7 +19,6 @@ export default function Home() {
     const checkAndHandleConversation = async () => {
       if (userEmail && isFetched) {
         if (conversations.length === 0) {
-          // Create a new conversation
           try {
             const newConversation = createConversationWrite(userEmail, "base", 0);
             const result = await addConversation(newConversation).unwrap();
