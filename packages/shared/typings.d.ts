@@ -13,7 +13,7 @@ export interface ConversationRead {
     userId: string;
     timestamp: Timestamp;
     turnState: number;
-    messages: MessageRead[];
+    messages?: MessageRead[];
 }
 
 export interface MessageWrite {
