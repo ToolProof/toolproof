@@ -1,8 +1,8 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Conversation, Message } from "shared/typings";
+import { ConversationRead, MessageRead } from "shared/typings";
 
 interface ConversationsState {
-  conversations: Conversation[];
+  conversations: ConversationRead[];
   isFetched: boolean;
 }
 
@@ -15,10 +15,10 @@ const mainSlice = createSlice({
   name: "conversations",
   initialState,
   reducers: {
-    updateConversations: (state, action: PayloadAction<Conversation[]>) => {
+    updateConversations: (state, action: PayloadAction<ConversationRead[]>) => {
       state.conversations = action.payload;
     },
-    updateMessages: (state, action: PayloadAction<{ conversationId: string; messages: Message[] }>) => {
+    updateMessages: (state, action: PayloadAction<{ conversationId: string; messages: MessageRead[] }>) => {
       const { conversationId, messages } = action.payload;
       const conversationIndex = state.conversations.findIndex(c => c.id === conversationId);
       if (conversationIndex !== -1) {
