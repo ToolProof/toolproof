@@ -67,7 +67,7 @@ function Conversation({ conversationId }: Props) {
                 </div>
             )}
             {messages?.map((message, index) => {
-                const isNew = isNewMessage(message.timestamp, index, messages.length);
+                const isNew = isNewMessage(message.timestamp as FirebaseFirestore.Timestamp, index, messages.length);
 
                 const messageComponent = <MessageDisplay key={message.id} message={message} isNew={isNew} />
 
