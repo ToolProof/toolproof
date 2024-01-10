@@ -11,7 +11,9 @@ type Props = {
 
 function Conversation({ conversationId }: Props) {
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
-    const messages: MessageRead[] = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId)?.messages);
+    const messages: MessageRead[] = useAppSelector((state) => 
+    state.conversations.conversations.find((c) => c.id === conversationId)?.messages || []
+);
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
     useEffect(() => {
