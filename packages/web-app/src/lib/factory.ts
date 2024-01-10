@@ -1,8 +1,8 @@
 
-import { Timestamp, FieldValue, serverTimestamp } from "firebase/firestore";
-import { Conversation, Message } from "shared/typings";
+import { serverTimestamp } from "firebase/firestore";
+import { ConversationWrite, MessageWrite } from "shared/typings";
 
-export function createMessageForWrite(userId: string, content: string): Message<FieldValue> {
+export function createMessageWrite(userId: string, content: string): MessageWrite {
     return {
         userId,
         content,
@@ -10,32 +10,24 @@ export function createMessageForWrite(userId: string, content: string): Message<
     };
 }
 
-export function createConversationForWrite(parentId: string, userId: string, turnState: number): Conversation<FieldValue> {
+export function createConversationWrite(parentId: string, userId: string, turnState: number): ConversationWrite {
     return {
         parentId,
         userId,
         turnState,
         timestamp: serverTimestamp(),
-        messages: [],
     };
 }
 
-export function createMessageForRead(id: string, userId: string, content: string, timestamp: Timestamp): Message<Timestamp> {
+/* export function createMessageRead(): MessageRead {
     return {
-        id,
-        userId,
-        content,
-        timestamp,
+        
     };
 }
 
-export function createConversationForRead(id: string, parentId: string, userId: string, turnState: number, timestamp: Timestamp, messages: Message<Timestamp>[]): Conversation<Timestamp> {
+export function createConversationRead(): ConversationRead {
     return {
-        parentId,
-        userId,
-        turnState,
-        timestamp,
-        messages,
+
     };
-}
+} */
 

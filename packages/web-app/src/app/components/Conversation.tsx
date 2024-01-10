@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
 import { useAppSelector } from "@/redux/hooks";
+import { MessageRead } from "shared/typings";
 
 type Props = {
     conversationId: string;
@@ -10,7 +11,7 @@ type Props = {
 
 function Conversation({ conversationId }: Props) {
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
-    const messages = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId)?.messages);
+    const messages: MessageRead[] = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId)?.messages);
     const [componentMountTime, setComponentMountTime] = useState(new Date());
 
     useEffect(() => {
@@ -67,7 +68,7 @@ function Conversation({ conversationId }: Props) {
                 </div>
             )}
             {messages?.map((message, index) => {
-                const isNew = isNewMessage(message.timestamp as FirebaseFirestore.Timestamp, index, messages.length);
+                const isNew = isNewMessage(message.timestamp, index, messages.length);
 
                 const messageComponent = <MessageDisplay key={message.id} message={message} isNew={isNew} />
 

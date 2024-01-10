@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
-import { createConversationForWrite } from "@/lib/factory";
+import { createConversationWrite } from "@/lib/factory";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -21,7 +21,7 @@ export default function Home() {
         if (conversations.length === 0) {
           // Create a new conversation
           try {
-            const newConversation = createConversationForWrite(userEmail, "base", 0);
+            const newConversation = createConversationWrite(userEmail, "base", 0);
             const result = await addConversation(newConversation).unwrap();
             if (result && result.conversationId) {
               router.push(`/conversation/${result.conversationId}`);

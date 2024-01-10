@@ -7,8 +7,7 @@ import { useEffect } from "react";
 import { updateConversations, updateMessages, setIsFetched } from "@/redux/features/mainSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useAppSelector } from "@/redux/hooks";
-import { Conversation, Message } from "shared/typings";
-//import { createConversationForRead, createMessageForRead } from "@/lib/factory";
+import { ConversationRead, MessageRead } from "shared/typings";
 
 function SideBar() {
     const { data: session } = useSession();
@@ -30,9 +29,7 @@ function SideBar() {
                 ),
                 (conversationsSnapshot) => {
                     const conversations = conversationsSnapshot.docs.map(doc => {
-                        return  { id: doc.id, ...doc.data(), messages: [] as Message[] } as Conversation;
-                        //const data = doc.data();
-                        //return createConversationForRead(doc.id, data.parentId, data.userId, data.turnState, data.timestamp.toDate(), []);
+                        return  { id: doc.id, ...doc.data(), messages: [] as MessageRead[] } as ConversationRead;
                     });
                     dispatch(updateConversations(conversations));
 
@@ -48,11 +45,9 @@ function SideBar() {
                                     ),
                                     (messagesSnapshot) => {
                                         const messages = messagesSnapshot.docs.map(doc => {
-                                            return { id: doc.id, ...doc.data() } as Message
-                                            //const msgData = doc.data();
-                                            //return createMessageForRead(doc.id, msgData.userId, msgData.content, msgData.timestamp.toDate());
+                                            return { id: doc.id, ...doc.data() } as MessageRead;
                                         });
-                                        dispatch(updateMessages({ conversationId: conversation.id as string, messages }));
+                                        dispatch(updateMessages({ conversationId: conversation.id, messages }));
                                     }
                                 );
                                 unsubscribeMessagesFunctions.push(unsubscribeMessages);
@@ -81,7 +76,7 @@ function SideBar() {
                         }
                         {/* Map through the conversation rows */}
                         {conversations?.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversationId={conversation.id as string} />
+                            return <ConversationRow key={conversation.id} conversationId={conversation.id} />
                         })}
                     </div>
                 </div>

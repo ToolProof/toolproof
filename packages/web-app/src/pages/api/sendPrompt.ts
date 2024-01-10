@@ -1,5 +1,5 @@
 import dbAdmin from "shared/firebaseAdmin";
-import { createMessageForWrite } from "../../lib/factory";
+import { createMessageWrite } from "../../lib/factory";
 import query from "../../lib/query";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
@@ -21,7 +21,7 @@ const updateTurnState = async (conversationId: string, code: number) => {
 };
 
 async function sendMessageToFirestore(content: string, conversationId: string) {
-  const message = createMessageForWrite("ChatGPT", content || "ChatGPT was unable to respond!");
+  const message = createMessageWrite("ChatGPT", content || "ChatGPT was unable to respond!");
   await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
 }
 
