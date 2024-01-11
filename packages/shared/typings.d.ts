@@ -18,13 +18,11 @@ export interface ConversationRead {
 
 export interface MessageWrite {
     userId: string;
-    timestamp: FieldValue;
     content: string;
 }
 
 export interface ConversationWrite {
     parentId: string;
     userId: string;
-    timestamp: FieldValue;
     turnState: number;
 }
