@@ -13,5 +13,7 @@ export const updateTurnState = async (conversationId: string, code: number): Pro
 
 export const sendMessageToFirestore = async (content: string, conversationId: string): Promise<void> => {
   const message = createMessageWrite({ userId: "ChatGPT", content });
-  await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
+  console.log("conversationId", conversationId);
+  console.log("message", message);
+  //await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
 };

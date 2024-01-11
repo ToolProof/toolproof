@@ -1,6 +1,6 @@
 "use server";
 //import query from "./query";
-import { updateTurnState } from "./firestoreHelpers";
+import { updateTurnState, sendMessageToFirestore } from "./firestoreHelpers";
 
 interface SendPromptResponse {
   action: string;
@@ -22,7 +22,7 @@ export default async function sendPrompt({ conversationId, prompt }: { conversat
         //const content = "Test-Content";
         const action = "Test-Action";
 
-        //await sendMessageToFirestore(content, conversationId);
+        await sendMessageToFirestore(content, conversationId);
         await updateTurnState(conversationId, 1);
 
         return { action };
