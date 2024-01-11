@@ -44,7 +44,7 @@ export default function ConversationInput({ conversationId }: Props) {
         setInput("");
         await addMessageWrapper(content);
         const data = await sendPromptAction({ conversationId: conversationId, prompt: content, user: "René" });
-        // Check if the sendPrompt property exists and is not null
+        
         if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_conversation) {

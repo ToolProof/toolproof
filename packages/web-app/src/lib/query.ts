@@ -68,7 +68,7 @@ const chain = RunnableSequence.from([
 
 
 
-const query = async (prompt: string, user: string, conversationId: string) => {
+const query = async ({ conversationId, prompt }: { conversationId: string; prompt: string; user: string }) => {
 
   try {
     // Check if a new conversation has started or the existing one continues
