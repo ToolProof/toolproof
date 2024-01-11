@@ -112,7 +112,7 @@ export default function ConversationInput({ conversationId }: Props) {
                 toast.dismiss(toastIdRef.current);
             }
         };
-    }, [turnState, textareaRef]); //ATTENTION: textareaRef should maybe be an effect-dependency
+    }, [turnState, textareaRef]); //ATTENTION: maybe textareaRef should be an effect-dependency
 
     const renderHelper = (criterion: boolean) => {
         return (
