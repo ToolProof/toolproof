@@ -43,11 +43,11 @@ export default function ConversationInput({ conversationId }: Props) {
         const content = input.trim();
         setInput("");
         await addMessageWrapper(content);
-        const data = await sendPromptAction({ conversatioId: conversationId, content: content, user: "René" });
+        const data = await sendPromptAction({ conversationId: conversationId, prompt: content, user: "René" });
         // Check if the sendPrompt property exists and is not null
-        if (data && data.sendPrompt) {
-            console.log("action", data.sendPrompt.action);
-            if (data.sendPrompt.action === Constants.create_new_conversation) {
+        if (data && data.action) {
+            console.log("action", data.action);
+            if (data.action === Constants.create_new_conversation) {
                 if (session) {
                     // Create a new conversation
                     try {
@@ -64,7 +64,7 @@ export default function ConversationInput({ conversationId }: Props) {
                         console.error("Failed to create conversation", err);
                     }
                 }
-            } else if (data.sendPrompt.action === Constants.back_to_parent) {
+            } else if (data.action === Constants.back_to_parent) {
                 const parentId = conversation?.parentId; //ATTENTION: what if parentId is "base"?
                 router.push(`/conversation/${parentId}`);
             }

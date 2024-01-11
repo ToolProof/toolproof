@@ -6,7 +6,7 @@ interface SendPromptResponse {
   action: string;
 }
 
-export async function sendPrompt({ conversationId, prompt, user }: { conversationId: string; prompt: string; user: string }): Promise<SendPromptResponse> {
+export default async function sendPrompt({ conversationId, prompt, user }: { conversationId: string; prompt: string; user: string }): Promise<SendPromptResponse> {
     if (!prompt) {
         throw new Error("Prompt is required");
     }
