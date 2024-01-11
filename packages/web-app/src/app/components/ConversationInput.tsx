@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
-import { createConversationWrite, createMessageWrite } from "@/lib/factory";
 
 type Props = {
     conversationId: string;
@@ -30,8 +29,7 @@ export default function ConversationInput({ conversationId }: Props) {
 
     async function addMessageWrapper(content: string) {
         try {
-            const message = createMessageWrite({ userId: "René", content: content }); //ATTENTION: hard-coded name
-            await addMessage({ conversationId, message }); //ATTENTION_
+            await addMessage({ conversationId: conversationId, message: { userId: "René", content: content } }); //ATTENTION hardcoded user
         } catch (error) {
             console.error("Error:", error);
             toast.error("An error occurred while sending the message.");
@@ -43,7 +41,7 @@ export default function ConversationInput({ conversationId }: Props) {
         const content = input.trim();
         setInput("");
         await addMessageWrapper(content);
-        const data = await sendPromptAction({ conversationId: conversationId, prompt: content, user: "René" });
+        const data = await sendPromptAction({ conversationId: conversationId, prompt: content, user: "René" }); //ATTENTION hardcoded user
         
         if (data && data.action) {
             console.log("action", data.action);
@@ -52,8 +50,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const newConversation = createConversationWrite({ parentId: conversationId, userId: userEmail, turnState: 0 });
-                            const result = await addConversation(newConversation).unwrap();
+                            const result = await addConversation({conversation: { parentId: conversationId, userId: userEmail, turnState: 0 }}).unwrap();
                             if (result && result.conversationId) {
                                 router.push(`/conversation/${result.conversationId}`);
                             } else {
@@ -112,7 +109,7 @@ export default function ConversationInput({ conversationId }: Props) {
                 toast.dismiss(toastIdRef.current);
             }
         };
-    }, [turnState, textareaRef]); //ATTENTION: maybe textareaRef should be an effect-dependency
+    }, [turnState, textareaRef]); //ATTENTION: textareaRef should maybe be an effect-dependency
 
     const renderHelper = (criterion: boolean) => {
         return (

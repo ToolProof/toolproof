@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
-import { createConversationWrite } from "@/lib/factory";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -20,8 +19,7 @@ export default function Home() {
       if (userEmail && isFetched) {
         if (conversations.length === 0) {
           try {
-            const newConversation = createConversationWrite({ parentId: "base", userId: userEmail, turnState: 0 });
-            const result = await addConversation(newConversation).unwrap();
+            const result = await addConversation({conversation: { parentId: "base", userId: userEmail, turnState: 0 }}).unwrap();
             if (result && result.conversationId) {
               router.push(`/conversation/${result.conversationId}`);
             } else {
