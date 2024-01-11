@@ -1,6 +1,6 @@
 "use server";
 import query from "./query";
-import { updateTurnState, sendPromptAndUpdateState } from "./firestoreHelpers";
+import { sendPromptAndUpdateState } from "./firestoreHelpers";
 
 interface SendPromptResponse {
   action: string;
@@ -15,7 +15,7 @@ export default async function sendPrompt({ conversationId, prompt, user }: { con
     }
 
     try {
-        await updateTurnState(conversationId, -1);
+        //await updateTurnState(conversationId, -1);
         const response = await query({ conversationId, prompt, user });
         const content = response?.modelResponse || "ChatGPT was unable to respond!";
         const action = response?.action || "";

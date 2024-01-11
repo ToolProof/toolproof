@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { addDoc, deleteDoc, doc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, deleteDoc, doc, collection, serverTimestamp, writeBatch } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 import { ConversationWrite, MessageWrite } from "shared/typings";
 
@@ -24,17 +24,28 @@ export const rtkQuerySlice = createApi({
     addMessage: builder.mutation({
       async queryFn({ conversationId, message }: { conversationId: string, message: MessageWrite }) {
         try {
-          await addDoc(collection(db, "conversations", conversationId, "messages"), {
+          const batch = writeBatch(db);
+
+          // Message document reference
+          const messageRef = doc(collection(db, "conversations", conversationId, "messages"));
+          batch.set(messageRef, {
             ...message,
             timestamp: serverTimestamp(),
           });
+
+          // Conversation document reference
+          const conversationRef = doc(db, "conversations", conversationId);
+          batch.update(conversationRef, { turnState: -1 });
+
+          // Commit the batch
+          await batch.commit();
           return { data: "ok" };
         } catch (err) {
           return { error: err };
         }
       },
     }),
-    
+
     deleteConversation: builder.mutation({
       async queryFn(conversationId) {
         try {
