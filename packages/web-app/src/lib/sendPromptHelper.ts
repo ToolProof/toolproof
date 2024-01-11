@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+/* import { gql } from "@apollo/client";
 import { client } from "../setup/apolloClient";
 import { MutationSendPromptArgs, Mutation } from "../setup/generated/typesClient";
 
@@ -34,4 +34,4 @@ export default async function sendPromptHelper(conversationId: string, content: 
     } catch (error) {
         console.error("Error:", error);
     }
-}
+} */

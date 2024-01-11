@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { ArrowUpIcon } from "@heroicons/react/24/solid";
 import { StopIcon } from "@heroicons/react/24/solid";
-import sendPromptHelper from "../../lib/sendPromptHelper";
+import sendPromptAction from "../../lib/sendPromptAction";
 import * as Constants from "../../setup/definitions/constants";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -43,7 +43,7 @@ export default function ConversationInput({ conversationId }: Props) {
         const content = input.trim();
         setInput("");
         await addMessageWrapper(content);
-        const data = await sendPromptHelper(conversationId, content);
+        const data = await sendPromptAction({ conversatioId: conversationId, content: content, user: "René" });
         // Check if the sendPrompt property exists and is not null
         if (data && data.sendPrompt) {
             console.log("action", data.sendPrompt.action);

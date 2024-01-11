@@ -1,4 +1,4 @@
-import dbAdmin from "shared/firebaseAdmin";
+/* import dbAdmin from "shared/firebaseAdmin";
 import { createMessageWrite } from "../../lib/factory";
 import query from "../../lib/query";
 import { ApolloServer } from "@apollo/server";
@@ -73,9 +73,4 @@ const server = new ApolloServer({
   typeDefs,
 });
 
-export default startServerAndCreateNextHandler(server);
-
-
-
-
-
+export default startServerAndCreateNextHandler(server); */
