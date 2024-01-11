@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { addDoc, deleteDoc, doc, collection, serverTimestamp, } from "firebase/firestore";
+import { addDoc, deleteDoc, doc, collection } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
 
 export const rtkQuerySlice = createApi({
@@ -12,7 +12,7 @@ export const rtkQuerySlice = createApi({
         try {
           const docRef = await addDoc(collection(db, "conversations"), {
             ...conversation,
-            timestamp: serverTimestamp(),
+            //timestamp: serverTimestamp(),
           });
           return { data: { conversationId: docRef.id } }; // Return the conversation ID
         } catch (err) {
@@ -25,7 +25,7 @@ export const rtkQuerySlice = createApi({
         try {
           await addDoc(collection(db, "conversations", conversationId, "messages"), {
             ...message,
-            timestamp: serverTimestamp(),
+            //timestamp: serverTimestamp(),
           });
           return { data: "ok" };
         } catch (err) {
