@@ -1,5 +1,5 @@
 import dbAdmin from "shared/firebaseAdmin";
-import { serverTimestamp } from "firebase/firestore";
+import admin from "firebase-admin";
 import { createMessageWrite } from "./factory";
 
 export const updateTurnState = async (conversationId: string, code: number): Promise<void> => {
@@ -15,12 +15,10 @@ export const updateTurnState = async (conversationId: string, code: number): Pro
 export const sendMessageToFirestore = async (content: string, conversationId: string): Promise<void> => {
     try {
         const message = createMessageWrite({ userId: "ChatGPT", content });
-        console.log("conversationId", conversationId);
-        console.log("message", message);
         await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(
             {
                 ...message,
-                timestamp: serverTimestamp(),
+                timestamp: admin.firestore.Timestamp.now(),
             }
         ); //ATTENTION_
     } catch (error) {
