@@ -1,6 +1,8 @@
 "use server";
 import query from "./query";
-import { updateTurnState, sendMessageToFirestore } from "./firestoreHelpers";
+import { updateTurnState } from "./firestoreHelpers";
+import dbAdmin from "shared/firebaseAdmin";
+import { createMessageWrite } from "./factory";
 
 interface SendPromptResponse {
   action: string;
@@ -20,7 +22,9 @@ export default async function sendPrompt({ conversationId, prompt, user }: { con
         const content = response?.modelResponse || "ChatGPT was unable to respond!";
         const action = response?.action || "";
 
-        await sendMessageToFirestore(content, conversationId);
+        //await sendMessageToFirestore(content, conversationId);
+        const message = createMessageWrite({ userId: "ChatGPT", content });
+        await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message);
         await updateTurnState(conversationId, 1);
 
         return { action };
