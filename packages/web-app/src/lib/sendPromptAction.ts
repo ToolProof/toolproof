@@ -19,7 +19,7 @@ export default async function sendPrompt({ conversationId, prompt }: { conversat
         /* const response = await query({ conversationId, prompt, user });
         const content = response?.modelResponse || "ChatGPT was unable to respond!";
         const action = response?.action || ""; */
-        //const content = "Test-Content";
+        const content = "Test-Content";
         const action = "Test-Action";
 
         await sendMessageToFirestore(content, conversationId);
