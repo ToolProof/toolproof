@@ -1,12 +1,12 @@
 "use server";
-import query from "./query";
+//import query from "./query";
 import { updateTurnState, sendMessageToFirestore } from "./firestoreHelpers";
 
 interface SendPromptResponse {
   action: string;
 }
 
-export default async function sendPrompt({ conversationId, prompt, user }: { conversationId: string; prompt: string; user: string }): Promise<SendPromptResponse> {
+export default async function sendPrompt({ conversationId, prompt }: { conversationId: string; prompt: string; user: string }): Promise<SendPromptResponse> {
     if (!prompt) {
         throw new Error("Prompt is required");
     }
