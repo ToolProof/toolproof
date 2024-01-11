@@ -50,7 +50,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const result = await addConversation({conversation: { parentId: conversationId, userId: userEmail, turnState: 0 }}).unwrap();
+                            const result = await addConversation({ parentId: conversationId, userId: userEmail, turnState: 0 }).unwrap();
                             if (result && result.conversationId) {
                                 router.push(`/conversation/${result.conversationId}`);
                             } else {

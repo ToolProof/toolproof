@@ -1,6 +1,7 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { addDoc, deleteDoc, doc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "shared/firebaseClient";
+import { ConversationWrite, MessageWrite } from "shared/typings";
 
 export const rtkQuerySlice = createApi({
   reducerPath: "rtkQuerySlice",
@@ -8,7 +9,7 @@ export const rtkQuerySlice = createApi({
   //tagTypes: [],
   endpoints: (builder) => ({
     addConversation: builder.mutation({
-      async queryFn(conversation) {
+      async queryFn(conversation: ConversationWrite) {
         try {
           const docRef = await addDoc(collection(db, "conversations"), {
             ...conversation,
@@ -21,7 +22,7 @@ export const rtkQuerySlice = createApi({
       },
     }),
     addMessage: builder.mutation({
-      async queryFn({ conversationId, message }) {
+      async queryFn({ conversationId, message }: { conversationId: string, message: MessageWrite }) {
         try {
           await addDoc(collection(db, "conversations", conversationId, "messages"), {
             ...message,
@@ -33,6 +34,7 @@ export const rtkQuerySlice = createApi({
         }
       },
     }),
+    
     deleteConversation: builder.mutation({
       async queryFn(conversationId) {
         try {

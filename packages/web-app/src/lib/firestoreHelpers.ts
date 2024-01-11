@@ -1,5 +1,6 @@
 import dbAdmin from "shared/firebaseAdmin";
 import admin from "firebase-admin";
+import { MessageWrite } from "shared/typings";
 
 export const updateTurnState = async (conversationId: string, code: number): Promise<void> => {
     try {
@@ -13,9 +14,10 @@ export const updateTurnState = async (conversationId: string, code: number): Pro
 
 export const sendMessageToFirestore = async (content: string, conversationId: string): Promise<void> => {
     try {
+        const message: MessageWrite = { userId: "ChatGPT", content };
         await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(
             {
-                message: { userId: "ChatGPT", content },
+                message: message,
                 timestamp: admin.firestore.Timestamp.now(),
             }
         ); //ATTENTION_
