@@ -1,6 +1,6 @@
 "use server";
 import query from "./query";
-import { addMessageAndUpdateTurnState } from "./firestoreHelpers";
+import { addMessageAndUpdateTurnState } from "./firestoreHelper";
 
 interface SendPromptResponse {
   action: string;

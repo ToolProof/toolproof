@@ -1,4 +1,4 @@
-import { CodegenConfig } from "@graphql-codegen/cli";
+/* import { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   schema: "./src/setup/definitions/schema.graphql",
@@ -31,3 +31,4 @@ const config: CodegenConfig = {
 };
 
 export default config;
+ */
