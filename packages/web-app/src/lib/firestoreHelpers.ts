@@ -17,7 +17,7 @@ export const sendMessageToFirestore = async (content: string, conversationId: st
         const message: MessageWrite = { userId: "ChatGPT", content };
         await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(
             {
-                message: message,
+                ...message,
                 timestamp: admin.firestore.Timestamp.now(),
             }
         ); //ATTENTION_
