@@ -15,5 +15,5 @@ export const sendMessageToFirestore = async (content: string, conversationId: st
   const message = createMessageWrite({ userId: "ChatGPT", content });
   console.log("conversationId", conversationId);
   console.log("message", message);
-  //await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
+  await dbAdmin.collection("conversations").doc(conversationId).collection("messages").add(message); //ATTENTION_
 };
