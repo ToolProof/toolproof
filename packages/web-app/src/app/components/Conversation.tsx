@@ -2,25 +2,38 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
-import { useAppSelector } from "@/redux/hooks";
-import { MessageRead } from "shared/typings";
+import { useMessagesForConversation } from "@/redux/hooks";
 
 type Props = {
     conversationId: string;
 }
 
 function Conversation({ conversationId }: Props) {
-    const lastMessageRef = useRef<HTMLDivElement | null>(null);
-    const messages: MessageRead[] = useAppSelector((state) => 
-    state.conversations.conversations.find((c) => c.id === conversationId)?.messages || []
-);
+    const messages = useMessagesForConversation(conversationId);
     const [componentMountTime, setComponentMountTime] = useState(new Date());
-
+    
+    const messageContainerRef = useRef<HTMLDivElement | null>(null);
+    
     useEffect(() => {
-        if (lastMessageRef.current) {
-            lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+        // Function to scroll to the bottom of the container
+        const scrollToBottom = () => {
+            const messageContainer = messageContainerRef.current;
+            if (messageContainer) {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+        };
+
+        setTimeout(scrollToBottom, 1000);
+
+    }, [conversationId]);
+
+    const handleTextChange = () => {
+        const messageContainer = messageContainerRef.current;
+        if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            console.log("scrollHeight: " + messageContainer.scrollHeight);
         }
-    }, []);
+    };
 
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -37,7 +50,6 @@ function Conversation({ conversationId }: Props) {
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, []); // Empty dependency array ensures this runs only once on mount
-
 
     function isNewMessage(messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) {
 
@@ -60,7 +72,7 @@ function Conversation({ conversationId }: Props) {
     };
 
     return (
-        <div className="bg-white flex-1 overflow-y-auto overflow-x-hidden">
+        <div ref={messageContainerRef} className="bg-white flex-1 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
             {messages && messages.length === 0 && (
                 <div>
                     <p className="mt-10 text-center text-black">
@@ -72,14 +84,15 @@ function Conversation({ conversationId }: Props) {
             {messages?.map((message, index) => {
                 const isNew = isNewMessage(message.timestamp, index, messages.length);
 
-                const messageComponent = <MessageDisplay key={message.id} message={message} isNew={isNew} />
-
-                if (index === messages.length - 1) {
-                    return <div ref={lastMessageRef} key={message.id}>{messageComponent}</div>;
-                } else {
-                    return messageComponent;
-                }
+                const messageComponent = <MessageDisplay
+                    key={message.id}
+                    message={message}
+                    isNew={isNew}
+                    onTextChange={handleTextChange}
+                />
+                return messageComponent;
             })}
+    
         </div>
     );
 

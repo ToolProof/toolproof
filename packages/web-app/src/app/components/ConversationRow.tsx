@@ -4,7 +4,7 @@ import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useAppSelector } from "@/redux/hooks";
+import { useConversationById } from "@/redux/hooks";
 import { useDeleteConversationMutation } from "@/redux/features/rtkQuerySlice";
 
 type Props = {
@@ -16,8 +16,8 @@ function ConversationRow({ conversationId }: Props) {
     const router = useRouter();
     const [active, setActive] = useState(false);
     const href = `/conversation/${conversationId}`;
-    const conversation = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId));
-    const messages = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId)?.messages);
+    const conversation = useConversationById(conversationId);
+    const messages = conversation?.messages;
     const [deleteConversation] = useDeleteConversationMutation();
 
     useEffect(() => {

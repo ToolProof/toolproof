@@ -7,12 +7,13 @@ import { useEffect } from "react";
 import { updateConversations, updateMessages, setIsFetched } from "@/redux/features/mainSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useAppSelector } from "@/redux/hooks";
+import { useConversationIds } from "@/redux/hooks";
 import { ConversationRead, MessageRead } from "shared/typings";
 
 function SideBar() {
     const { data: session } = useSession();
     const dispatch = useAppDispatch();
-    const conversations = useAppSelector((state) => state.conversations.conversations); //ATTENTION: could we load only the ids here?
+    const conversationIds = useConversationIds();
     const isFetched = useAppSelector((state) => state.conversations.isFetched);
     const userEmail = session?.user?.email;
 
@@ -74,9 +75,8 @@ function SideBar() {
                         {!isFetched &&
                             <div className="animate-pulse text-center text-white">Loading...</div>
                         }
-                        {/* Map through the conversation rows */}
-                        {conversations?.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversationId={conversation.id} />
+                        {conversationIds?.map((conversationId) => {
+                            return <ConversationRow key={conversationId} conversationId={conversationId} />
                         })}
                     </div>
                 </div>
