@@ -1,4 +1,4 @@
-import "../setup/definitions/globals.css"
+import "../setup/globals.css"
 import * as Constants from "../setup/constants"
 import type { Metadata } from "next"
 import SideBar from "./components/SideBar"
