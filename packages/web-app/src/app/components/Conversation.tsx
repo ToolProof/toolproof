@@ -33,7 +33,7 @@ export default function Conversation({ conversationId }: Props) {
         const messageContainer = messageContainerRef.current;
         if (messageContainer) {
             messageContainer.scrollTop = messageContainer.scrollHeight;
-            console.log("scrollHeight: " + messageContainer.scrollHeight);
+            //console.log("scrollHeight: " + messageContainer.scrollHeight);
         }
     };
 

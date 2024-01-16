@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
 import { useAppSelector } from "@/redux/hooks";
 import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
-import * as Constants from "../../setup/definitions/constants";
+import * as Constants from "../../setup/constants";
 
 
 type Props = {
