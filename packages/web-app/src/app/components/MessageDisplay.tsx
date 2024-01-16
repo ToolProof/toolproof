@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MessageRead } from "shared/typings";
+
 
 type Props = {
   message: MessageRead;
@@ -7,7 +8,8 @@ type Props = {
   onTextChange: (text: string) => void;
 };
 
-function MessageDisplay({ message, isNew, onTextChange }: Props) {
+
+export default function MessageDisplay({ message, isNew, onTextChange }: Props) {
   const [displayedText, setDisplayedText] = useState("");
   const imageSource = (message.userId === "René") ? "/images/rene_stavnes.jpg" : "/images/openai_logo.png";
 
@@ -18,16 +20,21 @@ function MessageDisplay({ message, isNew, onTextChange }: Props) {
     }
   }, [displayedText, isNew, onTextChange]);
 
+
   useEffect(() => {
     let timeoutId: number | undefined;
 
     if (isNew && message.userId === "ChatGPT") {
       const typeLetter = (index: number) => {
         if (index < message.content.length) {
+          const currentChar = message.content[index];
+          const isPunctuation = ",.?!;:".includes(currentChar);
+          const delay = isPunctuation ? 50 : 10; // Longer delay for punctuation
+
           timeoutId = window.setTimeout(() => {
-            setDisplayedText((currentText) => currentText + message.content[index]);
+            setDisplayedText((currentText) => currentText + currentChar);
             typeLetter(index + 1);
-          }, 10); // Adjust the typing speed here
+          }, delay);
         }
       };
       typeLetter(0);
@@ -43,16 +50,12 @@ function MessageDisplay({ message, isNew, onTextChange }: Props) {
     };
   }, [message, isNew]);
 
+
   return (
-    <div className="py-5 text-black">
-      <div className="flex space-x-5 px-10 max-w-2xl mx-auto">
-        <img src={imageSource} alt="" className="h-8 w-8"/>
-        <p className="pt-1 text-base break-words whitespace-normal max-w-full">
-          {displayedText}
-        </p>
-      </div>
+    <div className="flex py-5 px-0 space-x-5 max-w-2xl mx-auto">
+      <img src={imageSource} alt="" className="h-8 w-8" />
+      <p className="text-base">{displayedText}</p>
     </div>
   );
-}
 
-export default MessageDisplay;
+}

@@ -4,6 +4,7 @@
     "packages/web-app",
     "packages/transformer",
     "packages/space-xyz",
+    "packages/test",
     "packages/debate-importer"
   ],
   "scripts": {

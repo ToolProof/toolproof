@@ -4,14 +4,15 @@ import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
 import { useMessagesForConversation } from "@/redux/hooks";
 
+
 type Props = {
     conversationId: string;
 }
 
-function Conversation({ conversationId }: Props) {
+
+export default function Conversation({ conversationId }: Props) {
     const messages = useMessagesForConversation(conversationId);
     const [componentMountTime, setComponentMountTime] = useState(new Date());
-    
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     
     useEffect(() => {
@@ -27,6 +28,7 @@ function Conversation({ conversationId }: Props) {
 
     }, [conversationId]);
 
+
     const handleTextChange = () => {
         const messageContainer = messageContainerRef.current;
         if (messageContainer) {
@@ -34,6 +36,7 @@ function Conversation({ conversationId }: Props) {
             console.log("scrollHeight: " + messageContainer.scrollHeight);
         }
     };
+
 
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -50,6 +53,7 @@ function Conversation({ conversationId }: Props) {
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, []); // Empty dependency array ensures this runs only once on mount
+    
 
     function isNewMessage(messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) {
 
@@ -66,13 +70,14 @@ function Conversation({ conversationId }: Props) {
         const messageCreationTime = messageTimestamp.toDate();
         const currentTime = new Date();
         const timeSinceMessageCreation = (currentTime.getTime() - messageCreationTime.getTime()) / 1000;
-        const timeBetweenMessageCreationAndComponentMount = (componentMountTime.getTime() - messageCreationTime.getTime()) / 1000;
+        const timeBetweenMessageCreationAndComponentMount = (messageCreationTime.getTime() - componentMountTime.getTime()) / 1000;
 
-        return timeBetweenMessageCreationAndComponentMount < 0 && timeSinceMessageCreation < 30;
+        return timeBetweenMessageCreationAndComponentMount > 0 && timeSinceMessageCreation < 30;
     };
 
+
     return (
-        <div ref={messageContainerRef} className="bg-white flex-1 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
+        <div ref={messageContainerRef} className="max-h-[calc(80vh)] overflow-y-auto overflow-x-hidden">
             {messages && messages.length === 0 && (
                 <div>
                     <p className="mt-10 text-center text-black">
@@ -97,5 +102,3 @@ function Conversation({ conversationId }: Props) {
     );
 
 }
-
-export default Conversation;

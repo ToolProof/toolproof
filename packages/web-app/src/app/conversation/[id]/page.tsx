@@ -10,11 +10,11 @@ type Props = {
 
 function ConversationPage({ params: { id } }: Props) {
     return (
-        <div className="bg-white flex flex-col h-screen overflow-hidden relative">
-            <div className="flex-1 my-10">
+        <div className="flex flex-col h-screen overflow-hidden bg-white">
+            <div className="flex-1 my-8">
                 <Conversation key={id} conversationId={id} />
             </div>
-            <div className="w-full">
+            <div>
                 <ConversationInput conversationId={id} />
             </div>
         </div>
