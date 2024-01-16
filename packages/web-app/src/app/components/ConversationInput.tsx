@@ -124,15 +124,18 @@ export default function ConversationInput({ conversationId }: Props) {
             <form onSubmit={handleSubmit} className="flex flex-col justify-center relative mx-48 mb-4 p-2 rounded-2xl border-2 border-gray-500 text-black">
                 <textarea
                     ref={textareaRef}
-                    className="p-4 pr-16 max-h-[10em] focus:outline-none disabled:cursor-not-allowed placeholder:text-gray-300 bg-transparent w-full overflow-auto resize-none"
+                    className="p-4 pr-16 max-h-[10em] focus:outline-none disabled:cursor-not-allowed placeholder:text-gray-300"
                     disabled={criterion}
                     placeholder="Type your message here..."
                     value={input}
+                    rows={1}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
                 <button
-                    className="absolute right-10 bottom-4 h-8 w-8 font-bold disabled:cursor-not-allowed bg-[#11A37F] disabled:bg-gray-300 text-white hover:opacity-50 px-4 py-2 rounded"
+                    className={`absolute right-10 bottom-4 h-8 w-8 font-bold text-white bg-[#11A37F] 
+                    ${!input ? "disabled:cursor-not-allowed disabled:bg-gray-300" : "hover:opacity-50"}
+                   `}
                     disabled={!input}
                     type="submit"
                 >

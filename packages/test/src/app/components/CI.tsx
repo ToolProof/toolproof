@@ -91,7 +91,7 @@ export default function ConversationInput({ conversationId }: Props) {
             <button
                 type="submit"
                 disabled={!input}
-                className="absolute right-10 bottom-4 h-8 w-8 font-bold disabled:cursor-not-allowed bg-[#11A37F] disabled:bg-gray-300 text-white"
+                className="absolute right-10 bottom-4 h-8 w-8 font-bold disabled:cursor-not-allowed hover:opacity-50 bg-[#11A37F] disabled:bg-gray-300 text-white"
             >
                 {
                     turnState === -1 ?
