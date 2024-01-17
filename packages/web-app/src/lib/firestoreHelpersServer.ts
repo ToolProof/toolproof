@@ -2,6 +2,7 @@ import dbAdmin from "shared/firebaseAdmin";
 import admin from "firebase-admin";
 import { MessageWrite } from "shared/typings";
 
+
 export const addMessageAndUpdateTurnState = async (conversationId: string, content: string, code: number): Promise<void> => {
     try {
         const batch = dbAdmin.batch();
@@ -25,3 +26,7 @@ export const addMessageAndUpdateTurnState = async (conversationId: string, conte
         throw new Error("An error occurred while executing batch operation");
     }
 };
+
+
+
+

@@ -6,9 +6,8 @@ import { StopIcon } from "@heroicons/react/24/solid";
 import sendPromptAction from "../../lib/sendPromptAction";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useAddMessageMutation } from "@/redux/features/rtkQuerySlice";
-import { useAppSelector } from "@/redux/hooks";
-import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
+import { useConversation } from "../../lib/firestoreHelpersClient";
+import { addConversation, addMessage } from "../../lib/firestoreHelpersClient";
 import * as Constants from "../../setup/constants";
 
 
@@ -19,16 +18,14 @@ type Props = {
 
 export default function ConversationInput({ conversationId }: Props) {
     const [input, setInput] = useState("");
-    const conversation = useAppSelector((state) => state.conversations.conversations.find((c) => c.id === conversationId));
+    const { conversation } = useConversation(conversationId);
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     const router = useRouter();
     const toastIdRef = useRef<string | undefined>(undefined);
-    const [addMessage] = useAddMessageMutation();
-    const [addConversation] = useAddConversationMutation();
     const userEmail = session?.user?.email;
-
+   
 
     const addMessageWrapper = async (content: string) => {
         try {
@@ -54,9 +51,9 @@ export default function ConversationInput({ conversationId }: Props) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const result = await addConversation({ parentId: conversationId, userId: userEmail, turnState: 0 }).unwrap();
-                            if (result && result.conversationId) {
-                                router.push(`/conversation/${result.conversationId}`);
+                            const result = await addConversation({ parentId: conversationId, userId: userEmail, turnState: 0 });
+                            if (result && result.data && result.data.conversationId) {
+                                router.push(`/conversation/${result.data.conversationId}`);
                             } else {
                                 console.error("Conversation creation did not return a valid ID");
                             }

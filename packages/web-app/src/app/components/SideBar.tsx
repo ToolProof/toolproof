@@ -1,82 +1,23 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
-import { query, collection, onSnapshot, where, orderBy, Unsubscribe } from "firebase/firestore";
-import { db } from "shared/firebaseClient";
 import ConversationRow from "./ConversationRow";
-import { useEffect } from "react";
-import { updateConversations, updateMessages, setIsFetched } from "@/redux/features/mainSlice";
-import { useAppDispatch } from "@/redux/hooks";
-import { useAppSelector } from "@/redux/hooks";
-import { useConversationIds } from "@/redux/hooks";
-import { ConversationRead, MessageRead } from "shared/typings";
+import { useConversations } from "../../lib/firestoreHelpersClient";
 
-function SideBar() {
+export default function SideBar() {
     const { data: session } = useSession();
-    const dispatch = useAppDispatch();
-    const conversationIds = useConversationIds();
-    const isFetched = useAppSelector((state) => state.conversations.isFetched);
-    const userEmail = session?.user?.email;
-
-    useEffect(() => {
-        let unsubscribeConversations: Unsubscribe;
-        const unsubscribeMessagesFunctions: Unsubscribe[] = [];
-
-        if (userEmail) {
-            unsubscribeConversations = onSnapshot(
-                query(
-                    collection(db, "conversations"),
-                    where("userId", "==", userEmail),
-                    orderBy("timestamp", "asc")
-                ),
-                (conversationsSnapshot) => {
-                    const conversations = conversationsSnapshot.docs.map(doc => {
-                        return  { id: doc.id, ...doc.data(), messages: [] as MessageRead[] } as ConversationRead; //ATTENTION: should use factory here
-                    });
-                    dispatch(updateConversations(conversations));
-
-                    if (conversations.length === 0) {
-                        dispatch(setIsFetched(true));  // No conversations, so fetching is complete
-                    } else {
-                        conversations.forEach((conversation) => {
-                            if (conversation.id) {
-                                const unsubscribeMessages = onSnapshot(
-                                    query(
-                                        collection(db, "conversations", conversation.id, "messages"),
-                                        orderBy("timestamp", "asc")
-                                    ),
-                                    (messagesSnapshot) => {
-                                        const messages = messagesSnapshot.docs.map(doc => {
-                                            return { id: doc.id, ...doc.data() } as MessageRead; //ATTENTION: should use factory here
-                                        });
-                                        dispatch(updateMessages({ conversationId: conversation.id, messages }));
-                                    }
-                                );
-                                unsubscribeMessagesFunctions.push(unsubscribeMessages);
-                            }
-                        });
-                        dispatch(setIsFetched(true));  // Listeners are set up, consider fetching complete
-                    }
-                }
-            );
-
-            return () => {
-                if (unsubscribeConversations) unsubscribeConversations();
-                unsubscribeMessagesFunctions.forEach(unsubscribe => unsubscribe());
-            };
-        }
-    }, [userEmail, dispatch]);
-
-
+    const userEmail = session?.user?.email || "";
+    const { conversations, loading } = useConversations(userEmail);
+    
     return (
         <div className="p-d flex flex-col h-screen">
             <div className="flex-1">
                 <div>
                     <div className="flex flex-col space-y-2">
-                        {!isFetched &&
+                        {loading &&
                             <div className="animate-pulse text-center text-white">Loading...</div>
                         }
-                        {conversationIds?.map((conversationId) => {
-                            return <ConversationRow key={conversationId} conversationId={conversationId} />
+                        {conversations.map((conversation) => {
+                            return <ConversationRow key={conversation.id} conversationId={conversation.id} />
                         })}
                     </div>
                 </div>
@@ -92,5 +33,3 @@ function SideBar() {
         </div>
     );
 }
-
-export default SideBar;

@@ -4,38 +4,41 @@ import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useConversationById } from "@/redux/hooks";
-import { useDeleteConversationMutation } from "@/redux/features/rtkQuerySlice";
+import { useMessages, useConversation, deleteConversation } from "../../lib/firestoreHelpersClient";
+
 
 type Props = {
     conversationId: string;
 }
 
-function ConversationRow({ conversationId }: Props) {
+export default function ConversationRow({ conversationId }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
     const href = `/conversation/${conversationId}`;
-    const conversation = useConversationById(conversationId);
-    const messages = conversation?.messages;
-    const [deleteConversation] = useDeleteConversationMutation();
+    const {conversation} = useConversation(conversationId);
+    const {messages} = useMessages(conversationId);
+  
 
     useEffect(() => {
         if (!pathName) return;
         setActive(pathName.includes(conversationId)); //ATTENTION: what if one id contains another id?
     }, [pathName, conversationId]);
 
+
+
     const handleDeleteConversation = async () => {
         try {
-            if (conversation?.parentId !== "base") {
+            if (conversation?.parentId !== "base") {  
                 // Delete the conversation
-                await deleteConversation(conversationId).unwrap();
+                await deleteConversation(conversationId);
                 router.replace("/"); // Redirect after deletion
             }
         } catch (err) {
             console.error("Failed to delete conversation", err);
         }
     };
+
 
     return (
         <Link
@@ -57,5 +60,3 @@ function ConversationRow({ conversationId }: Props) {
         </Link>
     );
 }
-
-export default ConversationRow;

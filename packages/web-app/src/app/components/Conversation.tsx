@@ -2,12 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
-import { useMessagesForConversation } from "@/redux/hooks";
-/* import { collection, query, orderBy, limit } from "firebase/firestore";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { db } from "shared/firebaseClient";
-import { MessageRead } from "shared/typings"; */
-
+import { useMessages } from "../../lib/firestoreHelpersClient";
 
 type Props = {
     conversationId: string;
@@ -15,12 +10,7 @@ type Props = {
 
 
 export default function Conversation({ conversationId }: Props) {
-    const messages = useMessagesForConversation(conversationId);
-    /* const messagesQuery = conversationId
-        ? query(collection(db, "conversations", conversationId, "messages"), orderBy("timestamp", "asc"), limit(100))
-        : null;
-    const [messageSnapshots] = useCollection(messagesQuery);
-    const messages = messageSnapshots?.docs.map((doc) => doc.data() as MessageRead) ?? []; */
+    const {messages} = useMessages(conversationId);
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     

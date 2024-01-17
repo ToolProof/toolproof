@@ -3,25 +3,22 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { useAppSelector } from "@/redux/hooks";
-import { useAddConversationMutation } from "@/redux/features/rtkQuerySlice";
+import { useConversations, addConversation } from "../lib/firestoreHelpersClient";
 
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
-  const userEmail = session?.user?.email;
-  const isFetched = useAppSelector((state) => state.conversations.isFetched);
-  const conversations = useAppSelector((state) => state.conversations.conversations);
-  const [addConversation] = useAddConversationMutation();
+  const userEmail = session?.user?.email || "";
+  const { conversations } = useConversations(userEmail);
 
   useEffect(() => {
     const checkAndHandleConversation = async () => {
-      if (userEmail && isFetched) {
+      if (userEmail) {
         if (conversations.length === 0) {
           try {
-            const result = await addConversation({ parentId: "base", userId: userEmail, turnState: 0 }).unwrap();
-            if (result && result.conversationId) {
-              router.push(`/conversation/${result.conversationId}`);
+            const result = await addConversation({ parentId: "base", userId: userEmail, turnState: 0 });
+            if (result && result.data && result.data.conversationId) {
+              router.push(`/conversation/${result.data.conversationId}`);
             } else {
               console.error("Conversation creation did not return a valid ID");
             }
@@ -37,7 +34,8 @@ export default function Home() {
     };
 
     checkAndHandleConversation();
-  }, [userEmail, isFetched, conversations, addConversation, router]);
+  }, [userEmail, conversations, router]);
+  
 
   return (
     <div className="baseBackground flex flex-col items-center justify-center h-screen">
