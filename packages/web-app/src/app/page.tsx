@@ -1,7 +1,7 @@
 "use client"
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { signIn } from "next-auth/react";
 import { useConversations, addConversation } from "../lib/firestoreHelpersClient";
 
@@ -11,17 +11,18 @@ export default function Home() {
   const router = useRouter();
   const userEmail = session?.user?.email || "";
   const { conversations } = useConversations(userEmail);
-  const [isCreated, setIsCreated] = useState(false);
+  const isCreatedRef = useRef(false);
 
   useEffect(() => {
     const checkAndHandleConversation = async () => {
       if (userEmail) {
-        if (conversations.length === 0 && !isCreated) { //ATTENTION: asynchronous updates of isCreated
+        if (conversations.length === 0 && !isCreatedRef.current) { //ATTENTION: asynchronous updates of isCreated
           try {
+            console.log(Date.now().toString());
             const result = await addConversation({ parentId: "base", userId: userEmail, turnState: 0 });
             if (result && result.data && result.data.conversationId) {
               router.push(`/conversation/${result.data.conversationId}`);
-              setIsCreated(true);
+              isCreatedRef.current = true;
             } else {
               console.error("Conversation creation did not return a valid ID");
             }
@@ -31,14 +32,14 @@ export default function Home() {
         } else {
           // Redirect to the first conversation
           const existingConversationId = conversations[0].id;
-          setIsCreated(true);
+          isCreatedRef.current = true;
           router.push(`/conversation/${existingConversationId}`);
         }
       }
     };
 
     checkAndHandleConversation();
-  }, [isCreated, userEmail, conversations, router]);
+  }, [userEmail, conversations, router]);
   
 
   return (
