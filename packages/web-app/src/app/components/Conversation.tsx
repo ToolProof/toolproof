@@ -3,6 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
 import { useMessagesForConversation } from "@/redux/hooks";
+/* import { collection, query, orderBy, limit } from "firebase/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { db } from "shared/firebaseClient";
+import { MessageRead } from "shared/typings"; */
 
 
 type Props = {
@@ -12,32 +16,15 @@ type Props = {
 
 export default function Conversation({ conversationId }: Props) {
     const messages = useMessagesForConversation(conversationId);
+    /* const messagesQuery = conversationId
+        ? query(collection(db, "conversations", conversationId, "messages"), orderBy("timestamp", "asc"), limit(100))
+        : null;
+    const [messageSnapshots] = useCollection(messagesQuery);
+    const messages = messageSnapshots?.docs.map((doc) => doc.data() as MessageRead) ?? []; */
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     
-    useEffect(() => {
-        // Function to scroll to the bottom of the container
-        const scrollToBottom = () => {
-            const messageContainer = messageContainerRef.current;
-            if (messageContainer) {
-                messageContainer.scrollTop = messageContainer.scrollHeight;
-            }
-        };
-
-        setTimeout(scrollToBottom, 1000);
-
-    }, [conversationId]);
-
-
-    const handleTextChange = () => {
-        const messageContainer = messageContainerRef.current;
-        if (messageContainer) {
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-            //console.log("scrollHeight: " + messageContainer.scrollHeight);
-        }
-    };
-
-
+    
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
@@ -73,6 +60,34 @@ export default function Conversation({ conversationId }: Props) {
         const timeBetweenMessageCreationAndComponentMount = (messageCreationTime.getTime() - componentMountTime.getTime()) / 1000;
 
         return timeBetweenMessageCreationAndComponentMount > 0 && timeSinceMessageCreation < 30;
+    };
+
+
+    useEffect(() => {
+        // Function to scroll to the bottom of the container
+        const scrollToBottom = () => {
+            const messageContainer = messageContainerRef.current;
+            if (messageContainer) {
+                messageContainer.scrollTo({
+                    top: messageContainer.scrollHeight,
+                    behavior: "smooth"
+                });
+            }
+        };
+
+        setTimeout(scrollToBottom, 1000);
+
+    }, [conversationId]);
+
+
+    const handleTextChange = () => {
+        const messageContainer = messageContainerRef.current;
+        if (messageContainer) {
+            messageContainer.scrollTo({
+                top: messageContainer.scrollHeight,
+                behavior: "smooth"
+            });
+        }
     };
 
 

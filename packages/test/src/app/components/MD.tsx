@@ -12,6 +12,14 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
     const imageSource = (message.userId === "René") ? "/images/rene_stavnes.jpg" : "/images/openai_logo.png";
 
     useEffect(() => {
+      if (isNew) {
+          onTextChange(displayedText);
+          //console.log(message.userId);
+      }
+  }, [displayedText, isNew, onTextChange]);
+  
+
+    useEffect(() => {
         let timeoutId: number | undefined;
     
         if (isNew && message.userId === "ChatGPT") {
@@ -39,14 +47,6 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
           }
         };
     }, [message, isNew]);
-
-
-    useEffect(() => {
-        if (isNew) {
-            onTextChange(displayedText);
-            console.log(message.userId);
-        }
-    }, [displayedText, isNew, onTextChange, message.userId]);
     
 
     return (
