@@ -1,4 +1,4 @@
-import { addDoc, deleteDoc, serverTimestamp, writeBatch, doc, query, collection, where, orderBy, limit } from "firebase/firestore";
+import { getDocs, addDoc, deleteDoc, serverTimestamp, writeBatch, doc, query, collection, where, orderBy, limit } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { db } from "shared/firebaseClient";
 import { MessageRead } from "shared/typings";
@@ -97,4 +97,16 @@ export async function deleteConversation(conversationId: string) {
     } catch (err) {
         return { error: err };
     }
+}
+
+
+export async function noConversationCreated(userId: string) {
+    const q = query(
+        collection(db, "conversations"),
+        where("userId", "==", userId),
+        orderBy("timestamp", "asc"),
+        limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
 }

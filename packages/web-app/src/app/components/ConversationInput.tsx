@@ -1,8 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
-import { toast } from "react-hot-toast";
-import { ArrowUpIcon } from "@heroicons/react/24/solid";
-import { StopIcon } from "@heroicons/react/24/solid";
+// import { toast } from "react-hot-toast";
 import sendPromptAction from "../../lib/sendPromptAction";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -23,16 +21,15 @@ export default function ConversationInput({ conversationId }: Props) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     const router = useRouter();
-    const toastIdRef = useRef<string | undefined>(undefined);
+    // const toastIdRef = useRef<string | undefined>(undefined);
     const userEmail = session?.user?.email;
-   
+
 
     const addMessageWrapper = async (content: string) => {
         try {
             await addMessage({ conversationId: conversationId, message: { userId: "René", content: content } }); //ATTENTION hardcoded user
         } catch (error) {
             console.error("Error:", error);
-            toast.error("An error occurred while sending the message.");
             // Optionally revert optimistic UI updates here
         }
     }
@@ -101,19 +98,19 @@ export default function ConversationInput({ conversationId }: Props) {
 
     useEffect(() => {
         if (turnState === -1) {
-            toastIdRef.current = toast.loading("ChatGPT is thinking...");
+            // toastIdRef.current = toast.loading("ChatGPT is thinking...");
         } else {
-            if (toastIdRef.current) {
+            /* if (toastIdRef.current) {
                 toast.dismiss(toastIdRef.current);
-            }
+            } */
             textareaRef.current?.focus();
         }
-        return () => {
+        /* return () => {
             if (toastIdRef.current) {
                 toast.dismiss(toastIdRef.current);
             }
-        };
-    }, [turnState, textareaRef]); //ATTENTION: textareaRef should maybe be an effect-dependency
+        }; */
+    }, [turnState]);
 
 
     const renderHelper = (criterion: boolean) => {
@@ -130,20 +127,24 @@ export default function ConversationInput({ conversationId }: Props) {
                     onKeyDown={handleKeyDown}
                 />
                 <button
-                    className={`absolute right-10 bottom-4 h-8 w-8 font-bold text-white bg-[#11A37F] 
-                    ${!input ? "disabled:cursor-not-allowed disabled:bg-gray-300" : "hover:opacity-50"}
+                    className={`absolute right-10 bottom-4 h-8 w-8 rounded-lg
+                    ${!input ? "disabled:cursor-not-allowed" : "hover:opacity-50"}
                    `}
                     disabled={!input}
                     type="submit"
                 >
                     {
                         criterion ?
-                            <div className="flex justify-center items-center">
-                                <StopIcon className="bg-white text-black" />
+                            <div className="flex justify-center items-center w-8 h-8 bg-transparent">
+                                <img src="/icons/encircled_square.png" />
                             </div>
                             :
-                            <div className="flex justify-center items-center">
-                                <ArrowUpIcon className="h-6 w-6" />
+                            <div
+                                className={`flex justify-center items-center h-8 w-8 bg-black
+                                ${!input && "bg-gray-300"}
+                                `}
+                            >
+                                <img src="/icons/up_arrow.png" className="w-4 h-4" />
                             </div>
                     }
                 </button>
