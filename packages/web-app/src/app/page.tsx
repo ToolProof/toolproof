@@ -13,6 +13,8 @@ export default function Home() {
   const { conversations, loading } = useConversations(userEmail);
 
   useEffect(() => {
+    console.log("loading", loading);
+    console.log("conversations.length", conversations.length);
     const checkAndHandleConversation = async () => {
       if (userEmail) {
         if (loading) {
@@ -20,7 +22,6 @@ export default function Home() {
         }
         if (conversations.length === 0) { //ATTENTION: asynchronous updates of isCreated
           try {
-            console.log(Date.now().toString());
             const result = await addConversation({ parentId: "base", userId: userEmail, turnState: 0 });
             if (result && result.data && result.data.conversationId) {
               router.push(`/conversation/${result.data.conversationId}`);
