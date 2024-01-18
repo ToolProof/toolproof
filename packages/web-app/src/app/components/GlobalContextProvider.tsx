@@ -1,27 +1,26 @@
 "use client";
-import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 interface GlobalContextType {
-    isAlfa: boolean;
-    setIsAlfa: Dispatch<SetStateAction<boolean>>;
+    isTyping: boolean;
+    setIsTyping: (value: boolean) => void;
 }
 
 const GlobalContext = createContext<GlobalContextType>({
-    isAlfa: true, // Default value for isAlfa
-    setIsAlfa: (value: boolean | ((prevState: boolean) => boolean)) => {
-        console.log("value: ", value);
-    }, // Default value for setIsAlfa
+    isTyping: false,
+    setIsTyping: () => {}, // Simpler placeholder function
 });
+
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
 export const GlobalContextProvider = ({ children }: {
     children: React.ReactNode
 }) => {
-    const [isAlfaLocal, setIsAlfaLocal] = useState(true);
+    const [isTypingLocal, setIsTypingLocal] = useState(false);
 
     return (
-        <GlobalContext.Provider value={{ isAlfa: isAlfaLocal, setIsAlfa: setIsAlfaLocal }}>
+        <GlobalContext.Provider value={{ isTyping: isTypingLocal, setIsTyping: setIsTypingLocal }}>
             {children}
         </GlobalContext.Provider>
     );

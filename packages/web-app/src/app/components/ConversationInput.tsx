@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useConversation } from "../../lib/firestoreHelpersClient";
 import { addConversation, addMessage } from "../../lib/firestoreHelpersClient";
+import { useGlobalContext } from "./GlobalContextProvider";
 import * as Constants from "../../setup/constants";
 
 
@@ -23,6 +24,7 @@ export default function ConversationInput({ conversationId }: Props) {
     const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
     const userEmail = session?.user?.email;
+    const { isTyping } = useGlobalContext();
 
 
     const addMessageWrapper = async (content: string) => {
@@ -134,7 +136,7 @@ export default function ConversationInput({ conversationId }: Props) {
                     type="submit"
                 >
                     {
-                        criterion ?
+                        (criterion || isTyping) ?
                             <div className="flex justify-center items-center w-8 h-8 bg-transparent">
                                 <img src="/icons/encircled_square.png" />
                             </div>
