@@ -7,7 +7,7 @@ import { RunnableSequence } from "langchain/schema/runnable";
 //import dbAdmin from "../../configFirebaseAdmin";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import * as Constants from "../setup/constants"
+import * as Constants from "shared/constants"
 
 let currentConversationId: string = "";
 

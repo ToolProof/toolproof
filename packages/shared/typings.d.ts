@@ -9,11 +9,10 @@ export interface MessageRead {
 
 export interface ConversationRead {
     id: string;
-    parentId: string;
     userId: string;
+    type: string;
     timestamp: Timestamp;
     turnState: number;
-    messages: MessageRead[];
 }
 
 export interface MessageWrite {
@@ -22,7 +21,7 @@ export interface MessageWrite {
 }
 
 export interface ConversationWrite {
-    parentId: string;
     userId: string;
+    type: string;
     turnState: number;
 }

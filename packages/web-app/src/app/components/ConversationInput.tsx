@@ -2,34 +2,33 @@
 import { useState, useEffect, useRef } from "react";
 // import { toast } from "react-hot-toast";
 import sendPromptAction from "../../lib/sendPromptAction";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useConversation } from "../../lib/firestoreHelpersClient";
-import { addConversation, addMessage } from "../../lib/firestoreHelpersClient";
+// import { useSession } from "next-auth/react";
+// import { useRouter } from "next/navigation";
+import { addMessage } from "../../lib/firestoreHelpersClient";
 import { useGlobalContext } from "./GlobalContextProvider";
-import * as Constants from "../../setup/constants";
+// import * as Constants from "shared/constants";
+import { ConversationRead } from "shared/typings";
 
 
 type Props = {
-    conversationId: string;
+    conversation: ConversationRead;
 };
 
 
-export default function ConversationInput({ conversationId }: Props) {
+export default function ConversationInput({ conversation }: Props) {
     const [input, setInput] = useState("");
-    const { conversation } = useConversation(conversationId);
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    const { data: session } = useSession();
-    const router = useRouter();
+    //const { data: session } = useSession();
+    //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
-    const userEmail = session?.user?.email;
+    //const userEmail = session?.user?.email;
     const { isTyping } = useGlobalContext();
 
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage({ conversationId: conversationId, message: { userId: "René", content: content } }); //ATTENTION hardcoded user
+            await addMessage({ conversationPath: conversation.path, message: { userId: "René", content: content } }); //ATTENTION hardcoded user
         } catch (error) {
             console.error("Error:", error);
             // Optionally revert optimistic UI updates here
@@ -41,16 +40,16 @@ export default function ConversationInput({ conversationId }: Props) {
         const content = input.trim();
         setInput("");
         await addMessageWrapper(content);
-        const data = await sendPromptAction({ conversationId: conversationId, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
-
-        if (data && data.action) {
+        // const data = 
+        await sendPromptAction({ conversationId: conversation.id, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
+        /* if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_conversation) {
                 if (session) {
                     // Create a new conversation
                     try {
                         if (userEmail) {
-                            const result = await addConversation({ parentId: conversationId, userId: userEmail, turnState: 0 });
+                            const result = await addChild({conversationId, { userId: userEmail, type: Constants.data, turnState: 0 }});
                             if (result && result.data && result.data.conversationId) {
                                 router.push(`/conversation/${result.data.conversationId}`);
                             } else {
@@ -62,10 +61,10 @@ export default function ConversationInput({ conversationId }: Props) {
                     }
                 }
             } else if (data.action === Constants.back_to_parent) {
-                const parentId = conversation?.parentId; //ATTENTION: what if parentId is "base"?
+                const parentId = conversation?.parentId; //ATTENTION: what if parentId is "meta"?
                 router.push(`/conversation/${parentId}`);
             }
-        }
+        } */
     };
 
 

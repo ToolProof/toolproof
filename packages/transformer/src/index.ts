@@ -1,5 +1,6 @@
 import { DataSet } from 'vis-data';
 import { Network, Node as VisNode, Edge as VisEdge } from 'vis-network';
+import * as Constants from "shared/constants";
 
 class Message {
     id: string;
@@ -35,7 +36,7 @@ const createConversations = (conNum: number, mesNum: number) => {
         for (let j = 1; j <= mesNum; j++) {
             messages.push(new Message(`${i}.${j}`, `Content ${i}.${j}`));
         }
-        conversations.push(new Conversation(i.toString(), "base", messages));
+        conversations.push(new Conversation(i.toString(), Constants.meta, messages));
     }
     return conversations;
 }

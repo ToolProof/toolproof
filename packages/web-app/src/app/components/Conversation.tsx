@@ -3,14 +3,15 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
 import { useMessages } from "../../lib/firestoreHelpersClient";
+import { ConversationRead } from "shared/typings";
 
 type Props = {
-    conversationId: string;
+    conversation: ConversationRead;
 }
 
 
-export default function Conversation({ conversationId }: Props) {
-    const {messages} = useMessages(conversationId);
+export default function Conversation({ conversation }: Props) {
+    const {messages} = useMessages(conversation?.path || "");
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     
@@ -67,7 +68,7 @@ export default function Conversation({ conversationId }: Props) {
 
         setTimeout(scrollToBottom, 1000);
 
-    }, [conversationId]);
+    }, [conversation.id]);
 
 
     const handleTextChange = () => {

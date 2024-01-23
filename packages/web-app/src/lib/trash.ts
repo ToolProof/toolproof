@@ -163,3 +163,45 @@ const functionSchemaBeta = [
 } */
 
 
+/* useEffect(() => {
+  const checkAndHandleConversation = async () => {
+    if (userEmail && await userConversationsIsEmpty(userEmail)) {
+      try {
+        const result = await addConversation({ parentId: Constants.meta, userId: userEmail, turnState: 0 });
+        if (result && result.data && result.data.conversationId) {
+          router.push(`/conversation/${result.data.conversationId}`);
+        } else {
+          console.error("Conversation creation did not return a valid ID");
+        }
+      } catch (err) {
+        console.error("Failed to create conversation", err);
+      }
+    };
+  }
+  checkAndHandleConversation();
+}, [userEmail, router]);
+
+
+useEffect(() => {
+  if (!loading && conversations.length > 0) {
+    // Redirect to the first conversation
+    const existingConversationId = conversations[0].id;
+    router.push(`/conversation/${existingConversationId}`);
+  }
+}, [loading, conversations, router]); 
+
+
+export async function userConversationsIsEmpty(userId: string) {
+    const q = query(
+        collection(db, Constants.conversations),
+        where(Constants.userId, "==", userId),
+        orderBy(Constants.timestamp, Constants.asc),
+        limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
+}
+
+*/
+
+

@@ -1,15 +1,41 @@
 "use client"
 import { useSession, signOut } from "next-auth/react"
+import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
-import { useConversations } from "../../lib/firestoreHelpersClient";
+import { useGenesisConversations, addGenesisConversation } from "../../lib/firestoreHelpersClient";
+import * as Constants from "shared/constants";
 
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
-    const { conversations, loading } = useConversations(userEmail);
-    
+    const router = useRouter();
+    const { conversations, loading } = useGenesisConversations(userEmail);
+
+
+    const handleClick = async () => {
+        if (userEmail) {
+            try {
+                const result = await addGenesisConversation({conversation: { userId: userEmail, type: Constants.meta, turnState: 0 }});
+                if (result && result.data && result.data.conversationId) {
+                    router.push(`/conversation/${result.data.conversationId}`);
+                } else {
+                    console.error("Conversation creation did not return a valid ID");
+                }
+            } catch (err) {
+                console.error("Failed to create conversation", err);
+            }
+        };
+    }
+
+
     return (
         <div className="p-d flex flex-col h-screen">
+            <div
+                className="flex justify-center items-center h-12 bg-white text-black"
+                onClick={handleClick}
+            >
+                <p>Create New Meta Conversation</p>
+            </div>
             <div className="flex-1">
                 <div>
                     <div className="flex flex-col space-y-2">
@@ -17,7 +43,7 @@ export default function SideBar() {
                             <div className="animate-pulse text-center text-white">Loading...</div>
                         }
                         {conversations.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversationId={conversation.id} />
+                            return <ConversationRow key={conversation.id} conversation={conversation} />
                         })}
                     </div>
                 </div>

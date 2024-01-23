@@ -4,38 +4,54 @@ import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useMessages, useConversation, deleteConversation } from "../../lib/firestoreHelpersClient";
+import { useMessages, addChildConversation } from "../../lib/firestoreHelpersClient";
+import { useSession } from "next-auth/react";
+import * as Constants from "shared/constants";
+import { ConversationRead } from "shared/typings";
 
 
 type Props = {
-    conversationId: string;
+    conversation: ConversationRead;
 }
 
-export default function ConversationRow({ conversationId }: Props) {
+export default function ConversationRow({ conversation }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/conversation/${conversationId}`;
-    const {conversation} = useConversation(conversationId);
-    const {messages} = useMessages(conversationId);
+    const href = `/conversation/${conversation.id}`;
+    const {messages} = useMessages(conversation.ref);
+    const { data: session } = useSession();
+    const userEmail = session?.user?.email || "";
   
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(conversationId)); //ATTENTION: what if one id contains another id?
-    }, [pathName, conversationId]);
+        setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
+    }, [pathName, conversation.id]);
 
 
 
     const handleDeleteConversation = async () => {
-        try {
-            if (conversation?.parentId !== "base") {  
+        /* try {
+            if (conversation?.parentId !== Constants.meta || true) {   
                 // Delete the conversation
                 await deleteConversation(conversationId);
                 router.replace("/"); // Redirect after deletion
             }
         } catch (err) {
             console.error("Failed to delete conversation", err);
+        } */
+        try {
+            if (userEmail) {
+                const result = await addChildConversation({ parentConversationRef: conversation.ref, conversation: { userId: userEmail, type: Constants.data, turnState: 0 }});
+                if (result && result.data && result.data.conversationId) {
+                    router.push(`/conversation/${result.data.conversationId}`);
+                } else {
+                    console.error("Conversation creation did not return a valid ID");
+                }
+            }
+        } catch (err) {
+            console.error("Failed to create conversation", err);
         }
     };
 
