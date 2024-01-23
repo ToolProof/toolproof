@@ -55,6 +55,18 @@ export function useGenesisConversation(conversationId: string) {
 }
 
 
+export function useChildConversation(genesisConversationId: string, childConversationId: string) {
+    const conversationRef = doc(db, Constants.conversations, genesisConversationId, Constants.conversations, childConversationId);
+    const [conversationSnapshot, loading, error] = useDocument(conversationRef);
+
+    const conversation = conversationRef
+        ? { id: conversationRef.id, ...conversationSnapshot?.data() } as ConversationRead
+        : null;
+
+    return { conversation, loading, error };
+}
+
+
 export function useGenesisMessages(conversationId: string) {
     const messagesQuery = query(
         collection(db, Constants.conversations, conversationId, Constants.messages),

@@ -1,9 +1,10 @@
 "use client"
+import * as Constants from "shared/constants";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
 import { useGenesisConversations, addGenesisConversation } from "../../lib/firestoreHelpersClient";
-import * as Constants from "shared/constants";
+
 
 export default function SideBar() {
     const { data: session } = useSession();

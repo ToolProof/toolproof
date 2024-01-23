@@ -1,7 +1,7 @@
 "use client";
 import Conversation from "../../components/Conversation";
 import ConversationInput from "../../components/ConversationInput";
-import { useGenesisConversation } from "@/lib/firestoreHelpersClient";
+import { useChildConversation } from "@/lib/firestoreHelpersClient";
 
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 
 
 export default function ConversationPage({ params: { id } }: Props) {
-    const { conversation } = useGenesisConversation(id);
+    const { conversation } = useChildConversation(id, id);
 
     if (!conversation) { //ATTENTION: find a better way to handle this
         return (
