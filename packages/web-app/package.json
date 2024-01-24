@@ -11,6 +11,7 @@
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@pinecone-database/pinecone": "^1.1.2",
+    "@reduxjs/toolkit": "^2.0.1",
     "autoprefixer": "10.4.15",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
@@ -23,6 +24,7 @@
     "react-dom": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-hot-toast": "^2.4.1",
+    "react-redux": "^9.1.0",
     "shared": "file:../shared",
     "tailwindcss": "3.3.3",
     "typescript": "5.2.2",
