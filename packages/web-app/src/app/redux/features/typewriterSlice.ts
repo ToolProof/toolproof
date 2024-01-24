@@ -6,13 +6,15 @@ const typewriterSlice = createSlice({
         isTyping: false
     },
     reducers: {
-        setTrue: (state) => {
+        startTyping: (state) => {
             state.isTyping = true;
         },
-        setFalse: (state) => {
+        stopTyping: (state) => {
             state.isTyping = false;
         }
     }
 });
 
+
+export const { startTyping, stopTyping } = typewriterSlice.actions;
 export default typewriterSlice.reducer;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { MessageRead } from "shared/typings";
-import { useGlobalContext } from "./GlobalContextProvider";
+import { useAppDispatch } from "../redux/hooks";
+import { startTyping, stopTyping } from "../redux/features/typewriterSlice";
 
 
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
 export default function MessageDisplay({ message, isNew, onTextChange }: Props) {
   const [displayedText, setDisplayedText] = useState("");
   const imageSource = (message.userId === "René") ? "/images/rene_stavnes.jpg" : "/images/openai_logo.png";
-  const { setIsTyping } = useGlobalContext();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (isNew) {
@@ -27,7 +28,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
     let timeoutId: number | undefined;
 
     if (isNew && message.userId === "ChatGPT") {
-      setIsTyping(true); // Starts typing
+      dispatch(startTyping());
       const typeLetter = (index: number) => {
         if (index < message.content.length) {
           const currentChar = message.content[index];
@@ -39,7 +40,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
             typeLetter(index + 1);
           }, delay);
         } else {
-          setIsTyping(false); // Stops typing
+          dispatch(stopTyping());
         }
       };
       typeLetter(0);
@@ -53,7 +54,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
         clearTimeout(timeoutId);
       }
     };
-  }, [message, isNew]);
+  }, [message, isNew, dispatch]);
 
 
   return (

@@ -2,16 +2,15 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
-import { useMessages } from "../../lib/firestoreHelpersClient";
-import { ConversationRead } from "shared/typings";
+import { ConversationRead, MessageRead } from "shared/typings";
 
 type Props = {
     conversation: ConversationRead;
+    messages: MessageRead[];
 }
 
 
-export default function Conversation({ conversation }: Props) {
-    const {messages} = useMessages(conversation?.path || "");
+export default function ConversationDisplay({ conversation, messages }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     

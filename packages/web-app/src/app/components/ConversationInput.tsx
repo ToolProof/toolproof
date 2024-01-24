@@ -4,18 +4,18 @@ import { useState, useEffect, useRef } from "react";
 import sendPromptAction from "../../lib/sendPromptAction";
 // import { useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
-import { addMessage } from "../../lib/firestoreHelpersClient";
-import { useGlobalContext } from "./GlobalContextProvider";
+import { useAppSelector } from "../redux/hooks";
 // import * as Constants from "shared/constants";
-import { ConversationRead } from "shared/typings";
+import { ConversationRead, MessageWrite } from "shared/typings";
 
 
 type Props = {
     conversation: ConversationRead;
+    addMessage: (message: MessageWrite) => Promise<{ data?: string, error?: unknown }>;
 };
 
 
-export default function ConversationInput({ conversation }: Props) {
+export default function ConversationInput({ conversation, addMessage }: Props) {
     const [input, setInput] = useState("");
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -23,12 +23,12 @@ export default function ConversationInput({ conversation }: Props) {
     //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
     //const userEmail = session?.user?.email;
-    const { isTyping } = useGlobalContext();
+    const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage({ conversationPath: conversation.path, message: { userId: "René", content: content } }); //ATTENTION hardcoded user
+            await addMessage({ userId: "René", content: content }); //ATTENTION hardcoded user
         } catch (error) {
             console.error("Error:", error);
             // Optionally revert optimistic UI updates here

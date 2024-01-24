@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 import { useGenesisMessages, addChildConversation, deleteGenesisConversation } from "../../lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/typings";
+import { useAppDispatch } from "../redux/hooks";
+import { setGenesisConversationId } from "../redux/features/navigationSlice";
 
 
 type Props = {
@@ -23,6 +25,7 @@ export default function ConversationRow({ conversation }: Props) {
     const { messages } = useGenesisMessages(conversation.id);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
+    const dispatch = useAppDispatch();
 
 
     useEffect(() => {
@@ -30,6 +33,10 @@ export default function ConversationRow({ conversation }: Props) {
         setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
     }, [pathName, conversation.id]);
 
+
+    const handleLinkClick = () => {
+        dispatch(setGenesisConversationId(conversation.id));
+    };
 
 
     const handleCreateChildConversation = async () => {
@@ -50,7 +57,7 @@ export default function ConversationRow({ conversation }: Props) {
 
     const handleDeleteGenesisConversation = async () => {
         try {
-            if (true) {   
+            if (true) {
                 // Delete the conversation
                 await deleteGenesisConversation(conversation.id);
                 router.replace("/"); // Redirect after deletion
@@ -62,14 +69,14 @@ export default function ConversationRow({ conversation }: Props) {
 
 
     return (
-        <Link
-            href={href}
-            className={`conversationRow justify-center ${active && ""} ${!active && "hover:bg-gray-700/70"}`}
-        >
-            <div className="flex space-x-10">
+        <Link href={href} passHref>
+            <div className={`conversationRow ${active ? "" : "hover:bg-gray-700/70"}`} onClick={handleLinkClick}>
                 <TrashIcon
                     className="h-6 w-6 text-gray-700 hover:text-red-700"
-                    onClick={handleDeleteGenesisConversation}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent Link navigation
+                        handleDeleteGenesisConversation();
+                    }}
                 />
 
                 <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
@@ -77,9 +84,13 @@ export default function ConversationRow({ conversation }: Props) {
                         `${messages[0].content.slice(0, 20)}...` :
                         "Empty Conversation"}
                 </p>
-                <ChatBubbleLeftIcon 
+
+                <ChatBubbleLeftIcon
                     className="h-6 w-6 hover:opacity-50"
-                    onClick={handleCreateChildConversation}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent Link navigation
+                        handleCreateChildConversation();
+                    }}
                 />
             </div>
         </Link>

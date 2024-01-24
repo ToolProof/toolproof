@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const navigationSlice = createSlice({
     name: "navigation",
@@ -6,10 +6,11 @@ const navigationSlice = createSlice({
         genesisConversationId: "",
     },
     reducers: {
-        setGenesisConversationId: (state, action) => {
+        setGenesisConversationId: (state, action: PayloadAction<string>) => {
             state.genesisConversationId = action.payload;
-        },
-    }
+        }
+    },
 });
 
+export const { setGenesisConversationId } = navigationSlice.actions;
 export default navigationSlice.reducer;

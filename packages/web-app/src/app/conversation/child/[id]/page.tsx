@@ -1,7 +1,8 @@
 "use client";
 import ConversationDisplay from "@/app/components/ConversationDisplay";
 import ConversationInput from "@/app/components/ConversationInput";
-import { useGenesisConversation, useGenesisMessages, addGenesisMessage } from "@/lib/firestoreHelpersClient";
+import { useChildConversation, useChildMessages, addChildMessage } from "@/lib/firestoreHelpersClient";
+import { useAppSelector } from "@/app/redux/hooks";
 import { MessageWrite } from "shared/typings";
 
 
@@ -13,12 +14,13 @@ type Props = {
 
 
 export default function ConversationPage({ params: { id } }: Props) {
-    const { conversation } = useGenesisConversation(id);
-    const { messages } = useGenesisMessages(id);
+    const genesisConversationId = useAppSelector(state => state.navigation.genesisConversationId);
+    const { conversation } = useChildConversation(genesisConversationId, id);
+    const { messages } = useChildMessages(genesisConversationId, id);
 
 
-    const handleAddMessage = (message: MessageWrite) => addGenesisMessage({ conversationId: id, message });
-      
+    const handleAddMessage = (message: MessageWrite) => addChildMessage({ genesisConversationId, childConversationId: id, message });
+
 
     if (!conversation) { //ATTENTION: find a better way to handle this
         return (
