@@ -11,14 +11,18 @@ import { ConversationRead, MessageWrite } from "shared/typings";
 
 type Props = {
     conversation: ConversationRead;
-    addMessage: (message: MessageWrite) => Promise<{ data?: string, error?: unknown }>;
+    technicalDebt: {
+        addMessage: (message: MessageWrite) => Promise<{ data?: string, error?: unknown }>;
+        genesisConversationId: string;
+    }
 };
 
 
-export default function ConversationInput({ conversation, addMessage }: Props) {
+export default function ConversationInput({ conversation, technicalDebt }: Props) {
     const [input, setInput] = useState("");
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const { addMessage, genesisConversationId } = technicalDebt;
     //const { data: session } = useSession();
     //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
@@ -41,7 +45,7 @@ export default function ConversationInput({ conversation, addMessage }: Props) {
         setInput("");
         await addMessageWrapper(content);
         // const data = 
-        await sendPromptAction({ conversationId: conversation.id, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
+        await sendPromptAction({ conversationId: conversation.id, genesisConversationId, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
         /* if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_conversation) {

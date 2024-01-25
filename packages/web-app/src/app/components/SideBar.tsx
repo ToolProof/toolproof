@@ -16,7 +16,7 @@ export default function SideBar() {
     const handleClick = async () => {
         if (userEmail) {
             try {
-                const result = await addGenesisConversation({conversation: { userId: userEmail, type: Constants.meta, turnState: 0 }});
+                const result = await addGenesisConversation({ conversation: { userId: userEmail, type: Constants.meta, turnState: 0 } });
                 if (result && result.data && result.data.conversationId) {
                     router.push(`/conversation/${result.data.conversationId}`);
                 } else {
@@ -30,23 +30,21 @@ export default function SideBar() {
 
 
     return (
-        <div className="p-d flex flex-col h-screen">
-            <div
+        <div className="flex flex-col h-screen">
+            <button
                 className="flex justify-center items-center h-12 bg-white text-black"
                 onClick={handleClick}
             >
                 <p>Create New Meta Conversation</p>
-            </div>
+            </button>
             <div className="flex-1">
-                <div>
-                    <div className="flex flex-col space-y-2">
-                        {loading &&
-                            <div className="animate-pulse text-center text-white">Loading...</div>
-                        }
-                        {conversations.map((conversation) => {
-                            return <ConversationRow key={conversation.id} conversation={conversation} />
-                        })}
-                    </div>
+                <div className="flex flex-col space-y-2">
+                    {loading &&
+                        <div className="animate-pulse text-center text-white">Loading...</div>
+                    }
+                    {conversations.map((conversation) => {
+                        return <ConversationRow key={conversation.id} conversation={conversation} />
+                    })}
                 </div>
             </div>
             {session && (

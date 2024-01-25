@@ -1,7 +1,7 @@
 "use client"
 import * as Constants from "shared/constants";
 import Link from "next/link";
-import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
+//import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -44,7 +44,7 @@ export default function ConversationRow({ conversation }: Props) {
             if (userEmail) {
                 const result = await addChildConversation({ genesisConversationId: conversation.id, conversation: { userId: userEmail, type: Constants.data, turnState: 0 } });
                 if (result && result.data && result.data.conversationId) {
-                    router.push(`/conversation/${result.data.conversationId}`);
+                    router.push(`/conversation/child/${result.data.conversationId}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }
@@ -67,33 +67,36 @@ export default function ConversationRow({ conversation }: Props) {
         }
     };
 
-
+    // transition-all duration-200 ease-out
     return (
-        <Link href={href} passHref>
-            <div className={`conversationRow ${active ? "" : "hover:bg-gray-700/70"}`} onClick={handleLinkClick}>
-                <TrashIcon
-                    className="h-6 w-6 text-gray-700 hover:text-red-700"
-                    onClick={(e) => {
-                        e.stopPropagation(); // Prevent Link navigation
-                        handleDeleteGenesisConversation();
-                    }}
-                />
-
-                <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
-                    {messages && messages.length > 0 ?
-                        `${messages[0].content.slice(0, 20)}...` :
-                        "Empty Conversation"}
-                </p>
-
-                <ChatBubbleLeftIcon
-                    className="h-6 w-6 hover:opacity-50"
-                    onClick={(e) => {
-                        e.stopPropagation(); // Prevent Link navigation
-                        handleCreateChildConversation();
-                    }}
-                />
+        <div
+            className={`flex items-center justify-center space-x-2 px-3 py-1 rounded-2xl 
+            text-sm cursor-pointer text-gray-300 bg-slate-500
+        ${active ? "" : "hover:bg-gray-700/70"}`}
+        >
+            <Link href={href} passHref className="flex-1">
+                <div onClick={handleLinkClick} className="flex space-x-4">
+                    <TrashIcon
+                        className="h-6 w-6 text-gray-700 hover:text-red-700"
+                        onClick={(e) => {
+                            e.stopPropagation(); // Prevent Link navigation
+                            handleDeleteGenesisConversation();
+                        }}
+                    />
+                    <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
+                        {messages && messages.length > 0 ?
+                            `${messages[0].content.slice(0, 20)}...` :
+                            "Empty Conversation"}
+                    </p>
+                </div>
+            </Link>
+            <div
+                className="flex justify-center items-center h-12 w-12"
+                onClick={handleCreateChildConversation}
+            >
+                <img src="  /icons/double_arrow.png"/>
             </div>
-        </Link>
+        </div>
     );
 
 }
