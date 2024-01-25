@@ -67,7 +67,6 @@ const chain = RunnableSequence.from([
 ]);
 
 
-
 const query = async ({ conversationId, prompt }: { conversationId: string; prompt: string; user: string }) => {
 
   try {

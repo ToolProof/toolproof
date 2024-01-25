@@ -1,7 +1,6 @@
 "use client"
 import * as Constants from "shared/constants";
 import Link from "next/link";
-//import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -10,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/typings";
 import { useAppDispatch } from "../redux/hooks";
 import { setGenesisConversationId } from "../redux/features/navigationSlice";
+import Childbar from "./Childbar";
 
 
 type Props = {
@@ -26,6 +26,7 @@ export default function ConversationRow({ conversation }: Props) {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
     const dispatch = useAppDispatch();
+    const [showChildbar, setShowChildbar] = useState(false);
 
 
     useEffect(() => {
@@ -36,6 +37,15 @@ export default function ConversationRow({ conversation }: Props) {
 
     const handleLinkClick = () => {
         dispatch(setGenesisConversationId(conversation.id));
+    };
+
+
+    const handleMouseEnter = () => {
+        setShowChildbar(true);
+    };
+
+    const handleMouseLeave = () => {
+        setShowChildbar(false);
     };
 
 
@@ -70,12 +80,18 @@ export default function ConversationRow({ conversation }: Props) {
     // transition-all duration-200 ease-out
     return (
         <div
-            className={`flex items-center justify-center space-x-2 px-3 py-1 rounded-2xl 
+            className={`relative flex items-center justify-center space-x-2 px-3 py-1 rounded-2xl 
             text-sm cursor-pointer text-gray-300 bg-slate-500
         ${active ? "" : "hover:bg-gray-700/70"}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             <Link href={href} passHref className="flex-1">
-                <div onClick={handleLinkClick} className="flex space-x-4">
+                <div
+                    className="flex space-x-4"
+                    onClick={handleLinkClick}
+
+                >
                     <TrashIcon
                         className="h-6 w-6 text-gray-700 hover:text-red-700"
                         onClick={(e) => {
@@ -94,8 +110,14 @@ export default function ConversationRow({ conversation }: Props) {
                 className="flex justify-center items-center h-12 w-12"
                 onClick={handleCreateChildConversation}
             >
-                <img src="  /icons/double_arrow.png"/>
+                <img src="  /icons/double_arrow.png" />
             </div>
+            {/* Childbar */}
+            {showChildbar && (
+                <div className="absolute top-full left-0 z-10">
+                    <Childbar conversationId={conversation.id} />
+                </div>
+            )}
         </div>
     );
 

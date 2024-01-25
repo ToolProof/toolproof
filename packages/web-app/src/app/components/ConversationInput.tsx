@@ -11,14 +11,14 @@ import { ConversationRead, MessageWrite } from "shared/typings";
 
 type Props = {
     conversation: ConversationRead;
-    technicalDebt: {
+    navigationCookie: { //ATTENTION: find a better name (suggested by Copilot) or, preferably, a better way to handle this
         addMessage: (message: MessageWrite) => Promise<{ data?: string, error?: unknown }>;
         genesisConversationId: string;
     }
 };
 
 
-export default function ConversationInput({ conversation, technicalDebt }: Props) {
+export default function ConversationInput({ conversation, navigationCookie: technicalDebt }: Props) {
     const [input, setInput] = useState("");
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);

@@ -15,7 +15,6 @@ type Props = {
 export default function ConversationPage({ params: { id } }: Props) {
     const { conversation } = useGenesisConversation(id);
     const { messages } = useGenesisMessages(id);
-    console.log("Are we here all the time?")
 
     const handleAddMessage = (message: MessageWrite) => addGenesisMessage({ conversationId: id, message });
       
@@ -33,7 +32,7 @@ export default function ConversationPage({ params: { id } }: Props) {
                 <ConversationDisplay key={id} conversation={conversation} messages={messages} />
             </div>
             <div>
-                <ConversationInput conversation={conversation} technicalDebt={{ addMessage: handleAddMessage, genesisConversationId: "" }} />
+                <ConversationInput conversation={conversation} navigationCookie={{ addMessage: handleAddMessage, genesisConversationId: "" }} />
             </div>
         </div>
     );

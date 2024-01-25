@@ -30,7 +30,7 @@ export default function SideBar() {
 
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen overflow-x-hidden">
             <button
                 className="flex justify-center items-center h-12 bg-white text-black"
                 onClick={handleClick}

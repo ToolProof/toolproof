@@ -17,7 +17,6 @@ export default function ConversationPage({ params: { id } }: Props) {
     const genesisConversationId = useAppSelector(state => state.navigation.genesisConversationId);
     const { conversation } = useChildConversation(genesisConversationId, id);
     const { messages } = useChildMessages(genesisConversationId, id);
-    console.log(genesisConversationId ? genesisConversationId : "No genesisConversationId")
 
 
     const handleAddMessage = (message: MessageWrite) => addChildMessage({ genesisConversationId, childConversationId: id, message });
@@ -36,7 +35,7 @@ export default function ConversationPage({ params: { id } }: Props) {
                 <ConversationDisplay key={id} conversation={conversation} messages={messages} />
             </div>
             <div>
-                <ConversationInput conversation={conversation} technicalDebt={{ addMessage: handleAddMessage, genesisConversationId: genesisConversationId }} />
+                <ConversationInput conversation={conversation} navigationCookie={{ addMessage: handleAddMessage, genesisConversationId: genesisConversationId }} />
             </div>
         </div>
     );
