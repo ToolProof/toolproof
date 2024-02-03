@@ -2,18 +2,18 @@
 export const TITLE = "toolproof.com";
 export const DESCRIPTION = "A tool to proof things";
 
-export const genesis = "genesis";
-export const meta = "meta";
-export const data = "data";
+export const GENESIS = "genesis";
+export const META = "meta";
+export const DATA = "data";
 
-export const conversations = "conversations";
-export const messages = "messages";
-export const userId = "userId";
-export const timestamp = "timestamp";
-export const asc = "asc";
-export const desc = "desc";
-export const limit = "limit";
+export const CONVERSATIONS = "conversations";
+export const MESSAGES = "messages";
+export const USERID = "userId";
+export const TIMESTAMP = "timestamp";
+export const ASC = "asc";
+export const DESC = "desc";
+export const LIMIT = "limit";
 
-export const continue_conversation = "continue_conversation";
-export const create_new_conversation = "create_new_conversation";
-export const back_to_parent = "back_to_parent";
+export const CONTINUE_CONVERSATION = "continue_conversation";
+export const CREATE_NEW_CONVERSATION = "create_new_conversation";
+export const BACK_TO_PARENT = "back_to_parent";

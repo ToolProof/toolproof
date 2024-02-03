@@ -9,7 +9,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import * as Constants from "shared/constants"
 
-let currentConversationId: string = "";
+let currentConversationPath: string = "";
 
 const chatModel = new ChatOpenAI({
   modelName: "gpt-4",
@@ -37,7 +37,7 @@ const functionSchema = [
     parameters: zodToJsonSchema(
       z.object({
         modelResponse: z.string().describe("The model's response"),
-        action: z.enum([Constants.continue_conversation, Constants.create_new_conversation, Constants.back_to_parent]).describe("The action to be taken"),
+        action: z.enum([Constants.CONTINUE_CONVERSATION, Constants.CREATE_NEW_CONVERSATION, Constants.BACK_TO_PARENT]).describe("The action to be taken"),
       })
     )
   },
@@ -67,15 +67,15 @@ const chain = RunnableSequence.from([
 ]);
 
 
-const query = async ({ conversationId, prompt }: { conversationId: string; prompt: string; user: string }) => {
+const query = async ({ conversationPath, prompt }: { conversationPath: string; prompt: string; user: string }) => {
 
   try {
     // Check if a new conversation has started or the existing one continues
-    if (currentConversationId !== conversationId) {
+    if (currentConversationPath !== conversationPath) {
       /*
       const messagesSnapshot = await dbAdmin //ATTENTION_
         .collection("conversations")
-        .doc(conversationId)
+        .doc(conversationPath)
         .collection("messages")
         .orderBy("timestamp", "asc")
         .get();
@@ -97,7 +97,7 @@ const query = async ({ conversationId, prompt }: { conversationId: string; promp
         //chatHistory: chatHistory,
       });
 
-      currentConversationId = conversationId;
+      currentConversationPath = conversationPath;
     }
 
     const inputs = {
@@ -115,7 +115,7 @@ const query = async ({ conversationId, prompt }: { conversationId: string; promp
       let modelResponse = argsInsecure.modelResponse;
       const action = argsInsecure.action;
 
-      if (!modelResponse || action !== Constants.continue_conversation) {
+      if (!modelResponse || action !== Constants.CONTINUE_CONVERSATION) {
         console.log("modelResponse", modelResponse);
         console.log("action", action);
         modelResponse = action;

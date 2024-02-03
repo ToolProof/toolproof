@@ -16,9 +16,9 @@ export default function SideBar() {
     const handleClick = async () => {
         if (userEmail) {
             try {
-                const result = await addGenesisConversation({ conversation: { userId: userEmail, type: Constants.meta, turnState: 0 } });
-                if (result && result.data && result.data.conversationId) {
-                    router.push(`/conversation/${result.data.conversationId}`);
+                const result = await addGenesisConversation({ userId: userEmail, type: Constants.META, turnState: 0, path: "" });
+                if (result && result.path) {
+                    router.push(`/conversation/${result.path}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }

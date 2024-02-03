@@ -6,23 +6,19 @@ import sendPromptAction from "../../lib/sendPromptAction";
 // import { useRouter } from "next/navigation";
 import { useAppSelector } from "../redux/hooks";
 // import * as Constants from "shared/constants";
-import { ConversationRead, MessageWrite } from "shared/typings";
+import { ConversationRead } from "shared/typings";
+import { addMessage } from "../../lib/firestoreHelpersClient";
 
 
 type Props = {
     conversation: ConversationRead;
-    navigationCookie: { //ATTENTION: find a better name (suggested by Copilot) or, preferably, a better way to handle this
-        addMessage: (message: MessageWrite) => Promise<{ data?: string, error?: unknown }>;
-        genesisConversationId: string;
-    }
 };
 
 
-export default function ConversationInput({ conversation, navigationCookie: technicalDebt }: Props) {
+export default function ConversationInput({ conversation }: Props) {
     const [input, setInput] = useState("");
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    const { addMessage, genesisConversationId } = technicalDebt;
     //const { data: session } = useSession();
     //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
@@ -32,7 +28,7 @@ export default function ConversationInput({ conversation, navigationCookie: tech
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage({ userId: "René", content: content }); //ATTENTION hardcoded user
+            await addMessage(conversation.path, { userId: "René", content: content }); //ATTENTION hardcoded user
         } catch (error) {
             console.error("Error:", error);
             // Optionally revert optimistic UI updates here
@@ -45,7 +41,7 @@ export default function ConversationInput({ conversation, navigationCookie: tech
         setInput("");
         await addMessageWrapper(content);
         // const data = 
-        await sendPromptAction({ conversationId: conversation.id, genesisConversationId, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
+        await sendPromptAction({ path: conversation.path, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
         /* if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_conversation) {

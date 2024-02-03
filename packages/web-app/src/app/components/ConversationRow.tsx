@@ -4,11 +4,9 @@ import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useGenesisMessages, addChildConversation, deleteGenesisConversation } from "../../lib/firestoreHelpersClient";
+import { useMessages, addChildConversation, deleteConversation } from "../../lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/typings";
-import { useAppDispatch } from "../redux/hooks";
-import { setGenesisConversationId } from "../redux/features/navigationSlice";
 import Childbar from "./Childbar";
 
 
@@ -22,10 +20,9 @@ export default function ConversationRow({ conversation }: Props) {
     const router = useRouter();
     const [active, setActive] = useState(false);
     const href = `/conversation/${conversation.id}`;
-    const { messages } = useGenesisMessages(conversation.id);
+    const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
-    const dispatch = useAppDispatch();
     const [showChildbar, setShowChildbar] = useState(false);
 
 
@@ -33,11 +30,6 @@ export default function ConversationRow({ conversation }: Props) {
         if (!pathName) return;
         setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
     }, [pathName, conversation.id]);
-
-
-    const handleLinkClick = () => {
-        dispatch(setGenesisConversationId(conversation.id));
-    };
 
 
     const handleMouseEnter = () => {
@@ -52,9 +44,9 @@ export default function ConversationRow({ conversation }: Props) {
     const handleCreateChildConversation = async () => {
         try {
             if (userEmail) {
-                const result = await addChildConversation({ genesisConversationId: conversation.id, conversation: { userId: userEmail, type: Constants.data, turnState: 0 } });
-                if (result && result.data && result.data.conversationId) {
-                    router.push(`/conversation/child/${result.data.conversationId}`);
+                const result = await addChildConversation(conversation.path, { userId: userEmail, type: Constants.DATA, turnState: 0, path: "" });
+                if (result && result.path) {
+                    router.push(`/conversation/child/${result.path}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }
@@ -69,7 +61,7 @@ export default function ConversationRow({ conversation }: Props) {
         try {
             if (true) {
                 // Delete the conversation
-                await deleteGenesisConversation(conversation.id);
+                await deleteConversation(conversation.path);
                 router.replace("/"); // Redirect after deletion
             }
         } catch (err) {
@@ -89,8 +81,7 @@ export default function ConversationRow({ conversation }: Props) {
             <Link href={href} passHref className="flex-1">
                 <div
                     className="flex space-x-4"
-                    onClick={handleLinkClick}
-
+                    // Cound set navigationState here
                 >
                     <TrashIcon
                         className="h-6 w-6 text-gray-700 hover:text-red-700"

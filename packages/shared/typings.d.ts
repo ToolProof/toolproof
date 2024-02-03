@@ -7,20 +7,22 @@ export interface MessageRead {
     content: string;
 }
 
+export interface MessageWrite {
+    userId: string;
+    content: string;
+}
+
 export interface ConversationRead {
     id: string;
+    path: string;
     userId: string;
     type: string;
     timestamp: Timestamp;
     turnState: number;
 }
 
-export interface MessageWrite {
-    userId: string;
-    content: string;
-}
-
 export interface ConversationWrite {
+    path: string;
     userId: string;
     type: string;
     turnState: number;
