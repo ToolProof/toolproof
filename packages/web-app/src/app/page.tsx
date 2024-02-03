@@ -1,6 +1,5 @@
 "use client"
-import { useSession } from "next-auth/react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 
 export default function Home() {
@@ -12,7 +11,7 @@ export default function Home() {
     <div className="baseBackground flex flex-col items-center justify-center h-screen">
       <div className="text-black text-5xl mb-4">toolproof.com</div>
       {
-        userEmail === "renestavnes@hotmail.com" &&
+        userEmail === "renestavnes@hotmail.com" || true &&
         <div className="flex">
           {!session && (
             <button onClick={() => signIn("google")} className="text-black font-bold text-3xl animate-pulse">Sign In</button> //ATTENTION: project-number shown in google sign-in
