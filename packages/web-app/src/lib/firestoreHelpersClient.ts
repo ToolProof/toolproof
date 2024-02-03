@@ -78,7 +78,7 @@ export const useChildConversations = (path: string) => {
   const conversations = value?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
-  } as ConversationRead));
+  } as ConversationRead)) || [];
 
   return { conversations, loading, error };
 };
@@ -104,7 +104,7 @@ export const useMessages = (path: string) => {
   const messages = value?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
-  } as MessageRead));
+  } as MessageRead)) || [];
 
   return { messages, loading, error };
 };

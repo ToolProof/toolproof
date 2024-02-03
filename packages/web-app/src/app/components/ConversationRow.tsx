@@ -19,7 +19,7 @@ export default function ConversationRow({ conversation }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/conversation/${conversation.id}`;
+    const href = `/conversation/${conversation.path}`;
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
@@ -46,7 +46,7 @@ export default function ConversationRow({ conversation }: Props) {
             if (userEmail) {
                 const result = await addChildConversation(conversation.path, { userId: userEmail, type: Constants.DATA, turnState: 0, path: "" });
                 if (result && result.path) {
-                    router.push(`/conversation/child/${result.path}`);
+                    router.push(`/conversation/${result.path}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }
@@ -57,7 +57,7 @@ export default function ConversationRow({ conversation }: Props) {
     }
 
 
-    const handleDeleteGenesisConversation = async () => {
+    const handleDeleteConversation = async () => {
         try {
             if (true) {
                 // Delete the conversation
@@ -87,7 +87,7 @@ export default function ConversationRow({ conversation }: Props) {
                         className="h-6 w-6 text-gray-700 hover:text-red-700"
                         onClick={(e) => {
                             e.stopPropagation(); // Prevent Link navigation
-                            handleDeleteGenesisConversation();
+                            handleDeleteConversation();
                         }}
                     />
                     <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
@@ -106,7 +106,7 @@ export default function ConversationRow({ conversation }: Props) {
             {/* Childbar */}
             {showChildbar && (
                 <div className="absolute top-full left-0 z-10">
-                    <Childbar conversationId={conversation.id} />
+                    <Childbar conversation={conversation} />
                 </div>
             )}
         </div>

@@ -2,10 +2,10 @@ import dbAdmin from "shared/firebaseAdmin";
 import admin from "firebase-admin";
 import { MessageWrite } from "shared/typings";
 
-export const addMessageAndUpdateTurnState = async (conversationId: string, content: string, code: number): Promise<void> => {
+export const addMessageAndUpdateTurnState = async (path: string, content: string, code: number): Promise<void> => {
     try {
         const batch = dbAdmin.batch();
-        const conversationRef = dbAdmin.collection("conversations").doc(conversationId);
+        const conversationRef = dbAdmin.doc(path);
 
         // Update turnState
         batch.update(conversationRef, { turnState: code });
