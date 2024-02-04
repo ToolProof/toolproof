@@ -12,7 +12,7 @@ export const addGenesisConversation = async (conversationWrite: ConversationWrit
     conversationWrite.path = newPath;
     await setDoc(docRef, conversationWrite);
     console.log("Document added successfully with path:", conversationWrite.path);
-    return { path: newPath }
+    return { id: docRef.id, path: newPath }
   } catch (error) {
     console.error("Error adding document: ", error);
     return "";
@@ -27,7 +27,7 @@ export const addChildConversation = async (parentPath: string, conversationWrite
     conversationWrite.path = newPath;
     await setDoc(docRef, conversationWrite);
     console.log("Document added successfully with path:", conversationWrite.path);
-    return { path: newPath }
+    return { id: docRef.id, path: newPath }
   } catch (error) {
     console.error("Error adding document: ", error);
     return "";
@@ -36,13 +36,13 @@ export const addChildConversation = async (parentPath: string, conversationWrite
 
 
 export async function deleteConversation(path: string) {
-    try {
-        const conversationRef = doc(db, path);
-        await deleteDoc(conversationRef);
-        return { data: "ok" };
-    } catch (err) {
-        return { error: err };
-    }
+  try {
+    const conversationRef = doc(db, path);
+    await deleteDoc(conversationRef);
+    return { data: "ok" };
+  } catch (err) {
+    return { error: err };
+  }
 }
 
 
@@ -64,6 +64,7 @@ export const useGenesisConversations = (userEmail: string) => {
   const conversations = value?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
+    idPath: replaceSlashWithTilde(doc.data().path),
   } as ConversationRead)) || [];
 
   return { conversations, loading, error };
@@ -78,6 +79,7 @@ export const useChildConversations = (path: string) => {
   const conversations = value?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
+    idPath: replaceSlashWithTilde(doc.data().path),
   } as ConversationRead)) || [];
 
   return { conversations, loading, error };
@@ -85,14 +87,18 @@ export const useChildConversations = (path: string) => {
 
 
 export function useConversation(path: string) {
-    const conversationRef = doc(db, path);
-    const [conversationSnapshot, loading, error] = useDocument(conversationRef);
+  const conversationRef = doc(db, path);
+  const [conversationSnapshot, loading, error] = useDocument(conversationRef);
 
-    const conversation = conversationSnapshot?.exists()
-        ? { id: conversationSnapshot.id, ...conversationSnapshot.data() } as ConversationRead
-        : null;
+  const conversation = conversationSnapshot?.exists()
+    ? {
+      ...conversationSnapshot.data(),
+      id: conversationSnapshot.id,
+      idPath: replaceSlashWithTilde(path)
+    } as ConversationRead
+    : null;
 
-    return { conversation, loading, error };
+  return { conversation, loading, error };
 }
 
 
@@ -108,4 +114,14 @@ export const useMessages = (path: string) => {
 
   return { messages, loading, error };
 };
+
+
+export function replaceSlashWithTilde(input: string) {
+  return input.replace(/\//g, "~");
+}
+
+
+export function replaceTildeWithSlash(input: string) {
+  return input.replace(/~/g, "/");
+}
 

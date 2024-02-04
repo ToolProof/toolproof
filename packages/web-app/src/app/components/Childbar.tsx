@@ -18,15 +18,15 @@ export default function Childbar({ conversation }: Props) {
         return <div>Error loading child conversations: {error.message}</div>;
     }
 
-    const handleClick = (childConversationPath: string) => {
-        router.push(`/conversation/${childConversationPath}`);
+    const handleClick = (childConversationId: string) => {
+        router.push(`/conversation/${childConversationId}`);
     }
 
     return (
         <div className="border border-gray-300 rounded-lg p-2 bg-white shadow-lg">
             {conversations.length > 0 ? (
                 conversations.map((childConversation) => (
-                    <div key={childConversation.path} className="p-2 hover:bg-gray-100" onClick={() => handleClick(childConversation.path)}>
+                    <div key={childConversation.path} className="p-2 hover:bg-gray-100" onClick={() => handleClick(childConversation.id)}>
                         {childConversation.path}
                     </div>
                 ))

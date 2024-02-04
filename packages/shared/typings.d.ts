@@ -15,6 +15,7 @@ export interface MessageWrite {
 export interface ConversationRead {
     id: string;
     path: string;
+    idPath: string;
     userId: string;
     type: string;
     timestamp: Timestamp;

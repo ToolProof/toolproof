@@ -1,18 +1,16 @@
 "use client";
 import ConversationDisplay from "@/app/components/ConversationDisplay";
 import ConversationInput from "@/app/components/ConversationInput";
-import { useConversation } from "@/lib/firestoreHelpersClient";
+import { useConversation, replaceTildeWithSlash } from "@/lib/firestoreHelpersClient";
 
 
 type Props = {
-    params: {
-        path: string;
-    }
-}
+    idPath: string;
+};
 
 
-export default function ConversationPage({ params: { path } }: Props) {
-    const { conversation } = useConversation(path);
+export default function Conversation({ idPath }: Props) {
+    const { conversation } = useConversation(replaceTildeWithSlash(idPath));
 
 
     if (!conversation) { //ATTENTION: find a better way to handle this

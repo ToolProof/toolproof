@@ -3,7 +3,7 @@ import * as Constants from "shared/constants";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
-import { useGenesisConversations, addGenesisConversation } from "../../lib/firestoreHelpersClient";
+import { useGenesisConversations, addGenesisConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
 
 
 export default function SideBar() {
@@ -18,7 +18,7 @@ export default function SideBar() {
             try {
                 const result = await addGenesisConversation({ userId: userEmail, type: Constants.META, turnState: 0, path: "" });
                 if (result && result.path) {
-                    router.push(`/conversation/${result.path}`);
+                    router.push(`/conversation/${replaceSlashWithTilde(result.path)}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }

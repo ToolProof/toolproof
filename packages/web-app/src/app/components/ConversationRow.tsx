@@ -4,7 +4,7 @@ import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useMessages, addChildConversation, deleteConversation } from "../../lib/firestoreHelpersClient";
+import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/typings";
 import Childbar from "./Childbar";
@@ -19,7 +19,7 @@ export default function ConversationRow({ conversation }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/conversation/${conversation.path}`;
+    const href = `/conversation/${replaceSlashWithTilde(conversation.path)}`;
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
@@ -46,7 +46,7 @@ export default function ConversationRow({ conversation }: Props) {
             if (userEmail) {
                 const result = await addChildConversation(conversation.path, { userId: userEmail, type: Constants.DATA, turnState: 0, path: "" });
                 if (result && result.path) {
-                    router.push(`/conversation/${result.path}`);
+                    router.push(`/conversation/${replaceSlashWithTilde(result.path)}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }
@@ -78,10 +78,12 @@ export default function ConversationRow({ conversation }: Props) {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <Link href={href} passHref className="flex-1">
+            <Link
+                href={href}
+                passHref className="flex-1">
                 <div
                     className="flex space-x-4"
-                    // Cound set navigationState here
+                // Could set navigationState here
                 >
                     <TrashIcon
                         className="h-6 w-6 text-gray-700 hover:text-red-700"
