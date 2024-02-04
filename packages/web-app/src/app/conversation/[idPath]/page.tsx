@@ -11,7 +11,7 @@ type Props = {
 }
 
 
-export default function ConversationPage({ params: { idPath } }: Props) {
+export default function Conversation({ params: { idPath } }: Props) {
     const { conversation } = useConversation(replaceTildeWithSlash(idPath));
 
 

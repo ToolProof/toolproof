@@ -56,7 +56,11 @@ export async function deleteConversation(path: string) {
 
 export const addMessage = async (path: string, messageWrite: MessageWrite) => {
   try {
-    await addDoc(collection(db, path, Constants.MESSAGES), messageWrite);
+    await addDoc(collection(db, path, Constants.MESSAGES),
+      {
+        ...messageWrite,
+        timestamp: serverTimestamp(),
+      });
     console.log("Document added successfully");
   } catch (error) {
     console.error("Error adding document: ", error);
