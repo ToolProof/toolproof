@@ -4,12 +4,12 @@ import ConversationInput from "@/app/components/ConversationInput";
 import { useConversation, replaceTildeWithSlash } from "@/lib/firestoreHelpersClient";
 
 
-type Props = {
+type PageProps = {
     idPath: string;
 };
 
 
-export default function Conversation({ idPath }: Props) {
+export default function Conversation({ params }: PageProps) {
     const { conversation } = useConversation(replaceTildeWithSlash(idPath));
 
 
