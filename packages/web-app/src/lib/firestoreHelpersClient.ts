@@ -1,5 +1,5 @@
 import { db } from "shared/firebaseClient";
-import { doc, setDoc, addDoc, deleteDoc, collection, query, where, orderBy } from "firebase/firestore";
+import { doc, setDoc, addDoc, deleteDoc, serverTimestamp, collection, query, where, orderBy } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { ConversationWrite, MessageWrite, ConversationRead, MessageRead } from "shared/typings";
 import * as Constants from "shared/constants";
@@ -10,7 +10,11 @@ export const addGenesisConversation = async (conversationWrite: ConversationWrit
     const docRef = doc(collection(db, Constants.CONVERSATIONS));
     const newPath = `${Constants.CONVERSATIONS}/${docRef.id}`;
     conversationWrite.path = newPath;
-    await setDoc(docRef, conversationWrite);
+    await setDoc(docRef,
+      {
+        ...conversationWrite,
+        timestamp: serverTimestamp(),
+      });
     console.log("Document added successfully with path:", conversationWrite.path);
     return { id: docRef.id, path: newPath }
   } catch (error) {
@@ -25,7 +29,11 @@ export const addChildConversation = async (parentPath: string, conversationWrite
     const docRef = doc(collection(db, parentPath, Constants.CONVERSATIONS));
     const newPath = `${parentPath}/${Constants.CONVERSATIONS}/${docRef.id}`;
     conversationWrite.path = newPath;
-    await setDoc(docRef, conversationWrite);
+    await setDoc(docRef,
+      {
+        ...conversationWrite,
+        timestamp: serverTimestamp(),
+      });
     console.log("Document added successfully with path:", conversationWrite.path);
     return { id: docRef.id, path: newPath }
   } catch (error) {
