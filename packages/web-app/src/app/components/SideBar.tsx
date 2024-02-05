@@ -38,39 +38,41 @@ export default function SideBar() {
             }
         };
     }
+    
+
+    if (!isApproved) {
+        return (
+            <div></div>
+        )
+    }
 
 
     return (
         <div className="flex flex-col h-screen overflow-x-hidden">
-            {
-                isApproved &&
-                <div>
-                    <button
-                        className="flex justify-center items-center h-12 bg-white text-black"
-                        onClick={handleClick}
-                    >
-                        <p>Create New Meta Conversation</p>
-                    </button>
-                    <div className="flex-1">
-                        <div className="flex flex-col space-y-2">
-                            {loading &&
-                                <div className="animate-pulse text-center text-white">Loading...</div>
-                            }
-                            {conversations.map((conversation) => {
-                                return <ConversationRow key={conversation.id} conversation={conversation} />
-                            })}
-                        </div>
-                    </div>
-                    {session && (
-                        <img
-                            src={session?.user?.image || ""}
-                            onClick={() => signOut()}
-                            alt="Profile Picture"
-                            className="h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50"
-                        />
-                    )}
+            <button
+                className="flex justify-center items-center h-12 bg-white text-black"
+                onClick={handleClick}
+            >
+                <p>Create New Meta Conversation</p>
+            </button>
+            <div className="flex-1">
+                <div className="flex flex-col space-y-2">
+                    {loading &&
+                        <div className="animate-pulse text-center text-white">Loading...</div>
+                    }
+                    {conversations.map((conversation) => {
+                        return <ConversationRow key={conversation.id} conversation={conversation} />
+                    })}
                 </div>
-            }
+            </div>
+            {session && (
+                <img
+                    src={session?.user?.image || ""}
+                    onClick={() => signOut()}
+                    alt="Profile Picture"
+                    className="h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50"
+                />
+            )}
         </div>
 
     );
