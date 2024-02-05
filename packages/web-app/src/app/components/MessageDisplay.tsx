@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { MessageRead } from "shared/typings";
-import { useAppDispatch } from "../redux/hooks";
-import { startTyping, stopTyping } from "../redux/features/typewriterSlice";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { startTyping, stopTyping } from "@/lib/redux/features/typewriterSlice";
 
 
 type Props = {

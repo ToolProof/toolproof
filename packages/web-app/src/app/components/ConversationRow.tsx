@@ -4,7 +4,7 @@ import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
+import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde } from "@/lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/typings";
 import Childbar from "./Childbar";

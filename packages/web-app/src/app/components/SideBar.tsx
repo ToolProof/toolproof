@@ -1,9 +1,13 @@
 "use client"
 import * as Constants from "shared/constants";
+import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
 import { useGenesisConversations, addGenesisConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { setUserEmail } from "@/lib/redux/features/devConfigSlice";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 
 export default function SideBar() {
@@ -11,6 +15,13 @@ export default function SideBar() {
     const userEmail = session?.user?.email || "";
     const router = useRouter();
     const { conversations, loading } = useGenesisConversations(userEmail);
+    const dispatch = useAppDispatch();
+
+    const isApproved = useAppSelector(state => state.devConfig.isApproved);
+
+    useEffect(() => {
+        dispatch(setUserEmail(userEmail));
+    }, [dispatch, userEmail]);
 
 
     const handleClick = async () => {
@@ -31,30 +42,36 @@ export default function SideBar() {
 
     return (
         <div className="flex flex-col h-screen overflow-x-hidden">
-            <button
-                className="flex justify-center items-center h-12 bg-white text-black"
-                onClick={handleClick}
-            >
-                <p>Create New Meta Conversation</p>
-            </button>
-            <div className="flex-1">
-                <div className="flex flex-col space-y-2">
-                    {loading &&
-                        <div className="animate-pulse text-center text-white">Loading...</div>
-                    }
-                    {conversations.map((conversation) => {
-                        return <ConversationRow key={conversation.id} conversation={conversation} />
-                    })}
+            {
+                isApproved &&
+                <div>
+                    <button
+                        className="flex justify-center items-center h-12 bg-white text-black"
+                        onClick={handleClick}
+                    >
+                        <p>Create New Meta Conversation</p>
+                    </button>
+                    <div className="flex-1">
+                        <div className="flex flex-col space-y-2">
+                            {loading &&
+                                <div className="animate-pulse text-center text-white">Loading...</div>
+                            }
+                            {conversations.map((conversation) => {
+                                return <ConversationRow key={conversation.id} conversation={conversation} />
+                            })}
+                        </div>
+                    </div>
+                    {session && (
+                        <img
+                            src={session?.user?.image || ""}
+                            onClick={() => signOut()}
+                            alt="Profile Picture"
+                            className="h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50"
+                        />
+                    )}
                 </div>
-            </div>
-            {session && (
-                <img
-                    src={session?.user?.image || ""}
-                    onClick={() => signOut()}
-                    alt="Profile Picture"
-                    className="h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50"
-                />
-            )}
+            }
         </div>
+
     );
 }

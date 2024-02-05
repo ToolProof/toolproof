@@ -1,13 +1,13 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
 // import { toast } from "react-hot-toast";
-import sendPromptAction from "../../lib/sendPromptAction";
+import sendPromptAction from "@/lib/sendPromptAction";
 // import { useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
-import { useAppSelector } from "../redux/hooks";
+import { useAppSelector } from "@/lib/redux/hooks";
 // import * as Constants from "shared/constants";
 import { ConversationRead } from "shared/typings";
-import { addMessage } from "../../lib/firestoreHelpersClient";
+import { addMessage } from "@/lib/firestoreHelpersClient";
 
 
 type Props = {

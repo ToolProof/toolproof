@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit"
 import navigationReducer from "./features/navigationSlice"
 import typewriterReducer from "./features/typewriterSlice"
+import devConfigReducer from "./features/devConfigSlice"
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             navigation: navigationReducer,
             typewriter: typewriterReducer,
+            devConfig: devConfigReducer,
         },
     })
 }

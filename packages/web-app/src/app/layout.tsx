@@ -1,5 +1,5 @@
 import * as Constants from "shared/constants"
-import "../setup/globals.css"
+import "@/setup/globals.css"
 import type { Metadata } from "next"
 import SideBar from "./components/SideBar"
 import { getServerSession } from "next-auth"
