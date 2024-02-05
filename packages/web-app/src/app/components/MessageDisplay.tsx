@@ -33,7 +33,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
         if (index < message.content.length) {
           const currentChar = message.content[index];
           const isPunctuation = ",.?!;:".includes(currentChar);
-          const delay = isPunctuation ? 50 : 10; // Longer delay for punctuation
+          const delay = isPunctuation ? 25 : 5; // Longer delay for punctuation
 
           timeoutId = window.setTimeout(() => {
             setDisplayedText((currentText) => currentText + currentChar);

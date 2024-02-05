@@ -145,7 +145,10 @@ export default function ConversationInput({ conversation }: Props) {
                                 ${!input && "bg-gray-300"}
                                 `}
                             >
-                                {/*<img src="/icons/up_arrow.png" className="w-4 h-4" />*/}
+                                <div className="w-4 h-4"> {/*ATTENTION: without the outer div, img might violate restrictions*/}
+                                    <img className="w-4 h-4"
+                                        src="/icons/up_arrow.png"/>
+                                </div>
                             </div>
                     }
                 </button>
