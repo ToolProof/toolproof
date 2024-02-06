@@ -1,12 +1,12 @@
 "use client"
-import * as Constants from "shared/constants";
+import * as Constants from "shared/src/flow_0/constants";
 import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde } from "@/lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
-import { ConversationRead } from "shared/typings";
+import { ConversationRead } from "shared/src/flow_0/typings";
 import Childbar from "./Childbar";
 
 

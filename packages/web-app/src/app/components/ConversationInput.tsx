@@ -5,8 +5,8 @@ import sendPromptAction from "@/lib/sendPromptAction";
 // import { useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/lib/redux/hooks";
-// import * as Constants from "shared/constants";
-import { ConversationRead } from "shared/typings";
+// import * as Constants from "shared/src/flow_0/constants";
+import { ConversationRead } from "shared/src/flow_0/typings";
 import { addMessage } from "@/lib/firestoreHelpersClient";
 
 

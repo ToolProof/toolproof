@@ -1,7 +1,7 @@
-import * as Constants from "shared/constants";
-import dbAdmin from "shared/firebaseAdmin";
+import * as Constants from "shared/src/flow_0/constants";
+import dbAdmin from "shared/src/flow_0/firebaseAdmin";
 import admin from "firebase-admin";
-import { MessageWrite } from "shared/typings";
+import { MessageWrite } from "shared/src/flow_0/typings";
 
 
 export const addMessageAndUpdateTurnState = async (path: string, content: string, code: number): Promise<void> => {

@@ -1,6 +1,6 @@
 
 export const TITLE = "toolproof.com";
-export const DESCRIPTION = "A tool to proof things";
+export const DESCRIPTION = "";
 
 export const GENESIS = "genesis";
 export const META = "meta";

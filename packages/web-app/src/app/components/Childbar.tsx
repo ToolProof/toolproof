@@ -1,6 +1,6 @@
 import { useChildConversations, replaceSlashWithTilde } from "@/lib/firestoreHelpersClient";
 import { useRouter } from "next/navigation";
-import { ConversationRead } from "shared/typings";
+import { ConversationRead } from "shared/src/flow_0/typings";
 
 type Props = {
     conversation: ConversationRead

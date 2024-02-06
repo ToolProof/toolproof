@@ -1,4 +1,4 @@
-import * as Constants from "shared/constants"
+import * as Constants from "shared/src/flow_0/constants"
 import "@/setup/globals.css"
 import type { Metadata } from "next"
 import SideBar from "./components/SideBar"

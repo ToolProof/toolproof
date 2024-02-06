@@ -1,5 +1,5 @@
 "use client"
-import * as Constants from "shared/constants";
+import * as Constants from "shared/src/flow_0/constants";
 import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
