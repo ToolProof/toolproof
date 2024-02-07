@@ -22,7 +22,7 @@ export default function Conversation({ params: { idPath } }: Props) {
         );
     }
 
-    return ( //ATTENTION: since ConversationInput doesn't need messages, consider wrapping it in a useMemo
+    return ( 
         <div className="flex flex-col h-screen overflow-hidden bg-white">
             <div className="flex-1 my-8">
                 <ConversationDisplay key={conversation.path} conversation={conversation} />

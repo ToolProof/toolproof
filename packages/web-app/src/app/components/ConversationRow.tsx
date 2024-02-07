@@ -4,7 +4,7 @@ import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde } from "@/lib/firestoreHelpersClient";
+import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde, useChildConversations } from "@/lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/src/flow_0/typings";
 import Childbar from "./Childbar";
@@ -12,10 +12,11 @@ import Childbar from "./Childbar";
 
 type Props = {
     conversation: ConversationRead;
+    foo: (conversationsPassed: ConversationRead[]) => void;
 }
 
 
-export default function ConversationRow({ conversation }: Props) {
+export default function ConversationRow({ conversation, foo }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
@@ -23,7 +24,10 @@ export default function ConversationRow({ conversation }: Props) {
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
-    const [showChildbar, setShowChildbar] = useState(false);
+    const [showChildbar, ] = useState(false); //setShowChildbar
+
+    const { conversations: childConversations } = useChildConversations(conversation.path);
+    const childernAccompanied = [conversation, ...childConversations];
 
 
     useEffect(() => {
@@ -33,11 +37,13 @@ export default function ConversationRow({ conversation }: Props) {
 
 
     const handleMouseEnter = () => {
-        setShowChildbar(true);
+        //setShowChildbar(true);
+       foo(childernAccompanied);
     };
 
     const handleMouseLeave = () => {
-        setShowChildbar(false);
+        //setShowChildbar(false);
+        foo([]);
     };
 
 
@@ -69,12 +75,13 @@ export default function ConversationRow({ conversation }: Props) {
         }
     };
 
-    // transition-all duration-200 ease-out
+    // transition-all duration-200 ease-out // ${active ? "" : "hover:bg-gray-700/70"}
     return (
         <div
             className={`relative flex items-center justify-center space-x-2 px-3 py-1 rounded-2xl 
             text-sm cursor-pointer text-gray-300 bg-slate-500
-        ${active ? "" : "hover:bg-gray-700/70"}`}
+        
+        ${conversation.type === Constants.DATA ? "bg-black" : ""}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -106,7 +113,7 @@ export default function ConversationRow({ conversation }: Props) {
                 <img src="  /icons/double_arrow.png" />
             </div>
             {/* Childbar */}
-            {showChildbar && (
+            {(showChildbar && false) && (
                 <div className="absolute top-full left-0 z-10">
                     <Childbar conversation={conversation} />
                 </div>

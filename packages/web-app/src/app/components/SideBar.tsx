@@ -1,6 +1,6 @@
 "use client"
 import * as Constants from "shared/src/flow_0/constants";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
@@ -8,6 +8,7 @@ import { useGenesisConversations, addGenesisConversation, replaceSlashWithTilde 
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setUserEmail } from "@/lib/redux/features/devConfigSlice";
 import { useAppSelector } from "@/lib/redux/hooks";
+import { ConversationRead } from "shared/src/flow_0/typings";
 
 
 export default function SideBar() {
@@ -16,6 +17,25 @@ export default function SideBar() {
     const router = useRouter();
     const { conversations, loading } = useGenesisConversations(userEmail);
     const dispatch = useAppDispatch();
+
+    const [conversationsToUse, setConversationsToUse] = useState(conversations);
+
+    const foo = (conversationsPassed: ConversationRead[]): void => {
+        if (conversationsPassed.length === 0) {
+            setConversationsToUse(conversations);
+        } else {
+            const index = conversations.findIndex((conversation) => conversation.id === conversationsPassed[0].id);
+            const conversationsToUseLocal = [...conversations.slice(0, index), ...conversationsPassed];
+            setConversationsToUse(conversationsToUseLocal);
+        }
+    };
+
+    useEffect(() => {
+        if (JSON.stringify(conversations) !== JSON.stringify(conversationsToUse)) {
+            setConversationsToUse(conversations);
+          }
+    }, [conversations, conversationsToUse]);    
+
 
     const isApproved = useAppSelector(state => state.devConfig.isApproved);
 
@@ -38,7 +58,7 @@ export default function SideBar() {
             }
         };
     }
-    
+
 
     if (!isApproved) {
         return (
@@ -60,8 +80,8 @@ export default function SideBar() {
                     {loading &&
                         <div className="animate-pulse text-center text-white">Loading...</div>
                     }
-                    {conversations.map((conversation) => {
-                        return <ConversationRow key={conversation.id} conversation={conversation} />
+                    {conversationsToUse.map((conversation) => {
+                        return <ConversationRow key={conversation.id} conversation={conversation} foo={foo} />
                     })}
                 </div>
             </div>
