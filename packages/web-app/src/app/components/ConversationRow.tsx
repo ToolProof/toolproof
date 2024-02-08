@@ -20,7 +20,7 @@ export default function ConversationRow({ conversation, foo }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/conversation/${replaceSlashWithTilde(conversation.path)}`;
+    const href = `/conversation/${conversation.idPath}`;
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
