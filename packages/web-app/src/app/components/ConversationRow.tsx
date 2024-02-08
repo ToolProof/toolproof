@@ -75,12 +75,12 @@ export default function ConversationRow({ conversation, foo }: Props) {
         }
     };
 
-    // transition-all duration-200 ease-out // ${active ? "" : "hover:bg-gray-700/70"}
+    // transition-all duration-200 ease-out // 
     return (
         <div
             className={`relative flex items-center justify-center space-x-2 px-3 py-1 rounded-2xl 
             text-sm cursor-pointer text-gray-300 bg-slate-500
-        
+            ${active ? "" : ""}
         ${conversation.type === Constants.DATA ? "bg-black" : ""}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
