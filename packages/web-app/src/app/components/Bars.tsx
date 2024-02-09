@@ -11,7 +11,6 @@ export default function Bars() {
     const { conversations: genesisConversations } = useGenesisConversations(userEmail);
     const [index, setIndex] = useState(-1);
 
-    // Conditional rendering logic and variable assignment
     let childBarContent = null;
     const genesisConversation = genesisConversations[index]; //ATTENTION: why can't I do this in the return statement?
     childBarContent = (
