@@ -12,7 +12,7 @@ export default function Bars() {
     const [index, setIndex] = useState(-1);
 
     let childBarContent = null;
-    const genesisConversation = genesisConversations[index]; //ATTENTION: why can't I do this in the return statement?
+    const genesisConversation = genesisConversations[index]; //ATTENTION: why can't this be in the return statement?
     childBarContent = (
         <div className="h-full w-80 py-4 bg-[#c96565]">
             {
