@@ -20,7 +20,7 @@ export default function ConversationRow({ conversation, index, setIndex }: Props
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/conversation/${conversation.idPath}`;
+    const href = `/flow_${index}/${conversation.idPath}`;
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
@@ -95,7 +95,7 @@ export default function ConversationRow({ conversation, index, setIndex }: Props
                     />
                     <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
                         {messages && messages.length > 0 ?
-                            `${messages[0].content.slice(0, 20)}...` :
+                            `${messages[0].content.slice(0, 20)}` :
                             "Empty Conversation"}
                     </p>
                 </div>
