@@ -4,19 +4,19 @@ import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde, useChildConversations } from "@/lib/firestoreHelpersClient";
+import { useMessages, addChildConversation, deleteConversation, replaceSlashWithTilde } from "@/lib/firestoreHelpersClient";
 import { useSession } from "next-auth/react";
 import { ConversationRead } from "shared/src/flow_0/typings";
-import Childbar from "./Childbar";
 
 
 type Props = {
     conversation: ConversationRead;
-    foo: (conversationsPassed: ConversationRead[]) => void;
+    index: number;
+    setIndex: (index: number) => void;
 }
 
 
-export default function ConversationRow({ conversation, foo }: Props) {
+export default function ConversationRow({ conversation, index, setIndex }: Props) {
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
@@ -24,10 +24,6 @@ export default function ConversationRow({ conversation, foo }: Props) {
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
-    const [showChildbar, ] = useState(false); //setShowChildbar
-
-    const { conversations: childConversations } = useChildConversations(conversation.path);
-    const childernAccompanied = [conversation, ...childConversations];
 
 
     useEffect(() => {
@@ -37,13 +33,11 @@ export default function ConversationRow({ conversation, foo }: Props) {
 
 
     const handleMouseEnter = () => {
-        //setShowChildbar(true);
-       foo(childernAccompanied);
+        setIndex(index);
     };
 
     const handleMouseLeave = () => {
-        //setShowChildbar(false);
-        foo([]);
+        //setIndex(-1);
     };
 
 
@@ -112,12 +106,6 @@ export default function ConversationRow({ conversation, foo }: Props) {
             >
                 <img src="  /icons/double_arrow.png" />
             </div>
-            {/* Childbar */}
-            {(showChildbar && false) && (
-                <div className="absolute top-full left-0 z-10">
-                    <Childbar conversation={conversation} />
-                </div>
-            )}
         </div>
     );
 

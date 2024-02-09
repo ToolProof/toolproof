@@ -1,11 +1,11 @@
 import * as Constants from "shared/src/flow_0/constants"
 import "@/setup/globals.css"
 import type { Metadata } from "next"
-import SideBar from "./components/SideBar"
+import Bars from "./components/Bars"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/setup/authOptions";
 import { SessionProvider } from "./components/SessionProvider"
-import ClientProvider from "./components/ClientProvider"
+//import ClientProvider from "./components/ClientProvider"
 import StoreProvider from "./components/StoreProvider"
 
 export const metadata: Metadata = {
@@ -25,13 +25,10 @@ export default async function RootLayout({
       <body>
         <SessionProvider session={session}>
           <StoreProvider>
-            <div className="flex">
-              <div className="bg-[#202123] max-w-xs h-screen overflow-y-auto md:min-w-[20rem]">
-                <SideBar />
-              </div>
-              <ClientProvider />
-              <div className="bg-[#343531] flex-1">
-                {children}
+            <div className="flex h-screen overflow-hidden">
+              <Bars />
+              <div className="flex-1 flex flex-col overflow-auto bg-[#ecf6a5]">
+                <div className="flex-1 p-12 bg-[#6c8a3a]">{children}</div>
               </div>
             </div>
           </StoreProvider>

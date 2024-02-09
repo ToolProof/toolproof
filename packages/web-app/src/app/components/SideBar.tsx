@@ -1,41 +1,27 @@
 "use client"
 import * as Constants from "shared/src/flow_0/constants";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
-import { useGenesisConversations, addGenesisConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
+import { addGenesisConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setUserEmail } from "@/lib/redux/features/devConfigSlice";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { ConversationRead } from "shared/src/flow_0/typings";
 
+type Props = {
+    genesisConversations: ConversationRead[];
+    setIndex: (index: number) => void;
+}
 
-export default function SideBar() {
+
+export default function SideBar({genesisConversations, setIndex}: Props) {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
     const router = useRouter();
-    const { conversations, loading } = useGenesisConversations(userEmail);
     const dispatch = useAppDispatch();
-
-    const [conversationsToUse, setConversationsToUse] = useState(conversations);
-
-    const foo = (conversationsPassed: ConversationRead[]): void => {
-        if (conversationsPassed.length === 0) {
-            setConversationsToUse(conversations);
-        } else {
-            const index = conversations.findIndex((conversation) => conversation.id === conversationsPassed[0].id);
-            const conversationsToUseLocal = [...conversations.slice(0, index), ...conversationsPassed];
-            setConversationsToUse(conversationsToUseLocal);
-        }
-    };
-
-    useEffect(() => {
-        if (JSON.stringify(conversations) !== JSON.stringify(conversationsToUse)) {
-            setConversationsToUse(conversations);
-          }
-    }, [conversations, conversationsToUse]);    
-
+    const loading = false; //ATTENTION: This is a placeholder for now
 
     const isApproved = useAppSelector(state => state.devConfig.isApproved);
 
@@ -43,6 +29,11 @@ export default function SideBar() {
         dispatch(setUserEmail(userEmail));
     }, [dispatch, userEmail]);
 
+    if (!isApproved) {
+        return (
+            <div></div>
+        )
+    }
 
     const handleClick = async () => {
         if (userEmail) {
@@ -60,13 +51,6 @@ export default function SideBar() {
     }
 
 
-    if (!isApproved) {
-        return (
-            <div></div>
-        )
-    }
-
-
     return (
         <div className="flex flex-col h-screen overflow-x-hidden">
             <button
@@ -80,8 +64,8 @@ export default function SideBar() {
                     {loading &&
                         <div className="animate-pulse text-center text-white">Loading...</div>
                     }
-                    {conversationsToUse.map((conversation) => {
-                        return <ConversationRow key={conversation.id} conversation={conversation} foo={foo} />
+                    {genesisConversations.map((conversation, index) => {
+                        return <ConversationRow key={conversation.id} conversation={conversation} index={index} setIndex={setIndex} />
                     })}
                 </div>
             </div>
