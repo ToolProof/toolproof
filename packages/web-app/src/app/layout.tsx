@@ -1,12 +1,12 @@
 import * as Constants from "shared/src/flow_0/constants"
 import "@/setup/globals.css"
 import type { Metadata } from "next"
-import Bars from "./components/Bars"
+import Bars from "../components/Bars"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/setup/authOptions";
-import { SessionProvider } from "./components/SessionProvider"
+import { SessionProvider } from "../components/SessionProvider"
 //import ClientProvider from "./components/ClientProvider"
-import StoreProvider from "./components/StoreProvider"
+import StoreProvider from "../components/StoreProvider"
 
 export const metadata: Metadata = {
   title: Constants.TITLE,

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import ConversationRow from "./ConversationRow";
-import { addGenesisConversation, replaceSlashWithTilde } from "../../lib/firestoreHelpersClient";
+import { addGenesisConversation, replaceSlashWithTilde } from "../lib/firestoreHelpersClient";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setUserEmail } from "@/lib/redux/features/devConfigSlice";
 import { useAppSelector } from "@/lib/redux/hooks";

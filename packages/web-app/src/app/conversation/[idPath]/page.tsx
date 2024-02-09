@@ -1,6 +1,6 @@
 "use client";
-import ConversationDisplay from "@/app/components/ConversationDisplay";
-import ConversationInput from "@/app/components/ConversationInput";
+import ConversationDisplay from "@/components/ConversationDisplay";
+import ConversationInput from "@/components/ConversationInput";
 import { useConversation, replaceTildeWithSlash } from "@/lib/firestoreHelpersClient";
 
 

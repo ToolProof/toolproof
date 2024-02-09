@@ -10,7 +10,7 @@ export default function Home() {
 
 
   return (
-    <div className="baseBackground flex flex-col items-center justify-center h-screen">
+    <div className="bg-[#e2e883] flex flex-col items-center justify-center h-full">
       <div className="text-black text-5xl mb-4">toolproof.com</div>
       {
         isApproved &&
