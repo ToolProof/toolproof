@@ -1,7 +1,7 @@
 "use client";
-import ConversationDisplay from "@/components/ConversationDisplay";
-import ConversationInput from "@/components/ConversationInput";
-import { useConversation, replaceTildeWithSlash } from "@/lib/firestoreHelpersClient";
+import ConversationDisplay from "@/flow_1/components/ConversationDisplay";
+import ConversationInput from "@/flow_1/components/ConversationInput";
+import { useConversation, replaceTildeWithSlash } from "@/flow_1/lib/firestoreHelpersClient";
 
 
 type Props = {

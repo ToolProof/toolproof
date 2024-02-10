@@ -1,6 +1,6 @@
 "use client";
 import ChildRow from "./ChildRow";
-import { useChildConversations } from "@/lib/firestoreHelpersClient";
+import { useChildConversations } from "@/flow_1/lib/firestoreHelpersClient";
 import { ConversationRead } from "shared/src/flow_0/typings";
 
 type Props = {

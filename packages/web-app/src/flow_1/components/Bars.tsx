@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Sidebar from "./SideBar";
 import ChildBar from "./ChildBar";
-import { useGenesisConversations } from "@/lib/firestoreHelpersClient";
+import { useGenesisConversations } from "@/flow_1/lib/firestoreHelpersClient";
 
 export default function Bars() {
     const { data: session } = useSession();
