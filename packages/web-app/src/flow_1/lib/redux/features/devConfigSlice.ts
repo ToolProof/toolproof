@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
     userEmail: "",
-    isApproved: true,
+    isApproved: false,
 };
 
 const devConfigSlice = createSlice({
@@ -11,7 +11,7 @@ const devConfigSlice = createSlice({
     reducers: {
         setUserEmail: (state, action: PayloadAction<string>) => {
             state.userEmail = action.payload;
-            state.isApproved = true; //action.payload === "renestavnes@hotmail.com";
+            state.isApproved = action.payload === "renestavnes@hotmail.com";
         },
         // You can add more reducers here as needed
     },
