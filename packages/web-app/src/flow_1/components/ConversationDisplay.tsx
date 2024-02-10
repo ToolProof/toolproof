@@ -11,7 +11,6 @@ type Props = {
 
 
 export default function ConversationDisplay({ conversation }: Props) {
-
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     const { messages } = useMessages(conversation.path);
@@ -56,7 +55,6 @@ export default function ConversationDisplay({ conversation }: Props) {
 
 
     useEffect(() => {
-        // Function to scroll to the bottom of the container
         const scrollToBottom = () => {
             const messageContainer = messageContainerRef.current;
             if (messageContainer) {

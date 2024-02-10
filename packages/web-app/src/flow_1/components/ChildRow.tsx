@@ -7,7 +7,9 @@ type Props = {
 };
 
 export default function ChildRow({ conversation, index }: Props) {
-    const href = `/flow_${index}/${conversation.idPath}`;
+    const href = `/flow_1/${conversation.idPath}`; //ATTENTION: hardcoded flow_1
+    //const href = `/flow_${index}/${conversation.idPath}`;
+    console.log(index) // ATTENTION: eslint hack
 
 
     return ( // ${conversation.type === DATA ? 'bg-gray-200' : 'bg-gray-700'}

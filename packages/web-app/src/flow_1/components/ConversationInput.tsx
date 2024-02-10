@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 // import { toast } from "react-hot-toast";
 import sendPromptAction from "@/flow_1/lib/sendPromptAction";
-// import { useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/flow_1/lib/redux/hooks";
 // import * as Constants from "shared/src/flow_0/constants";
@@ -19,16 +19,18 @@ export default function ConversationInput({ conversation }: Props) {
     const [input, setInput] = useState("");
     const turnState = conversation?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    //const { data: session } = useSession();
+    const { data: session } = useSession();
     //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
-    //const userEmail = session?.user?.email;
+    const userEmail = session?.user?.email || "";
+    const userName = session?.user?.name || "";
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
+
 
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage(conversation.path, { userId: "René", content: content }); //ATTENTION hardcoded user
+            await addMessage(conversation.path, { userId: userEmail, content: content });
         } catch (error) {
             console.error("Error:", error);
             // Optionally revert optimistic UI updates here
@@ -41,7 +43,7 @@ export default function ConversationInput({ conversation }: Props) {
         setInput("");
         await addMessageWrapper(content);
         // const data = 
-        await sendPromptAction({ path: conversation.path, prompt: content, user: "René" }); //ATTENTION[hardcoded user, message order not secured]
+        await sendPromptAction({ conversationPath: conversation.path, promptSeed: content, userName: userName }); //ATTENTION: message order not secured
         /* if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_conversation) {
@@ -92,12 +94,12 @@ export default function ConversationInput({ conversation }: Props) {
     };
 
 
-    useEffect(() => {
+    useEffect(() => { //ATTENTION: should we use LayoutEffect?
         updateInputHeight();
     }, [input]);
 
 
-    useEffect(() => {
+    useEffect(() => { //ATTENTION: should we use LayoutEffect?
         if (turnState === -1) {
             // toastIdRef.current = toast.loading("ChatGPT is thinking...");
         } else {

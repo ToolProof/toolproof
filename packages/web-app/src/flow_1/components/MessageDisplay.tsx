@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { MessageRead } from "shared/src/flow_0/typings";
 import { useAppDispatch } from "@/flow_1/lib/redux/hooks";
 import { startTyping, stopTyping } from "@/flow_1/lib/redux/features/typewriterSlice";
+import { useSession } from "next-auth/react";
 
 
 type Props = {
@@ -13,8 +14,10 @@ type Props = {
 
 export default function MessageDisplay({ message, isNew, onTextChange }: Props) {
   const [displayedText, setDisplayedText] = useState("");
-  const imageSource = (message.userId === "René") ? "/images/rene_stavnes.jpg" : "/images/openai_logo.png";
   const dispatch = useAppDispatch();
+  const { data: session } = useSession();
+  const userImg = session?.user?.image || "";
+  const imageSource = (message.userId !== "ChatGPT") ? userImg : "/images/openai_logo.png";
 
   useEffect(() => {
     if (isNew) {
@@ -58,9 +61,9 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
 
 
   return (
-    <div className="flex py-5 px-0 space-x-5 max-w-2xl mx-auto">
+    <div className="flex py-4 px-2 space-x-5 max-w-2xl mx-auto">
       <img src={imageSource} alt="" className="h-8 w-8" />
-      <p className="text-base">{displayedText}</p>
+      <p className="text-black">{displayedText}</p>
     </div>
   );
 

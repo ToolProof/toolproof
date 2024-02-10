@@ -28,7 +28,7 @@ export default async function RootLayout({
             <div className="flex h-screen overflow-hidden">
               <Bars />
               <div className="flex-1 flex flex-col overflow-auto bg-[#ecf6a5]">
-                <div className="flex-1 p-12 bg-[#6c8a3a]">{children}</div>
+                <div className="flex-1 p-4 bg-[#6c8a3a]">{children}</div>
               </div>
             </div>
           </StoreProvider>

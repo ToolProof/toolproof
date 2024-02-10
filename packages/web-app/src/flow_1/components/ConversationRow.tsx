@@ -20,7 +20,8 @@ export default function ConversationRow({ conversation, index, setIndex }: Props
     const pathName = usePathname();
     const router = useRouter();
     const [active, setActive] = useState(false);
-    const href = `/flow_${index}/${conversation.idPath}`;
+    const href = `/flow_1/${conversation.idPath}`; //ATTENTION: hardcoded flow_1
+    //const href = `/flow_${index}/${conversation.idPath}`;
     const { messages } = useMessages(conversation.path);
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
@@ -46,7 +47,7 @@ export default function ConversationRow({ conversation, index, setIndex }: Props
             if (userEmail) {
                 const result = await addChildConversation(conversation.path, { userId: userEmail, type: Constants.DATA, turnState: 0, path: "" });
                 if (result && result.path) {
-                    router.push(`/conversation/${replaceSlashWithTilde(result.path)}`);
+                    router.push(`/flow_1/${replaceSlashWithTilde(result.path)}`);
                 } else {
                     console.error("Conversation creation did not return a valid ID");
                 }

@@ -67,7 +67,7 @@ const chain = RunnableSequence.from([
 ]);
 
 
-const query = async ({ conversationPath, prompt }: { conversationPath: string; prompt: string; user: string }) => {
+const query = async ({ conversationPath, promptSeed }: { conversationPath: string; promptSeed: string; userName: string }) => {
 
   try {
     // Check if a new conversation has started or the existing one continues
@@ -101,8 +101,8 @@ const query = async ({ conversationPath, prompt }: { conversationPath: string; p
     }
 
     const inputs = {
-      input: prompt,
-      //speaker: user,
+      input: promptSeed,
+      //speaker: userName,
     };
 
     const response = await chain.invoke(inputs);
@@ -123,7 +123,7 @@ const query = async ({ conversationPath, prompt }: { conversationPath: string; p
 
       await memory.saveContext(
         {
-          input: prompt,
+          input: promptSeed,
         }, { //ATTENTION
         output: modelResponse,
       });
