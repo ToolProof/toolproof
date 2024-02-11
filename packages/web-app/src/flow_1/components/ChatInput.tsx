@@ -6,18 +6,18 @@ import { useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/flow_1/lib/redux/hooks";
 // import * as Constants from "shared/src/flow_0/constants";
-import { ConversationRead } from "shared/src/flow_0/typings";
+import { ChatRead } from "shared/src/flow_0/typings";
 import { addMessage } from "@/flow_1/lib/firestoreHelpersClient";
 
 
 type Props = {
-    conversation: ConversationRead;
+    chat: ChatRead;
 };
 
 
-export default function ConversationInput({ conversation }: Props) {
+export default function ChatInput({ chat }: Props) {
     const [input, setInput] = useState("");
-    const turnState = conversation?.turnState;
+    const turnState = chat?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     //const router = useRouter();
@@ -30,7 +30,7 @@ export default function ConversationInput({ conversation }: Props) {
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage(conversation.path, { userId: userEmail, content: content });
+            await addMessage(chat.path, { userId: userEmail, content: content });
         } catch (error) {
             console.error("Error:", error);
             // Optionally revert optimistic UI updates here
@@ -43,28 +43,28 @@ export default function ConversationInput({ conversation }: Props) {
         setInput("");
         await addMessageWrapper(content);
         // const data = 
-        await sendPromptAction({ conversationPath: conversation.path, promptSeed: content, userName: userName }); //ATTENTION: message order not secured
+        await sendPromptAction({ chatPath: chat.path, promptSeed: content, userName: userName }); //ATTENTION: message order not secured
         /* if (data && data.action) {
             console.log("action", data.action);
-            if (data.action === Constants.create_new_conversation) {
+            if (data.action === Constants.create_new_chat) {
                 if (session) {
-                    // Create a new conversation
+                    // Create a new chat
                     try {
                         if (userEmail) {
-                            const result = await addChild({conversationId, { userId: userEmail, type: Constants.data, turnState: 0 }});
-                            if (result && result.data && result.data.conversationId) {
-                                router.push(`/conversation/${result.data.conversationId}`);
+                            const result = await addChild({chatId, { userId: userEmail, type: Constants.data, turnState: 0 }});
+                            if (result && result.data && result.data.chatId) {
+                                router.push(`/chat/${result.data.chatId}`);
                             } else {
-                                console.error("Conversation creation did not return a valid ID");
+                                console.error("Chat creation did not return a valid ID");
                             }
                         }
                     } catch (err) {
-                        console.error("Failed to create conversation", err);
+                        console.error("Failed to create chat", err);
                     }
                 }
             } else if (data.action === Constants.back_to_parent) {
-                const parentId = conversation?.parentId; //ATTENTION: what if parentId is "meta"?
-                router.push(`/conversation/${parentId}`);
+                const parentId = chat?.parentId; //ATTENTION: what if parentId is "meta"?
+                router.push(`/chat/${parentId}`);
             }
         } */
     };

@@ -5,7 +5,7 @@ const promptTemplateBeta = ChatPromptTemplate.fromMessages([
     ["system", `You are a moderator between two humans who are discussing. 
     The current speaker is {speaker}. 
     Summarize what {speaker} says, decide who the next speaker is, and prompt the next speaker for their opinion. 
-    In this conversation, the speakers are René and Peter.`],
+    In this chat, the speakers are René and Peter.`],
   
     new MessagesPlaceholder("history"),
     ["human", "{input}"],
@@ -26,7 +26,7 @@ const functionSchemaBeta = [
           },
           nextSpeaker: {
             type: "string",
-            description: "The next speaker in the conversation",
+            description: "The next speaker in the chat",
           },
         },
         required: ["moderatorSummaryAndPrompt", "nextSpeaker"],
@@ -107,9 +107,9 @@ const functionSchemaBeta = [
 
   const handleClick = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const conversationId = await createConversationInFirestore(session, "base", 2);
-    if (conversationId) {
-      const invitationLink = `https://www.toolproof.com/conversation/invitee/${conversationId}`;
+    const chatId = await createChatInFirestore(session, "base", 2);
+    if (chatId) {
+      const invitationLink = `https://www.toolproof.com/chat/invitee/${chatId}`;
       await sendInvitation(input, invitationLink);
       setInput("");
     } 
@@ -164,36 +164,36 @@ const functionSchemaBeta = [
 
 
 /* useEffect(() => {
-  const checkAndHandleConversation = async () => {
-    if (userEmail && await userConversationsIsEmpty(userEmail)) {
+  const checkAndHandleChat = async () => {
+    if (userEmail && await userChatsIsEmpty(userEmail)) {
       try {
-        const result = await addConversation({ parentId: Constants.meta, userId: userEmail, turnState: 0 });
-        if (result && result.data && result.data.conversationId) {
-          router.push(`/conversation/${result.data.conversationId}`);
+        const result = await addChat({ parentId: Constants.meta, userId: userEmail, turnState: 0 });
+        if (result && result.data && result.data.chatId) {
+          router.push(`/chat/${result.data.chatId}`);
         } else {
-          console.error("Conversation creation did not return a valid ID");
+          console.error("Chat creation did not return a valid ID");
         }
       } catch (err) {
-        console.error("Failed to create conversation", err);
+        console.error("Failed to create chat", err);
       }
     };
   }
-  checkAndHandleConversation();
+  checkAndHandleChat();
 }, [userEmail, router]);
 
 
 useEffect(() => {
-  if (!loading && conversations.length > 0) {
-    // Redirect to the first conversation
-    const existingConversationId = conversations[0].id;
-    router.push(`/conversation/${existingConversationId}`);
+  if (!loading && chats.length > 0) {
+    // Redirect to the first chat
+    const existingChatId = chats[0].id;
+    router.push(`/chat/${existingChatId}`);
   }
-}, [loading, conversations, router]); 
+}, [loading, chats, router]); 
 
 
-export async function userConversationsIsEmpty(userId: string) {
+export async function userChatsIsEmpty(userId: string) {
     const q = query(
-        collection(db, Constants.conversations),
+        collection(db, Constants.chats),
         where(Constants.userId, "==", userId),
         orderBy(Constants.timestamp, Constants.asc),
         limit(1)

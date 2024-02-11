@@ -5,26 +5,26 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useMessages } from "@/flow_1/lib/firestoreHelpersClient";
-import { ConversationRead } from "shared/src/flow_0/typings";
+import { ChatRead } from "shared/src/flow_0/typings";
 
 
 type Props = {
-    conversation: ConversationRead;
+    chat: ChatRead;
 }
 
 
-export default function ConversationRow({ conversation }: Props) {
+export default function ChatRow({ chat }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `/flow_1/${conversation.idPath}`; //ATTENTION: hardcoded flow_1
-    //const href = `/flow_${index}/${conversation.idPath}`;
-    const { messages } = useMessages(conversation.path);
+    const href = `/flow_1/${chat.idPath}`; //ATTENTION: hardcoded flow_1
+    //const href = `/flow_${index}/${chat.idPath}`;
+    const { messages } = useMessages(chat.path);
 
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(conversation.id)); //ATTENTION: what if one id contains another id?
-    }, [pathName, conversation.id]);
+        setActive(pathName.includes(chat.id)); //ATTENTION: what if one id contains another id?
+    }, [pathName, chat.id]);
 
     const handleMouseEnter = () => {
         
@@ -41,7 +41,7 @@ export default function ConversationRow({ conversation }: Props) {
             className={`relative flex items-center justify-center space-x-2 px-3 py-1 rounded-2xl 
             text-sm cursor-pointer text-gray-300 bg-slate-500
             ${active ? "" : ""}
-        ${conversation.type === Constants.DATA ? "bg-black" : ""}`}
+        ${chat.type === Constants.DATA ? "bg-black" : ""}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -56,13 +56,13 @@ export default function ConversationRow({ conversation }: Props) {
                         className="h-6 w-6 text-gray-700 hover:text-red-700"
                         onClick={(e) => {
                             e.stopPropagation(); // Prevent Link navigation
-                            //handleDeleteConversation();
+                            //handleDeleteChat();
                         }}
                     />
                     <p className="flex-1 hover:opacity-50 hidden md:inline-flex truncate">
                         {messages && messages.length > 0 ?
                             `${messages[0].content.slice(0, 20)}` :
-                            "Empty Conversation"}
+                            "Empty Chat"}
                     </p>
                 </div>
             </Link>

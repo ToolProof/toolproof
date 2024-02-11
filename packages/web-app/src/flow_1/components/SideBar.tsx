@@ -3,18 +3,18 @@
 import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
-import ConversationRow from "./ConversationRow";
-//import { addGenesisConversation, replaceSlashWithTilde } from "../lib/firestoreHelpersClient";
+import ChatRow from "./ChatRow";
+//import { addGenesisChat, replaceSlashWithTilde } from "../lib/firestoreHelpersClient";
 import { useAppDispatch } from "@/flow_1/lib/redux/hooks";
 import { setUserEmail } from "@/flow_1/lib/redux/features/devConfigSlice";
 import { useAppSelector } from "@/flow_1/lib/redux/hooks";
-import { useGenesisConversations, userConversationsIsEmpty, addGenesisConversation, replaceSlashWithTilde } from "@/flow_1/lib/firestoreHelpersClient";
+import { useGenesisChats, userChatsIsEmpty, addGenesisChat, replaceSlashWithTilde } from "@/flow_1/lib/firestoreHelpersClient";
 
 
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
-    const { conversations: genesisConversations, loading } = useGenesisConversations(userEmail);
+    const { chats: genesisChats, loading } = useGenesisChats(userEmail);
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -28,14 +28,14 @@ export default function SideBar() {
     useEffect(() => {
         const foo = async () => {
             if (!userEmail) return;
-            if (await userConversationsIsEmpty(userEmail)) {
-                console.log("User has no conversations");
-                const result = await addGenesisConversation({ type: "meta", userId: userEmail, turnState: 0, path: "" });
+            if (await userChatsIsEmpty(userEmail)) {
+                console.log("User has no chats");
+                const result = await addGenesisChat({ type: "meta", userId: userEmail, turnState: 0, path: "" });
                 if (result && result.path) {
                     router.push(`/flow_1/${replaceSlashWithTilde(result.path)}`);
                 }
             } else {
-                console.log("User has conversations");
+                console.log("User has chats");
             }
         }
         foo();
@@ -54,8 +54,8 @@ export default function SideBar() {
                     {loading &&
                         <div className="animate-pulse text-center text-white">Loading...</div>
                     }
-                    {genesisConversations.map((conversation) => {
-                        return <ConversationRow key={conversation.id} conversation={conversation}/>
+                    {genesisChats.map((chat) => {
+                        return <ChatRow key={chat.id} chat={chat}/>
                     })}
                 </div>
             </div>

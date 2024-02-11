@@ -12,7 +12,7 @@ export interface MessageWrite {
     content: string;
 }
 
-export interface ConversationRead {
+export interface ChatRead {
     id: string;
     path: string;
     idPath: string;
@@ -22,7 +22,7 @@ export interface ConversationRead {
     turnState: number;
 }
 
-export interface ConversationWrite {
+export interface ChatWrite {
     path: string;
     userId: string;
     type: string;

@@ -6,19 +6,19 @@ interface SendPromptResponse {
   action: string;
 }
 
-export default async function sendPromptAction({ conversationPath, promptSeed, userName: userName }: { conversationPath: string, promptSeed: string; userName: string }): Promise<SendPromptResponse> {
+export default async function sendPromptAction({ chatPath, promptSeed, userName: userName }: { chatPath: string, promptSeed: string; userName: string }): Promise<SendPromptResponse> {
     if (!promptSeed) {
         throw new Error("Prompt is required");
     }
-    if (!conversationPath) {
-        throw new Error("Conversation ID is required");
+    if (!chatPath) {
+        throw new Error("Chat ID is required");
     }
     
     try {
-        const response = await query({ conversationPath: conversationPath, promptSeed, userName: userName });
+        const response = await query({ chatPath: chatPath, promptSeed, userName: userName });
         const content = response?.modelResponse || "ChatGPT was unable to respond!";
         const action = response?.action || "";
-        await addMessageAndUpdateTurnState(conversationPath, content, 1);
+        await addMessageAndUpdateTurnState(chatPath, content, 1);
         return { action };
     } catch (error) {
         console.error("Error:", error);

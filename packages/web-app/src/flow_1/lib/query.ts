@@ -9,7 +9,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import * as Constants from "shared/src/flow_0/constants"
 
-let currentConversationPath: string = "";
+let currentChatPath: string = "";
 
 const chatModel = new ChatOpenAI({
   modelName: "gpt-4",
@@ -24,7 +24,7 @@ let memory = new BufferMemory({
 });
 
 const promptTemplate = ChatPromptTemplate.fromMessages([
-  ["system", `You are a conversation orchestrator. Try to best accomodate the user's wishes or keep the current conversation going.`],
+  ["system", `You are a chat orchestrator. Try to best accomodate the user's wishes or keep the current chat going.`],
   new MessagesPlaceholder("history"),
   ["human", `{input}`],
 ]);
@@ -32,12 +32,12 @@ const promptTemplate = ChatPromptTemplate.fromMessages([
 
 const functionSchema = [
   {
-    name: "conversation_orchestration",
-    description: "An instance of conversation orchestration",
+    name: "chat_orchestration",
+    description: "An instance of chat orchestration",
     parameters: zodToJsonSchema(
       z.object({
         modelResponse: z.string().describe("The model's response"),
-        action: z.enum([Constants.CONTINUE_CONVERSATION, Constants.CREATE_NEW_CONVERSATION, Constants.BACK_TO_PARENT]).describe("The action to be taken"),
+        action: z.enum([Constants.CONTINUE_CHAT, Constants.CREATE_NEW_CHAT, Constants.BACK_TO_PARENT]).describe("The action to be taken"),
       })
     )
   },
@@ -62,20 +62,20 @@ const chain = RunnableSequence.from([
   },
   chatModel.bind({
     functions: functionSchema,
-    function_call: { name: "conversation_orchestration" },
+    function_call: { name: "chat_orchestration" },
   }),
 ]);
 
 
-const query = async ({ conversationPath, promptSeed }: { conversationPath: string; promptSeed: string; userName: string }) => {
+const query = async ({ chatPath, promptSeed }: { chatPath: string; promptSeed: string; userName: string }) => {
 
   try {
-    // Check if a new conversation has started or the existing one continues
-    if (currentConversationPath !== conversationPath) {
+    // Check if a new chat has started or the existing one continues
+    if (currentChatPath !== chatPath) {
       /*
       const messagesSnapshot = await dbAdmin //ATTENTION_
-        .collection("conversations")
-        .doc(conversationPath)
+        .collection("chats")
+        .doc(chatPath)
         .collection("messages")
         .orderBy("timestamp", "asc")
         .get();
@@ -97,7 +97,7 @@ const query = async ({ conversationPath, promptSeed }: { conversationPath: strin
         //chatHistory: chatHistory,
       });
 
-      currentConversationPath = conversationPath;
+      currentChatPath = chatPath;
     }
 
     const inputs = {
@@ -115,7 +115,7 @@ const query = async ({ conversationPath, promptSeed }: { conversationPath: strin
       let modelResponse = argsInsecure.modelResponse;
       const action = argsInsecure.action;
 
-      if (!modelResponse || action !== Constants.CONTINUE_CONVERSATION) {
+      if (!modelResponse || action !== Constants.CONTINUE_CHAT) {
         console.log("modelResponse", modelResponse);
         console.log("action", action);
         modelResponse = action;

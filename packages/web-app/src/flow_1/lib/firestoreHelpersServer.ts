@@ -7,13 +7,13 @@ import { MessageWrite } from "shared/src/flow_0/typings";
 export const addMessageAndUpdateTurnState = async (path: string, content: string, code: number): Promise<void> => {
     try {
         const batch = dbAdmin.batch();
-        const conversationRef = dbAdmin.doc(path);
+        const chatRef = dbAdmin.doc(path);
 
         // Update turnState
-        batch.update(conversationRef, { turnState: code });
+        batch.update(chatRef, { turnState: code });
 
         // Send message to Firestore
-        const messageRef = conversationRef.collection(Constants.MESSAGES).doc();
+        const messageRef = chatRef.collection(Constants.MESSAGES).doc();
         const message: MessageWrite = { userId: "ChatGPT", content };
         batch.set(messageRef, {
             ...message,

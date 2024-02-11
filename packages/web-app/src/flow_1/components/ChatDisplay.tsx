@@ -2,18 +2,18 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
-import { ConversationRead } from "shared/src/flow_0/typings";
+import { ChatRead } from "shared/src/flow_0/typings";
 import { useMessages } from "../lib/firestoreHelpersClient";
 
 type Props = {
-    conversation: ConversationRead;
+    chat: ChatRead;
 }
 
 
-export default function ConversationDisplay({ conversation }: Props) {
+export default function ChatDisplay({ chat }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
-    const { messages } = useMessages(conversation.path);
+    const { messages } = useMessages(chat.path);
     
     
     useEffect(() => {
@@ -67,7 +67,7 @@ export default function ConversationDisplay({ conversation }: Props) {
 
         setTimeout(scrollToBottom, 1000);
 
-    }, [conversation.id]);
+    }, [chat.id]);
 
 
     const handleTextChange = () => {
@@ -86,7 +86,7 @@ export default function ConversationDisplay({ conversation }: Props) {
             {messages && messages.length === 0 && (
                 <div>
                     <p className="mt-10 text-center text-black">
-                        Type a prompt to start a conversation!
+                        Type a prompt to start a chat!
                     </p>
                     <ArrowDownCircleIcon className="h-10 w-10 mx-auto mt-5 text-black animate-bounce" />
                 </div>

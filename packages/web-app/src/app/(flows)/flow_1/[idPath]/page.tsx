@@ -1,7 +1,7 @@
 "use client";
-import ConversationDisplay from "@/flow_1/components/ConversationDisplay";
-import ConversationInput from "@/flow_1/components/ConversationInput";
-import { useConversation, replaceTildeWithSlash } from "@/flow_1/lib/firestoreHelpersClient";
+import ChatDisplay from "@/flow_1/components/ChatDisplay";
+import ChatInput from "@/flow_1/components/ChatInput";
+import { useChat, replaceTildeWithSlash } from "@/flow_1/lib/firestoreHelpersClient";
 
 
 type Props = {
@@ -11,11 +11,11 @@ type Props = {
 }
 
 
-export default function Conversation({ params: { idPath } }: Props) {
-    const { conversation } = useConversation(replaceTildeWithSlash(idPath));
+export default function Chat({ params: { idPath } }: Props) {
+    const { chat } = useChat(replaceTildeWithSlash(idPath));
 
 
-    if (!conversation) { //ATTENTION: find a better way to handle this
+    if (!chat) { //ATTENTION: find a better way to handle this
         return (
             <div>
             </div>
@@ -25,10 +25,10 @@ export default function Conversation({ params: { idPath } }: Props) {
     return ( 
         <div className="flex flex-col h-full overflow-hidden bg-white">
             <div className="flex-1 my-8">
-                <ConversationDisplay key={conversation.path} conversation={conversation} />
+                <ChatDisplay key={chat.path} chat={chat} />
             </div>
             <div>
-                <ConversationInput conversation={conversation} />
+                <ChatInput chat={chat} />
             </div>
         </div>
     );

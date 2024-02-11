@@ -1,21 +1,21 @@
 import { db } from "shared/src/flow_0/firebaseClient";
 import { doc, getDocs, setDoc, addDoc, deleteDoc, serverTimestamp, collection, query, where, orderBy, limit } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
-import { ConversationWrite, MessageWrite, ConversationRead, MessageRead } from "shared/src/flow_0/typings";
+import { ChatWrite, MessageWrite, ChatRead, MessageRead } from "shared/src/flow_0/typings";
 import * as Constants from "shared/src/flow_0/constants";
 
 
-export const addGenesisConversation = async (conversationWrite: ConversationWrite) => {
+export const addGenesisChat = async (chatWrite: ChatWrite) => {
   try {
-    const docRef = doc(collection(db, Constants.CONVERSATIONS));
-    const newPath = `${Constants.CONVERSATIONS}/${docRef.id}`;
-    conversationWrite.path = newPath;
+    const docRef = doc(collection(db, Constants.CHATS));
+    const newPath = `${Constants.CHATS}/${docRef.id}`;
+    chatWrite.path = newPath;
     await setDoc(docRef,
       {
-        ...conversationWrite,
+        ...chatWrite,
         timestamp: serverTimestamp(),
       });
-    console.log("Document added successfully with path:", conversationWrite.path);
+    console.log("Document added successfully with path:", chatWrite.path);
     return { id: docRef.id, path: newPath }
   } catch (error) {
     console.error("Error adding document: ", error);
@@ -24,17 +24,17 @@ export const addGenesisConversation = async (conversationWrite: ConversationWrit
 };
 
 
-export const addChildConversation = async (parentPath: string, conversationWrite: ConversationWrite) => {
+export const addChildChat = async (parentPath: string, chatWrite: ChatWrite) => {
   try {
-    const docRef = doc(collection(db, parentPath, Constants.CONVERSATIONS));
-    const newPath = `${parentPath}/${Constants.CONVERSATIONS}/${docRef.id}`;
-    conversationWrite.path = newPath;
+    const docRef = doc(collection(db, parentPath, Constants.CHATS));
+    const newPath = `${parentPath}/${Constants.CHATS}/${docRef.id}`;
+    chatWrite.path = newPath;
     await setDoc(docRef,
       {
-        ...conversationWrite,
+        ...chatWrite,
         timestamp: serverTimestamp(),
       });
-    console.log("Document added successfully with path:", conversationWrite.path);
+    console.log("Document added successfully with path:", chatWrite.path);
     return { id: docRef.id, path: newPath }
   } catch (error) {
     console.error("Error adding document: ", error);
@@ -43,10 +43,10 @@ export const addChildConversation = async (parentPath: string, conversationWrite
 };
 
 
-export async function deleteConversation(path: string) {
+export async function deleteChat(path: string) {
   try {
-    const conversationRef = doc(db, path);
-    await deleteDoc(conversationRef);
+    const chatRef = doc(db, path);
+    await deleteDoc(chatRef);
     return { data: "ok" };
   } catch (err) {
     return { error: err };
@@ -68,49 +68,49 @@ export const addMessage = async (path: string, messageWrite: MessageWrite) => {
 }
 
 
-export const useGenesisConversations = (userEmail: string) => {
+export const useGenesisChats = (userEmail: string) => {
   const [value, loading, error] = useCollection(
-    query(collection(db, Constants.CONVERSATIONS), where(Constants.USERID, "==", userEmail), orderBy(Constants.TIMESTAMP))
+    query(collection(db, Constants.CHATS), where(Constants.USERID, "==", userEmail), orderBy(Constants.TIMESTAMP))
   );
 
-  const conversations = value?.docs.map((doc) => ({
+  const chats = value?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
     idPath: replaceSlashWithTilde(doc.data().path),
-  } as ConversationRead)) || [];
+  } as ChatRead)) || [];
 
-  return { conversations, loading, error };
+  return { chats, loading, error };
 };
 
 
-export const useChildConversations = (path: string) => {
+export const useChildChats = (path: string) => {
   const [value, loading, error] = useCollection(
-    query(collection(db, path, Constants.CONVERSATIONS), orderBy(Constants.TIMESTAMP))
+    query(collection(db, path, Constants.CHATS), orderBy(Constants.TIMESTAMP))
   );
 
-  const conversations = value?.docs.map((doc) => ({
+  const chats = value?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
     idPath: replaceSlashWithTilde(doc.data().path),
-  } as ConversationRead)) || [];
+  } as ChatRead)) || [];
 
-  return { conversations, loading, error };
+  return { chats, loading, error };
 };
 
 
-export function useConversation(path: string) {
-  const conversationRef = doc(db, path);
-  const [conversationSnapshot, loading, error] = useDocument(conversationRef);
+export function useChat(path: string) {
+  const chatRef = doc(db, path);
+  const [chatSnapshot, loading, error] = useDocument(chatRef);
 
-  const conversation = conversationSnapshot?.exists()
+  const chat = chatSnapshot?.exists()
     ? {
-      ...conversationSnapshot.data(),
-      id: conversationSnapshot.id,
+      ...chatSnapshot.data(),
+      id: chatSnapshot.id,
       idPath: replaceSlashWithTilde(path)
-    } as ConversationRead
+    } as ChatRead
     : null;
 
-  return { conversation, loading, error };
+  return { chat, loading, error };
 }
 
 
@@ -128,9 +128,9 @@ export const useMessages = (path: string) => {
 };
 
 
-export async function userConversationsIsEmpty(userId: string) {
+export async function userChatsIsEmpty(userId: string) {
   const q = query(
-      collection(db, Constants.CONVERSATIONS),
+      collection(db, Constants.CHATS),
       where(Constants.USERID, "==", userId),
       orderBy(Constants.TIMESTAMP, Constants.ASC),
       limit(1)
