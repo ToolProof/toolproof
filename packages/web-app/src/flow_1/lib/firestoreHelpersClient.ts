@@ -1,5 +1,5 @@
 import { db } from "shared/src/flow_0/firebaseClient";
-import { doc, setDoc, addDoc, deleteDoc, serverTimestamp, collection, query, where, orderBy } from "firebase/firestore";
+import { doc, getDocs, setDoc, addDoc, deleteDoc, serverTimestamp, collection, query, where, orderBy, limit } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { ConversationWrite, MessageWrite, ConversationRead, MessageRead } from "shared/src/flow_0/typings";
 import * as Constants from "shared/src/flow_0/constants";
@@ -128,6 +128,18 @@ export const useMessages = (path: string) => {
 };
 
 
+export async function userConversationsIsEmpty(userId: string) {
+  const q = query(
+      collection(db, Constants.CONVERSATIONS),
+      where(Constants.USERID, "==", userId),
+      orderBy(Constants.TIMESTAMP, Constants.ASC),
+      limit(1)
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.empty;
+}
+
+
 export function replaceSlashWithTilde(input: string) {
   return input.replace(/\//g, "~");
 }
@@ -136,4 +148,6 @@ export function replaceSlashWithTilde(input: string) {
 export function replaceTildeWithSlash(input: string) {
   return input.replace(/~/g, "/");
 }
+
+
 
