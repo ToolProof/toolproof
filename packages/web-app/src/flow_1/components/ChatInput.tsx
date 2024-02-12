@@ -30,7 +30,7 @@ export default function ChatInput({ chat }: Props) {
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage(chat.path, { userId: userEmail, content: content });
+            await addMessage(chat.id, { userId: userEmail, content: content });
         } catch (error) {
             console.error("Error:", error);
             // Optionally revert optimistic UI updates here
@@ -43,7 +43,7 @@ export default function ChatInput({ chat }: Props) {
         setInput("");
         await addMessageWrapper(content);
         // const data = 
-        await sendPromptAction({ chatPath: chat.path, promptSeed: content, userName: userName }); //ATTENTION: message order not secured
+        await sendPromptAction({ chatId: chat.id, promptSeed: content, userName: userName }); //ATTENTION: message order not secured
         /* if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_chat) {

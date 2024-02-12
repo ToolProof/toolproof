@@ -4,10 +4,10 @@ import admin from "firebase-admin";
 import { MessageWrite } from "shared/src/flow_0/typings";
 
 
-export const addMessageAndUpdateTurnState = async (path: string, content: string, code: number): Promise<void> => {
+export const addMessageAndUpdateTurnState = async (chatId: string, content: string, code: number): Promise<void> => {
     try {
         const batch = dbAdmin.batch();
-        const chatRef = dbAdmin.doc(path);
+        const chatRef = dbAdmin.collection(Constants.CHATS).doc(chatId);
 
         // Update turnState
         batch.update(chatRef, { turnState: code });

@@ -3,18 +3,19 @@
 import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
-import ChatRow from "./ChatRow";
+//import ChatRow from "./ChatRow";
 //import { addGenesisChat, replaceSlashWithTilde } from "../lib/firestoreHelpersClient";
 import { useAppDispatch } from "@/flow_1/lib/redux/hooks";
 import { setUserEmail } from "@/flow_1/lib/redux/features/devConfigSlice";
 import { useAppSelector } from "@/flow_1/lib/redux/hooks";
-import { useGenesisChats, userChatsIsEmpty, addGenesisChat, replaceSlashWithTilde } from "@/flow_1/lib/firestoreHelpersClient";
+import { getFirstUserChatId, addChat } from "@/flow_1/lib/firestoreHelpersClient";
 
 
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || "";
-    const { chats: genesisChats, loading } = useGenesisChats(userEmail);
+    //const [chatId, setChatId] = useState("");
+    //const { chat, loading } = useChat(chatId);
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -28,14 +29,18 @@ export default function SideBar() {
     useEffect(() => {
         const foo = async () => {
             if (!userEmail) return;
-            if (await userChatsIsEmpty(userEmail)) {
+            const firstUserChatId = await getFirstUserChatId(userEmail);
+            if (!firstUserChatId) {
                 console.log("User has no chats");
-                const result = await addGenesisChat({ type: "meta", userId: userEmail, turnState: 0, path: "" });
-                if (result && result.path) {
-                    router.push(`/flow_1/${replaceSlashWithTilde(result.path)}`);
+                const result = await addChat({ userId: userEmail, turnState: 0 });
+                if (result && result.chatId) {
+                    router.push(`/flow_1/${result.chatId}`);
+                    //setChatId(result.chatId);
                 }
             } else {
                 console.log("User has chats");
+                router.push(`/flow_1/${firstUserChatId}`);
+                //setChatId(firstUserChatId);
             }
         }
         foo();
@@ -51,12 +56,12 @@ export default function SideBar() {
         <div className="flex flex-col h-screen py-4 overflow-x-hidden">
             <div className="flex-1">
                 <div className="flex flex-col space-y-2">
-                    {loading &&
+                    {/*loading &&
                         <div className="animate-pulse text-center text-white">Loading...</div>
-                    }
-                    {genesisChats.map((chat) => {
+    */}
+                    {/*genesisChats.map((chat) => {
                         return <ChatRow key={chat.id} chat={chat}/>
-                    })}
+                    })*/}
                 </div>
             </div>
             {session && (

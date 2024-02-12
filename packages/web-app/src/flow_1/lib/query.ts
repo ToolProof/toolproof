@@ -9,7 +9,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import * as Constants from "shared/src/flow_0/constants"
 
-let currentChatPath: string = "";
+let currentChatId: string = "";
 
 const chatModel = new ChatOpenAI({
   modelName: "gpt-4",
@@ -67,15 +67,15 @@ const chain = RunnableSequence.from([
 ]);
 
 
-const query = async ({ chatPath, promptSeed }: { chatPath: string; promptSeed: string; userName: string }) => {
+const query = async ({ chatId, promptSeed }: { chatId: string; promptSeed: string; userName: string }) => {
 
   try {
     // Check if a new chat has started or the existing one continues
-    if (currentChatPath !== chatPath) {
+    if (currentChatId !== chatId) {
       /*
       const messagesSnapshot = await dbAdmin //ATTENTION_
         .collection("chats")
-        .doc(chatPath)
+        .doc(chatId)
         .collection("messages")
         .orderBy("timestamp", "asc")
         .get();
@@ -97,7 +97,7 @@ const query = async ({ chatPath, promptSeed }: { chatPath: string; promptSeed: s
         //chatHistory: chatHistory,
       });
 
-      currentChatPath = chatPath;
+      currentChatId = chatId;
     }
 
     const inputs = {

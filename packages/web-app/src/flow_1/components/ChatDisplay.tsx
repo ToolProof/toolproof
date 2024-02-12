@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
 import { ChatRead } from "shared/src/flow_0/typings";
-import { useMessages } from "../lib/firestoreHelpersClient";
+import { useMessages } from "@/flow_1/lib/firestoreHelpersClient";
 
 type Props = {
     chat: ChatRead;
@@ -13,7 +13,7 @@ type Props = {
 export default function ChatDisplay({ chat }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
-    const { messages } = useMessages(chat.path);
+    const { messages } = useMessages(chat.id);
     
     
     useEffect(() => {

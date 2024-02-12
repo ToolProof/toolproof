@@ -1,5 +1,5 @@
 import { db } from "shared/src/flow_0/firebaseClient";
-import { doc, addDoc, serverTimestamp, collection, query, orderBy, limit } from "firebase/firestore";
+import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { ChatWrite, MessageWrite, ChatRead, MessageRead } from "shared/src/flow_0/typings";
 import * as Constants from "shared/src/flow_0/constants";
@@ -7,24 +7,30 @@ import * as Constants from "shared/src/flow_0/constants";
 
 export const addChat = async (chatWrite: ChatWrite) => {
   try {
-    const docRef = await addDoc(collection(db, Constants.CHATS), chatWrite);
-    return docRef.id;
-  } catch {
-    
+    const docRef = await addDoc(collection(db, Constants.CHATS), {
+      ...chatWrite,
+      [Constants.TIMESTAMP]: serverTimestamp(),
+    });
+    return { chatId: docRef.id };
+  } catch(e) {
+    console.error(e);
   }
 }
 
 export const addMessage = async (chatId: string, messageWrite: MessageWrite) => {
   try {
-    const docRef = await addDoc(collection(db, Constants.CHATS, chatId, Constants.MESSAGES), messageWrite);
-    return docRef.id;
-  } catch {
-
+    const docRef = await addDoc(collection(db, Constants.CHATS, chatId, Constants.MESSAGES), {
+      ...messageWrite,
+      [Constants.TIMESTAMP]: serverTimestamp(),
+    });
+    return { messageId: docRef.id };
+  } catch(e) {
+    console.error(e);
   }
 }
 
 export function useChat(chatId: string) {
-  const chatRef = doc(db, chatId);
+  const chatRef = doc(db, Constants.CHATS, chatId);
   const [chatSnapshot, loading, error] = useDocument(chatRef);
 
   const chat = chatSnapshot?.exists()
@@ -44,7 +50,23 @@ export const useMessages = (chatId: string) => {
   const messages = messagesSnapshot?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
-  })) as MessageRead[];
+  })) as MessageRead[] || [];
 
-  return [messages, loading, error];
+  return { messages, loading, error };
+}
+
+export async function getFirstUserChatId(userId: string) {
+  const q = query(
+    collection(db, Constants.CHATS),
+    where(Constants.USERID, "==", userId),
+    limit(1)
+  );
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    // Assuming there is at least one document, return its ID
+    return querySnapshot.docs[0].id;
+  } else {
+    // Return null or an empty string to indicate no documents found
+    return null; // or return '';
+  }
 }
