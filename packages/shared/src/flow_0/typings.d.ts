@@ -2,8 +2,8 @@ import { Timestamp, FieldValue } from "firebase/firestore";
 
 export interface MessageRead {
     id: string;
-    userId: string;
     timestamp: Timestamp;
+    userId: string;
     content: string;
 }
 
@@ -14,17 +14,12 @@ export interface MessageWrite {
 
 export interface ChatRead {
     id: string;
-    path: string;
-    idPath: string;
-    userId: string;
-    type: string;
     timestamp: Timestamp;
+    userId: string;
     turnState: number;
 }
 
 export interface ChatWrite {
-    path: string;
     userId: string;
-    type: string;
     turnState: number;
 }
