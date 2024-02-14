@@ -1,4 +1,5 @@
 "use client"
+import * as Constants from "shared/src/flow_0/constants"
 import { useState, useEffect, useRef } from "react";
 // import { toast } from "react-hot-toast";
 import sendPromptAction from "@/flow_1/lib/sendPromptAction";
@@ -30,7 +31,7 @@ export default function ChatInput({ chat }: Props) {
 
     const addMessageWrapper = async (content: string) => {
         try {
-            const userMessage = await addMessage(chat.id, { userId: userEmail, content: content });
+            const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.TEST] });
             return userMessage;
         } catch (error) {
             console.error("Error:", error);

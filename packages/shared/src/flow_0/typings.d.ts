@@ -3,6 +3,7 @@ import { Timestamp, FieldValue } from "firebase/firestore";
 export interface MessageWrite {
     userId: string;
     content: string;
+    tags: string[];
 }
 
 export interface MessageRead extends MessageWrite {

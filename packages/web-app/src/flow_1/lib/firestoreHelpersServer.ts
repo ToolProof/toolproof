@@ -14,7 +14,7 @@ export const addMessageAndUpdateTurnState = async (chatId: string, content: stri
 
         // Send message to Firestore
         const docRef = chatRef.collection(Constants.MESSAGES).doc();
-        const messageWrite: MessageWrite = { userId: "ChatGPT", content };
+        const messageWrite: MessageWrite = { userId: Constants.ChatGPT, content, tags: [Constants.TEST]};
         batch.set(docRef, {
             ...messageWrite,
             timestamp: admin.firestore.Timestamp.now(),

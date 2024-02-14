@@ -1,3 +1,4 @@
+import * as Constants from "shared/src/flow_0/constants"
 import { useState, useEffect } from "react";
 import { MessageRead } from "shared/src/flow_0/typings";
 import { useAppDispatch } from "@/flow_1/lib/redux/hooks";
@@ -17,7 +18,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
   const userImg = session?.user?.image || "";
-  const imageSource = (message.userId !== "ChatGPT") ? userImg : "/images/openai_logo.png";
+  const imageSource = (message.userId !== Constants.ChatGPT) ? userImg : "/images/openai_logo.png";
 
   useEffect(() => {
     if (isNew) {
