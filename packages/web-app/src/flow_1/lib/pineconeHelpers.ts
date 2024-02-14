@@ -1,10 +1,11 @@
+import * as Constants from "shared/src/flow_0/constants";
 import pc from "@/flow_1/setup/pinecone";
 import { MessagePinecone } from "shared/src/flow_0/typings";
+import { OpenAIEmbeddings } from "@langchain/openai";
 
-export default async function foo(chatId: string, userMessage: MessagePinecone, aiMessage: MessagePinecone): Promise<void> {
-    console.log("foo", chatId, userMessage, aiMessage);
-    await pc.createIndex({
-        name: "test-index",
+export async function createIndexWrapper() {
+    /* await pc.createIndex({
+        name: Constants.MESSAGES,
         dimension: 1536,
         metric: "cosine",
         spec: { 
@@ -13,18 +14,24 @@ export default async function foo(chatId: string, userMessage: MessagePinecone, 
                 region: "us-west-2" 
             }
         } 
-    }) 
-    const index = pc.index("test-index");
+    }) */ 
+}
+
+export async function upsertVectors(chatId: string, userMessage: MessagePinecone, aiMessage: MessagePinecone): Promise<void> {
+    
+    const index = pc.index(Constants.MESSAGES);
+    const embeddings = new OpenAIEmbeddings();
+    const userMessageEmbedding = await embeddings.embedQuery(userMessage.content); 
+    const aiMessageEmbedding = await embeddings.embedQuery(aiMessage.content);
+
     await index.namespace(chatId).upsert([
         {
           "id": userMessage.id,
-          // calculate embedding from userMessage.content 
-          "values": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+          "values": userMessageEmbedding
         },
         {
           "id": aiMessage.id, 
-          // calculate embedding from aiMessage.content
-          "values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+          "values": aiMessageEmbedding
         }
       ]);
       

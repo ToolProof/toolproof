@@ -2,7 +2,7 @@
 import query from "./query";
 import { addMessageAndUpdateTurnState } from "./firestoreHelpersServer";
 import { MessagePinecone } from "shared/src/flow_0/typings";
-import foo from "./pineconeHelpers";
+import { upsertVectors } from "./pineconeHelpers";
 
 interface SendPromptResponse {
   action: string;
@@ -25,9 +25,8 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
             * turnState should be updated based on the action
             * several query methods could be called here
             * both human and AI messages should be upserted to Pinecone
-                * 
         */
-        await foo(chatId, userMessage, aiMessage); //ATTENTION: do I want to await this?
+        await upsertVectors(chatId, userMessage, aiMessage); //ATTENTION: do I want to await this?
         return { action };
     } catch (error) {
         console.error("Error:", error);
