@@ -1,25 +1,26 @@
 import { Timestamp, FieldValue } from "firebase/firestore";
 
-export interface MessageRead {
-    id: string;
-    timestamp: Timestamp;
-    userId: string;
-    content: string;
-}
-
 export interface MessageWrite {
     userId: string;
     content: string;
 }
 
-export interface ChatRead {
+export interface MessageRead extends MessageWrite {
     id: string;
     timestamp: Timestamp;
-    userId: string;
-    turnState: number;
+}
+
+export interface MessagePinecone extends MessageWrite {
+    id: string;
 }
 
 export interface ChatWrite {
     userId: string;
     turnState: number;
 }
+
+export interface ChatRead extends ChatWrite {
+    id: string;
+    timestamp: Timestamp;
+}
+

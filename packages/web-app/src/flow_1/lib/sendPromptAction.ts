@@ -1,12 +1,14 @@
 "use server";
 import query from "./query";
 import { addMessageAndUpdateTurnState } from "./firestoreHelpersServer";
+import { MessagePinecone } from "shared/src/flow_0/typings";
+import foo from "./pineconeHelpers";
 
 interface SendPromptResponse {
   action: string;
 }
 
-export default async function sendPromptAction({ chatId, promptSeed, userName: userName }: { chatId: string, promptSeed: string; userName: string }): Promise<SendPromptResponse> {
+export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: MessagePinecone }): Promise<SendPromptResponse> { 
     if (!promptSeed) {
         throw new Error("Prompt is required");
     }
@@ -18,10 +20,18 @@ export default async function sendPromptAction({ chatId, promptSeed, userName: u
         const response = await query({ chatId: chatId, promptSeed, userName: userName });
         const content = response?.modelResponse || "ChatGPT was unable to respond!";
         const action = response?.action || "";
-        await addMessageAndUpdateTurnState(chatId, content, 1);
+        const aiMessage = await addMessageAndUpdateTurnState(chatId, content, 1);
+        /*
+            * turnState should be updated based on the action
+            * several query methods could be called here
+            * both human and AI messages should be upserted to Pinecone
+                * 
+        */
+        await foo(chatId, userMessage, aiMessage); //ATTENTION: do I want to await this?
         return { action };
     } catch (error) {
         console.error("Error:", error);
         throw new Error("An error occurred");
     }
 }
+

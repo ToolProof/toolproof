@@ -30,9 +30,11 @@ export default function ChatInput({ chat }: Props) {
 
     const addMessageWrapper = async (content: string) => {
         try {
-            await addMessage(chat.id, { userId: userEmail, content: content });
+            const userMessage = await addMessage(chat.id, { userId: userEmail, content: content });
+            return userMessage;
         } catch (error) {
             console.error("Error:", error);
+            throw new Error("An error occurred while adding message");
             // Optionally revert optimistic UI updates here
         }
     }
@@ -41,9 +43,9 @@ export default function ChatInput({ chat }: Props) {
     const submissionHelper = async () => {
         const content = input.trim();
         setInput("");
-        await addMessageWrapper(content);
+        const userMessage = await addMessageWrapper(content);
         // const data = 
-        await sendPromptAction({ chatId: chat.id, promptSeed: content, userName: userName }); //ATTENTION: message order not secured
+        await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
         /* if (data && data.action) {
             console.log("action", data.action);
             if (data.action === Constants.create_new_chat) {

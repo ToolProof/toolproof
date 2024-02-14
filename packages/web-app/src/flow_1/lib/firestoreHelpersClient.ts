@@ -1,7 +1,7 @@
 import { db } from "shared/src/flow_0/firebaseClient";
 import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
-import { ChatWrite, MessageWrite, ChatRead, MessageRead } from "shared/src/flow_0/typings";
+import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from "shared/src/flow_0/typings";
 import * as Constants from "shared/src/flow_0/constants";
 
 
@@ -17,15 +17,16 @@ export const addChat = async (chatWrite: ChatWrite) => {
   }
 }
 
-export const addMessage = async (chatId: string, messageWrite: MessageWrite) => {
+export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<MessagePinecone> => {
   try {
     const docRef = await addDoc(collection(db, Constants.CHATS, chatId, Constants.MESSAGES), {
       ...messageWrite,
       [Constants.TIMESTAMP]: serverTimestamp(),
     });
-    return { messageId: docRef.id };
+    return { id: docRef.id, ...messageWrite };
   } catch(e) {
     console.error(e);
+    throw new Error("An error occurred while adding message");
   }
 }
 

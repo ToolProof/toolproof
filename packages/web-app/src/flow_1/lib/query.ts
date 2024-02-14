@@ -24,16 +24,16 @@ let memory = new BufferMemory({
 });
 
 const promptTemplate = ChatPromptTemplate.fromMessages([
-  ["system", `You are a chat orchestrator. Try to best accomodate the user's wishes or keep the current chat going.`],
+  ["system", ``],
   new MessagesPlaceholder("history"),
-  ["human", `{input}`],
+  ["human", `{speaker}: {input}`],
 ]);
 
 
 const functionSchema = [
   {
-    name: "chat_orchestration",
-    description: "An instance of chat orchestration",
+    name: "test_function",
+    description: "",
     parameters: zodToJsonSchema(
       z.object({
         modelResponse: z.string().describe("The model's response"),
@@ -56,18 +56,18 @@ const chain = RunnableSequence.from([
     history: (previousOutput) => previousOutput.memory.history,
   },
   promptTemplate,
-  (previousOutput) => {
-    //console.log(previousOutput);
+  /* (previousOutput) => {
+    console.log(previousOutput);
     return previousOutput;
-  },
+  }, */
   chatModel.bind({
     functions: functionSchema,
-    function_call: { name: "chat_orchestration" },
+    function_call: { name: "test_function" },
   }),
 ]);
 
 
-const query = async ({ chatId, promptSeed }: { chatId: string; promptSeed: string; userName: string }) => {
+const query = async ({ chatId, promptSeed, userName }: { chatId: string; promptSeed: string; userName: string }) => {
 
   try {
     // Check if a new chat has started or the existing one continues
@@ -102,7 +102,7 @@ const query = async ({ chatId, promptSeed }: { chatId: string; promptSeed: strin
 
     const inputs = {
       input: promptSeed,
-      //speaker: userName,
+      speaker: userName,
     };
 
     const response = await chain.invoke(inputs);

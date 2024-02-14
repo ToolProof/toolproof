@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
-    "@pinecone-database/pinecone": "^1.1.2",
+    "@pinecone-database/pinecone": "^2.0.1",
     "@reduxjs/toolkit": "^2.0.1",
     "autoprefixer": "10.4.15",
     "eslint": "8.48.0",
