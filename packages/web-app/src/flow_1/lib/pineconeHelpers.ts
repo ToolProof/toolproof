@@ -5,7 +5,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 
 export async function createIndexWrapper() {
     /* await pc.createIndex({
-        name: Constants.MESSAGES,
+        name: Constants.MESSAGES, //ATTENTION: name should indicate that this index stores openai embeddings
         dimension: 1536,
         metric: "cosine",
         spec: { 
