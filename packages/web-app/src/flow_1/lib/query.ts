@@ -1,8 +1,8 @@
-import { ChatOpenAI } from "langchain/chat_models/openai";
+import { ChatOpenAI } from "@langchain/openai";
 //import { BufferMemory, ChatMessageHistory } from "langchain/memory";
 import { BufferMemory } from "langchain/memory";
-import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
-import { RunnableSequence } from "langchain/schema/runnable";
+import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { RunnableSequence } from "@langchain/core/runnables";
 //import { AIMessage, HumanMessage } from "langchain/schema";
 //import dbAdmin from "../../configFirebaseAdmin";
 import { z } from "zod";
