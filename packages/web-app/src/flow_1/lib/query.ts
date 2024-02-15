@@ -9,6 +9,8 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import * as Constants from "shared/src/flow_0/constants"
 
+const TOPIC_DETECTION = "topic_detection"; //ATTENTION: move to constants
+
 let currentChatId: string = "";
 
 const chatModel = new ChatOpenAI({
@@ -24,7 +26,7 @@ let memory = new BufferMemory({
 });
 
 const promptTemplate = ChatPromptTemplate.fromMessages([
-  ["system", ``],
+  ["system", `Your job is to keep the conversation going and keep track of the topic.`],
   new MessagesPlaceholder("history"),
   ["human", `{speaker}: {input}`],
 ]);
@@ -32,12 +34,13 @@ const promptTemplate = ChatPromptTemplate.fromMessages([
 
 const functionSchema = [
   {
-    name: "test_function",
-    description: "",
+    name: TOPIC_DETECTION,
+    description: "The purpose of this function is to detect the topic of the conversation based on the input message and the current context.",
     parameters: zodToJsonSchema(
       z.object({
         modelResponse: z.string().describe("The model's response"),
-        action: z.enum([Constants.CONTINUE_CHAT, Constants.CREATE_NEW_CHAT, Constants.BACK_TO_PARENT]).describe("The action to be taken"),
+        topicDetected: z.string().describe("The detected topic"),
+        action: z.enum([Constants.CONTINUE_TOPIC, Constants.CHANGE_TOPIC]).describe("The action to be taken"),
       })
     )
   },
@@ -62,7 +65,7 @@ const chain = RunnableSequence.from([
   }, */
   chatModel.bind({
     functions: functionSchema,
-    function_call: { name: "test_function" },
+    function_call: { name: TOPIC_DETECTION },
   }),
 ]);
 
@@ -108,18 +111,19 @@ const query = async ({ chatId, promptSeed, userName }: { chatId: string; promptS
     const response = await chain.invoke(inputs);
 
     // It's important to check if the response is successful before attempting to save the context
-    if (response && response.additional_kwargs && response.additional_kwargs.function_call) {
+    if (response && response.additional_kwargs && response.additional_kwargs.function_call) { //ATTENTION: optional chaining
 
       const argsString = response.additional_kwargs.function_call.arguments;
       const argsInsecure = JSON.parse(argsString);
-      let modelResponse = argsInsecure.modelResponse;
+      const modelResponse = argsInsecure.modelResponse;
+      const topicDetected = argsInsecure.topicDetected;
       const action = argsInsecure.action;
 
-      if (!modelResponse || action !== Constants.CONTINUE_CHAT) {
+      /* if (!modelResponse || action !== Constants.CONTINUE_TOPIC) {
         console.log("modelResponse", modelResponse);
         console.log("action", action);
         modelResponse = action;
-      }
+      } */
 
       await memory.saveContext(
         {
@@ -130,8 +134,10 @@ const query = async ({ chatId, promptSeed, userName }: { chatId: string; promptS
 
       const argsSecure = {
         modelResponse: modelResponse,
+        topicDetected: topicDetected,
         action: action,
       };
+      console.log("argsSecure", argsSecure);
 
       return argsSecure;
     } else {

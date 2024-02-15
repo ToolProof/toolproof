@@ -28,7 +28,6 @@ export default function ChatInput({ chat }: Props) {
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
 
-
     const addMessageWrapper = async (content: string) => {
         try {
             const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.TEST] });
@@ -45,31 +44,15 @@ export default function ChatInput({ chat }: Props) {
         const content = input.trim();
         setInput("");
         const userMessage = await addMessageWrapper(content);
-        // const data = 
-        await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
-        /* if (data && data.action) {
+     
+        const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
+        if (data && data.topicDetected && data.action) {
+            console.log("topicDetected", data.topicDetected);
             console.log("action", data.action);
-            if (data.action === Constants.create_new_chat) {
-                if (session) {
-                    // Create a new chat
-                    try {
-                        if (userEmail) {
-                            const result = await addChild({chatId, { userId: userEmail, type: Constants.data, turnState: 0 }});
-                            if (result && result.data && result.data.chatId) {
-                                router.push(`/chat/${result.data.chatId}`);
-                            } else {
-                                console.error("Chat creation did not return a valid ID");
-                            }
-                        }
-                    } catch (err) {
-                        console.error("Failed to create chat", err);
-                    }
-                }
-            } else if (data.action === Constants.back_to_parent) {
-                const parentId = chat?.parentId; //ATTENTION: what if parentId is "meta"?
-                router.push(`/chat/${parentId}`);
-            }
-        } */
+        } else {
+            console.log("No topic detected or action found");
+        }
+
     };
 
 

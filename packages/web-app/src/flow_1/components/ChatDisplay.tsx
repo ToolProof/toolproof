@@ -93,7 +93,7 @@ export default function ChatDisplay({ chat }: Props) {
             )}
             {messages?.map((message, index) => {
                 const isNew = isNewMessage(message.timestamp, index, messages.length);
-                console.log("message", message.tags[0]);
+                //console.log("message", message.tags[0]);
                 const messageComponent = <MessageDisplay
                     key={message.id}
                     message={message}

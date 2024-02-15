@@ -28,13 +28,13 @@ export default function SideBar() {
             if (!userEmail) return;
             const firstUserChatId = await getFirstUserChatId(userEmail);
             if (!firstUserChatId) {
-                console.log("User has no chats");
+                //console.log("User has no chats");
                 const result = await addChat({ userId: userEmail, turnState: 0 });
                 if (result && result.chatId) {
                     router.push(`/flow_1/${result.chatId}`);
                 }
             } else {
-                console.log("User has chats");
+                //console.log("User has chats");
                 router.push(`/flow_1/${firstUserChatId}`);
             }
         }

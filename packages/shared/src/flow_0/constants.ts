@@ -17,6 +17,8 @@ export const LIMIT = "limit";
 
 export const TEST = "test";
 
-export const CONTINUE_CHAT = "continue_chat";
-export const CREATE_NEW_CHAT = "create_new_chat";
-export const BACK_TO_PARENT = "back_to_parent";
+export const EMBEDDINGS_OPENAI = "embeddings_openai";
+
+export const TOPICS = "topics";
+export const CONTINUE_TOPIC = "continue_topic";
+export const CHANGE_TOPIC = "change_topic";

@@ -4,8 +4,8 @@ import { MessagePinecone } from "shared/src/flow_0/typings";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
 export async function createIndexWrapper() {
-    /* await pc.createIndex({
-        name: Constants.MESSAGES, //ATTENTION: name should indicate that this index stores openai embeddings
+    await pc.createIndex({
+        name: Constants.EMBEDDINGS_OPENAI,
         dimension: 1536,
         metric: "cosine",
         spec: { 
@@ -14,12 +14,12 @@ export async function createIndexWrapper() {
                 region: "us-west-2" 
             }
         } 
-    }) */ 
+    }) 
 }
 
 export async function upsertVectors(chatId: string, userMessage: MessagePinecone, aiMessage: MessagePinecone): Promise<void> {
     
-    const index = pc.index(Constants.MESSAGES);
+    const index = pc.index(Constants.EMBEDDINGS_OPENAI);
     const embeddings = new OpenAIEmbeddings();
     const userMessageEmbedding = await embeddings.embedQuery(userMessage.content); 
     const aiMessageEmbedding = await embeddings.embedQuery(aiMessage.content);
