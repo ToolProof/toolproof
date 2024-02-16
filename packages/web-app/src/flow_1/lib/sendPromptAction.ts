@@ -1,5 +1,5 @@
 "use server";
-import query from "./query";
+import chainOrchestrator from "./chains/chainOrchestrator";
 import { updateChat } from "./firestoreHelpersServer";
 import { MessagePinecone } from "shared/src/flow_0/typings";
 import { upsertVectors } from "./pineconeHelpers";
@@ -18,15 +18,15 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
     }
 
     try {
-        const response = await query({ chatId: chatId, promptSeed, userName: userName });
+        const foo = await chainOrchestrator({ chatId, promptSeed, userName });
 
-        const content = response?.modelResponse || "ChatGPT was unable to respond!";
-        const topicDetected = response?.topicDetected || "default-topic";
-        const action = response?.action || "";
+        const aiMessageContent = foo.modelResponse;
+        const topicDetected = foo.topicDetected;
+        const action = foo.action;
 
-        const aiMessage = await updateChat(chatId, content, userMessage.id, topicDetected, 1); //ATTENTION: turnState should be decided by the AI
+        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, topicDetected, 1); //ATTENTION: turnState should be decided by the AI
         
-        await upsertVectors(chatId, userMessage, aiMessage); //ATTENTION: do I want to await this?
+        // upsertVectors(chatId, userMessage, aiMessage); //ATTENTION: do I want to await this?
 
         return { topicDetected, action };
     } catch (error) {

@@ -47,6 +47,9 @@ export default function ChatInput({ chat }: Props) {
      
         const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
         if (data && data.topicDetected && data.action) {
+            /*
+                * Could interact with the Redux store here
+            */
             console.log("topicDetected", data.topicDetected);
             console.log("action", data.action);
         } else {
