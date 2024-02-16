@@ -23,7 +23,7 @@ export default function Chat({ params: { id } }: Props) {
     }
 
     return ( 
-        <div className="flex-1 flex flex-col m-4 overflow-hidden bg-white">
+        <div className="flex-1 flex flex-col m-4 overflow-hidden bg-[#3344ff]">
             <div className="flex-1 my-0">
                 <ChatDisplay key={chat.id} chat={chat} />
             </div>
