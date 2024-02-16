@@ -20,16 +20,16 @@ export default async function RootLayout({
 }) {
   const session = await getServerSession(authOptions)
 
-  
+
   return (
     <html lang="en">
       <body>
         <SessionProvider session={session}>
           <StoreProvider>
             <div className="flex h-screen overflow-hidden">
-              <div className="w-80 py-4 bg-black"><SideBar/></div>
+              <div className="w-80 py-4 bg-black"><SideBar /></div>
               <div className="flex-1 flex flex-col overflow-hidden bg-[#ecf6a5]">
-                <div className="flex-1 p-0 bg-[#6c8a3a]">{children}</div>
+                {children}
               </div>
             </div>
           </StoreProvider>

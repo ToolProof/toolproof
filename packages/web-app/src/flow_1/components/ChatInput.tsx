@@ -76,8 +76,8 @@ export default function ChatInput({ chat }: Props) {
     const updateInputHeight = () => {
         const textarea = textareaRef.current;
         if (textarea) {
-            textarea.style.height = "auto"; // Reset height to auto to get the new scroll height
-            const maxHeight = parseInt(window.getComputedStyle(textarea).maxHeight, 10); // Get the max height from computed styles
+            textarea.style.height = "auto"; // Reset height to auto to get the new scroll height //ATTENTION: hardcoded string
+            const maxHeight = parseInt(window.getComputedStyle(textarea).maxHeight, 10); // Get the max height from computed styles //ATTENTION: could be computed once
             textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`; // Set the height up to the max height
         }
     };
