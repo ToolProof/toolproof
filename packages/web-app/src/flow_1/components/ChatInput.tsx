@@ -116,7 +116,7 @@ export default function ChatInput({ chat }: Props) {
 
     const renderHelper = (criterion: boolean) => {
         return (
-            <form onSubmit={handleSubmit} className="flex flex-col items-center relative h-full bg-[#bc8888]">
+            <form onSubmit={handleSubmit} className="flex justify-center relative h-full bg-[#bc8888]">
                 <textarea
                     ref={textareaRef}
                     className={`w-full max-h-[20em] mx-72 mt-12 mb-4 px-3 py-2 rounded-2xl outline-none bg-[#f0eded]
