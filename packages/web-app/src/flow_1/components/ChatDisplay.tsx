@@ -82,7 +82,7 @@ export default function ChatDisplay({ chat }: Props) {
 
 
     return (
-        <div ref={messageContainerRef} className="max-h-[calc(80vh)] overflow-y-auto overflow-x-hidden bg-[#d069ac]">
+        <div ref={messageContainerRef} className="max-h-[calc(80vh)] overflow-y-auto overflow-x-hidden bg-[#ffffff]">
             {messages && messages.length === 0 && (
                 <div>
                     <p className="mt-10 text-center text-black">

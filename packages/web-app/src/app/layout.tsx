@@ -26,9 +26,9 @@ export default async function RootLayout({
       <body>
         <SessionProvider session={session}>
           <StoreProvider>
-            <div className="flex h-screen overflow-hidden">
+            <div className="flex h-screen overflow-hidden bg-[#f15c5c]">
               <div className="w-80 py-4 bg-black"><SideBar /></div>
-              <div className="flex-1 flex flex-col overflow-hidden bg-[#ecf6a5]">
+              <div className="flex-1 p-0 bg-[#ffffff]">
                 {children}
               </div>
             </div>

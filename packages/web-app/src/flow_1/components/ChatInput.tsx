@@ -76,9 +76,18 @@ export default function ChatInput({ chat }: Props) {
     const updateInputHeight = () => {
         const textarea = textareaRef.current;
         if (textarea) {
-            textarea.style.height = "auto"; // Reset height to auto to get the new scroll height //ATTENTION: hardcoded string
-            const maxHeight = parseInt(window.getComputedStyle(textarea).maxHeight, 10); // Get the max height from computed styles //ATTENTION: could be computed once
-            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`; // Set the height up to the max height
+            // Reset height to auto to get the new scroll height
+            textarea.style.height = "auto";
+            const maxHeight = parseInt(window.getComputedStyle(textarea).maxHeight, 10);
+            // Calculate new height based on content, up to the max height
+            const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+            textarea.style.height = `${newHeight}px`;
+
+            // Adjust the bottom position to move up as the textarea grows
+            // This requires the textarea (or its container) to have `position: absolute;` 
+            // and be inside a `position: relative;` container.
+            const offset = maxHeight - newHeight;
+            textarea.style.bottom = `${offset}px`;
         }
     };
 
@@ -107,10 +116,12 @@ export default function ChatInput({ chat }: Props) {
 
     const renderHelper = (criterion: boolean) => {
         return (
-            <form onSubmit={handleSubmit} className="flex flex-col justify-center relative mx-48 mb-4 p-2 rounded-2xl border-2 border-gray-500 text-black">
+            <form onSubmit={handleSubmit} className="flex flex-col items-center relative h-full bg-[#bc8888]">
                 <textarea
                     ref={textareaRef}
-                    className="p-4 pr-16 max-h-[10em] focus:outline-none disabled:cursor-not-allowed placeholder:text-gray-300"
+                    className={`w-full max-h-[20em] mx-72 mt-12 mb-4 px-3 py-2 rounded-2xl outline-none bg-[#f0eded]
+                
+                    `}
                     disabled={criterion}
                     placeholder="Type your message here..."
                     value={input}
@@ -118,8 +129,9 @@ export default function ChatInput({ chat }: Props) {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
+                
                 <button
-                    className={`absolute right-10 bottom-4 h-8 w-8 rounded-lg
+                    className={`absolute right-5 bottom-4 h-8 w-8 rounded-lg
                     ${!input ? "disabled:cursor-not-allowed" : "hover:opacity-50"}
                    `}
                     disabled={!input}
@@ -136,24 +148,23 @@ export default function ChatInput({ chat }: Props) {
                                 ${!input && "bg-gray-300"}
                                 `}
                             >
-                                <div className="w-4 h-4"> {/*ATTENTION: without the outer div, img might violate restrictions*/}
+                                <div className="w-4 h-4"> 
                                     <img className="w-4 h-4"
                                         src="/icons/up_arrow.png"/>
                                 </div>
                             </div>
                     }
                 </button>
+                
             </form>
         )
     }
 
 
-    return (
-        <div>
-            {
-                renderHelper(turnState === -1)
-            }
-        </div>
-    );
+    return renderHelper(turnState === -1);
 
 }
+
+// relative border-2 border-gray-500 text-black
+
+// w-full max-h-[20em] mx-72 mt-12 mb-4 px-3 pt-6 pb-1 rounded-xlg focus:outline-none disabled:cursor-not-allowed placeholder:text-gray-300
