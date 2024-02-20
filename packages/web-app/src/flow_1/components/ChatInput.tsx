@@ -116,11 +116,11 @@ export default function ChatInput({ chat }: Props) {
 
     const renderHelper = (criterion: boolean) => {
         return (
-            <form onSubmit={handleSubmit} className="flex justify-center relative h-full bg-[#bc8888]">
+            <form onSubmit={handleSubmit} className="flex items-center relative h-full bg-[#ffffff]">
                 <textarea
                     ref={textareaRef}
-                    className={`w-full max-h-[20em] mx-72 mt-12 mb-4 px-3 py-2 rounded-2xl outline-none bg-[#f0eded]
-                
+                    className={`w-full min-h-[4em] max-h-[20em] mx-72 mt-12 mb-4 pl-3 pr-20 pt-6 pb-1 rounded-2xl outline-none bg-[#f0eded]
+                    disabled:cursor-not-allowed placeholder:text-gray-300
                     `}
                     disabled={criterion}
                     placeholder="Type your message here..."
@@ -131,8 +131,9 @@ export default function ChatInput({ chat }: Props) {
                 />
                 
                 <button
-                    className={`absolute right-5 bottom-4 h-8 w-8 rounded-lg
+                    className={`absolute right-[19.5rem] bottom-6 flex justify-center items-center h-10 w-10 rounded-xl
                     ${!input ? "disabled:cursor-not-allowed" : "hover:opacity-50"}
+                    ${!input ? "bg-gray-300" : "bg-black"}
                    `}
                     disabled={!input}
                     type="submit"
@@ -153,7 +154,7 @@ export default function ChatInput({ chat }: Props) {
                                         src="/icons/up_arrow.png"/>
                                 </div>
                             </div>
-                    }
+        }
                 </button>
                 
             </form>
@@ -164,7 +165,3 @@ export default function ChatInput({ chat }: Props) {
     return renderHelper(turnState === -1);
 
 }
-
-// relative border-2 border-gray-500 text-black
-
-// w-full max-h-[20em] mx-72 mt-12 mb-4 px-3 pt-6 pb-1 rounded-xlg focus:outline-none disabled:cursor-not-allowed placeholder:text-gray-300
