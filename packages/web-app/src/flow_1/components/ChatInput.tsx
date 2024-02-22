@@ -44,7 +44,7 @@ export default function ChatInput({ chat }: Props) {
         const content = input.trim();
         setInput("");
         const userMessage = await addMessageWrapper(content);
-     
+
         const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
         if (data && data.topicDetected && data.action) {
             /*
@@ -76,25 +76,28 @@ export default function ChatInput({ chat }: Props) {
     const updateInputHeight = () => {
         const textarea = textareaRef.current;
         if (textarea) {
-            // Reset height to auto to get the new scroll height
             textarea.style.height = "auto";
             const maxHeight = parseInt(window.getComputedStyle(textarea).maxHeight, 10);
-            // Calculate new height based on content, up to the max height
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = `${newHeight}px`;
-
-            // Adjust the bottom position to move up as the textarea grows
-            // This requires the textarea (or its container) to have `position: absolute;` 
-            // and be inside a `position: relative;` container.
-            const offset = maxHeight - newHeight;
-            textarea.style.bottom = `${offset}px`;
         }
     };
 
-
-    useEffect(() => { //ATTENTION: should we use LayoutEffect?
+    useEffect(() => {
         updateInputHeight();
     }, [input]);
+
+    // Adding useEffect for window resize
+    useEffect(() => {
+        const handleResize = () => {
+            updateInputHeight();
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        // Cleanup function to remove the event listener
+        return () => window.removeEventListener("resize", handleResize);
+    }, []); // Empty dependency array ensures this effect runs only once on mount
 
 
     useEffect(() => { //ATTENTION: should we use LayoutEffect?
@@ -116,49 +119,47 @@ export default function ChatInput({ chat }: Props) {
 
     const renderHelper = (criterion: boolean) => {
         return (
-            <form onSubmit={handleSubmit} className="flex items-center relative h-full bg-[#ffffff]">
-                <textarea
-                    ref={textareaRef}
-                    className={`w-full min-h-[4em] max-h-[20em] mx-72 mt-12 mb-4 pl-3 pr-20 pt-6 pb-1 rounded-2xl outline-none bg-[#f0eded]
-                    disabled:cursor-not-allowed placeholder:text-gray-300
-                    `}
-                    disabled={criterion}
-                    placeholder="Type your message here..."
-                    value={input}
-                    rows={1}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                />
-                
-                <button
-                    className={`absolute right-[19.5rem] bottom-6 flex justify-center items-center h-10 w-10 rounded-xl
-                    ${!input ? "disabled:cursor-not-allowed" : "hover:opacity-50"}
-                    ${!input ? "bg-gray-300" : "bg-black"}
-                   `}
-                    disabled={!input}
-                    type="submit"
-                >
-                    {
-                        (criterion || isTyping) ?
-                            <div className="flex justify-center items-center w-8 h-8 bg-transparent">
-                                <img src="/icons/encircled_square.png" />
-                            </div>
-                            :
-                            <div
-                                className={`flex justify-center items-center h-8 w-8 bg-black
-                                ${!input && "bg-gray-300"}
-                                `}
-                            >
-                                <div className="w-4 h-4"> 
-                                    <img className="w-4 h-4"
-                                        src="/icons/up_arrow.png"/>
+            <form
+                onSubmit={handleSubmit}
+                className="flex flex-col items-center w-full bg-[#ffffff] p-4 sm:p-8">
+                {/* Add a relative container around the textarea and button */}
+                <div className="relative w-full">
+                    <textarea
+                        ref={textareaRef}
+                        className="w-full resize-none max-h-[50vh] py-3 pr-[6rem] pl-3 outline-none rounded-lg bg-[#eae8e8] overflow-x-hidden overflow-y-auto"
+                        disabled={criterion}
+                        placeholder="Type your message here..."
+                        value={input}
+                        rows={1}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                    />
+                    <button
+                        style={{ position: "absolute", right: "2rem", bottom: "0.75rem" }} // Adjust position relative to the new container
+                        className={`p-2 rounded-lg
+                        ${!input ? "disabled:cursor-not-allowed" : "hover:opacity-50"}
+                        ${!input ? "bg-gray-300" : "bg-black"}`
+                        }
+                        disabled={!input}
+                        type="submit"
+                    >
+                        {
+                            (criterion || isTyping) ?
+                                <div className="flex justify-center items-center w-4 h-4 bg-transparent">
+                                    <img src="/icons/encircled_square.png" alt="Loading"/>
                                 </div>
-                            </div>
-        }
-                </button>
-                
+                                :
+                                <div
+                                    className={`flex justify-center items-center w-4 h-4
+                                    ${!input && "bg-gray-300"}`}
+                                >
+                                    <img src="/icons/up_arrow.png" alt="Send"/>
+                                </div>
+                        }
+                    </button>
+                </div>
             </form>
-        )
+        )        
     }
 
 
