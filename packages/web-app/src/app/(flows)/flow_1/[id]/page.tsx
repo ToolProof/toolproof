@@ -15,10 +15,7 @@ export default function Chat({ params: { id } }: Props) {
     const { chat } = useChat(id);
 
     if (!chat) { //ATTENTION: find a better way to handle this
-        return (
-            <div>
-            </div>
-        );
+        return null;
     }
     
     return (

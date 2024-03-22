@@ -28,22 +28,10 @@ export default function ChatInput({ chat }: Props) {
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
 
-    const addMessageWrapper = async (content: string) => {
-        try {
-            const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.TEST] });
-            return userMessage;
-        } catch (error) {
-            console.error("Error:", error);
-            throw new Error("An error occurred while adding message");
-            // Optionally revert optimistic UI updates here
-        }
-    }
-
-
     const submissionHelper = async () => {
         const content = input.trim();
         setInput("");
-        const userMessage = await addMessageWrapper(content);
+        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.TEST] });
 
         const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
         if (data && data.topicDetected && data.action) {

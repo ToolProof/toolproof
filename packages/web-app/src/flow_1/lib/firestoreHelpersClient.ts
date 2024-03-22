@@ -30,7 +30,7 @@ export const addMessage = async (chatId: string, messageWrite: MessageWrite): Pr
   }
 }
 
-export function useChat(chatId: string) {
+export function useChat(chatId: string) { //ATTENTION: be consistent with function syntax
   const chatRef = doc(db, Constants.CHATS, chatId);
   const [chatSnapshot, loading, error] = useDocument(chatRef);
 
