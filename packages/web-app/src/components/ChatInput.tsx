@@ -1,14 +1,14 @@
 "use client"
-import * as Constants from "shared/src/flow_0/constants"
+import * as Constants from "shared/src/constants"
 import { useState, useEffect, useRef } from "react";
 // import { toast } from "react-hot-toast";
-import sendPromptAction from "@/flow_1/lib/sendPromptAction";
+import sendPromptAction from "@/lib/sendPromptAction";
 import { useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/flow_1/lib/redux/hooks";
-// import * as Constants from "shared/src/flow_0/constants";
-import { ChatRead } from "shared/src/flow_0/typings";
-import { addMessage } from "@/flow_1/lib/firestoreHelpersClient";
+import { useAppSelector } from "@/redux/hooks";
+// import * as Constants from "shared/src/constants";
+import { ChatRead } from "shared/src/typings";
+import { addMessage } from "@/lib/firestoreHelpersClient";
 
 
 type Props = {

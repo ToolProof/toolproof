@@ -7,7 +7,7 @@ import { RunnableSequence } from "@langchain/core/runnables";
 //import dbAdmin from "../../configFirebaseAdmin";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import * as Constants from "shared/src/flow_0/constants"
+import * as Constants from "shared/src/constants"
 import fs from "fs/promises";
 
 const TOPIC_DETECTION = "topic_detection"; //ATTENTION: move to constants

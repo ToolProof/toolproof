@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { MessageRead } from "shared/src/flow_0/typings";
-import { useAppDispatch } from "@/flow_1/lib/redux/hooks";
-import { startTyping, stopTyping } from "@/flow_1/lib/redux/features/typewriterSlice";
+import { MessageRead } from "shared/src/typings";
+import { useAppDispatch } from "@/redux/hooks";
+import { startTyping, stopTyping } from "@/redux/features/typewriterSlice";
 import { useSession } from "next-auth/react";
 
 

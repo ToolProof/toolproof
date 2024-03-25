@@ -1,7 +1,7 @@
-import * as Constants from "shared/src/flow_0/constants";
-import dbAdmin from "shared/src/flow_0/firebaseAdmin";
+import * as Constants from "shared/src/constants";
+import dbAdmin from "shared/src/firebaseAdmin";
 import admin from "firebase-admin";
-import { MessageWrite, MessagePinecone } from "shared/src/flow_0/typings";
+import { MessageWrite, MessagePinecone } from "shared/src/typings";
 
 
 export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, topic: string, newTurnState: number): Promise<MessagePinecone> => {

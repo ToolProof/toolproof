@@ -4,7 +4,7 @@ import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts
 import { RunnableSequence } from "@langchain/core/runnables";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import * as Constants from "shared/src/flow_0/constants"
+import * as Constants from "shared/src/constants"
 
 const TOPIC_DETECTION = "topic_detection"; //ATTENTION: move to constants
 

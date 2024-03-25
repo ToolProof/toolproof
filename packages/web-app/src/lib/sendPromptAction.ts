@@ -1,7 +1,7 @@
 "use server";
 import chainOrchestrator from "./chains/chainOrchestrator";
 import { updateChat } from "./firestoreHelpersServer";
-import { MessagePinecone } from "shared/src/flow_0/typings";
+import { MessagePinecone } from "shared/src/typings";
 import { upsertVectors } from "./pineconeHelpers";
 
 interface SendPromptResponse {

@@ -1,6 +1,6 @@
 "use client"
 import { signIn, useSession } from "next-auth/react";
-import { useAppSelector } from "@/flow_1/lib/redux/hooks";
+import { useAppSelector } from "@/redux/hooks";
 
 
 export default function Home() {

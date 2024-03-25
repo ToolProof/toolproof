@@ -1,6 +1,6 @@
-import * as Constants from "shared/src/flow_0/constants";
-import pc from "@/flow_1/setup/pinecone";
-import { MessagePinecone } from "shared/src/flow_0/typings";
+import * as Constants from "shared/src/constants";
+import pc from "@/setup/pinecone";
+import { MessagePinecone } from "shared/src/typings";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
 export async function createIndexWrapper() {

@@ -1,11 +1,11 @@
 "use client"
-//import * as Constants from "shared/src/flow_0/constants";
+//import * as Constants from "shared/src/constants";
 // import Link from "next/link";
 // import { TrashIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-//import { useMessages } from "@/flow_1/lib/firestoreHelpersClient";
-import { ChatRead } from "shared/src/flow_0/typings";
+//import { useMessages } from "@/lib/firestoreHelpersClient";
+import { ChatRead } from "shared/src/typings";
 
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 export default function ChatRow({ chat }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    //const href = `/flow_1/${chat.idPath}`; //ATTENTION: hardcoded flow_1
+    //const href = `/${chat.idPath}`; //ATTENTION: hardcoded flow_1
     //const href = `/flow_${index}/${chat.idPath}`;
     //const { messages } = useMessages(chat.path);
 

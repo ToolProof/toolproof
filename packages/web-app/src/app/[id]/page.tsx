@@ -1,7 +1,7 @@
 "use client";
-import ChatDisplay from "@/flow_1/components/ChatDisplay";
-import ChatInput from "@/flow_1/components/ChatInput";
-import { useChat } from "@/flow_1/lib/firestoreHelpersClient";
+import ChatDisplay from "@/components/ChatDisplay";
+import ChatInput from "@/components/ChatInput";
+import { useChat } from "@/lib/firestoreHelpersClient";
 
 
 type Props = {

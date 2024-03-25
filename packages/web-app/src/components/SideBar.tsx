@@ -3,10 +3,10 @@ import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 //import ChatRow from "./ChatRow";
-import { useAppDispatch } from "@/flow_1/lib/redux/hooks";
-import { setUserEmail } from "@/flow_1/lib/redux/features/devConfigSlice";
-import { useAppSelector } from "@/flow_1/lib/redux/hooks";
-import { getFirstUserChatId, addChat } from "@/flow_1/lib/firestoreHelpersClient";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUserEmail } from "@/redux/features/devConfigSlice";
+import { useAppSelector } from "@/redux/hooks";
+import { getFirstUserChatId, addChat } from "@/lib/firestoreHelpersClient";
 
 
 export default function SideBar() {
@@ -31,11 +31,11 @@ export default function SideBar() {
                 //console.log("User has no chats");
                 const result = await addChat({ userId: userEmail, turnState: 0 });
                 if (result && result.chatId) {
-                    router.push(`/flow_1/${result.chatId}`);
+                    router.push(`/${result.chatId}`);
                 }
             } else {
                 //console.log("User has chats");
-                router.push(`/flow_1/${firstUserChatId}`);
+                router.push(`/${firstUserChatId}`);
             }
         }
         foo();

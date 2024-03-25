@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
 import MessageDisplay from "./MessageDisplay";
-import { ChatRead } from "shared/src/flow_0/typings";
-import { useMessages } from "@/flow_1/lib/firestoreHelpersClient";
+import { ChatRead } from "shared/src/typings";
+import { useMessages } from "@/lib/firestoreHelpersClient";
 
 type Props = {
     chat: ChatRead;

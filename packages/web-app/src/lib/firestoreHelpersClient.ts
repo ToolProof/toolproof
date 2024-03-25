@@ -1,8 +1,8 @@
-import { db } from "shared/src/flow_0/firebaseClient";
+import { db } from "shared/src/firebaseClient";
 import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from "firebase/firestore";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
-import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from "shared/src/flow_0/typings";
-import * as Constants from "shared/src/flow_0/constants";
+import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from "shared/src/typings";
+import * as Constants from "shared/src/constants";
 
 
 export const addChat = async (chatWrite: ChatWrite) => {
