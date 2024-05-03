@@ -1,7 +1,7 @@
-"use client";
-import ChatDisplay from "@/components/ChatDisplay";
-import ChatInput from "@/components/ChatInput";
-import { useChat } from "@/lib/firestoreHelpersClient";
+'use client';
+import ChatDisplay from '@/components/ChatDisplay';
+import ChatInput from '@/components/ChatInput';
+import { useChat } from '@/lib/firestoreHelpersClient';
 
 
 type Props = {
@@ -14,16 +14,16 @@ type Props = {
 export default function Chat({ params: { id } }: Props) {
     const { chat } = useChat(id);
 
-    if (!chat) { //ATTENTION: find a better way to handle this
+    if (!chat) { // ATTENTION: find a better way to handle this
         return null;
     }
     
     return (
-        <div className="flex flex-col h-full overflow-hidden">
-            <div className="flex-grow overflow-hidden bg-[#ffffff]">
+        <div className='flex flex-col h-full overflow-hidden'>
+            <div className='flex-grow overflow-hidden bg-[#ffffff]'>
                 <ChatDisplay key={chat.id} chat={chat} />
             </div>
-            <div className="w-full bg-[#80807a]">
+            <div className='w-full bg-[#80807a]'>
                 <ChatInput chat={chat} />
             </div>
         </div>

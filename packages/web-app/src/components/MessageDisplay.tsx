@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { MessageRead } from "shared/src/typings";
-import { useAppDispatch } from "@/redux/hooks";
-import { startTyping, stopTyping } from "@/redux/features/typewriterSlice";
-import { useSession } from "next-auth/react";
+import { useState, useEffect } from 'react';
+import { MessageRead } from 'shared/src/typings';
+import { useAppDispatch } from '@/redux/hooks';
+import { startTyping, stopTyping } from '@/redux/features/typewriterSlice';
+import { useSession } from 'next-auth/react';
 
 
 type Props = {
@@ -13,12 +13,12 @@ type Props = {
 
 
 export default function MessageDisplay({ message, isNew, onTextChange }: Props) {
-  const [displayedText, setDisplayedText] = useState("");
+  const [displayedText, setDisplayedText] = useState('');
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
-  const userEmail = session?.user?.email || "";
-  const userImg = session?.user?.image || "";
-  const imageSource = (message.userId === userEmail) ? userImg : "/images/openai_logo.png";
+  const userEmail = session?.user?.email || '';
+  const userImg = session?.user?.image || '';
+  const imageSource = (message.userId === userEmail) ? userImg : '/images/openai_logo.png';
 
   useEffect(() => {
     if (isNew) {
@@ -31,12 +31,12 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   useEffect(() => {
     let timeoutId: number | undefined;
 
-    if (isNew && message.userId === "ChatGPT") {
+    if (isNew && message.userId === 'ChatGPT') {
       dispatch(startTyping());
       const typeLetter = (index: number) => {
         if (index < message.content.length) {
           const currentChar = message.content[index];
-          const isPunctuation = ",.?!;:".includes(currentChar);
+          const isPunctuation = ',.?!;:'.includes(currentChar);
           const delay = isPunctuation ? 25 : 5; // Longer delay for punctuation
 
           timeoutId = window.setTimeout(() => {
@@ -62,9 +62,9 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
 
 
   return (
-    <div className="flex py-4 px-2 space-x-5 max-w-2xl mx-auto">
-      <img src={imageSource} alt="" className="h-8 w-8" />
-      <p className="text-black">{displayedText}</p>
+    <div className='flex py-4 px-2 space-x-5 max-w-2xl mx-auto'>
+      <img src={imageSource} alt='' className='h-8 w-8' />
+      <p className='text-black'>{displayedText}</p>
     </div>
   );
 

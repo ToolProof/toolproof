@@ -1,24 +1,20 @@
 
-export const TITLE = "toolproof.com";
-export const DESCRIPTION = "";
+export const title = 'toolproof.com'; // ATTENTION: be consistent with variable naming
+export const description = ''; // ATTENTION: be consistent with variable naming
 
-export const GENESIS = "genesis";
-export const META = "meta";
-export const DATA = "data";
+export const chats = 'chats';
+export const messages = 'messages';
+export const userId = 'userId';
+export const ChatGPT = 'ChatGPT';
+export const timestamp = 'timestamp';
+export const asc = 'asc';
+export const desc = 'desc';
+export const limit = 'limit';
 
-export const CHATS = "chats";
-export const MESSAGES = "messages";
-export const USERID = "userId";
-export const ChatGPT = "ChatGPT";
-export const TIMESTAMP = "timestamp";
-export const ASC = "asc";
-export const DESC = "desc";
-export const LIMIT = "limit";
+export const test = 'test';
 
-export const TEST = "test";
+export const embeddings_openai = 'embeddings-openai'; // ATTENTION: be consistent with variable naming
 
-export const EMBEDDINGS_OPENAI = "embeddings_openai";
-
-export const TOPICS = "topics";
-export const CONTINUE_TOPIC = "continue_topic";
-export const CHANGE_TOPIC = "change_topic";
+export const topics = 'topics';
+export const continue_topic = 'continue_topic';
+export const change_topic = 'change_topic';

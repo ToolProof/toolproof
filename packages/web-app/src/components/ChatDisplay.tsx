@@ -1,9 +1,9 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { ArrowDownCircleIcon } from "@heroicons/react/24/solid";
-import MessageDisplay from "./MessageDisplay";
-import { ChatRead } from "shared/src/typings";
-import { useMessages } from "@/lib/firestoreHelpersClient";
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowDownCircleIcon } from '@heroicons/react/24/solid';
+import MessageDisplay from './MessageDisplay';
+import { ChatRead } from 'shared/src/typings';
+import { useMessages } from '@/lib/firestoreHelpersClient';
 
 type Props = {
     chat: ChatRead;
@@ -18,17 +18,17 @@ export default function ChatDisplay({ chat }: Props) {
     
     useEffect(() => {
         const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
+            if (document.visibilityState === 'visible') {
                 setComponentMountTime(new Date());
             }
         };
 
         // Add event listener
-        document.addEventListener("visibilitychange", handleVisibilityChange);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         // Cleanup
         return () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, []); // Empty dependency array ensures this runs only once on mount
     
@@ -40,7 +40,7 @@ export default function ChatDisplay({ chat }: Props) {
             return false;
         }
 
-        if (!messageTimestamp || typeof messageTimestamp.toDate !== "function") {
+        if (!messageTimestamp || typeof messageTimestamp.toDate !== 'function') {
             // Handle the case where timestamp is null or not a Firestore Timestamp
             return false;
         }
@@ -60,7 +60,7 @@ export default function ChatDisplay({ chat }: Props) {
             if (messageContainer) {
                 messageContainer.scrollTo({
                     top: messageContainer.scrollHeight,
-                    behavior: "smooth"
+                    behavior: 'smooth'
                 });
             }
         };
@@ -75,25 +75,25 @@ export default function ChatDisplay({ chat }: Props) {
         if (messageContainer) {
             messageContainer.scrollTo({
                 top: messageContainer.scrollHeight,
-                behavior: "smooth"
+                behavior: 'smooth'
             });
         }
     };
 
 
     return (
-        <div ref={messageContainerRef} className="max-h-[calc(80vh)] overflow-y-auto overflow-x-hidden bg-[#ffffff]">
+        <div ref={messageContainerRef} className='max-h-[calc(80vh)] overflow-y-auto overflow-x-hidden bg-[#ffffff]'>
             {messages && messages.length === 0 && (
                 <div>
-                    <p className="mt-10 text-center text-black">
+                    <p className='mt-10 text-center text-black'>
                         Type a prompt to start a chat!
                     </p>
-                    <ArrowDownCircleIcon className="h-10 w-10 mx-auto mt-5 text-black animate-bounce" />
+                    <ArrowDownCircleIcon className='h-10 w-10 mx-auto mt-5 text-black animate-bounce' />
                 </div>
             )}
             {messages?.map((message, index) => {
                 const isNew = isNewMessage(message.timestamp, index, messages.length);
-                //console.log("message", message.tags[0]);
+                //console.log('message', message.tags[0]);
                 const messageComponent = <MessageDisplay
                     key={message.id}
                     message={message}

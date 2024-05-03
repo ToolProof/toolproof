@@ -1,17 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState = {
-    userEmail: "",
+    userEmail: '',
     isApproved: true,
 };
 
 const devConfigSlice = createSlice({
-    name: "devConfig",
+    name: 'devConfig',
     initialState,
     reducers: {
         setUserEmail: (state, action: PayloadAction<string>) => {
             state.userEmail = action.payload;
-            state.isApproved = true; //action.payload === "renestavnes@hotmail.com";
+            state.isApproved = true; //action.payload === 'renestavnes@hotmail.com';
         },
         // You can add more reducers here as needed
     },

@@ -37,7 +37,7 @@ export default function ConversationInput({ conversationId }: Props) {
         const intervalId = setInterval(async () => {
             if (turnStateRef.current === -1) {
                 clearInterval(intervalId);
-                await sendPrompt({ conversationId, prompt, user: "René" }); //ATTENTION: secures the order of messages
+                await sendPrompt({ conversationId, prompt, user: "René" }); // ATTENTION: secures the order of messages
             }
         }, 100); // Check every 100ms
     };

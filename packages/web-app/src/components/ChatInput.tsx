@@ -1,14 +1,14 @@
-"use client"
-import * as Constants from "shared/src/constants"
-import { useState, useEffect, useRef } from "react";
-// import { toast } from "react-hot-toast";
-import sendPromptAction from "@/lib/sendPromptAction";
-import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/redux/hooks";
-// import * as Constants from "shared/src/constants";
-import { ChatRead } from "shared/src/typings";
-import { addMessage } from "@/lib/firestoreHelpersClient";
+'use client'
+import * as Constants from 'shared/src/constants'
+import { useState, useEffect, useRef } from 'react';
+// import { toast } from 'react-hot-toast';
+import sendPromptAction from '@/lib/sendPromptAction';
+import { useSession } from 'next-auth/react';
+// import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@/redux/hooks';
+// import * as Constants from 'shared/src/constants';
+import { ChatRead } from 'shared/src/typings';
+import { addMessage } from '@/lib/firestoreHelpersClient';
 
 
 type Props = {
@@ -17,38 +17,38 @@ type Props = {
 
 
 export default function ChatInput({ chat }: Props) {
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState('');
     const turnState = chat?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
-    const userEmail = session?.user?.email || "";
-    const userName = session?.user?.name || "";
+    const userEmail = session?.user?.email || '';
+    const userName = session?.user?.name || '';
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
 
     const submissionHelper = async () => {
         const content = input.trim();
-        setInput("");
-        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.TEST] });
+        setInput('');
+        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.test] });
 
-        const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); //ATTENTION: message order not secured
+        const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); // ATTENTION: message order not secured
         if (data && data.topicDetected && data.action) {
             /*
                 * Could interact with the Redux store here
             */
-            console.log("topicDetected", data.topicDetected);
-            console.log("action", data.action);
+            console.log('topicDetected', data.topicDetected);
+            console.log('action', data.action);
         } else {
-            console.log("No topic detected or action found");
+            console.log('No topic detected or action found');
         }
 
     };
 
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault(); // Prevent default to stop new line in textarea
             submissionHelper();
         }
@@ -64,7 +64,7 @@ export default function ChatInput({ chat }: Props) {
     const updateInputHeight = () => {
         const textarea = textareaRef.current;
         if (textarea) {
-            textarea.style.height = "auto";
+            textarea.style.height = 'auto';
             const maxHeight = parseInt(window.getComputedStyle(textarea).maxHeight, 10);
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = `${newHeight}px`;
@@ -81,16 +81,16 @@ export default function ChatInput({ chat }: Props) {
             updateInputHeight();
         };
 
-        window.addEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize);
 
         // Cleanup function to remove the event listener
-        return () => window.removeEventListener("resize", handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []); // Empty dependency array ensures this effect runs only once on mount
 
 
-    useEffect(() => { //ATTENTION: should we use LayoutEffect?
+    useEffect(() => { // ATTENTION: should we use LayoutEffect?
         if (turnState === -1) {
-            // toastIdRef.current = toast.loading("ChatGPT is thinking...");
+            // toastIdRef.current = toast.loading('ChatGPT is thinking...');
         } else {
             /* if (toastIdRef.current) {
                 toast.dismiss(toastIdRef.current);
@@ -109,39 +109,39 @@ export default function ChatInput({ chat }: Props) {
         return (
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col items-center w-full bg-[#ffffff] p-4 sm:p-8">
+                className='flex flex-col items-center w-full bg-[#ffffff] p-4 sm:p-8'>
                 {/* Add a relative container around the textarea and button */}
-                <div className="relative w-full">
+                <div className='relative w-full'>
                     <textarea
                         ref={textareaRef}
-                        className="w-full resize-none max-h-[50vh] py-3 pr-[6rem] pl-3 outline-none rounded-lg bg-[#eae8e8] overflow-x-hidden overflow-y-auto"
+                        className='w-full resize-none max-h-[50vh] py-3 pr-[6rem] pl-3 outline-none rounded-lg bg-[#eae8e8] overflow-x-hidden overflow-y-auto'
                         disabled={criterion}
-                        placeholder="Type your message here..."
+                        placeholder='Type your message here...'
                         value={input}
                         rows={1}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
                     <button
-                        style={{ position: "absolute", right: "2rem", bottom: "0.75rem" }} // Adjust position relative to the new container
+                        style={{ position: 'absolute', right: '2rem', bottom: '0.75rem' }} // Adjust position relative to the new container
                         className={`p-2 rounded-lg
-                        ${!input ? "disabled:cursor-not-allowed" : "hover:opacity-50"}
-                        ${!input ? "bg-gray-300" : "bg-black"}`
+                        ${!input ? 'disabled:cursor-not-allowed' : 'hover:opacity-50'}
+                        ${!input ? 'bg-gray-300' : 'bg-black'}`
                         }
                         disabled={!input}
-                        type="submit"
+                        type='submit'
                     >
                         {
                             (criterion || isTyping) ?
-                                <div className="flex justify-center items-center w-4 h-4 bg-transparent">
-                                    <img src="/icons/encircled_square.png" alt="Loading"/>
+                                <div className='flex justify-center items-center w-4 h-4 bg-transparent'>
+                                    <img src='/icons/encircled_square.png' alt='Loading'/>
                                 </div>
                                 :
                                 <div
                                     className={`flex justify-center items-center w-4 h-4
-                                    ${!input && "bg-gray-300"}`}
+                                    ${!input && 'bg-gray-300'}`}
                                 >
-                                    <img src="/icons/up_arrow.png" alt="Send"/>
+                                    <img src='/icons/up_arrow.png' alt='Send'/>
                                 </div>
                         }
                     </button>

@@ -1,15 +1,15 @@
-import { db } from "shared/src/firebaseClient";
-import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from "firebase/firestore";
-import { useCollection, useDocument } from "react-firebase-hooks/firestore";
-import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from "shared/src/typings";
-import * as Constants from "shared/src/constants";
+import { db } from 'shared/src/firebaseClient';
+import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
+import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from 'shared/src/typings';
+import * as CONSTANTS from 'shared/src/constants';
 
 
 export const addChat = async (chatWrite: ChatWrite) => {
   try {
-    const docRef = await addDoc(collection(db, Constants.CHATS), {
+    const docRef = await addDoc(collection(db, CONSTANTS.chats), {
       ...chatWrite,
-      [Constants.TIMESTAMP]: serverTimestamp(),
+      [CONSTANTS.timestamp]: serverTimestamp(),
     });
     return { chatId: docRef.id };
   } catch(e) {
@@ -19,19 +19,19 @@ export const addChat = async (chatWrite: ChatWrite) => {
 
 export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<MessagePinecone> => {
   try {
-    const docRef = await addDoc(collection(db, Constants.CHATS, chatId, Constants.MESSAGES), {
+    const docRef = await addDoc(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), {
       ...messageWrite,
-      [Constants.TIMESTAMP]: serverTimestamp(),
+      [CONSTANTS.timestamp]: serverTimestamp(),
     });
     return { id: docRef.id, ...messageWrite };
   } catch(e) {
     console.error(e);
-    throw new Error("An error occurred while adding message");
+    throw new Error('An error occurred while adding message');
   }
 }
 
-export function useChat(chatId: string) { //ATTENTION: be consistent with function syntax
-  const chatRef = doc(db, Constants.CHATS, chatId);
+export function useChat(chatId: string) { // ATTENTION: be consistent with function syntax
+  const chatRef = doc(db, CONSTANTS.chats, chatId);
   const [chatSnapshot, loading, error] = useDocument(chatRef);
 
   const chat = chatSnapshot?.exists()
@@ -45,7 +45,7 @@ export function useChat(chatId: string) { //ATTENTION: be consistent with functi
 }
 
 export const useMessages = (chatId: string) => {
-  const messagesQuery = query(collection(db, Constants.CHATS, chatId, Constants.MESSAGES), orderBy(Constants.TIMESTAMP, Constants.ASC));
+  const messagesQuery = query(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), orderBy(CONSTANTS.timestamp, CONSTANTS.asc));
   const [messagesSnapshot, loading, error] = useCollection(messagesQuery);
 
   const messages = messagesSnapshot?.docs.map((doc) => ({
@@ -58,8 +58,8 @@ export const useMessages = (chatId: string) => {
 
 export async function getFirstUserChatId(userId: string) {
   const q = query(
-    collection(db, Constants.CHATS),
-    where(Constants.USERID, "==", userId),
+    collection(db, CONSTANTS.chats),
+    where(CONSTANTS.userId, '==', userId),
     limit(1)
   );
   const querySnapshot = await getDocs(q);
