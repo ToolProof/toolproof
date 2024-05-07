@@ -11,9 +11,9 @@ const devConfigSlice = createSlice({
     reducers: {
         setUserEmail: (state, action: PayloadAction<string>) => {
             state.userEmail = action.payload;
-            state.isApproved = true; //action.payload === 'renestavnes@hotmail.com';
+            // The only way to not be approved is to be signed in with a non-approved email
+            state.isApproved = action.payload === 'renestavnes@hotmail.com' || action.payload === '';
         },
-        // You can add more reducers here as needed
     },
 });
 

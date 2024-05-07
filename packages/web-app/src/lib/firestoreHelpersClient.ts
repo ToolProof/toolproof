@@ -1,8 +1,8 @@
+import * as CONSTANTS from 'shared/src/constants';
+import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from 'shared/src/typings';
 import { db } from 'shared/src/firebaseClient';
 import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
-import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from 'shared/src/typings';
-import * as CONSTANTS from 'shared/src/constants';
 
 
 export const addChat = async (chatWrite: ChatWrite) => {
@@ -17,6 +17,7 @@ export const addChat = async (chatWrite: ChatWrite) => {
   }
 }
 
+
 export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<MessagePinecone> => {
   try {
     const docRef = await addDoc(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), {
@@ -29,6 +30,20 @@ export const addMessage = async (chatId: string, messageWrite: MessageWrite): Pr
     throw new Error('An error occurred while adding message');
   }
 }
+
+
+export function useChats(userId: string) {
+  const chatsQuery = query(collection(db, CONSTANTS.chats), where(CONSTANTS.userId, '==', userId), limit(10));
+  const [chatsSnapshot, loading, error] = useCollection(chatsQuery);
+
+  const chats = chatsSnapshot?.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  })) as ChatRead[] || [];
+
+  return { chats, loading, error };
+}
+
 
 export function useChat(chatId: string) { // ATTENTION: be consistent with function syntax
   const chatRef = doc(db, CONSTANTS.chats, chatId);
@@ -44,6 +59,7 @@ export function useChat(chatId: string) { // ATTENTION: be consistent with funct
   return { chat, loading, error };
 }
 
+
 export const useMessages = (chatId: string) => {
   const messagesQuery = query(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), orderBy(CONSTANTS.timestamp, CONSTANTS.asc));
   const [messagesSnapshot, loading, error] = useCollection(messagesQuery);
@@ -56,7 +72,8 @@ export const useMessages = (chatId: string) => {
   return { messages, loading, error };
 }
 
-export async function getFirstUserChatId(userId: string) {
+
+export async function getIdOfUsersFirstChat(userId: string) {
   const q = query(
     collection(db, CONSTANTS.chats),
     where(CONSTANTS.userId, '==', userId),

@@ -2,7 +2,9 @@
 import ChatDisplay from '@/components/ChatDisplay';
 import ChatInput from '@/components/ChatInput';
 import { useChat } from '@/lib/firestoreHelpersClient';
-
+import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
     params: {
@@ -10,9 +12,18 @@ type Props = {
     }
 }
 
-
 export default function Chat({ params: { id } }: Props) {
+    const { data: session } = useSession();
+    const userEmail = session?.user?.email || '';
+    const router = useRouter();
     const { chat } = useChat(id);
+
+    useEffect(() => {
+        if (!userEmail) {
+            // Redirect to '/' if no user is signed in
+            router.push('/');
+        }
+    }, [router, userEmail]);
 
     if (!chat) { // ATTENTION: find a better way to handle this
         return null;

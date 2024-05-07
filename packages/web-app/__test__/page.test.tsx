@@ -9,6 +9,7 @@ jest.mock('../src/redux/hooks', () => ({
     useAppSelector: jest.fn()
 }));
 
+import * as CONTSTANTS from 'shared/src/constants';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { signIn, useSession } from 'next-auth/react';
 import { useAppSelector } from '../src/redux/hooks';
@@ -31,7 +32,7 @@ describe('Home component', () => {
 
         render(<Home />);
         expect(screen.getByText('toolproof.com')).toBeInTheDocument();
-        expect(screen.getByText('Sign In')).toBeInTheDocument();
+        expect(screen.getByText(CONTSTANTS.Sign_In)).toBeInTheDocument();
 
         fireEvent.click(screen.getByText('Sign In'));
         expect(signIn).toHaveBeenCalledWith('google');
@@ -39,7 +40,7 @@ describe('Home component', () => {
 
     it('does not show sign in button when user is signed in', () => {
         // Setup specific mock returns for this test case
-        (useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Test User' } } });
+        (useSession as jest.Mock).mockReturnValue({ data: { user: { email: 'test.user@outlook.com' } } });
         (useAppSelector as jest.Mock).mockReturnValue(true);
 
         render(<Home />);
@@ -51,11 +52,7 @@ describe('Home component', () => {
         (useSession as jest.Mock).mockReturnValue({ data: null });
         (useAppSelector as jest.Mock).mockReturnValue(false);
 
-        console.log(useSession());  // Check what session data is coming as
-        console.log(useAppSelector(state => state.devConfig.isApproved));  // Verify approval status
-
         render(<Home />);
-        console.log(screen.debug());  // This will print the rendered HTML to the console
         expect(screen.queryByText('Sign In')).toBeNull();
     });
 });
