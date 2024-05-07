@@ -7,6 +7,7 @@ import { useChats, addChat } from '@/lib/firestoreHelpersClient';
 import { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 export default function SideBar() {
@@ -21,26 +22,6 @@ export default function SideBar() {
         dispatch(setUserEmail(userEmail));
     }, [dispatch, userEmail]);
 
-    /* useEffect(() => {
-        // Redirect to the user's first chat
-        const redirectToUsersFirstChat = async () => { 
-            if (!userEmail || !isApproved) return;
-            const usersFirstChatId = await getIdOfUsersFirstChat(userEmail);
-            if (!usersFirstChatId) {
-                // User has no chats, so create one and redirect
-                const result = await addChat({ userId: userEmail, turnState: 0 });
-                if (result && result.chatId) {
-                    router.push(`/${result.chatId}`);
-                }
-            } else {
-                // User has a chat, so redirect
-                router.push(`/${usersFirstChatId}`);
-            }
-        }
-        redirectToUsersFirstChat();
-    }, [userEmail, isApproved, router]); */
-
-
     const handleAddChat = async () => {
         const result = await addChat({ userId: userEmail, turnState: 0 });
         if (result && result.chatId) {
@@ -51,15 +32,15 @@ export default function SideBar() {
     if (!isApproved) return <div />
 
     return (
-        <div className='flex flex-col h-screen py-4 overflow-x-hidden'>
+        <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
             <div className='flex-1'>
                 <button
                     onClick={handleAddChat}
-                    className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600'
+                    className='bg-blue-500 text-white px-0 py-2 w-full rounded-md hover:bg-blue-600'
                 >
                     Add Chat
                 </button>
-                <div className='flex flex-col space-y-2'>
+                <div className='flex flex-col py-4 space-y-2'>
                     {chats.map(chat => (
                         <ChatRow key={chat.id} chat={chat} />
                     ))}

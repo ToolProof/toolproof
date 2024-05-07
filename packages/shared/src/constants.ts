@@ -18,3 +18,6 @@ export const embeddings_openai = 'embeddings-openai'; // ATTENTION: be consisten
 export const topics = 'topics';
 export const continue_topic = 'continue_topic';
 export const change_topic = 'change_topic';
+
+export const Sign_In = 'Sign In';
+export const Sign_Out = 'Sign Out';

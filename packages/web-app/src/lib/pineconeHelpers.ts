@@ -3,6 +3,7 @@ import pc from '@/setup/pinecone';
 import { MessagePinecone } from 'shared/src/typings';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
+
 export async function createIndexWrapper() {
     await pc.createIndex({
         name: CONSTANTS.embeddings_openai,
@@ -16,6 +17,7 @@ export async function createIndexWrapper() {
         } 
     }) 
 }
+
 
 export async function upsertVectors(chatId: string, userMessage: MessagePinecone, aiMessage: MessagePinecone): Promise<void> {
     

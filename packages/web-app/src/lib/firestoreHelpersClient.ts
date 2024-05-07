@@ -1,7 +1,7 @@
 import * as CONSTANTS from 'shared/src/constants';
 import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessagePinecone } from 'shared/src/typings';
 import { db } from 'shared/src/firebaseClient';
-import { doc, addDoc, getDocs, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
+import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 
 
@@ -12,6 +12,16 @@ export const addChat = async (chatWrite: ChatWrite) => {
       [CONSTANTS.timestamp]: serverTimestamp(),
     });
     return { chatId: docRef.id };
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+
+export const deleteChat = async (chatId: string) => {
+  try {
+    console.log('Deleting chat with ID:', chatId);
+    await deleteDoc(doc(db, CONSTANTS.chats, chatId));
   } catch(e) {
     console.error(e);
   }
