@@ -3,14 +3,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const navigationSlice = createSlice({
     name: "navigation",
     initialState: {
-        chatActive: "",
+        conceptActive: "",
     },
     reducers: {
-        setChatActive: (state, action: PayloadAction<string>) => {
-            state.chatActive = action.payload;
+        setConceptActive: (state, action: PayloadAction<string>) => {
+            state.conceptActive = action.payload;
         }
     },
 });
 
-export const { setChatActive } = navigationSlice.actions;
+export const { setConceptActive } = navigationSlice.actions;
 export default navigationSlice.reducer;

@@ -1,7 +1,7 @@
 'use server';
 import chainOrchestrator from './chains/chainOrchestrator';
-import { updateChat } from './firestoreHelpersServer';
-import { MessagePinecone } from 'shared/src/typings';
+import { updateConcept } from './firestoreHelpersServer';
+import { MessageReadWithoutTimestamp } from 'shared/src/typings';
 import { upsertVectors } from './pineconeHelpers';
 
 interface SendPromptResponse {
@@ -9,26 +9,31 @@ interface SendPromptResponse {
     action: string;
 }
 
-export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: MessagePinecone }): Promise<SendPromptResponse> {
+export default async function sendPromptAction({ conceptId, promptSeed, userName, userMessage }: { conceptId: string, promptSeed: string; userName: string, userMessage: MessageReadWithoutTimestamp }): Promise<SendPromptResponse> {
     if (!promptSeed) {
         throw new Error('Prompt is required');
     }
-    if (!chatId) {
-        throw new Error('Chat ID is required');
+    if (!conceptId) {
+        throw new Error('Concept ID is required');
     }
 
     try {
-        const foo = await chainOrchestrator({ chatId, promptSeed, userName });
+
+        upsertVectors(conceptId, userMessage, userMessage); // ATTENTION: do I want to await this?
+
+        return { topicDetected: 'topicDetected', action: 'action' };
+
+        /* const foo = await chainOrchestrator({ conceptId, promptSeed, userName });
 
         const aiMessageContent = foo.modelResponse;
         const topicDetected = foo.topicDetected;
         const action = foo.action;
 
-        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, topicDetected, 1); // ATTENTION: turnState should be decided by the AI
+        const aiMessage = await updateConcept(conceptId, aiMessageContent, userMessage.id, topicDetected, 1); // ATTENTION: turnState should be decided by the AI
         
-        upsertVectors(chatId, userMessage, aiMessage); // ATTENTION: do I want to await this?
+        upsertVectors(conceptId, userMessage, aiMessage); // ATTENTION: do I want to await this?
 
-        return { topicDetected, action };
+        return { topicDetected, action }; */
     } catch (error) {
         console.error('Error:', error);
         throw new Error(`An operation failed: ${(error as Error).message}`);

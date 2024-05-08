@@ -1,9 +1,9 @@
 'use client';
-import ChatRow from './ChatRow';
+import ConceptRow from './ConceptRow';
 import { useAppDispatch } from '@/redux/hooks';
 import { setUserEmail } from '@/redux/features/devConfigSlice';
 import { useAppSelector } from '@/redux/hooks';
-import { useChats, addChat } from '@/lib/firestoreHelpersClient';
+import { useConcepts, addConcept } from '@/lib/firestoreHelpersClient';
 import { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
@@ -13,7 +13,7 @@ import Link from 'next/link';
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
-    const { chats, loading, error } = useChats(userEmail);
+    const { concepts, loading, error } = useConcepts(userEmail);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.devConfig.isApproved);
@@ -22,10 +22,10 @@ export default function SideBar() {
         dispatch(setUserEmail(userEmail));
     }, [dispatch, userEmail]);
 
-    const handleAddChat = async () => {
-        const result = await addChat({ userId: userEmail, turnState: 0 });
-        if (result && result.chatId) {
-            router.push(`/${result.chatId}`);
+    const handleAddConcept = async () => {
+        const result = await addConcept({ userId: userEmail, turnState: 0 });
+        if (result && result.conceptId) {
+            router.push(`/${result.conceptId}`);
         }
     }
 
@@ -35,14 +35,14 @@ export default function SideBar() {
         <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
             <div className='flex-1'>
                 <button
-                    onClick={handleAddChat}
+                    onClick={handleAddConcept}
                     className='bg-blue-500 text-white px-0 py-2 w-full rounded-md hover:bg-blue-600'
                 >
-                    Add Chat
+                    Add Concept
                 </button>
                 <div className='flex flex-col py-4 space-y-2'>
-                    {chats.map(chat => (
-                        <ChatRow key={chat.id} chat={chat} />
+                    {concepts.map(concept => (
+                        <ConceptRow key={concept.id} concept={concept} />
                     ))}
                 </div>
             </div>

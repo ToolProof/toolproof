@@ -31,7 +31,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   useEffect(() => {
     let timeoutId: number | undefined;
 
-    if (isNew && message.userId === 'ChatGPT') {
+    if (isNew && message.userId === 'ConceptGPT') {
       dispatch(startTyping());
       const typeLetter = (index: number) => {
         if (index < message.content.length) {

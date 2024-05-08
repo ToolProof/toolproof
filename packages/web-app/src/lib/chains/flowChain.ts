@@ -1,7 +1,7 @@
-import { ChatOpenAI } from '@langchain/openai';
-//import { BufferMemory, ChatMessageHistory } from "langchain/memory";
+import { ConceptOpenAI } from '@langchain/openai';
+//import { BufferMemory, ConceptMessageHistory } from "langchain/memory";
 import { BufferMemory } from 'langchain/memory';
-import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
+import { ConceptPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 //import { AIMessage, HumanMessage } from "langchain/schema";
 //import dbAdmin from "../../configFirebaseAdmin";
@@ -12,9 +12,9 @@ import fs from 'fs/promises';
 
 const TOPIC_DETECTION = 'topic_detection'; // ATTENTION: move to constants
 
-const currentChatId: string = '';
+const currentConceptId: string = '';
 
-const chatModel = new ChatOpenAI({
+const conceptModel = new ConceptOpenAI({
     modelName: 'gpt-4',
     temperature: 0,
 });
@@ -26,7 +26,7 @@ const memory = new BufferMemory({
     memoryKey: 'history',
 });
 
-const promptTemplate = ChatPromptTemplate.fromMessages([
+const promptTemplate = ConceptPromptTemplate.fromMessages([
     ['system', `Your job is to keep the conversation going. You should answer the user's questions and keep track of the topic.`],
     new MessagesPlaceholder('history'),
     ['human', `{input}`],
@@ -69,45 +69,45 @@ const chain = RunnableSequence.from([
         }
         return previousOutput;
     },
-    chatModel.bind({
+    conceptModel.bind({
         functions: functionSchema,
         function_call: { name: TOPIC_DETECTION },
     }),
 ]);
 
 
-const invokeChainWrapper = async ({ chatId, promptSeed, userName }: { chatId: string; promptSeed: string; userName: string }) => {
+const invokeChainWrapper = async ({ conceptId, promptSeed, userName }: { conceptId: string; promptSeed: string; userName: string }) => {
 
     try {
-        // Check if a new chat has started or the existing one continues // ATTENTION: there'll never be a new chat
-        if (currentChatId !== chatId) {
+        // Check if a new concept has started or the existing one continues // ATTENTION: there'll never be a new concept
+        if (currentConceptId !== conceptId) {
             /* console.log("Are we here?")
             
             const messagesSnapshot = await dbAdmin // ATTENTION_
-              .collection("chats")
-              .doc(chatId)
+              .collection("concepts")
+              .doc(conceptId)
               .collection("messages")
               .orderBy("timestamp", "asc")
               .get();
       
             const pastMessages = messagesSnapshot.docs.map(doc => {
               const data = doc.data();
-              return data.userId === "ChatGPT" ?
+              return data.userId === "ConceptGPT" ?
                 new AIMessage(data.content) :
                 new HumanMessage(data.content);
             });
       
-            const chatHistory = new ChatMessageHistory(pastMessages);
+            const conceptHistory = new ConceptMessageHistory(pastMessages);
             
             memory = new BufferMemory({
                 returnMessages: true,
                 inputKey: "input",
                 outputKey: "output",
                 memoryKey: "history",
-                //chatHistory: chatHistory,
+                //conceptHistory: conceptHistory,
             });
 
-            currentChatId = chatId; */
+            currentConceptId = conceptId; */
         }
 
         const inputs = {
@@ -116,7 +116,7 @@ const invokeChainWrapper = async ({ chatId, promptSeed, userName }: { chatId: st
         };
 
         const response = await chain.invoke(inputs);
-        console.log('chatModel', chatModel);
+        console.log('conceptModel', conceptModel);
 
 
         if (response && response.additional_kwargs && response.additional_kwargs.function_call) { // ATTENTION: optional chaining

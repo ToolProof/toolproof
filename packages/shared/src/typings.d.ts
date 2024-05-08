@@ -3,7 +3,7 @@ import { Timestamp, FieldValue } from "firebase/firestore";
 export interface MessageWrite {
     userId: string;
     content: string;
-    tags: string[]; // ATTENTION: consider contentCode (like for VlogTalk) on the Chat instead of test-tag on the Message
+    tags: string[]; // ATTENTION: consider contentCode (like for VlogTalk) on the Concept instead of test-tag on the Message
 }
 
 export interface MessageRead extends MessageWrite {
@@ -11,16 +11,16 @@ export interface MessageRead extends MessageWrite {
     timestamp: Timestamp;
 }
 
-export interface MessagePinecone extends MessageWrite {
+export interface MessageReadWithoutTimestamp extends MessageWrite {
     id: string;
 }
 
-export interface ChatWrite {
+export interface ConceptWrite {
     userId: string;
     turnState: number;
 }
 
-export interface ChatRead extends ChatWrite {
+export interface ConceptRead extends ConceptWrite {
     id: string;
     timestamp: Timestamp;
 }

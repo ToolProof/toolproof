@@ -1,7 +1,7 @@
 'use client';
-import ChatDisplay from '@/components/ChatDisplay';
-import ChatInput from '@/components/ChatInput';
-import { useChat } from '@/lib/firestoreHelpersClient';
+import ConceptDisplay from '@/components/ConceptDisplay';
+import ConceptInput from '@/components/ConceptInput';
+import { useConcept } from '@/lib/firestoreHelpersClient';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,11 +12,11 @@ type Props = {
     }
 }
 
-export default function Chat({ params: { id } }: Props) {
+export default function Concept({ params: { id } }: Props) {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
     const router = useRouter();
-    const { chat } = useChat(id);
+    const { concept } = useConcept(id);
 
     useEffect(() => {
         if (!userEmail) {
@@ -25,17 +25,17 @@ export default function Chat({ params: { id } }: Props) {
         }
     }, [router, userEmail]);
 
-    if (!chat) { // ATTENTION: find a better way to handle this
+    if (!concept) { // ATTENTION: find a better way to handle this
         return null;
     }
     
     return (
         <div className='flex flex-col h-full overflow-hidden'>
             <div className='flex-grow overflow-hidden bg-[#ffffff]'>
-                <ChatDisplay key={chat.id} chat={chat} />
+                <ConceptDisplay key={concept.id} concept={concept} />
             </div>
             <div className='w-full bg-[#80807a]'>
-                <ChatInput chat={chat} />
+                <ConceptInput concept={concept} />
             </div>
         </div>
     );

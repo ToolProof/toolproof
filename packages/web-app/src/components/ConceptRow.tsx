@@ -3,30 +3,30 @@ import Link from 'next/link';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { useMessages, deleteChat } from '@/lib/firestoreHelpersClient';
-import { ChatRead } from 'shared/src/typings';
+import { useMessages, deleteConcept } from '@/lib/firestoreHelpersClient';
+import { ConceptRead } from 'shared/src/typings';
 
 type Props = {
-    chat: ChatRead;
+    concept: ConceptRead;
 }
 
-export default function ChatRow({ chat }: Props) {
+export default function ConceptRow({ concept }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `/${chat.id}`;
-    const { messages } = useMessages(chat.id);
+    const href = `/${concept.id}`;
+    const { messages } = useMessages(concept.id);
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(chat.id));
-    }, [pathName, chat.id]);
+        setActive(pathName.includes(concept.id));
+    }, [pathName, concept.id]);
 
-    const handleDeleteChat = async () => {
+    const handleDeleteConcept = async () => {
         try {
-            await deleteChat(chat.id);
-            // console.log(`Chat with id ${chat.id} deleted`);
+            await deleteConcept(concept.id);
+            // console.log(`Concept with id ${concept.id} deleted`);
         } catch (error) {
-            console.error(`Failed to delete chat: ${error}`);
+            console.error(`Failed to delete concept: ${error}`);
         }
     }
 
@@ -42,7 +42,7 @@ export default function ChatRow({ chat }: Props) {
                     <p className='flex-1 hover:opacity-50 hidden md:inline-flex truncate'>
                         {messages && messages.length > 0 ?
                             `${messages[0].content.slice(0, 20)}` :
-                            'Empty Chat'}
+                            'Empty Concept'}
                     </p>
                 </div>
             </Link>
@@ -50,7 +50,7 @@ export default function ChatRow({ chat }: Props) {
                 className='h-6 w-6 text-gray-700 hover:text-red-700'
                 onClick={(e) => {
                     e.stopPropagation(); // Prevent Link navigation
-                    handleDeleteChat();
+                    handleDeleteConcept();
                 }}
             />
         </div>

@@ -1,12 +1,16 @@
 import * as CONSTANTS from 'shared/src/constants';
 import pc from '@/setup/pinecone';
-import { MessagePinecone } from 'shared/src/typings';
+import { MessageReadWithoutTimestamp } from 'shared/src/typings';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
 
 export async function createIndexWrapper() {
+
+    // const openAIEmbeddings = new OpenAIEmbeddings();
+    const indexName = `${CONSTANTS.openai}-text-embedding-ada-002`; // ATTENTION: hardcoded
+
     await pc.createIndex({
-        name: CONSTANTS.embeddings_openai,
+        name: indexName,
         dimension: 1536,
         metric: 'cosine',
         spec: { 
@@ -19,14 +23,17 @@ export async function createIndexWrapper() {
 }
 
 
-export async function upsertVectors(chatId: string, userMessage: MessagePinecone, aiMessage: MessagePinecone): Promise<void> {
+export async function upsertVectors(conceptId: string, userMessage: MessageReadWithoutTimestamp, aiMessage: MessageReadWithoutTimestamp): Promise<void> {
     
-    const index = pc.index(CONSTANTS.embeddings_openai);
-    const embeddings = new OpenAIEmbeddings();
-    const userMessageEmbedding = await embeddings.embedQuery(userMessage.content); 
-    const aiMessageEmbedding = await embeddings.embedQuery(aiMessage.content);
+    // const index = pc.index(CONSTANTS.embeddings_openai);
+    const openAIEmbeddings = new OpenAIEmbeddings();
+    // const userMessageEmbedding = await embeddings.embedQuery(userMessage.content); 
+    // const aiMessageEmbedding = await embeddings.embedQuery(aiMessage.content);
 
-    await index.namespace(chatId).upsert([
+    console.log('modelName:', openAIEmbeddings.modelName);
+    return;
+
+   /*  await index.namespace(conceptId).upsert([
         {
           'id': userMessage.id,
           'values': userMessageEmbedding
@@ -35,6 +42,6 @@ export async function upsertVectors(chatId: string, userMessage: MessagePinecone
           'id': aiMessage.id, 
           'values': aiMessageEmbedding
         }
-      ]);
+      ]); */
       
   }

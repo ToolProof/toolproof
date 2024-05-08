@@ -1,6 +1,6 @@
-import { ChatOpenAI } from '@langchain/openai';
+import { ConceptOpenAI } from '@langchain/openai';
 import { BufferMemory } from 'langchain/memory';
-import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
+import { ConceptPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
@@ -8,7 +8,7 @@ import * as Constants from 'shared/src/constants'
 
 const TOPIC_DETECTION = 'topic_detection'; // ATTENTION: move to constants
 
-const chatModel = new ChatOpenAI({
+const conceptModel = new ConceptOpenAI({
   modelName: 'gpt-4',
   temperature: 0.5,
 });
@@ -20,7 +20,7 @@ const memory = new BufferMemory({
   memoryKey: 'history',
 });
 
-const promptTemplate = ChatPromptTemplate.fromMessages([
+const promptTemplate = ConceptPromptTemplate.fromMessages([
   ['system', `Your job is to detect the topic of the conversation based on the input message and the context.`],
   new MessagesPlaceholder('history'),
   ['human', `{speaker}: {input}`],
@@ -57,14 +57,14 @@ const chain = RunnableSequence.from([
     console.log(previousOutput);
     return previousOutput;
   }, */
-  chatModel.bind({
+  conceptModel.bind({
     functions: functionSchema,
     function_call: { name: TOPIC_DETECTION },
   }),
 ]);
 
 
-const invokeChainWrapper = async ({ promptSeed, userName }: { chatId: string; promptSeed: string; userName: string }) => {
+const invokeChainWrapper = async ({ promptSeed, userName }: { conceptId: string; promptSeed: string; userName: string }) => {
 
   try {
     
