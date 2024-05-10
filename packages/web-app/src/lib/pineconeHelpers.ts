@@ -3,11 +3,11 @@ import pc from '@/setup/pinecone';
 import { MessageReadWithoutTimestamp } from 'shared/src/typings';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
+const indexName = `${CONSTANTS.openai}-text-embedding-ada-002`; // ATTENTION: hardcoded
 
 export async function createIndexWrapper() {
 
-    // const openAIEmbeddings = new OpenAIEmbeddings();
-    const indexName = `${CONSTANTS.openai}-text-embedding-ada-002`; // ATTENTION: hardcoded
+    // const openAIEmbeddings = new OpenAIEmbeddings(); // ATTENTION: failes when invoked by useEffect callback
 
     await pc.createIndex({
         name: indexName,
@@ -23,25 +23,21 @@ export async function createIndexWrapper() {
 }
 
 
-export async function upsertVectors(conceptId: string, userMessage: MessageReadWithoutTimestamp, aiMessage: MessageReadWithoutTimestamp): Promise<void> {
-    
-    // const index = pc.index(CONSTANTS.embeddings_openai);
+export async function upsertVectors(conceptId: string, messages: MessageReadWithoutTimestamp[]): Promise<void> {
     const openAIEmbeddings = new OpenAIEmbeddings();
-    // const userMessageEmbedding = await embeddings.embedQuery(userMessage.content); 
-    // const aiMessageEmbedding = await embeddings.embedQuery(aiMessage.content);
+    const index = pc.index(indexName);
 
-    console.log('modelName:', openAIEmbeddings.modelName);
-    return;
+    // Generate embeddings for each message
+    const embeddings = await Promise.all(
+        messages.map(async (message) => {
+            const embedding = await openAIEmbeddings.embedQuery(message.content);
+            return {
+                id: message.id,
+                values: embedding
+            };
+        })
+    );
 
-   /*  await index.namespace(conceptId).upsert([
-        {
-          'id': userMessage.id,
-          'values': userMessageEmbedding
-        },
-        {
-          'id': aiMessage.id, 
-          'values': aiMessageEmbedding
-        }
-      ]); */
-      
-  }
+    // Upsert all the message embeddings to the namespace
+    await index.namespace(conceptId).upsert(embeddings);
+}

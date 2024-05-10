@@ -41,7 +41,7 @@ export default function ConceptRow({ concept }: Props) {
                 <div className='flex-1 flex space-x-4'>
                     <p className='flex-1 hover:opacity-50 hidden md:inline-flex truncate'>
                         {messages && messages.length > 0 ?
-                            `${messages[0].content.slice(0, 20)}` :
+                            `${messages[0].content.slice(0, 40)}...` :
                             'Empty Concept'}
                     </p>
                 </div>
