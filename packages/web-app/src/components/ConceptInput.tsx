@@ -26,7 +26,7 @@ export default function ConceptInput({ concept }: Props) {
     const userEmail = session?.user?.email || '';
     const userName = session?.user?.name || '';
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
-
+    
 
     const submissionHelper = async () => {
         const content = input.trim();

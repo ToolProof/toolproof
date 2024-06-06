@@ -11,7 +11,7 @@ interface ServiceAccountCredentials {
 }
 
 // Construct an absolute path from the project root using `process.cwd`
-const credentialsPath = join(process.cwd(), 'toolproof-563fe-aadab9fb0ced.json');
+const credentialsPath = join(process.cwd(), 'toolproof-563fe-aadab9fb0ced.json'); // ATTENTION: cwd isn't always the project root!
 
 // Load the credentials JSON file
 const credentials: ServiceAccountCredentials = JSON.parse(readFileSync(credentialsPath, 'utf8'));

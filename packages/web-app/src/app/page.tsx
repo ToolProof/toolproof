@@ -1,13 +1,13 @@
 'use client'
 import { useAppSelector } from '@/redux/hooks';
-import { createIndexWrapper } from '@/lib/pineconeHelpers';
+// import { createIndexWrapper } from '@/lib/pineconeHelpers';
 import { useEffect, useState } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 
 
 export default function Home() {
   const { data: session } = useSession();
-  const isApproved = useAppSelector(state => state.devConfig.isApproved);
+  const isApproved = useAppSelector(state => state.config.isApproved);
   const [isIndexCreated, setIsIndexCreated] = useState(false);
 
   useEffect(() => { // ATTENTION: temporary hack to create index

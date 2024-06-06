@@ -5,8 +5,8 @@ const initialState = {
     isApproved: true,
 };
 
-const devConfigSlice = createSlice({
-    name: 'devConfig',
+const configSlice = createSlice({
+    name: 'config',
     initialState,
     reducers: {
         setUserEmail: (state, action: PayloadAction<string>) => {
@@ -17,5 +17,5 @@ const devConfigSlice = createSlice({
     },
 });
 
-export const { setUserEmail } = devConfigSlice.actions;
-export default devConfigSlice.reducer;
+export const { setUserEmail } = configSlice.actions;
+export default configSlice.reducer;

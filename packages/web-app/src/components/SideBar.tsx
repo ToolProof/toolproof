@@ -1,13 +1,13 @@
 'use client';
 import ConceptRow from './ConceptRow';
 import { useAppDispatch } from '@/redux/hooks';
-import { setUserEmail } from '@/redux/features/devConfigSlice';
+import { setUserEmail } from '@/redux/features/configSlice';
 import { useAppSelector } from '@/redux/hooks';
 import { useConcepts, addConcept } from '@/lib/firestoreHelpersClient';
 import { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+// import Link from 'next/link'; // ATTENTION
 
 
 export default function SideBar() {
@@ -16,7 +16,7 @@ export default function SideBar() {
     const { concepts, loading, error } = useConcepts(userEmail);
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const isApproved = useAppSelector(state => state.devConfig.isApproved);
+    const isApproved = useAppSelector(state => state.config.isApproved);
 
     useEffect(() => {
         dispatch(setUserEmail(userEmail));

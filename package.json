@@ -2,7 +2,6 @@
   "name": "typescript-repo",
   "workspaces": [
     "packages/web-app",
-    "packages/transformer",
     "packages/playroom",
     "packages/shared"
   ],
