@@ -1,0 +1,17 @@
+* Internals
+  * **SequenceDraftConcept**
+    * Definition
+  * **VideoDraftConcept**
+    * Definition
+  * **Story**
+    * Definition
+  * **Debate**
+    * Definition
+  * **Interview**
+    * Definition
+  * **Tutorial**
+    * Definition
+  * **Initial**
+    * Definition
+  * **Response**
+    * Definition

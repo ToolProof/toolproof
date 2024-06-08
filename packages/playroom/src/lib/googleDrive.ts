@@ -2,6 +2,14 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { google } from 'googleapis';
+import mammoth from 'mammoth';
+import TurndownService from 'turndown';
+
+// Define the file structure for listing files
+export interface DriveFile {
+    id: string;
+    name: string;
+}
 
 // Define the structure of the credentials JSON file
 interface ServiceAccountCredentials {
@@ -17,28 +25,20 @@ const credentialsPath = join(process.cwd(), 'toolproof-563fe-aadab9fb0ced.json')
 const credentials: ServiceAccountCredentials = JSON.parse(readFileSync(credentialsPath, 'utf8'));
 
 // Initialize the authentication client
-const auth = new google.auth.GoogleAuth({
+const authClient = new google.auth.GoogleAuth({
     credentials,
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'], // or 'drive' for read/write access
+    scopes: ['https://www.googleapis.com/auth/drive'],
 });
 
-const drive = google.drive({ version: 'v3', auth });
+const drive = google.drive({ version: 'v3', auth: authClient });
 
-// Define the file structure for listing files
-interface DriveFile {
-    id: string;
-    name: string;
-}
-
-// Function to list files directly in the "Computing" folder
-export async function listFilesInComputingFolder(): Promise<DriveFile[]> {
+// Function to list files directly in the folder
+export async function listFilesInFolder(folderId: string): Promise<DriveFile[]> {
     try {
-        // Set the known "Computing" folder ID
-        const computingFolderId = '1PLHF_ERzQ1RVGZmhcZ8QDyZ_Qcj0ln1z';
 
-        // List files directly in the "Computing" folder
+        // List files directly in the folder
         const filesResponse = await drive.files.list({
-            q: `'${computingFolderId}' in parents`,
+            q: `'${folderId}' in parents`,
             fields: 'files(id, name)',
         });
 
@@ -48,3 +48,43 @@ export async function listFilesInComputingFolder(): Promise<DriveFile[]> {
         return [];
     }
 }
+
+// Function to read a file from Google Drive
+export async function readFile(fileId: string): Promise<string> {
+    try {
+        // Get the file metadata to check MIME type
+        const fileMeta = await drive.files.get({ fileId, fields: 'mimeType' });
+
+        let downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+
+        // If the file is a Google Docs file, we need to export it
+        if (fileMeta.data.mimeType === 'application/vnd.google-apps.document') {
+            downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/vnd.openxmlformats-officedocument.wordprocessingml.document`;
+        }
+
+        // Perform the request to download the file content
+        const response = await authClient.request({
+            url: downloadUrl,
+            method: 'GET',
+            responseType: 'arraybuffer'
+        });
+
+        const arrayBuffer = response.data as ArrayBuffer;
+        const buffer = Buffer.from(arrayBuffer);
+
+        // Convert the .docx buffer to HTML using Mammoth
+        const result = await mammoth.convertToHtml({ buffer });
+        const htmlContent = result.value;
+        // return htmlContent || '';
+
+        // Convert the HTML content to Markdown using Turndown
+        const turndownService = new TurndownService();
+        const markdownContent = turndownService.turndown(htmlContent);
+
+        return markdownContent || '';
+    } catch (error) {
+        console.error('Error reading the file:', error);
+        return '';
+    }
+}
+

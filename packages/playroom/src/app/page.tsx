@@ -1,34 +1,43 @@
 'use client'
 import { useEffect, useState } from 'react';
-import { listFilesInComputingFolder } from '../lib/googleDrive';
+import { readFile } from '../lib/googleDrive';
+import ReactMarkdown from 'react-markdown';
 
-interface DriveFile {
-  id: string;
-  name: string;
-}
 
 function Home() {
-  const [files, setFiles] = useState<DriveFile[]>([]);
+  const [fileContent, setFileContent] = useState<string>('');
 
   useEffect(() => {
-    async function fetchFiles() {
-      const filesList = await listFilesInComputingFolder();
-      setFiles(filesList);
+    async function fetchFile() {
+      const fileContentLocal = await readFile('1GMwp5zZgmfip5N0heqBe0V_WOzdrJK1tvZAlQsCtdvk');
+      setFileContent(fileContentLocal);
     }
-
-    fetchFiles();
+    fetchFile();
   }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
-      <h1>Files in Computing-Folder:</h1>
-      <ul>
-        {files.map((file) => (
-          <li key={file.id}>{file.name}</li>
-        ))}
-      </ul>
-    </div>
+      {/* <p>{fileContent}</p> */}
+      <ReactMarkdown
+        components={{
+          ul: ({ node, ...props }) => <ul style={styles.ul} {...props} />,
+          li: ({ node, ...props }) => <li style={styles.li} {...props} />,
+        }}>
+        {fileContent}</ReactMarkdown>
+    </div >
   );
+
 }
+
+const styles = {
+  ul: {
+    listStyleType: 'disc',
+    marginLeft: '20px',
+    paddingLeft: '20px',
+  },
+  li: {
+    marginBottom: '5px',
+  },
+};
 
 export default Home;
