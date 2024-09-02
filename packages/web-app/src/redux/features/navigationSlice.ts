@@ -1,9 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const navigationSlice = createSlice({
-    name: "navigation",
+    name: 'navigation',
     initialState: {
-        conceptActive: "",
+        conceptActive: '',
     },
     reducers: {
         setConceptActive: (state, action: PayloadAction<string>) => {

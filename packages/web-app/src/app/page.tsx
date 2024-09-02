@@ -19,7 +19,7 @@ export default function Home() {
   }, [isIndexCreated]);
 
   return (
-    <div className='bg-[#e2e883] flex flex-col items-center justify-center h-full'>
+    <div className='bg-[#A22222] flex flex-col items-center justify-center h-full'>
       <h1 className='text-black text-5xl mb-4'>toolproof.com</h1>
       {
         (isApproved && !session) && (

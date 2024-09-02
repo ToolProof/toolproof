@@ -1,6 +1,6 @@
-import { ConceptOpenAI } from '@langchain/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import { BufferMemory } from 'langchain/memory';
-import { ConceptPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
+import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
@@ -8,7 +8,7 @@ import * as Constants from 'shared/src/constants'
 
 const TOPIC_DETECTION = 'topic_detection'; // ATTENTION: move to constants
 
-const conceptModel = new ConceptOpenAI({
+const conceptModel = new ChatOpenAI({
   modelName: 'gpt-4',
   temperature: 0.5,
 });
@@ -20,7 +20,7 @@ const memory = new BufferMemory({
   memoryKey: 'history',
 });
 
-const promptTemplate = ConceptPromptTemplate.fromMessages([
+const promptTemplate = ChatPromptTemplate.fromMessages([
   ['system', `Your job is to detect the topic of the conversation based on the input message and the context.`],
   new MessagesPlaceholder('history'),
   ['human', `{speaker}: {input}`],

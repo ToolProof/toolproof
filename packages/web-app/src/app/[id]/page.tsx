@@ -2,8 +2,8 @@
 import ConceptDisplay from '@/components/ConceptDisplay';
 import ConceptInput from '@/components/ConceptInput';
 import { useConcept } from '@/lib/firestoreHelpersClient';
-import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 type Props = {
@@ -28,14 +28,16 @@ export default function Concept({ params: { id } }: Props) {
     if (!concept) { // ATTENTION: find a better way to handle this
         return null;
     }
-    
+
     return (
         <div className='flex flex-col h-full overflow-hidden'>
             <div className='flex-grow overflow-hidden bg-[#ffffff]'>
                 <ConceptDisplay key={concept.id} concept={concept} />
             </div>
-            <div className='w-full bg-[#80807a]'>
-                <ConceptInput concept={concept} />
+            <div className='flex justify-center items-center w-full'>
+                <div className='w-[50%] bg-[#80807a] flex justify-center items-center'>
+                    <ConceptInput concept={concept} />
+                </div>
             </div>
         </div>
     );

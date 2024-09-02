@@ -11,6 +11,9 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@heroicons/react": "^2.0.18",
     "@langchain/openai": "^0.0.14",
     "@pinecone-database/pinecone": "^2.0.1",

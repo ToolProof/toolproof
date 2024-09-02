@@ -19,7 +19,7 @@ export default async function sendPromptAction({ conceptId, promptSeed, userName
 
     try {
 
-        upsertVectors(conceptId, [userMessage]); // ATTENTION: do I want to await this?
+        upsertVectors(conceptId, [userMessage]); // ATTENTION: do we need to await this?
 
         return { topicDetected: 'topicDetected', action: 'action' };
 
@@ -38,5 +38,6 @@ export default async function sendPromptAction({ conceptId, promptSeed, userName
         console.error('Error:', error);
         throw new Error(`An operation failed: ${(error as Error).message}`);
     }
+    
 }
 

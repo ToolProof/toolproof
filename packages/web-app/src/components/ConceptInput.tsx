@@ -1,14 +1,15 @@
 'use client'
 import * as Constants from 'shared/src/constants'
+import { ConceptRead } from 'shared/src/typings';
+import sendPromptAction from '@/lib/sendPromptAction';
+import { addMessage } from '@/lib/firestoreHelpersClient';
+import { useAppSelector } from '@/redux/hooks';
 import { useState, useEffect, useRef } from 'react';
 // import { toast } from 'react-hot-toast';
-import sendPromptAction from '@/lib/sendPromptAction';
 import { useSession } from 'next-auth/react';
 // import { useRouter } from 'next/navigation';
-import { useAppSelector } from '@/redux/hooks';
-// import * as Constants from 'shared/src/constants';
-import { ConceptRead } from 'shared/src/typings';
-import { addMessage } from '@/lib/firestoreHelpersClient';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircle, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 
 type Props = {
@@ -26,7 +27,7 @@ export default function ConceptInput({ concept }: Props) {
     const userEmail = session?.user?.email || '';
     const userName = session?.user?.name || '';
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
-    
+
 
     const submissionHelper = async () => {
         const content = input.trim();
@@ -114,7 +115,7 @@ export default function ConceptInput({ concept }: Props) {
                 <div className='relative w-full'>
                     <textarea
                         ref={textareaRef}
-                        className='w-full resize-none max-h-[50vh] py-3 pr-[6rem] pl-3 outline-none rounded-lg bg-[#eae8e8] overflow-x-hidden overflow-y-auto'
+                        className='w-full resize-none max-h-[50vh] py-3 pr-[6rem] pl-3 outline-none rounded-full bg-[#eae8e8] overflow-x-hidden overflow-y-auto'
                         disabled={criterion}
                         placeholder='Type your message here...'
                         value={input}
@@ -122,34 +123,30 @@ export default function ConceptInput({ concept }: Props) {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
-                    <button
+                                        <button
                         style={{ position: 'absolute', right: '2rem', bottom: '0.75rem' }} // Adjust position relative to the new container
-                        className={`p-2 rounded-lg
+                        className={`p-2 rounded-full
                         ${!input ? 'disabled:cursor-not-allowed' : 'hover:opacity-50'}
-                        ${!input ? 'bg-gray-300' : 'bg-black'}`
-                        }
+                        ${!input ? 'bg-gray-300' : 'bg-black'}`}
                         disabled={!input}
                         type='submit'
                     >
                         {
-                            (criterion || isTyping) ?
+                            (criterion || isTyping) ? (
                                 <div className='flex justify-center items-center w-4 h-4 bg-transparent'>
-                                    <img src='/icons/encircled_square.png' alt='Loading'/>
+                                    <FontAwesomeIcon icon={faCircle} className="text-white" />
                                 </div>
-                                :
-                                <div
-                                    className={`flex justify-center items-center w-4 h-4
-                                    ${!input && 'bg-gray-300'}`}
-                                >
-                                    <img src='/icons/up_arrow.png' alt='Send'/>
+                            ) : (
+                                <div className='flex justify-center items-center w-4 h-4'>
+                                    <FontAwesomeIcon icon={faArrowUp} className="text-white" />
                                 </div>
+                            )
                         }
                     </button>
                 </div>
             </form>
-        )        
+        )
     }
-
 
     return renderHelper(turnState === -1);
 

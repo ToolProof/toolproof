@@ -1,7 +1,7 @@
-import { ConceptOpenAI } from '@langchain/openai';
-//import { BufferMemory, ConceptMessageHistory } from "langchain/memory";
+import { ChatOpenAI } from '@langchain/openai';
+//import { BufferMemory, ConversationMessageHistory } from "langchain/memory";
 import { BufferMemory } from 'langchain/memory';
-import { ConceptPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
+import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 //import { AIMessage, HumanMessage } from "langchain/schema";
 //import dbAdmin from "../../configFirebaseAdmin";
@@ -12,9 +12,9 @@ import fs from 'fs/promises';
 
 const TOPIC_DETECTION = 'topic_detection'; // ATTENTION: move to constants
 
-const currentConceptId: string = '';
+const currentConversationId: string = '';
 
-const conceptModel = new ConceptOpenAI({
+const conversationModel = new ChatOpenAI({
     modelName: 'gpt-4',
     temperature: 0,
 });
@@ -26,7 +26,7 @@ const memory = new BufferMemory({
     memoryKey: 'history',
 });
 
-const promptTemplate = ConceptPromptTemplate.fromMessages([
+const promptTemplate = ChatPromptTemplate.fromMessages([
     ['system', `Your job is to keep the conversation going. You should answer the user's questions and keep track of the topic.`],
     new MessagesPlaceholder('history'),
     ['human', `{input}`],
@@ -69,45 +69,45 @@ const chain = RunnableSequence.from([
         }
         return previousOutput;
     },
-    conceptModel.bind({
+    conversationModel.bind({
         functions: functionSchema,
         function_call: { name: TOPIC_DETECTION },
     }),
 ]);
 
 
-const invokeChainWrapper = async ({ conceptId, promptSeed, userName }: { conceptId: string; promptSeed: string; userName: string }) => {
+const invokeChainWrapper = async ({ conversationId, promptSeed, userName }: { conversationId: string; promptSeed: string; userName: string }) => {
 
     try {
-        // Check if a new concept has started or the existing one continues // ATTENTION: there'll never be a new concept
-        if (currentConceptId !== conceptId) {
+        // Check if a new conversation has started or the existing one continues // ATTENTION: there'll never be a new conversation
+        if (currentConversationId !== conversationId) {
             /* console.log("Are we here?")
             
             const messagesSnapshot = await dbAdmin // ATTENTION_
-              .collection("concepts")
-              .doc(conceptId)
+              .collection("conversations")
+              .doc(conversationId)
               .collection("messages")
               .orderBy("timestamp", "asc")
               .get();
       
             const pastMessages = messagesSnapshot.docs.map(doc => {
               const data = doc.data();
-              return data.userId === "ConceptGPT" ?
+              return data.userId === "ConversationGPT" ?
                 new AIMessage(data.content) :
                 new HumanMessage(data.content);
             });
       
-            const conceptHistory = new ConceptMessageHistory(pastMessages);
+            const conversationHistory = new ConversationMessageHistory(pastMessages);
             
             memory = new BufferMemory({
                 returnMessages: true,
                 inputKey: "input",
                 outputKey: "output",
                 memoryKey: "history",
-                //conceptHistory: conceptHistory,
+                //conversationHistory: conversationHistory,
             });
 
-            currentConceptId = conceptId; */
+            currentConversationId = conversationId; */
         }
 
         const inputs = {
@@ -116,7 +116,7 @@ const invokeChainWrapper = async ({ conceptId, promptSeed, userName }: { concept
         };
 
         const response = await chain.invoke(inputs);
-        console.log('conceptModel', conceptModel);
+        console.log('conversationModel', conversationModel);
 
 
         if (response && response.additional_kwargs && response.additional_kwargs.function_call) { // ATTENTION: optional chaining

@@ -1,9 +1,8 @@
 'use client';
-import ConceptRow from './ConceptRow';
-import { useAppDispatch } from '@/redux/hooks';
-import { setUserEmail } from '@/redux/features/configSlice';
-import { useAppSelector } from '@/redux/hooks';
+import ConceptRow from '@/components/ConceptRow';
 import { useConcepts, addConcept } from '@/lib/firestoreHelpersClient';
+import { setUserEmail } from '@/redux/features/configSlice';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
