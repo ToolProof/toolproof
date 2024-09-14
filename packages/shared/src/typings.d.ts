@@ -15,13 +15,29 @@ export interface MessageReadWithoutTimestamp extends MessageWrite {
     id: string;
 }
 
+
+// ATTENTION: note the difference between RelatedConcept and Relationship
+
 export interface ConceptWrite {
-    userId: string;
-    turnState: number;
+    relatedConcepts: RelatedConceptWrite[]; // ATTENTION: RelatedConceptsRead[]
+    originId: string;
 }
 
 export interface ConceptRead extends ConceptWrite {
     id: string;
     timestamp: Timestamp;
 }
+
+export interface RelatedConceptWrite {
+    relatedConceptId: string;
+    relationshipId: string; // name, definition, examples, etc.
+    originId: string;
+}
+
+export interface RelatedConceptRead extends RelatedConceptWrite {
+    id: string;
+    timestamp: Timestamp;
+}
+
+
 
