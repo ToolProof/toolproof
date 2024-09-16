@@ -34,6 +34,8 @@ export default function ConceptInput({ concept }: Props) {
         setInput('');
         const userMessage = await addMessage(concept.id, { userId: userEmail, content: content, tags: [Constants.test] });
 
+        return;
+
         const data = await sendPromptAction({ conceptId: concept.id, promptSeed: content, userName, userMessage }); // ATTENTION: message order not secured
         if (data && data.topicDetected && data.action) {
             /*

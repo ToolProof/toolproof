@@ -1,4 +1,4 @@
-import { Timestamp, FieldValue } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
 export interface MessageWrite {
     userId: string;
@@ -19,8 +19,9 @@ export interface MessageReadWithoutTimestamp extends MessageWrite {
 // ATTENTION: note the difference between RelatedConcept and Relationship
 
 export interface ConceptWrite {
-    relatedConcepts: RelatedConceptWrite[]; // ATTENTION: RelatedConceptsRead[]
-    originId: string;
+    _name: string;
+    relatedConcepts: RelatedConceptWrite[];
+    userId: string;
 }
 
 export interface ConceptRead extends ConceptWrite {
@@ -30,8 +31,8 @@ export interface ConceptRead extends ConceptWrite {
 
 export interface RelatedConceptWrite {
     relatedConceptId: string;
-    relationshipId: string; // name, definition, examples, etc.
-    originId: string;
+    relationshipId: string; // definition, synonyms, examples, etc.
+    userId: string;
 }
 
 export interface RelatedConceptRead extends RelatedConceptWrite {

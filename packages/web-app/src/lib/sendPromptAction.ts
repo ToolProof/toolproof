@@ -19,7 +19,7 @@ export default async function sendPromptAction({ conceptId, promptSeed, userName
 
     try {
 
-        upsertVectors(conceptId, [userMessage]); // ATTENTION: do we need to await this?
+        // upsertVectors(conceptId, [userMessage]); // ATTENTION: do we need to await this?
 
         return { topicDetected: 'topicDetected', action: 'action' };
 

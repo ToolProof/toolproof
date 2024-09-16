@@ -1,18 +1,19 @@
 'use client';
 import ConceptRow from '@/components/ConceptRow';
 import { useConcepts, addConcept } from '@/lib/firestoreHelpersClient';
-import { setUserEmail } from '@/redux/features/configSlice';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { setUserEmail } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
+// import Image from 'next/image'; // ATTENTION
 // import Link from 'next/link'; // ATTENTION
 
 
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
-    const { concepts, loading, error } = useConcepts(userEmail);
+    const { concepts } = useConcepts(userEmail);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
@@ -22,7 +23,7 @@ export default function SideBar() {
     }, [dispatch, userEmail]);
 
     const handleAddConcept = async () => {
-        const result = await addConcept({ userId: userEmail, turnState: 0 });
+        const result = await addConcept({ _name: '', relatedConcepts: [], userId: userEmail });
         if (result && result.conceptId) {
             router.push(`/${result.conceptId}`);
         }
