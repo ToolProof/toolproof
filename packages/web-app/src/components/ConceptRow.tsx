@@ -1,10 +1,12 @@
 'use client';
-import Link from 'next/link';
-import { TrashIcon } from '@heroicons/react/24/outline';
-import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { useMessages, deleteConcept } from '@/lib/firestoreHelpersClient';
+import * as CONSTANTS from 'shared/src/constants';
 import { ConceptRead } from 'shared/src/typings';
+import { useMessages, deleteConcept } from '@/lib/firestoreHelpersClient';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { TrashIcon } from '@heroicons/react/24/outline';
+
 
 type Props = {
     concept: ConceptRead;
@@ -13,7 +15,7 @@ type Props = {
 export default function ConceptRow({ concept }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `/${concept.id}`;
+    const href = `/${CONSTANTS.concept}/${concept.id}`;
     const { messages } = useMessages(concept.id);
 
     useEffect(() => {

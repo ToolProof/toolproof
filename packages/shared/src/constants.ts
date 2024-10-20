@@ -2,6 +2,7 @@
 export const title = 'toolproof.com'; // ATTENTION: be consistent with variable naming
 export const description = ''; // ATTENTION: be consistent with variable naming
 
+export const concept = 'concept';
 export const concepts = 'concepts';
 export const messages = 'messages';
 export const userId = 'userId';
