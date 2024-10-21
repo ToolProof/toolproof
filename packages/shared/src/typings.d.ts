@@ -3,6 +3,7 @@ import { Timestamp } from "firebase/firestore";
 export interface MessageWrite {
     userId: string;
     content: string;
+    isMeta: boolean;
     tags: string[];
 }
 

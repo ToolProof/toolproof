@@ -27,7 +27,7 @@ export default function ChatInput({ chat }: Props) {
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
 
-    const submissionHelper = async () => {
+    const submissionHelper = async (isMeta: boolean) => {
         const content = input.trim();
         setInput('');
         const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [] });
@@ -51,14 +51,14 @@ export default function ChatInput({ chat }: Props) {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault(); // Prevent default to stop new line in textarea
-            submissionHelper();
+            submissionHelper(false);
         }
     };
 
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        submissionHelper();
+        submissionHelper(false);
     };
 
 
