@@ -7,15 +7,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
-
 type Props = {
     chat: ChatRead;
+    selectedOption: string;
 }
 
-export default function ChatRow({ chat }: Props) {
+export default function ChatRow({ chat, selectedOption }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `/${CONSTANTS.chat}/${chat.id}`;
+    const href = `/${selectedOption.toLowerCase().slice(0, -1)}/${chat.id}`;
     const { messages } = useMessages(chat.id);
 
     useEffect(() => {

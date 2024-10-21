@@ -1,5 +1,5 @@
 'use client'
-import * as Constants from 'shared/src/constants'
+// import * as Constants from 'shared/src/constants'
 import { ChatRead } from 'shared/src/typings';
 import sendPromptAction from '@/lib/sendPromptAction';
 import { addMessage } from '@/lib/firestoreHelpersClient';
@@ -30,7 +30,7 @@ export default function ChatInput({ chat }: Props) {
     const submissionHelper = async () => {
         const content = input.trim();
         setInput('');
-        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.test] });
+        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [] });
 
         return;
 
@@ -123,7 +123,7 @@ export default function ChatInput({ chat }: Props) {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
-                                        <button
+                    <button
                         style={{ position: 'absolute', right: '2rem', bottom: '0.75rem' }} // Adjust position relative to the new container
                         className={`p-2 rounded-full
                         ${!input ? 'disabled:cursor-not-allowed' : 'hover:opacity-50'}
