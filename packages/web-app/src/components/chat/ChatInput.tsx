@@ -19,6 +19,7 @@ export default function ChatInput({ chat }: Props) {
     const [input, setInput] = useState('');
     const turnState = chat?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const { data: session } = useSession();
     //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
@@ -26,11 +27,10 @@ export default function ChatInput({ chat }: Props) {
     const userName = session?.user?.name || '';
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
-
     const submissionHelper = async (isMeta: boolean) => {
         const content = input.trim();
         setInput('');
-        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [] });
+        const userMessage = await addMessage(chat.id, { userId: userEmail, content, isMeta, tags: [] });
 
         return;
 
@@ -46,21 +46,6 @@ export default function ChatInput({ chat }: Props) {
         }
 
     };
-
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault(); // Prevent default to stop new line in textarea
-            submissionHelper(false);
-        }
-    };
-
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        submissionHelper(false);
-    };
-
 
     const updateInputHeight = () => {
         const textarea = textareaRef.current;
@@ -105,8 +90,47 @@ export default function ChatInput({ chat }: Props) {
         }; */
     }, [turnState]);
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && e.shiftKey) {
+            // Allow default behavior to create a new paragraph
+            return;
+        } else if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            submissionHelper(true);
+        } else if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent default to stop new line in textarea
+            submissionHelper(false);
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        submissionHelper(false);
+    };
 
     const renderHelper = (criterion: boolean) => {
+
+        const handleMouseDown = () => {
+            buttonRef.current?.addEventListener('mouseup', handleMouseUp);
+            buttonRef.current?.addEventListener('mouseleave', handleMouseUp);
+            buttonRef.current?.addEventListener('touchend', handleMouseUp);
+            buttonRef.current?.addEventListener('touchcancel', handleMouseUp);
+            buttonRef.current?.addEventListener('contextmenu', handleMouseUp);
+            setTimeout(() => {
+                if (buttonRef.current) {
+                    submissionHelper(true);
+                }
+            }, 1000); // 1 second for long press
+        };
+
+        const handleMouseUp = () => {
+            buttonRef.current?.removeEventListener('mouseup', handleMouseUp);
+            buttonRef.current?.removeEventListener('mouseleave', handleMouseUp);
+            buttonRef.current?.removeEventListener('touchend', handleMouseUp);
+            buttonRef.current?.removeEventListener('touchcancel', handleMouseUp);
+            buttonRef.current?.removeEventListener('contextmenu', handleMouseUp);
+        };
+
         return (
             <form
                 onSubmit={handleSubmit}
@@ -124,6 +148,9 @@ export default function ChatInput({ chat }: Props) {
                         onKeyDown={handleKeyDown}
                     />
                     <button
+                        ref={buttonRef}
+                        onMouseDown={handleMouseDown}
+                        onTouchStart={handleMouseDown}
                         style={{ position: 'absolute', right: '2rem', bottom: '0.75rem' }} // Adjust position relative to the new container
                         className={`p-2 rounded-full
                         ${!input ? 'disabled:cursor-not-allowed' : 'hover:opacity-50'}
@@ -145,8 +172,9 @@ export default function ChatInput({ chat }: Props) {
                     </button>
                 </div>
             </form>
-        )
-    }
+        );
+    };
+
 
     return renderHelper(turnState === -1);
 

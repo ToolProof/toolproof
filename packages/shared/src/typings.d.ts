@@ -4,7 +4,7 @@ export interface MessageWrite {
     userId: string;
     content: string;
     isMeta: boolean;
-    tags: string[];
+    tags: string[];   
 }
 
 export interface MessageRead extends MessageWrite {
