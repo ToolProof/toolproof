@@ -58,9 +58,10 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   }, [message, isNew, dispatch]);
 
   return (
-    <div className={`flex py-4 px-2 space-x-5 max-w-2xl mx-auto ${message.isMeta ? 'bg-gray-100' : ''}`}>
+    <div className={`flex py-4 px-2 space-x-5 max-w-2xl mx-auto ${message.isMeta ? 'bg-green-100' : ''} my-2 p-4`}>
       <img src={imageSource} alt='' className='h-8 w-8' />
       <p className={`text-black ${message.isMeta ? 'italic text-gray-500' : ''}`}>{displayedText}</p>
     </div>
   );
+
 }
