@@ -2,11 +2,11 @@
 export const title = 'toolproof.com'; // ATTENTION: be consistent with variable naming
 export const description = ''; // ATTENTION: be consistent with variable naming
 
-export const concept = 'concept';
-export const concepts = 'concepts';
+export const chat = 'chat';
+export const chats = 'chats';
 export const messages = 'messages';
 export const userId = 'userId';
-export const ConceptGPT = 'ConceptGPT';
+export const ChatGPT = 'ChatGPT';
 export const timestamp = 'timestamp';
 export const asc = 'asc';
 export const desc = 'desc';

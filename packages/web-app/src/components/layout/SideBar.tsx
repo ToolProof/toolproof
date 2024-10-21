@@ -1,6 +1,6 @@
 'use client';
-import ConceptRow from '@/components/ConceptRow';
-import { useConcepts, addConcept } from '@/lib/firestoreHelpersClient';
+import ChatRow from '@/components/layout/ChatRow';
+import { useChats, addChat } from '@/lib/firestoreHelpersClient';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setUserEmail } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
-    const { concepts } = useConcepts(userEmail);
+    const { chats } = useChats(userEmail);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
@@ -22,10 +22,10 @@ export default function SideBar() {
         dispatch(setUserEmail(userEmail));
     }, [dispatch, userEmail]);
 
-    const handleAddConcept = async () => {
-        const result = await addConcept({ _name: '', relatedConcepts: [], userId: userEmail });
-        if (result && result.conceptId) {
-            router.push(`/${result.conceptId}`);
+    const handleAddChat = async () => {
+        const result = await addChat({ _name: '', userId: userEmail });
+        if (result && result.chatId) {
+            router.push(`/${result.chatId}`);
         }
     }
 
@@ -35,14 +35,14 @@ export default function SideBar() {
         <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
             <div className='flex-1'>
                 <button
-                    onClick={handleAddConcept}
+                    onClick={handleAddChat}
                     className='bg-blue-500 text-white px-0 py-2 w-full rounded-md hover:bg-blue-600'
                 >
-                    Add Concept
+                    Add Chat
                 </button>
                 <div className='flex flex-col py-4 space-y-2'>
-                    {concepts.map(concept => (
-                        <ConceptRow key={concept.id} concept={concept} />
+                    {chats.map(chat => (
+                        <ChatRow key={chat.id} chat={chat} />
                     ))}
                 </div>
             </div>

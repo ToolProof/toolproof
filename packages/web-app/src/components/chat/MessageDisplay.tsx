@@ -4,13 +4,11 @@ import { useAppDispatch } from '@/redux/hooks';
 import { startTyping, stopTyping } from '@/redux/features/typewriterSlice';
 import { useSession } from 'next-auth/react';
 
-
 type Props = {
   message: MessageRead;
   isNew: boolean;
   onTextChange: (text: string) => void;
 };
-
 
 export default function MessageDisplay({ message, isNew, onTextChange }: Props) {
   const [displayedText, setDisplayedText] = useState('');
@@ -31,7 +29,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   useEffect(() => {
     let timeoutId: number | undefined;
 
-    if (isNew && message.userId === 'ConceptGPT') {
+    if (isNew && message.userId === 'ChatGPT') {
       dispatch(startTyping());
       const typeLetter = (index: number) => {
         if (index < message.content.length) {

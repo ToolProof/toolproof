@@ -1,6 +1,6 @@
 'use client'
 import * as Constants from 'shared/src/constants'
-import { ConceptRead } from 'shared/src/typings';
+import { ChatRead } from 'shared/src/typings';
 import sendPromptAction from '@/lib/sendPromptAction';
 import { addMessage } from '@/lib/firestoreHelpersClient';
 import { useAppSelector } from '@/redux/hooks';
@@ -11,15 +11,13 @@ import { useSession } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
-
 type Props = {
-    concept: ConceptRead;
+    chat: ChatRead;
 };
 
-
-export default function ConceptInput({ concept }: Props) {
+export default function ChatInput({ chat }: Props) {
     const [input, setInput] = useState('');
-    const turnState = concept?.turnState;
+    const turnState = chat?.turnState;
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const { data: session } = useSession();
     //const router = useRouter();
@@ -32,11 +30,11 @@ export default function ConceptInput({ concept }: Props) {
     const submissionHelper = async () => {
         const content = input.trim();
         setInput('');
-        const userMessage = await addMessage(concept.id, { userId: userEmail, content: content, tags: [Constants.test] });
+        const userMessage = await addMessage(chat.id, { userId: userEmail, content: content, tags: [Constants.test] });
 
         return;
 
-        const data = await sendPromptAction({ conceptId: concept.id, promptSeed: content, userName, userMessage }); // ATTENTION: message order not secured
+        const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); // ATTENTION: message order not secured
         if (data && data.topicDetected && data.action) {
             /*
                 * Could interact with the Redux store here
@@ -93,7 +91,7 @@ export default function ConceptInput({ concept }: Props) {
 
     useEffect(() => { // ATTENTION: should we use LayoutEffect?
         if (turnState === -1) {
-            // toastIdRef.current = toast.loading('ConceptGPT is thinking...');
+            // toastIdRef.current = toast.loading('ChatGPT is thinking...');
         } else {
             /* if (toastIdRef.current) {
                 toast.dismiss(toastIdRef.current);

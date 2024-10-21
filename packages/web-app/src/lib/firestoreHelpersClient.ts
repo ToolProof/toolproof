@@ -1,36 +1,36 @@
 import * as CONSTANTS from 'shared/src/constants';
-import { ConceptWrite, MessageWrite, ConceptRead, MessageRead, MessageReadWithoutTimestamp } from 'shared/src/typings';
+import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessageReadWithoutTimestamp } from 'shared/src/typings';
 import { db } from 'shared/src/firebaseClient';
 import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 
 
-export const addConcept = async (conceptWrite: ConceptWrite) => {
+export const addChat = async (chatWrite: ChatWrite) => {
   try {
-    const docRef = await addDoc(collection(db, CONSTANTS.concepts), {
-      ...conceptWrite,
+    const docRef = await addDoc(collection(db, CONSTANTS.chats), {
+      ...chatWrite,
       [CONSTANTS.timestamp]: serverTimestamp(),
     });
-    return { conceptId: docRef.id };
+    return { chatId: docRef.id };
   } catch(e) {
     console.error(e);
   }
 }
 
 
-export const deleteConcept = async (conceptId: string) => {
+export const deleteChat = async (chatId: string) => {
   try {
-    console.log('Deleting concept with ID:', conceptId);
-    await deleteDoc(doc(db, CONSTANTS.concepts, conceptId));
+    console.log('Deleting chat with ID:', chatId);
+    await deleteDoc(doc(db, CONSTANTS.chats, chatId));
   } catch(e) {
     console.error(e);
   }
 }
 
 
-export const addMessage = async (conceptId: string, messageWrite: MessageWrite): Promise<MessageReadWithoutTimestamp> => {
+export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<MessageReadWithoutTimestamp> => {
   try {
-    const docRef = await addDoc(collection(db, CONSTANTS.concepts, conceptId, CONSTANTS.messages), {
+    const docRef = await addDoc(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), {
       ...messageWrite,
       [CONSTANTS.timestamp]: serverTimestamp(),
     });
@@ -42,36 +42,36 @@ export const addMessage = async (conceptId: string, messageWrite: MessageWrite):
 }
 
 
-export function useConcepts(userId: string) {
-  const conceptsQuery = query(collection(db, CONSTANTS.concepts), where(CONSTANTS.userId, '==', userId), limit(10));
-  const [conceptsSnapshot, loading, error] = useCollection(conceptsQuery);
+export function useChats(userId: string) {
+  const chatsQuery = query(collection(db, CONSTANTS.chats), where(CONSTANTS.userId, '==', userId), limit(10));
+  const [chatsSnapshot, loading, error] = useCollection(chatsQuery);
 
-  const concepts = conceptsSnapshot?.docs.map((doc) => ({
+  const chats = chatsSnapshot?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
-  })) as ConceptRead[] || [];
+  })) as ChatRead[] || [];
 
-  return { concepts, loading, error };
+  return { chats, loading, error };
 }
 
 
-export function useConcept(conceptId: string) { // ATTENTION: be consistent with function syntax
-  const conceptRef = doc(db, CONSTANTS.concepts, conceptId);
-  const [conceptSnapshot, loading, error] = useDocument(conceptRef);
+export function useChat(chatId: string) { // ATTENTION: be consistent with function syntax
+  const chatRef = doc(db, CONSTANTS.chats, chatId);
+  const [chatSnapshot, loading, error] = useDocument(chatRef);
 
-  const concept = conceptSnapshot?.exists()
+  const chat = chatSnapshot?.exists()
     ? {
-      ...conceptSnapshot.data(),
-      id: conceptSnapshot.id,
-    } as ConceptRead
+      ...chatSnapshot.data(),
+      id: chatSnapshot.id,
+    } as ChatRead
     : null;
 
-  return { concept, loading, error };
+  return { chat, loading, error };
 }
 
 
-export const useMessages = (conceptId: string) => {
-  const messagesQuery = query(collection(db, CONSTANTS.concepts, conceptId, CONSTANTS.messages), orderBy(CONSTANTS.timestamp, CONSTANTS.asc));
+export const useMessages = (chatId: string) => {
+  const messagesQuery = query(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), orderBy(CONSTANTS.timestamp, CONSTANTS.asc));
   const [messagesSnapshot, loading, error] = useCollection(messagesQuery);
 
   const messages = messagesSnapshot?.docs.map((doc) => ({
@@ -83,9 +83,9 @@ export const useMessages = (conceptId: string) => {
 }
 
 
-export async function getIdOfUsersFirstConcept(userId: string) {
+export async function getIdOfUsersFirstChat(userId: string) {
   const q = query(
-    collection(db, CONSTANTS.concepts),
+    collection(db, CONSTANTS.chats),
     where(CONSTANTS.userId, '==', userId),
     limit(1)
   );

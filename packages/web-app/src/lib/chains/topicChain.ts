@@ -8,7 +8,7 @@ import * as Constants from 'shared/src/constants'
 
 const TOPIC_DETECTION = 'topic_detection'; // ATTENTION: move to constants
 
-const conceptModel = new ChatOpenAI({
+const chatModel = new ChatOpenAI({
   modelName: 'gpt-4',
   temperature: 0.5,
 });
@@ -57,14 +57,14 @@ const chain = RunnableSequence.from([
     console.log(previousOutput);
     return previousOutput;
   }, */
-  conceptModel.bind({
+  chatModel.bind({
     functions: functionSchema,
     function_call: { name: TOPIC_DETECTION },
   }),
 ]);
 
 
-const invokeChainWrapper = async ({ promptSeed, userName }: { conceptId: string; promptSeed: string; userName: string }) => {
+const invokeChainWrapper = async ({ promptSeed, userName }: { chatId: string; promptSeed: string; userName: string }) => {
 
   try {
     

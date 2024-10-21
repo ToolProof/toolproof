@@ -3,7 +3,7 @@ import { Timestamp } from "firebase/firestore";
 export interface MessageWrite {
     userId: string;
     content: string;
-    tags: string[]; // ATTENTION: consider contentCode (like for VlogTalk) on the Concept instead of test-tag on the Message
+    tags: string[]; // ATTENTION: consider contentCode (like for VlogTalk) on the Chat instead of test-tag on the Message
 }
 
 export interface MessageRead extends MessageWrite {
@@ -15,16 +15,12 @@ export interface MessageReadWithoutTimestamp extends MessageWrite {
     id: string;
 }
 
-
-// ATTENTION: note the difference between RelatedConcept and Relationship
-
-export interface ConceptWrite {
-    _name: string;
-    relatedConcepts: RelatedConceptWrite[];
+export interface ChatWrite {
     userId: string;
+    tags: string[];
 }
 
-export interface ConceptRead extends ConceptWrite {
+export interface ChatRead extends ChatWrite {
     id: string;
     timestamp: Timestamp;
 }
@@ -39,6 +35,8 @@ export interface RelatedConceptRead extends RelatedConceptWrite {
     id: string;
     timestamp: Timestamp;
 }
+
+// ATTENTION: note the difference between RelatedConcept and Relationship
 
 
 

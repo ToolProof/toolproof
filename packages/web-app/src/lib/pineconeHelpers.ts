@@ -23,7 +23,7 @@ export async function createIndexWrapper() {
 }
 
 
-export async function upsertVectors(conceptId: string, messages: MessageReadWithoutTimestamp[]): Promise<void> {
+export async function upsertVectors(chatId: string, messages: MessageReadWithoutTimestamp[]): Promise<void> {
     const openAIEmbeddings = new OpenAIEmbeddings();
     const index = pc.index(indexName);
 
@@ -39,5 +39,5 @@ export async function upsertVectors(conceptId: string, messages: MessageReadWith
     );
 
     // Upsert all the message embeddings to the namespace
-    await index.namespace(conceptId).upsert(embeddings);
+    await index.namespace(chatId).upsert(embeddings);
 }
