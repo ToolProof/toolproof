@@ -1,4 +1,5 @@
 'use client';
+import * as CONSTANTS from 'shared/src/constants';
 import ChatRow from '@/components/layout/ChatRow';
 import { useChats, addChat } from '@/lib/firestoreHelpersClient';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
@@ -16,7 +17,7 @@ export default function SideBar() {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
-    const [selectedOption, setSelectedOption] = useState('Opinions');
+    const [selectedOption, setSelectedOption] = useState<CONSTANTS.Option>(CONSTANTS.endpoint.opinion.option);
 
     useEffect(() => {
         dispatch(setUserEmail(userEmail));
@@ -25,7 +26,7 @@ export default function SideBar() {
     const handleAddChat = async () => {
         const result = await addChat({ userId: userEmail, turnState: 0, tags: [selectedOption] });
         if (result && result.chatId) {
-            router.push(`/${selectedOption.toLowerCase().slice(0, -1)}/${result.chatId}`);
+            router.push(`/${CONSTANTS.mapOptionToName(selectedOption)}/${result.chatId}`);
         }
     }
 
@@ -37,11 +38,11 @@ export default function SideBar() {
                 <div className='flex justify-center py-4'>
                     <select
                         value={selectedOption}
-                        onChange={(e) => setSelectedOption(e.target.value)}
+                        onChange={(e) => setSelectedOption(e.target.value as CONSTANTS.Option)}
                         className='bg-white border border-gray-300 rounded-md px-4 py-2'
                     >
-                        <option value='Concepts'>Concepts</option>
-                        <option value='Opinions'>Opinions</option>
+                        <option value='Concepts'>{CONSTANTS.endpoint.opinion.option}</option>
+                        <option value='Opinions'>{CONSTANTS.endpoint.concept.option}</option>
                     </select>
                 </div>
                 <button
