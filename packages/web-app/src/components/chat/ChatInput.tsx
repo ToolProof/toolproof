@@ -32,17 +32,14 @@ export default function ChatInput({ chat }: Props) {
         setInput('');
         const userMessage = await addMessage(chat.id, { userId: userEmail, content, isMeta, tags: [] });
 
-        return;
-
         const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); // ATTENTION: message order not secured
-        if (data && data.topicDetected && data.action) {
+        if (data) {
             /*
                 * Could interact with the Redux store here
             */
-            console.log('topicDetected', data.topicDetected);
-            console.log('action', data.action);
+            console.log('data', JSON.stringify(data));
         } else {
-            console.log('No topic detected or action found');
+            console.error('Error:', 'No data returned');
         }
 
     };

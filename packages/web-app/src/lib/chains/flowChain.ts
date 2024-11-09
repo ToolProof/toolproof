@@ -1,20 +1,14 @@
 import { ChatOpenAI } from '@langchain/openai';
-//import { BufferMemory, ConversationMessageHistory } from "langchain/memory";
+//import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import { BufferMemory } from 'langchain/memory';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
-//import { AIMessage, HumanMessage } from "langchain/schema";
-//import dbAdmin from "../../configFirebaseAdmin";
-import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
-import * as Constants from 'shared/src/constants'
+//import { AIMessage, HumanMessage } from 'langchain/schema';
 import fs from 'fs/promises';
 
-const TOPIC_DETECTION = 'topic_detection'; // ATTENTION: move to constants
+const currentChatId: string = '';
 
-const currentConversationId: string = '';
-
-const conversationModel = new ChatOpenAI({
+const chatModel = new ChatOpenAI({
     modelName: 'gpt-4',
     temperature: 0,
 });
@@ -27,24 +21,10 @@ const memory = new BufferMemory({
 });
 
 const promptTemplate = ChatPromptTemplate.fromMessages([
-    ['system', `Your job is to keep the conversation going. You should answer the user's questions and keep track of the topic.`],
+    ['system', `The user will present an opinion. Your job is challenge this opinion with follow-up questions.`],
     new MessagesPlaceholder('history'),
     ['human', `{input}`],
 ]);
-
-const functionSchema = [
-    {
-        name: TOPIC_DETECTION,
-        description: 'The purpose of this function is to detect the topic of the conversation based on the input message and the context.',
-        parameters: zodToJsonSchema(
-            z.object({
-                modelResponse: z.string().describe('The response from the model'),
-                topicDetected: z.string().describe('The detected topic'),
-                action: z.enum([Constants.continue_topic, Constants.change_topic]).describe('Whether to continue the current topic or change to a new one'),
-            })
-        )
-    },
-];
 
 
 const chain = RunnableSequence.from([
@@ -63,51 +43,48 @@ const chain = RunnableSequence.from([
         try {
             const data = JSON.stringify(previousOutput, null, 2); // Beautify the JSON
             await fs.writeFile('C:\\Users\\renes\\Documents\\output.json', data, 'utf-8');
-            //console.log("previousOutput:", previousOutput);
+            //console.log('previousOutput:', previousOutput);
         } catch (error) {
             console.error('Failed to write previousOutput to file:', error);
         }
         return previousOutput;
     },
-    conversationModel.bind({
-        functions: functionSchema,
-        function_call: { name: TOPIC_DETECTION },
-    }),
+    chatModel,
 ]);
 
 
-const invokeChainWrapper = async ({ conversationId, promptSeed, userName }: { conversationId: string; promptSeed: string; userName: string }) => {
+const invokeChainWrapper = async ({ chatId, promptSeed, userName }: { chatId: string; promptSeed: string; userName: string }) => {
 
     try {
-        // Check if a new conversation has started or the existing one continues // ATTENTION: there'll never be a new conversation
-        if (currentConversationId !== conversationId) {
-            /* console.log("Are we here?")
+        // Check if a new chat has started or the existing one continues // ATTENTION: there'll never be a new chat
+        if (currentChatId !== chatId) {
+            /* console.log('Are we here?')
             
             const messagesSnapshot = await dbAdmin // ATTENTION_
-              .collection("conversations")
-              .doc(conversationId)
-              .collection("messages")
-              .orderBy("timestamp", "asc")
+              .collection('chats')
+              .doc(chatId)
+              .collection('messages')
+              .orderBy('timestamp', 'asc')
               .get();
       
             const pastMessages = messagesSnapshot.docs.map(doc => {
               const data = doc.data();
-              return data.userId === "ConversationGPT" ?
+              return data.userId === 'ChatGPT' ?
                 new AIMessage(data.content) :
                 new HumanMessage(data.content);
             });
       
-            const conversationHistory = new ConversationMessageHistory(pastMessages);
+            const chatHistory = new ChatMessageHistory(pastMessages);
             
             memory = new BufferMemory({
                 returnMessages: true,
-                inputKey: "input",
-                outputKey: "output",
-                memoryKey: "history",
-                //conversationHistory: conversationHistory,
+                inputKey: 'input',
+                outputKey: 'output',
+                memoryKey: 'history',
+                //chatHistory: chatHistory,
             });
 
-            currentConversationId = conversationId; */
+            currentChatId = chatId; */
         }
 
         const inputs = {
@@ -116,41 +93,21 @@ const invokeChainWrapper = async ({ conversationId, promptSeed, userName }: { co
         };
 
         const response = await chain.invoke(inputs);
-        console.log('conversationModel', conversationModel);
+        // console.log('chatModel', chatModel);
 
+        if (response && response.lc_kwargs) { // ATTENTION: optional chaining
 
-        if (response && response.additional_kwargs && response.additional_kwargs.function_call) { // ATTENTION: optional chaining
+            // console.log('response', JSON.stringify(response, null, 2));
 
-            const argsString = response.additional_kwargs.function_call.arguments;
-            const argsInsecure = JSON.parse(argsString);
-            const modelResponse = argsInsecure.modelResponse;
-            const topicDetected = argsInsecure.topicDetected;
-            const action = argsInsecure.action;
+            const responseContent = response.lc_kwargs.content;
 
-            await memory.saveContext(
-                {
-                    input: promptSeed,
-                }, { // ATTENTION
-                output: modelResponse,
-            });
-
-            const argsSecure = {
-                modelResponse: modelResponse || 'default modelResponse',
-                topicDetected: topicDetected || 'default topicDetected',
-                action: action || 'default action',
-            };
-            // console.log("argsSecure", argsSecure);
-
-            return argsSecure;
+            return responseContent;
         } else {
             // Handle the case when response is not as expected
             throw new Error('Received an unexpected response format from the chain invocation.');
         }
     } catch (error) {
-        // Log the error or handle it as needed
-        console.error('An error occurred during the query operation:', error);
-        // You could return a default error message or rethrow the error depending on your error handling strategy
-        throw error; // or return a default message like "An error occurred. Please try again."
+        throw new Error(`An operation failed: ${(error as Error).message}`);
     }
 }
 

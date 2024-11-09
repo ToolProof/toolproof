@@ -4,7 +4,7 @@ import admin from 'firebase-admin';
 import { MessageWrite, MessageReadWithoutTimestamp } from 'shared/src/typings';
 
 
-export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, topic: string, newTurnState: number): Promise<MessageReadWithoutTimestamp> => {
+export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, newTurnState: number): Promise<MessageReadWithoutTimestamp> => {
     try {
         const batch = dbAdmin.batch();
         const chatRef = dbAdmin.collection(Constants.chats).doc(chatId);
@@ -14,18 +14,10 @@ export const updateChat = async (chatId: string, aiMessageContent: string, userM
 
         // Add the message
         const messageDocRef = chatRef.collection(Constants.messages).doc();
-        const messageWrite: MessageWrite = { userId: Constants.ChatGPT, content: aiMessageContent, tags: [Constants.test]};
+        const messageWrite: MessageWrite = { userId: Constants.ChatGPT, content: aiMessageContent, isMeta: false, tags: [Constants.test] };
         batch.set(messageDocRef, {
             ...messageWrite,
             timestamp: admin.firestore.Timestamp.now(),
-        });
-
-        // Add the topic
-        const topicDocRef = chatRef.collection(Constants.topics).doc();
-        batch.set(topicDocRef, {
-            topic,
-            description: '',
-            userMessageId: userMessageId,
         });
 
         // Commit the batch

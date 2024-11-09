@@ -5,8 +5,7 @@ import { MessageReadWithoutTimestamp } from 'shared/src/typings';
 import { upsertVectors } from './pineconeHelpers';
 
 interface SendPromptResponse {
-    topicDetected: string;
-    action: string;
+    modelResponse: string;
 }
 
 export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: MessageReadWithoutTimestamp }): Promise<SendPromptResponse> {
@@ -19,25 +18,19 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
 
     try {
 
-        // upsertVectors(chatId, [userMessage]); // ATTENTION: do we need to await this?
-
-        return { topicDetected: 'topicDetected', action: 'action' };
-
-        /* const foo = await chainOrchestrator({ chatId, promptSeed, userName });
+        const foo = await chainOrchestrator({ chatId, promptSeed, userName });
 
         const aiMessageContent = foo.modelResponse;
-        const topicDetected = foo.topicDetected;
-        const action = foo.action;
 
-        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, topicDetected, 1); // ATTENTION: turnState should be decided by the AI
-        
-        upsertVectors(chatId, userMessage, aiMessage); // ATTENTION: do I want to await this?
+        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, 1); // ATTENTION: turnState should be decided by the AI
 
-        return { topicDetected, action }; */
+        upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
+
+        return foo;
     } catch (error) {
         console.error('Error:', error);
         throw new Error(`An operation failed: ${(error as Error).message}`);
     }
-    
+
 }
 
