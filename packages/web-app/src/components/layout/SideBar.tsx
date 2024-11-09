@@ -41,8 +41,8 @@ export default function SideBar() {
                         onChange={(e) => setSelectedOption(e.target.value as CONSTANTS.Option)}
                         className='bg-white border border-gray-300 rounded-md px-4 py-2'
                     >
-                        <option value='Opinions'>{CONSTANTS.endpoint.concept.option}</option>
-                        <option value='Concepts'>{CONSTANTS.endpoint.opinion.option}</option>
+                        <option value={CONSTANTS.endpoint.opinion.option}>{CONSTANTS.endpoint.opinion.option}</option>
+                        <option value={CONSTANTS.endpoint.concept.option}>{CONSTANTS.endpoint.concept.option}</option>
                     </select>
                 </div>
                 <button
