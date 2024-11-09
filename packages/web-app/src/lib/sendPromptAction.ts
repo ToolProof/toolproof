@@ -1,14 +1,14 @@
 'use server';
 import chainOrchestrator from './chains/chainOrchestrator';
 import { updateChat } from './firestoreHelpersServer';
-import { MessageReadWithoutTimestamp } from 'shared/src/typings';
+import { MessageRead } from 'shared/src/typings';
 import { upsertVectors } from './pineconeHelpers';
 
 interface SendPromptResponse {
     modelResponse: string;
 }
 
-export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: MessageReadWithoutTimestamp }): Promise<SendPromptResponse> {
+export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: Omit<MessageRead, 'timestamp'> }): Promise<SendPromptResponse> {
     if (!promptSeed) {
         throw new Error('Prompt is required');
     }

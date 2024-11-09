@@ -1,6 +1,6 @@
 import * as CONSTANTS from 'shared/src/constants';
 import pc from '@/setup/pinecone';
-import { MessageReadWithoutTimestamp } from 'shared/src/typings';
+import { MessageRead } from 'shared/src/typings';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
 const indexName = `${CONSTANTS.openai}-text-embedding-ada-002`; // ATTENTION: hardcoded
@@ -13,17 +13,17 @@ export async function createIndexWrapper() {
         name: indexName,
         dimension: 1536,
         metric: 'cosine',
-        spec: { 
-            serverless: { 
-                cloud: 'aws', 
-                region: 'us-west-2' 
+        spec: {
+            serverless: {
+                cloud: 'aws',
+                region: 'us-west-2'
             }
-        } 
-    }) 
+        }
+    })
 }
 
 
-export async function upsertVectors(chatId: string, messages: MessageReadWithoutTimestamp[]): Promise<void> {
+export async function upsertVectors(chatId: string, messages: Omit<MessageRead, 'timestamp'>[]): Promise<void> {
     const openAIEmbeddings = new OpenAIEmbeddings();
     const index = pc.index(indexName);
 

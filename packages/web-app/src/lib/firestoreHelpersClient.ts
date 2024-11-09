@@ -1,5 +1,5 @@
 import * as CONSTANTS from 'shared/src/constants';
-import { ChatWrite, MessageWrite, ChatRead, MessageRead, MessageReadWithoutTimestamp } from 'shared/src/typings';
+import { ChatWrite, MessageWrite, ChatRead, MessageRead } from 'shared/src/typings';
 import { db } from 'shared/src/firebaseClient';
 import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
@@ -12,7 +12,7 @@ export const addChat = async (chatWrite: ChatWrite) => {
       [CONSTANTS.timestamp]: serverTimestamp(),
     });
     return { chatId: docRef.id };
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
@@ -22,20 +22,20 @@ export const deleteChat = async (chatId: string) => {
   try {
     console.log('Deleting chat with ID:', chatId);
     await deleteDoc(doc(db, CONSTANTS.chats, chatId));
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 
-export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<MessageReadWithoutTimestamp> => {
+export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<Omit<MessageRead, 'timestamp'>> => {
   try {
     const docRef = await addDoc(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), {
       ...messageWrite,
       [CONSTANTS.timestamp]: serverTimestamp(),
     });
     return { id: docRef.id, ...messageWrite };
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     throw new Error('An error occurred while adding message');
   }

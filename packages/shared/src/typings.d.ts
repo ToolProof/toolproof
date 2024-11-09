@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
+
 export interface MessageWrite {
     userId: string;
     content: string;
@@ -7,14 +8,12 @@ export interface MessageWrite {
     tags: string[];   
 }
 
+
 export interface MessageRead extends MessageWrite {
     id: string;
     timestamp: Timestamp;
 }
 
-export interface MessageReadWithoutTimestamp extends MessageWrite {
-    id: string;
-}
 
 export interface ChatWrite {
     userId: string;
@@ -22,16 +21,19 @@ export interface ChatWrite {
     tags: string[];
 }
 
+
 export interface ChatRead extends ChatWrite {
     id: string;
     timestamp: Timestamp;
 }
+
 
 export interface RelatedConceptWrite {
     relatedConceptId: string;
     relationshipId: string; // definition, synonyms, examples, etc.
     userId: string;
 }
+
 
 export interface RelatedConceptRead extends RelatedConceptWrite {
     id: string;

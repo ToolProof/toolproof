@@ -1,10 +1,10 @@
 import * as Constants from 'shared/src/constants';
 import dbAdmin from 'shared/src/firebaseAdmin';
 import admin from 'firebase-admin';
-import { MessageWrite, MessageReadWithoutTimestamp } from 'shared/src/typings';
+import { MessageWrite, MessageRead } from 'shared/src/typings';
 
 
-export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, newTurnState: number): Promise<MessageReadWithoutTimestamp> => {
+export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, newTurnState: number): Promise<Omit<MessageRead, 'timestamp'>> => {
     try {
         const batch = dbAdmin.batch();
         const chatRef = dbAdmin.collection(Constants.chats).doc(chatId);

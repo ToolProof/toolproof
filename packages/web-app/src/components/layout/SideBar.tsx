@@ -1,5 +1,4 @@
 'use client';
-import * as CONSTANTS from 'shared/src/constants';
 import ChatRow from '@/components/layout/ChatRow';
 import { useChats, addChat } from '@/lib/firestoreHelpersClient';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
@@ -7,8 +6,8 @@ import { setUserEmail } from '@/redux/features/configSlice';
 import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
-// import Image from 'next/image'; // ATTENTION
-// import Link from 'next/link'; // ATTENTION
+import Image from 'next/image';
+
 
 export default function SideBar() {
     const { data: session } = useSession();
@@ -17,7 +16,7 @@ export default function SideBar() {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
-    const [selectedOption, setSelectedOption] = useState('Concepts');
+    const [selectedOption, setSelectedOption] = useState('Opinions');
 
     useEffect(() => {
         dispatch(setUserEmail(userEmail));
@@ -58,11 +57,13 @@ export default function SideBar() {
                 </div>
             </div>
             {session && (
-                <img
+                <Image
                     src={session?.user?.image || ''}
                     onClick={() => signOut()}
                     alt='Profile Picture'
                     className='h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50'
+                    width={48} // Adjust the width as needed
+                    height={48} // Adjust the height as needed
                 />
             )}
         </div>
