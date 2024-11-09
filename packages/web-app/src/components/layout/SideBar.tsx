@@ -41,8 +41,8 @@ export default function SideBar() {
                         onChange={(e) => setSelectedOption(e.target.value as CONSTANTS.Option)}
                         className='bg-white border border-gray-300 rounded-md px-4 py-2'
                     >
-                        <option value='Concepts'>{CONSTANTS.endpoint.opinion.option}</option>
                         <option value='Opinions'>{CONSTANTS.endpoint.concept.option}</option>
+                        <option value='Concepts'>{CONSTANTS.endpoint.opinion.option}</option>
                     </select>
                 </div>
                 <button
@@ -53,7 +53,9 @@ export default function SideBar() {
                 </button>
                 <div className='flex flex-col py-4 space-y-2'>
                     {chats.map(chat => (
-                        <ChatRow key={chat.id} chat={chat} selectedOption={selectedOption} />
+                        chat.tags.includes(selectedOption) && (
+                            <ChatRow key={chat.id} chat={chat} selectedOption={selectedOption} />
+                        )
                     ))}
                 </div>
             </div>
