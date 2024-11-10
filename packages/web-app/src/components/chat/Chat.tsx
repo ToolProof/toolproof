@@ -1,7 +1,7 @@
 'use client';
 import ChatDisplay from '@/components/chat/ChatDisplay';
 import ChatInput from '@/components/chat/ChatInput';
-import { useChat } from '@/lib/firestoreHelpersClient';
+import { useChat } from '@/lib/firebaseWebHelpers';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';

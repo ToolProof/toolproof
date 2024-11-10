@@ -1,6 +1,6 @@
 import * as CONSTANTS from 'shared/src/constants';
 import { ChatWrite, MessageWrite, ChatRead, MessageRead } from 'shared/src/typings';
-import { db } from 'shared/src/firebaseClient';
+import { db } from 'shared/src/firebaseInit/firebaseWebInit';
 import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 

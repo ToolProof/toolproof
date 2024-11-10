@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowDownCircleIcon } from '@heroicons/react/24/solid';
 import MessageDisplay from './MessageDisplay';
 import { ChatRead } from 'shared/src/typings';
-import { useMessages } from '@/lib/firestoreHelpersClient';
+import { useMessages } from '@/lib/firebaseWebHelpers';
 
 type Props = {
     chat: ChatRead;

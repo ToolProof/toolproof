@@ -1,5 +1,5 @@
 import * as Constants from 'shared/src/constants';
-import dbAdmin from 'shared/src/firebaseAdmin';
+import dbAdmin from 'shared/src/firebaseInit/firebaseAdminInit';
 import admin from 'firebase-admin';
 import { MessageWrite, MessageRead } from 'shared/src/typings';
 

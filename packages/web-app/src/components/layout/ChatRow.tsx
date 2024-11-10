@@ -1,7 +1,7 @@
 'use client';
 import * as CONSTANTS from 'shared/src/constants';
 import { ChatRead } from 'shared/src/typings';
-import { useMessages, deleteChat } from '@/lib/firestoreHelpersClient';
+import { useMessages, deleteChat } from '@/lib/firebaseWebHelpers';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

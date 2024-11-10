@@ -2,7 +2,7 @@
 // import * as Constants from 'shared/src/constants'
 import { ChatRead } from 'shared/src/typings';
 import sendPromptAction from '@/lib/sendPromptAction';
-import { addMessage } from '@/lib/firestoreHelpersClient';
+import { addMessage } from '@/lib/firebaseWebHelpers';
 import { useAppSelector } from '@/redux/hooks';
 import { useState, useEffect, useRef } from 'react';
 // import { toast } from 'react-hot-toast';

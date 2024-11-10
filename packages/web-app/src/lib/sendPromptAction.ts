@@ -1,6 +1,6 @@
 'use server';
 import chainOrchestrator from './chains/chainOrchestrator';
-import { updateChat } from './firestoreHelpersServer';
+import { updateChat } from './firebaseAdminHelpers';
 import { MessageRead } from 'shared/src/typings';
 import { upsertVectors } from './pineconeHelpers';
 

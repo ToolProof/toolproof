@@ -1,7 +1,7 @@
 'use client';
 import * as CONSTANTS from 'shared/src/constants';
 import ChatRow from '@/components/layout/ChatRow';
-import { useChats, addChat } from '@/lib/firestoreHelpersClient';
+import { useChats, addChat } from '@/lib/firebaseWebHelpers';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setUserEmail } from '@/redux/features/configSlice';
 import { useEffect, useState } from 'react';
