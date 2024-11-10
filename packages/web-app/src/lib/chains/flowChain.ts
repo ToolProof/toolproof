@@ -56,7 +56,7 @@ const chain = RunnableSequence.from([
 const invokeChainWrapper = async ({ chatId, promptSeed, userName }: { chatId: string; promptSeed: string; userName: string }) => {
 
     try {
-        // Check if a new chat has started or the existing one continues // ATTENTION: there'll never be a new chat
+        // Check if a new chat has started or the existing one continues
         if (currentChatId !== chatId) {
             /* console.log('Are we here?')
             
