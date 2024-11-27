@@ -63,6 +63,10 @@ const finalState = await graph.invoke({
 });
 console.log(finalState.messages[finalState.messages.length - 1].content);
 
+*/
+
+/*
+
 const nextState = await graph.invoke({
     // Including the messages from the previous run gives the LLM context.
     // This way it knows we're asking about the weather in NY
