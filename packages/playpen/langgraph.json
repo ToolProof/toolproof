@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "localAgent": "./src/agent.ts:graph"
+      "infiniteChat": "./src/infiniteChat.ts:graph"
     },
     "env": ".env"
   }
