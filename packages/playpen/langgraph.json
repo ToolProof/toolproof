@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "infiniteChat": "./src/tests/customerSupport.ts:graph"
+      "customerSupport": "./src/tests/customerSupport.ts:graph"
     },
     "env": ".env"
   }
