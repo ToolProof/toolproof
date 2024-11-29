@@ -77,7 +77,7 @@ Help the user to the best of your ability, but be concise in your responses.`;
   let trimmedHistory = state.messages;
   // Make the user's question the most recent message in the history.
   // This helps small models stay focused.
-  if (trimmedHistory.at(-1)._getType() === "ai") {
+  if (trimmedHistory.at(-1)?._getType() === "ai") {
     trimmedHistory = trimmedHistory.slice(0, -1);
   }
 
@@ -137,7 +137,7 @@ Help the user to the best of your ability, but be concise in your responses.`;
   let trimmedHistory = state.messages;
   // Make the user's question the most recent message in the history.
   // This helps small models stay focused.
-  if (trimmedHistory.at(-1)._getType() === "ai") {
+  if (trimmedHistory.at(-1)?._getType() === "ai") {
     trimmedHistory = trimmedHistory.slice(0, -1);
   }
 
