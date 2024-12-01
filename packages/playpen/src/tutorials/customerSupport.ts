@@ -1,5 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { ChatTogetherAI } from "@langchain/community/chat_models/togetherai";
 import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
+import { HumanMessage } from "@langchain/core/messages";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { StateGraph } from "@langchain/langgraph";
@@ -24,10 +27,12 @@ You can chat with customers and help them with basic questions, but if the custo
 do not try to answer the question directly or gather information.
 Instead, immediately transfer them to the billing or technical team by asking the user to hold for a moment.
 Otherwise, just respond conversationally.`;
-  const supportResponse = model.invoke([
+  const supportResponse = await model.invoke([
     { role: "system", content: SYSTEM_TEMPLATE },
     ...state.messages,
   ]);
+
+  // console.log("state.messages", JSON.stringify(state.messages, null, 2));
 
   const CATEGORIZATION_SYSTEM_TEMPLATE = `You are an expert customer support routing system.
 Your job is to detect whether a customer support representative is routing a user to a billing team or a technical team, or if they are just responding conversationally.`;
@@ -132,7 +137,7 @@ ${billingRepResponse.content}
 const technicalSupport = async (state: typeof StateAnnotation.State) => {
   const SYSTEM_TEMPLATE =
     `You are an expert at diagnosing technical computer issues. You work for a company called LangCorp that sells computers.
-Help the user to the best of your ability, but be concise in your responses.`;
+Help the user to the best of your ability, but be concise in your responses. Always answer in Spanish.`;
 
   let trimmedHistory = state.messages;
   // Make the user's question the most recent message in the history.
@@ -177,24 +182,24 @@ let builder = new StateGraph(StateAnnotation)
   .addEdge("__start__", "initial_support");
 
 
-  builder = builder.addConditionalEdges("initial_support", async (state: typeof StateAnnotation.State) => {
-    if (state.nextRepresentative.includes("BILLING")) {
-      return "billing";
-    } else if (state.nextRepresentative.includes("TECHNICAL")) {
-      return "technical";
-    } else {
-      return "conversational";
-    }
-  }, {
-    billing: "billing_support",
-    technical: "technical_support",
-    conversational: "__end__",
-  });
-  
-  console.log("Added edges!");
+builder = builder.addConditionalEdges("initial_support", async (state: typeof StateAnnotation.State) => {
+  if (state.nextRepresentative.includes("BILLING")) {
+    return "billing";
+  } else if (state.nextRepresentative.includes("TECHNICAL")) {
+    return "technical";
+  } else {
+    return "conversational";
+  }
+}, {
+  billing: "billing_support",
+  technical: "technical_support",
+  conversational: "__end__",
+});
+
+console.log("Added edges!");
 
 
-  builder = builder
+builder = builder
   .addEdge("technical_support", "__end__")
   .addConditionalEdges("billing_support", async (state) => {
     if (state.nextRepresentative.includes("REFUND")) {
@@ -215,6 +220,25 @@ import { MemorySaver } from "@langchain/langgraph";
 
 const checkpointer = new MemorySaver();
 
-export const graph = builder.compile({
+const graph = builder.compile({
   checkpointer,
 });
+
+const stream = await graph.stream({
+  messages: [
+    {
+      role: "user",
+      content: "I've changed my mind and I want a refund for order #182818!",
+    }
+  ]
+}, {
+  configurable: {
+    thread_id: "refund_testing_id",
+  }
+});
+
+for await (const value of stream) {
+  console.log("---STEP---");
+  console.log(value);
+  console.log("---END STEP---");
+}
