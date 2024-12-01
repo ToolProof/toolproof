@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "infiniteChat": "./src/infiniteChat.ts:graph"
+      "devilsAdvocate": "./src/devilsAdvocate.ts:graph"
     },
     "env": ".env"
   }

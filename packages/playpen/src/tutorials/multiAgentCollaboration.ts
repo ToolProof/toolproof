@@ -1,50 +1,50 @@
 import {
-    ChatPromptTemplate,
-    MessagesPlaceholder,
-  } from "@langchain/core/prompts";
-  import { StructuredTool } from "@langchain/core/tools";
-  import { convertToOpenAITool } from "@langchain/core/utils/function_calling";
-  import { Runnable } from "@langchain/core/runnables";
-  import { ChatOpenAI } from "@langchain/openai";
-  
-  /**
-   * Create an agent that can run a set of tools.
-   */
-  async function createAgent({
-    llm,
-    tools,
-    systemMessage,
-  }: {
-    llm: ChatOpenAI;
-    tools: StructuredTool[];
-    systemMessage: string;
-  }): Promise<Runnable> {
-    const toolNames = tools.map((tool) => tool.name).join(", ");
-    const formattedTools = tools.map((t) => convertToOpenAITool(t));
-  
-    let prompt = ChatPromptTemplate.fromMessages([
-      [
-        "system",
-        "You are a helpful AI assistant, collaborating with other assistants." +
-        " Use the provided tools to progress towards answering the question." +
-        " If you are unable to fully answer, that's OK, another assistant with different tools " +
-        " will help where you left off. Execute what you can to make progress." +
-        " If you or any of the other assistants have the final answer or deliverable," +
-        " prefix your response with FINAL ANSWER so the team knows to stop." +
-        " You have access to the following tools: {tool_names}.\n{system_message}",
-      ],
-      new MessagesPlaceholder("messages"),
-    ]);
-    prompt = await prompt.partial({
-      system_message: systemMessage,
-      tool_names: toolNames,
-    });
-  
-    return prompt.pipe(llm.bind({ tools: formattedTools }));
-  }
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import { StructuredTool } from "@langchain/core/tools";
+import { convertToOpenAITool } from "@langchain/core/utils/function_calling";
+import { Runnable } from "@langchain/core/runnables";
+import { ChatOpenAI } from "@langchain/openai";
+
+/**
+ * Create an agent that can run a set of tools.
+ */
+async function createAgent({
+  llm,
+  tools,
+  systemMessage,
+}: {
+  llm: ChatOpenAI;
+  tools: StructuredTool[];
+  systemMessage: string;
+}): Promise<Runnable> {
+  const toolNames = tools.map((tool) => tool.name).join(", ");
+  const formattedTools = tools.map((t) => convertToOpenAITool(t));
+
+  let prompt = ChatPromptTemplate.fromMessages([
+    [
+      "system",
+      "You are a helpful AI assistant, collaborating with other assistants." +
+      " Use the provided tools to progress towards answering the question." +
+      " If you are unable to fully answer, that's OK, another assistant with different tools " +
+      " will help where you left off. Execute what you can to make progress." +
+      " If you or any of the other assistants have the final answer or deliverable," +
+      " prefix your response with FINAL ANSWER so the team knows to stop." +
+      " You have access to the following tools: {tool_names}.\n{system_message}",
+    ],
+    new MessagesPlaceholder("messages"),
+  ]);
+  prompt = await prompt.partial({
+    system_message: systemMessage,
+    tool_names: toolNames,
+  });
+
+  return prompt.pipe(llm.bind({ tools: formattedTools }));
+}
 
 
-  import { BaseMessage } from "@langchain/core/messages";
+import { BaseMessage } from "@langchain/core/messages";
 import { Annotation } from "@langchain/langgraph";
 
 // This defines the object that is passed between each node
@@ -266,7 +266,7 @@ import { END, START, StateGraph } from "@langchain/langgraph";
 
 // 1. Create the graph
 const workflow = new StateGraph(AgentState)
-   // 2. Add the nodes; these will do the work
+  // 2. Add the nodes; these will do the work
   .addNode("Researcher", researchNode)
   .addNode("ChartGenerator", chartNode)
   .addNode("call_tool", toolNode);
@@ -306,39 +306,39 @@ const graph = workflow.compile();
 
 
 const streamResults = await graph.stream(
-    {
-      messages: [
-        new HumanMessage({
-          content: "Generate a bar chart of the US gdp over the past 3 years.",
-        }),
-      ],
-    },
-    { recursionLimit: 150 },
-  );
-  
-  const prettifyOutput = (output: Record<string, any>) => {
-    const keys = Object.keys(output);
-    const firstItem = output[keys[0]];
-  
-    if ("messages" in firstItem && Array.isArray(firstItem.messages)) {
-      const lastMessage = firstItem.messages[firstItem.messages.length - 1];
-      console.dir({
-        type: lastMessage._getType(),
-        content: lastMessage.content,
-        tool_calls: lastMessage.tool_calls,
-      }, { depth: null });
-    }
-  
-    if ("sender" in firstItem) {
-      console.log({
-        sender: firstItem.sender,
-      })
-    }
+  {
+    messages: [
+      new HumanMessage({
+        content: "Generate a bar chart of the US gdp over the past 3 years.",
+      }),
+    ],
+  },
+  { recursionLimit: 150 },
+);
+
+const prettifyOutput = (output: Record<string, any>) => {
+  const keys = Object.keys(output);
+  const firstItem = output[keys[0]];
+
+  if ("messages" in firstItem && Array.isArray(firstItem.messages)) {
+    const lastMessage = firstItem.messages[firstItem.messages.length - 1];
+    console.dir({
+      type: lastMessage._getType(),
+      content: lastMessage.content,
+      tool_calls: lastMessage.tool_calls,
+    }, { depth: null });
   }
-  
-  for await (const output of await streamResults) {
-    if (!output?.__end__) {
-      prettifyOutput(output);
-      console.log("----");
-    }
+
+  if ("sender" in firstItem) {
+    console.log({
+      sender: firstItem.sender,
+    })
   }
+}
+
+for await (const output of await streamResults) {
+  if (!output?.__end__) {
+    prettifyOutput(output);
+    console.log("----");
+  }
+}

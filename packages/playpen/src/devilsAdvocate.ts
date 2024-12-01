@@ -1,4 +1,8 @@
 import { StateGraph, MessagesAnnotation } from "@langchain/langgraph";
+import {
+    ChatPromptTemplate,
+    MessagesPlaceholder,
+} from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 
 const model = new ChatOpenAI({
@@ -6,9 +10,20 @@ const model = new ChatOpenAI({
     temperature: 0,
 });
 
+let prompt = ChatPromptTemplate.fromMessages([
+    [
+        "system",
+        "Your role is to play devil's advocate with the user.",
+    ],
+    new MessagesPlaceholder("messages"),
+]);
+
 
 const callModel = async (state: typeof MessagesAnnotation.State) => {
-    const response = await model.invoke(state.messages);
+
+    const chain = prompt.pipe(model);
+
+    const response = await chain.invoke(state);
 
     return { messages: [response] };
 }
@@ -17,6 +32,7 @@ const callModel = async (state: typeof MessagesAnnotation.State) => {
 const stateGraph = new StateGraph(MessagesAnnotation)
     .addNode("agent", callModel)
     .addEdge("__start__", "agent")
+
 
 
 export const graph = stateGraph.compile();
