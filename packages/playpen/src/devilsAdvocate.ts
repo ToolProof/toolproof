@@ -13,7 +13,7 @@ const model = new ChatOpenAI({
 let prompt = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your role is to play devil's advocate with the user.",
+        "Your role is to play devil's advocate with the user and challenge everything they say.",
     ],
     new MessagesPlaceholder("messages"),
 ]);
