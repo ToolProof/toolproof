@@ -5,10 +5,10 @@ import { Client } from "@langchain/langgraph-sdk";
 import { RemoteGraph } from "@langchain/langgraph/remote";
 
 
-const url = `https://toolproof-61ce0c80091e59b28999e161e82c61e1.default.us.langgraph.app`;
+const url = `https://devils-advocate-7b5597e2a7f45cb09ae9859794109061.default.us.langgraph.app`;
 const graphName = "agent";
 const client = new Client({
-    apiUrl: "https://toolproof-61ce0c80091e59b28999e161e82c61e1.default.us.langgraph.app",
+    apiUrl: url,
 });
 const remoteGraph = new RemoteGraph({ graphId: graphName, url });
 

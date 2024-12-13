@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "devilsAdvocate": "./src/devilsAdvocate.ts:graph"
+      "swedishPal": "./src/swedishPal.ts:graph"
     },
     "env": ".env"
   }
