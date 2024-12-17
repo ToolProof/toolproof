@@ -1,12 +1,9 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import { Client } from "@langchain/langgraph-sdk";
 import { RemoteGraph } from "@langchain/langgraph/remote";
 
 
-const url = `https://devils-advocate-7b5597e2a7f45cb09ae9859794109061.default.us.langgraph.app`;
-const graphName = "agent";
+const url = `https://swedish-pal-fd21683e4d295b9cbaa6b41412dfe328.default.us.langgraph.app`;
+const graphName = "swedishPal";
 const client = new Client({
     apiUrl: url,
 });
@@ -18,7 +15,7 @@ const thread = await client.threads.create();
 // invoke the graph with the thread config
 const config = { configurable: { thread_id: thread.thread_id }};
 const result = await remoteGraph.invoke({
-  messages: [{ role: "user", content: "What's the weather in KL?" }],
+  messages: [{ role: "user", content: "Who was the youngest member of The Beatles?" }],
 }, config);
 
 // verify that the state was persisted to the thread
