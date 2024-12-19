@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "agent": "./src/soria-moria/agent.ts:graph"
+      "agent": "./src/soria-moria/agent2.ts:graph"
     },
     "env": ".env"
   }

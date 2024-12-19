@@ -2,7 +2,7 @@
   "name": "toolproof",
   "workspaces": [
     "packages/web-app",
-    "packages/playroom",
+    "packages/graphs",
     "packages/shared"
   ],
   "scripts": {
