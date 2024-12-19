@@ -1,9 +1,9 @@
 'use server';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
-import { Client } from "@langchain/langgraph-sdk";
-import { RemoteGraph } from "@langchain/langgraph/remote";
+import { Client } from '@langchain/langgraph-sdk';
+import { RemoteGraph } from '@langchain/langgraph/remote';
 
 import { updateChat } from './firebaseAdminHelpers';
 import { MessageRead } from 'shared/src/typings';
@@ -14,7 +14,7 @@ interface SendPromptResponse {
 }
 
 const url = `https://spanish-pal-bf20aef1d10a52d1b8b04c76757c90f5.default.us.langgraph.app`;
-const graphName = "agent";
+const graphName = 'agent';
 const client = new Client({
     apiUrl: url,
 });
@@ -38,7 +38,7 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
     try {
 
         const result = await remoteGraph.invoke({
-            messages: [{ role: "user", content: promptSeed }],
+            messages: [{ role: 'user', content: promptSeed }],
         }, config);
 
         // console.log(result);
