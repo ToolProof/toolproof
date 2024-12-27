@@ -1,64 +1,28 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import { Client } from '@langchain/langgraph-sdk';
-import { RemoteGraph } from '@langchain/langgraph/remote';
+import { Client } from "@langchain/langgraph-sdk";
+import { RemoteGraph } from "@langchain/langgraph/remote";
 
-const url = `https://european-pals-2c35c0cc124551a6894f8a02afc3522b.default.us.langgraph.app`;
+
+const url = `https://toolproof-61ce0c80091e59b28999e161e82c61e1.default.us.langgraph.app`;
+const graphName = "agent";
 const client = new Client({
-    apiUrl: url,
+    apiUrl: "https://toolproof-61ce0c80091e59b28999e161e82c61e1.default.us.langgraph.app",
 });
-
-const spanishPal = new RemoteGraph({ graphId: 'spanishPal', url });
-const swedishPal = new RemoteGraph({ graphId: 'swedishPal', url });
+const remoteGraph = new RemoteGraph({ graphId: graphName, url });
 
 // create a thread (or use an existing thread instead)
 const thread = await client.threads.create();
 
 // invoke the graph with the thread config
-const config = { configurable: { thread_id: thread.thread_id } };
+const config = { configurable: { thread_id: thread.thread_id }};
+const result = await remoteGraph.invoke({
+  messages: [{ role: "user", content: "What's the weather in KL?" }],
+}, config);
 
-export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: Omit<MessageRead, 'timestamp'> }): Promise<SendPromptResponse> {
-    if (!promptSeed) {
-        throw new Error('Prompt is required');
-    }
-    if (!chatId) {
-        throw new Error('Chat ID is required');
-    }
+// verify that the state was persisted to the thread
+/* const threadState = await remoteGraph.getState(config);
+console.log(threadState); */
 
-    try {
-
-        let result;
-
-        if (promptSeed.includes('?')) {
-            result = await spanishPal.invoke({
-                messages: [{ role: 'user', content: promptSeed }],
-            }, config);
-        } else {
-            result = await swedishPal.invoke({
-                messages: [{ role: 'user', content: promptSeed }],
-            }, config);
-        }
-
-        // console.log(result);
-
-        const messagesLength = result.messages.length;
-
-        const usageMetadata = result.messages[messagesLength - 1].usage_metadata;
-
-        console.log('Usage metadata:', JSON.stringify(usageMetadata));
-
-        const aiMessageContent = result.messages[messagesLength - 1].content;
-
-        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, 1); // ATTENTION: turnState should be decided by the AI
-
-        upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
-
-        return { modelResponse: aiMessageContent };
-    } catch (error) {
-        console.error('Error:', error);
-        throw new Error(`An operation failed: ${(error as Error).message}`);
-    }
-
-}
-
+console.log(result);
