@@ -1,17 +1,8 @@
-'use server';
 import dotenv from 'dotenv';
 dotenv.config();
 
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
-
-import { MessageRead } from 'shared/src/typings';
-import { updateChat } from './firebaseAdminHelpers';
-import { upsertVectors } from './pineconeHelpers';
-
-interface SendPromptResponse {
-    modelResponse: string;
-}
 
 const url = `https://european-pals-2c35c0cc124551a6894f8a02afc3522b.default.us.langgraph.app`;
 const client = new Client({

@@ -3,8 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "spanishPal": "./src/soria-moria/spanishPal.ts:graph",
-      "swedishPal": "./src/soria-moria/swedishPal.ts:graph"
+      "test": "./src/soria-moria/test.ts:graph"
     },
     "env": ".env"
   }

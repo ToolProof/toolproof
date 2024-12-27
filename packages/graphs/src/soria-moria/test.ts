@@ -10,18 +10,20 @@ const model = new ChatOpenAI({
     temperature: 0,
 });
 
-let prompt = ChatPromptTemplate.fromMessages([
+let chatPromptTemplate = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your role is to answer the user in Spanish, no matter what language the user uses.",
+        "Your job is to output a yellowpaper on how to cure and prevent {disease}.",
     ],
     new MessagesPlaceholder("messages"),
 ]);
 
 
 const callModel = async (state: typeof MessagesAnnotation.State) => {
+   
+    console.log("state", JSON.stringify(state, null, 2));
 
-    const chain = prompt.pipe(model);
+    const chain = chatPromptTemplate.pipe(model);
 
     const response = await chain.invoke(state);
 
@@ -30,8 +32,8 @@ const callModel = async (state: typeof MessagesAnnotation.State) => {
 
 
 const stateGraph = new StateGraph(MessagesAnnotation)
-    .addNode("agent", callModel)
-    .addEdge("__start__", "agent")
+    .addNode("output", callModel)
+    .addEdge("__start__", "output")
 
 
 
