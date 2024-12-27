@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --loader ts-node/esm src/soria-moria/client.ts"
+    "start": "node --loader ts-node/esm src/soria-moria/testClient.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@langchain/core": "^0.3.24",
-    "@langchain/langgraph": "^0.2.34",
+    "@langchain/langgraph": "^0.2.36",
     "@langchain/langgraph-sdk": "^0.0.32",
     "@langchain/openai": "^0.3.14",
     "dotenv": "^16.4.7"

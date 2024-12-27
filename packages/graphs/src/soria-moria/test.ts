@@ -1,4 +1,4 @@
-import { StateGraph, MessagesAnnotation } from "@langchain/langgraph";
+import { StateGraph, Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import {
     ChatPromptTemplate,
     MessagesPlaceholder,
@@ -13,28 +13,51 @@ const model = new ChatOpenAI({
 let chatPromptTemplate = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to output a yellowpaper on how to cure and prevent {disease}.",
+        "Your job is to output a yellopaper, based on your general knowledge, for how to {goal} {disease}.", // ATTENTION: disease could be generalized
     ],
     new MessagesPlaceholder("messages"),
 ]);
 
+const StateWithParameter = Annotation.Root({
+    ...MessagesAnnotation.spec, // Spread in the messages state
+    goal: Annotation<"cure" | "prevent">(),
+    disease: Annotation<string>(),
+});
 
-const callModel = async (state: typeof MessagesAnnotation.State) => {
-   
-    console.log("state", JSON.stringify(state, null, 2));
+const inputNode = async (state: typeof StateWithParameter) => {
+    console.log("inputNode state before update:", state);
+    const newState = { ...state, goal: "cure", disease: "Diabetes Type 2" };
+    console.log("inputNode state after update:", newState);
+    return newState;
+};
+
+const outputNode = async (state: typeof StateWithParameter) => {
+    // ATTENTION: goal and disease are not propagated to outputNode
+    // console.log("outputNode received state:", state);
 
     const chain = chatPromptTemplate.pipe(model);
 
-    const response = await chain.invoke(state);
-
-    return { messages: [response] };
-}
+    try {
+        const response = await chain.invoke({
+            ...state,
+            goal: "cure", // ATTENTION: hardcoded for now
+            disease: "Dementia Lewy Body", // ATTENTION: hardcoded for now
+        });
+        // console.log("Model response:", response);
+        return { messages: [response] };
+    } catch (error) {
+        console.error("Error invoking model:", error);
+        throw error;
+    }
+};
 
 
 const stateGraph = new StateGraph(MessagesAnnotation)
-    .addNode("output", callModel)
-    .addEdge("__start__", "output")
-
+    // .addNode("inputNode", inputNode)
+    .addNode("outputNode", outputNode)
+    // .addEdge("__start__", "inputNode")
+    // .addEdge("inputNode", "outputNode")
+    .addEdge("__start__", "outputNode")
 
 
 export const graph = stateGraph.compile();
