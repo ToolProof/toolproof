@@ -25,7 +25,7 @@ export default function Home() {
         <button
           onClick={async () => {
             const response = await sendPromptAction({
-              chatId: '1',
+              chatId: '123456',
               promptSeed: 'What is the meaning of life?',
               userName: 'Test User'
             });

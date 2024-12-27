@@ -4,10 +4,12 @@ dotenv.config();
 
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
-
 import { MessageRead } from 'shared/src/typings';
-import { updateChat } from './firebaseAdminHelpers';
+import { updateChat, uploadFileToStorage } from './firebaseAdminHelpers';
 import { upsertVectors } from './pineconeHelpers';
+
+import fs from 'fs';
+import path from 'path';
 
 interface SendPromptResponse {
     modelResponse: string;
@@ -53,6 +55,25 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
         // upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
 
         // How do I save aiMessageContent to an .md file and upload the file to GCP Cloud Storage?
+
+        // Determine the appropriate directory for temporary files
+        const isVercel = process.env.VERCEL === '1' && false;
+        const tempDir = isVercel ? '/tmp' : path.join(process.env.TEMP || 'C:\\temp');
+
+        // Ensure the directory exists in development
+        if (!isVercel && !fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true });
+        }
+
+        // Step 1: Save aiMessageContent to a .md file
+        const fileName = `${chatId}.md`;
+        const filePath = path.join(tempDir, fileName);
+        fs.writeFileSync(filePath, aiMessageContent);
+
+        // Step 2: Upload the file to GCP Cloud Storage
+        await uploadFileToStorage(filePath, fileName);
+        
+        console.log('File uploaded to GCP Cloud Storage:', fileName);
 
         return { modelResponse: aiMessageContent };
     } catch (error) {

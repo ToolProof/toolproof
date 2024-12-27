@@ -1,6 +1,7 @@
 import * as Constants from 'shared/src/constants';
 import dbAdmin from 'shared/src/firebaseInit/firebaseAdminInit';
 import admin from 'firebase-admin';
+import { Storage, UploadResponse } from '@google-cloud/storage';
 import { MessageWrite, MessageRead } from 'shared/src/typings';
 
 
@@ -31,9 +32,12 @@ export const updateChat = async (chatId: string, aiMessageContent: string, userM
 
 
 
-export const uploadFileToStorage = async () => {
+export const uploadFileToStorage = (localFilePath: string, remoteFilePath: string): Promise<UploadResponse> => {
 
-}
+    const storage = new Storage();
+
+    return storage.bucket('toolproof-yellowpapers').upload(localFilePath, { destination: remoteFilePath });
+};
 
 
 
