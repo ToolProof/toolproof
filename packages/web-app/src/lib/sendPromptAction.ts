@@ -13,13 +13,12 @@ interface SendPromptResponse {
     modelResponse: string;
 }
 
-const url = `https://european-pals-2c35c0cc124551a6894f8a02afc3522b.default.us.langgraph.app`;
+const url = `https://soria-moria-7d184b0bf5fe520bac52d32d73931339.default.us.langgraph.app`;
 const client = new Client({
     apiUrl: url,
 });
 
-const spanishPal = new RemoteGraph({ graphId: 'spanishPal', url });
-const swedishPal = new RemoteGraph({ graphId: 'swedishPal', url });
+const test = new RemoteGraph({ graphId: 'test', url });
 
 // create a thread (or use an existing thread instead)
 const thread = await client.threads.create();
@@ -27,7 +26,7 @@ const thread = await client.threads.create();
 // invoke the graph with the thread config
 const config = { configurable: { thread_id: thread.thread_id } };
 
-export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage: Omit<MessageRead, 'timestamp'> }): Promise<SendPromptResponse> {
+export default async function sendPromptAction({ chatId, promptSeed, userName, userMessage }: { chatId: string, promptSeed: string; userName: string, userMessage?: Omit<MessageRead, 'timestamp'> }): Promise<SendPromptResponse> {
     if (!promptSeed) {
         throw new Error('Prompt is required');
     }
@@ -37,19 +36,9 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
 
     try {
 
-        let result;
-
-        if (promptSeed.includes('?')) {
-            result = await spanishPal.invoke({
-                messages: [{ role: 'user', content: promptSeed }],
-            }, config);
-        } else {
-            result = await swedishPal.invoke({
-                messages: [{ role: 'user', content: promptSeed }],
-            }, config);
-        }
-
-        // console.log(result);
+        const result = await test.invoke({
+            messages: [{ role: 'user', content: '' }],
+        }, config);
 
         const messagesLength = result.messages.length;
 
@@ -59,9 +48,11 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
 
         const aiMessageContent = result.messages[messagesLength - 1].content;
 
-        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, 1); // ATTENTION: turnState should be decided by the AI
+        // const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, 1); // ATTENTION: turnState should be decided by the AI
 
-        upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
+        // upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
+
+        // How do I save aiMessageContent to an .md file and upload the file to GCP Cloud Storage?
 
         return { modelResponse: aiMessageContent };
     } catch (error) {

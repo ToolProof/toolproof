@@ -1,5 +1,4 @@
 'use client';
-import * as CONSTANTS from 'shared/src/constants';
 import ChatRow from '@/components/layout/ChatRow';
 import { useChats, addChat } from '@/lib/firebaseWebHelpers';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
@@ -17,7 +16,7 @@ export default function SideBar() {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
-    const [selectedOption, setSelectedOption] = useState<CONSTANTS.Option>(CONSTANTS.endpoint.opinion.option);
+    const [selectedOption, setSelectedOption] = useState<string>('');
 
     useEffect(() => {
         dispatch(setUserEmail(userEmail));
@@ -26,23 +25,24 @@ export default function SideBar() {
     const handleAddChat = async () => {
         const result = await addChat({ userId: userEmail, turnState: 0, tags: [selectedOption] });
         if (result && result.chatId) {
-            router.push(`/${CONSTANTS.mapOptionToName(selectedOption)}/${result.chatId}`);
+            router.push(`${result.chatId}`);
         }
     }
 
     if (!isApproved) return <div />
 
     return (
+        false && // ATTENTION
         <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
             <div className='flex-1'>
                 <div className='flex justify-center py-4'>
                     <select
                         value={selectedOption}
-                        onChange={(e) => setSelectedOption(e.target.value as CONSTANTS.Option)}
+                        onChange={(e) => setSelectedOption(e.target.value)}
                         className='bg-white border border-gray-300 rounded-md px-4 py-2'
                     >
-                        <option value={CONSTANTS.endpoint.opinion.option}>{CONSTANTS.endpoint.opinion.option}</option>
-                        <option value={CONSTANTS.endpoint.concept.option}>{CONSTANTS.endpoint.concept.option}</option>
+                        <option value={'Alfa'}>Alfa</option>
+                        <option value={'Beta'}>Beta</option>
                     </select>
                 </div>
                 <button

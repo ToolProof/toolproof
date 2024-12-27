@@ -1,5 +1,4 @@
 'use client';
-import * as CONSTANTS from 'shared/src/constants';
 import { ChatRead } from 'shared/src/typings';
 import { useMessages, deleteChat } from '@/lib/firebaseWebHelpers';
 import { useState, useEffect } from 'react';
@@ -9,13 +8,13 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 
 type Props = {
     chat: ChatRead;
-    selectedOption: CONSTANTS.Option;
+    selectedOption: string;
 }
 
 export default function ChatRow({ chat, selectedOption }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `/${CONSTANTS.mapOptionToName(selectedOption)}/${chat.id}`;
+    const href = `${chat.id}`;
     const { messages } = useMessages(chat.id);
 
     useEffect(() => {

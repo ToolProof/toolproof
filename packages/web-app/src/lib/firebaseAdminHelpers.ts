@@ -31,5 +31,11 @@ export const updateChat = async (chatId: string, aiMessageContent: string, userM
 
 
 
+export const uploadFileToStorage = async () => {
+
+}
+
+
+
 
 
