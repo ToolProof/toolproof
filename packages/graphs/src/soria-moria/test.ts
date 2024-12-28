@@ -10,39 +10,58 @@ const model = new ChatOpenAI({
     temperature: 0,
 });
 
-let chatPromptTemplate = ChatPromptTemplate.fromMessages([
-    [
-        "system",
-        "Your job is to output a yellopaper, based on your general knowledge, for how to {goal} {disease}.", // ATTENTION: disease could be generalized
-    ],
-    new MessagesPlaceholder("messages"),
-]);
 
-const StateWithParameter = Annotation.Root({
+const State = Annotation.Root({
     ...MessagesAnnotation.spec, // Spread in the messages state
     goal: Annotation<"cure" | "prevent">(),
     disease: Annotation<string>(),
 });
 
-const inputNode = async (state: typeof StateWithParameter) => {
-    console.log("inputNode state before update:", state);
-    const newState = { ...state, goal: "cure", disease: "Diabetes Type 2" };
-    console.log("inputNode state after update:", newState);
-    return newState;
-};
 
-const outputNode = async (state: typeof StateWithParameter) => {
-    // ATTENTION: goal and disease are not propagated to outputNode
-    // console.log("outputNode received state:", state);
+const chatPromptTemplateContent = ChatPromptTemplate.fromMessages([
+    [
+        "system",
+        "Your job is to output everything you know about how to {goal} {disease}.", // ATTENTION: disease could be generalized
+    ],
+    // new MessagesPlaceholder("messages"),
+]);
 
-    const chain = chatPromptTemplate.pipe(model);
+const chatPromptTemplateStructure = ChatPromptTemplate.fromMessages([
+    [
+        "system",
+        "Your job is to output a technical yellopaper, in Swedish, based on the content of the previous message.",
+    ],
+    new MessagesPlaceholder<typeof State['spec']>("messages"),
+]);
+
+const contentNode = async (state: typeof State) => {
+
+    console.log("chatPromptTemplateContent:", JSON.stringify(chatPromptTemplateContent));
+
+    const chain = chatPromptTemplateContent.pipe(model);
 
     try {
         const response = await chain.invoke({
             ...state,
             goal: "cure", // ATTENTION: hardcoded for now
-            disease: "Dementia Lewy Body", // ATTENTION: hardcoded for now
+            disease: "Diabetes Type 1", // ATTENTION: hardcoded for now
         });
+        // console.log("Model response:", response);
+        return { messages: [response] };
+    } catch (error) {
+        console.error("Error invoking model:", error);
+        throw error;
+    }
+};
+
+const structureNode = async (state: typeof State) => {
+    // ATTENTION: goal and disease are not propagated to structureNode
+    // console.log("structureNode received state:", state);
+
+    const chain = chatPromptTemplateStructure.pipe(model);
+
+    try {
+        const response = await chain.invoke(state);
         // console.log("Model response:", response);
         return { messages: [response] };
     } catch (error) {
@@ -53,11 +72,10 @@ const outputNode = async (state: typeof StateWithParameter) => {
 
 
 const stateGraph = new StateGraph(MessagesAnnotation)
-    // .addNode("inputNode", inputNode)
-    .addNode("outputNode", outputNode)
-    // .addEdge("__start__", "inputNode")
-    // .addEdge("inputNode", "outputNode")
-    .addEdge("__start__", "outputNode")
+    .addNode("contentNode", contentNode)
+    .addNode("structureNode", structureNode)
+    .addEdge("__start__", "contentNode")
+    .addEdge("contentNode", "structureNode")
 
 
 export const graph = stateGraph.compile();
