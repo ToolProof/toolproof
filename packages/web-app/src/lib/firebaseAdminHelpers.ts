@@ -1,5 +1,5 @@
 import * as Constants from 'shared/src/constants';
-import dbAdmin from 'shared/src/firebaseInit/firebaseAdminInit';
+import dbAdmin from 'shared/src/firebaseAdminInit';
 import admin from 'firebase-admin';
 import { Storage, UploadResponse } from '@google-cloud/storage';
 import { MessageWrite, MessageRead } from 'shared/src/typings';

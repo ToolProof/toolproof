@@ -1,6 +1,6 @@
 import * as CONSTANTS from 'shared/src/constants';
 import { ChatWrite, MessageWrite, ChatRead, MessageRead } from 'shared/src/typings';
-import { db } from 'shared/src/firebaseInit/firebaseWebInit';
+import { db } from '@/lib/firebaseWebInit';
 import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 
@@ -98,3 +98,17 @@ export async function getIdOfUsersFirstChat(userId: string) {
     return null; // or return '';
   }
 }
+
+
+export const useFiles = () => {
+  const filesQuery = query(collection(db, CONSTANTS.files));
+  const [filesSnapshot, loading, error] = useCollection(filesQuery);
+
+  const files = filesSnapshot?.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  })) || [];
+
+  return { files, loading, error };
+}
+

@@ -1,35 +1,25 @@
 'use client';
-import { ChatRead } from 'shared/src/typings';
-import { useMessages, deleteChat } from '@/lib/firebaseWebHelpers';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
 type Props = {
-    chat: ChatRead;
+    file: {
+        fileName: string;
+    };
     selectedOption: string;
 }
 
-export default function ChatRow({ chat, selectedOption }: Props) {
+export default function ChatRow({ file, selectedOption }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `${chat.id}`;
-    const { messages } = useMessages(chat.id);
+    const href = `/file/${file.fileName}`;
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(chat.id));
-    }, [pathName, chat.id]);
-
-    const handleDeleteChat = async () => {
-        try {
-            await deleteChat(chat.id);
-            // console.log(`Chat with id ${chat.id} deleted`);
-        } catch (error) {
-            console.error(`Failed to delete chat: ${error}`);
-        }
-    }
+        setActive(pathName.includes(file.fileName));
+    }, [pathName, file.fileName]);
 
     return (
         <div
@@ -41,17 +31,14 @@ export default function ChatRow({ chat, selectedOption }: Props) {
             <Link href={href} passHref className='flex-1'>
                 <div className='flex-1 flex space-x-4'>
                     <p className='flex-1 hover:opacity-50 hidden md:inline-flex truncate'>
-                        {messages && messages.length > 0 ?
-                            `${messages[0].content.slice(0, 40)}...` :
-                            'Empty Chat'}
+                        {file.fileName}
                     </p>
                 </div>
             </Link>
             <TrashIcon
                 className='h-6 w-6 text-gray-700 hover:text-red-700'
                 onClick={(e) => {
-                    e.stopPropagation(); // Prevent Link navigation
-                    handleDeleteChat();
+                    e.stopPropagation(); // Prevent Link navigationyy
                 }}
             />
         </div>

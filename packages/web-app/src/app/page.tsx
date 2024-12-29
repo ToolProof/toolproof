@@ -18,42 +18,12 @@ export default function Home() {
     }
   }, [isIndexCreated]);
 
-  const invokeFooEndpoint = async (data) => {
-    try {
-      const response = await fetch('https://cloud-run-service-384484325421.europe-west2.run.app/foo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: data }), // Wrap the data in a JSON object
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const result = await response.json();
-      console.log('Response from Cloud Run:', result);
-      return result;
-    } catch (error) {
-      console.error('Error invoking Cloud Run service:', error);
-      throw error;
-    }
-  };
-  
-  
+
 
   return (
     <div className='bg-[#A22222] flex flex-col items-center justify-center h-full'>
       <h1 className='text-black text-5xl mb-4'>
-        <button
-          onClick={async () => {
-            invokeFooEndpoint('sfsdssdfssd');
-          }}
-          className='text-black font-bold text-3xl bg-yellow-500 hover:bg-yellow-700 py-2 px-4 rounded'
-        >
-          Generate Yellowpaper
-        </button>
+        toolproof.com
       </h1>
       {
         (isApproved && !session) && (

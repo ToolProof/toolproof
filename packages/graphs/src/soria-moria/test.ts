@@ -29,7 +29,7 @@ const chatPromptTemplateContent = ChatPromptTemplate.fromMessages([
 const chatPromptTemplateStructure = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to output a technical yellopaper, in Swedish, based on the content of the previous message.",
+        "Your job is to output a technical yellopaper, in Markdown, based on the content of the previous message.",
     ],
     new MessagesPlaceholder<typeof State['spec']>("messages"),
 ]);

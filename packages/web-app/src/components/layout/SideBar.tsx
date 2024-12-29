@@ -1,6 +1,6 @@
 'use client';
 import ChatRow from '@/components/layout/ChatRow';
-import { useChats, addChat } from '@/lib/firebaseWebHelpers';
+import { useFiles } from '@/lib/firebaseWebHelpers';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setUserEmail } from '@/redux/features/configSlice';
 import { useEffect, useState } from 'react';
@@ -12,49 +12,42 @@ import Image from 'next/image';
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
-    const { chats } = useChats(userEmail);
+    const { files } = useFiles();
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
-    const [selectedOption, setSelectedOption] = useState<string>('');
+    const [selectedOption, setSelectedOption] = useState<'DLB' | 'Alzheimer'>('DLB');
 
     useEffect(() => {
         dispatch(setUserEmail(userEmail));
     }, [dispatch, userEmail]);
 
-    const handleAddChat = async () => {
-        const result = await addChat({ userId: userEmail, turnState: 0, tags: [selectedOption] });
-        if (result && result.chatId) {
-            router.push(`${result.chatId}`);
-        }
-    }
-
     if (!isApproved) return <div />
 
     return (
-        false && // ATTENTION
+        true && // ATTENTION
         <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
             <div className='flex-1'>
                 <div className='flex justify-center py-4'>
                     <select
                         value={selectedOption}
-                        onChange={(e) => setSelectedOption(e.target.value)}
+                        onChange={(e) => setSelectedOption(e.target.value as 'DLB' | 'Alzheimer')}
                         className='bg-white border border-gray-300 rounded-md px-4 py-2'
                     >
-                        <option value={'Alfa'}>Alfa</option>
-                        <option value={'Beta'}>Beta</option>
+                        <option value={'Alzheimer'}>Alzheimer</option>
+                        <option value={'DLB'}>DLB</option>
                     </select>
                 </div>
-                <button
+                {/* <button
                     onClick={handleAddChat}
                     className='bg-blue-500 text-white px-0 py-2 w-full rounded-md hover:bg-blue-600'
                 >
                     Add Chat
-                </button>
+                </button> */}
                 <div className='flex flex-col py-4 space-y-2'>
-                    {chats.map(chat => (
-                        chat.tags.includes(selectedOption) && (
-                            <ChatRow key={chat.id} chat={chat} selectedOption={selectedOption} />
+                    {files.map(file => (
+                        true && (
+                            <ChatRow key={file.id} file={file} selectedOption={selectedOption} />
                         )
                     ))}
                 </div>
