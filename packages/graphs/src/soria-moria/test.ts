@@ -34,29 +34,32 @@ const chatPromptTemplateStructure = ChatPromptTemplate.fromMessages([
     new MessagesPlaceholder<typeof State['spec']>("messages"),
 ]);
 
-const contentNode = async (state: typeof State) => {
+const contentNode = async (state: typeof State.State) => {
 
     console.log("chatPromptTemplateContent:", JSON.stringify(chatPromptTemplateContent));
 
     const chain = chatPromptTemplateContent.pipe(model);
 
+    const foo = "cure";
+    const bar = "Diabetes Type 1";
+
     try {
         const response = await chain.invoke({
             ...state,
-            goal: "cure", // ATTENTION: hardcoded for now
-            disease: "Diabetes Type 1", // ATTENTION: hardcoded for now
+            goal: foo, // ATTENTION: hardcoded for now
+            disease: bar, // ATTENTION: hardcoded for now
         });
         // console.log("Model response:", response);
-        return { messages: [response] };
+        return { messages: [response], goal: foo, disease: bar };
     } catch (error) {
         console.error("Error invoking model:", error);
         throw error;
     }
 };
 
-const structureNode = async (state: typeof State) => {
+const structureNode = async (state: typeof State.State) => {
     // ATTENTION: goal and disease are not propagated to structureNode
-    // console.log("structureNode received state:", state);
+    console.log("structureNode received state:", JSON.stringify(state));
 
     const chain = chatPromptTemplateStructure.pipe(model);
 
