@@ -32,6 +32,7 @@ const chatPromptTemplateProtagonist = ChatPromptTemplate.fromMessages([
     new MessagesPlaceholder<typeof GraphState['spec']>("messages"),
 ]);
 
+// ATTENTION: how to type node functions?
 const antagonistNode = async (state: typeof GraphState.State) => {
 
     const chain = chatPromptTemplateAntagonist.pipe(model);

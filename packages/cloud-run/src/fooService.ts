@@ -73,13 +73,13 @@ export async function fooHelper(isWindows: boolean) {
             JSON.stringify(result.messages[2].content, null, 2)
         );
 
-        console.log('messages.length:', result.messages.length);
-
         // Upload the file to GCP Cloud Storage
         await uploadFileToStorage(filePath, fileName);
 
         // Upload the file name to Firestore
         await uploadFileNameToFirestore(fileName);
+
+        console.log('messages.length:', result.messages.length);
     } catch (error) {
         console.error('Error invoking graph:', error);
     }
