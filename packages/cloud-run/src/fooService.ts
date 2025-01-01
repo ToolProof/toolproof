@@ -1,6 +1,6 @@
-import { Client } from "@langchain/langgraph-sdk";
-import { RemoteGraph } from "@langchain/langgraph/remote";
-import { HumanMessage } from "@langchain/core/messages";
+import { Client } from '@langchain/langgraph-sdk';
+import { RemoteGraph } from '@langchain/langgraph/remote';
+import { HumanMessage } from '@langchain/core/messages';
 import fs from 'fs';
 import path from 'path';
 import { uploadFileToStorage, uploadFileNameToFirestore } from './firebaseAdminHelpers.js';
@@ -8,7 +8,7 @@ import { Request, Response } from 'express';
 
 const urlLocal = `http://localhost:8123`;
 const url = process.env.URL || urlLocal;
-const graphName = "test";
+const graphName = 'fooGraph';
 const client = new Client({
     apiUrl: url,
 });
@@ -23,11 +23,11 @@ export default async function fooHandler(req: Request, res: Response) {
         await fooHelper(false);
 
         // Send a success response to Pub/Sub
-        res.status(200).send("Task completed successfully");
+        res.status(200).send('Task completed successfully');
     } catch (error) {
-        console.error("Error invoking graph:", error);
+        console.error('Error invoking graph:', error);
         // Send a failure response to Pub/Sub
-        res.status(500).send("Task failed");
+        res.status(500).send('Task failed');
     }
 
 }
@@ -43,7 +43,7 @@ export async function fooHelper(isWindows: boolean) {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage("The target disease is Diabetes Type 2.")],
+                messages: [new HumanMessage('Gold is not a scarce resource because there is a lot of it in the ocean.')],
             },
         );
 
@@ -51,7 +51,7 @@ export async function fooHelper(isWindows: boolean) {
         // const threadState = await remoteGraph.getState(config);
         // console.log(threadState);
 
-        // console.log("Result:", result);
+        // console.log('Result:', result);
 
 
         // Determine the temporary directory based on the platform
@@ -67,11 +67,13 @@ export async function fooHelper(isWindows: boolean) {
 
         fs.writeFileSync(filePath,
             JSON.stringify(result.messages[0].content, null, 2) +
-            "\n-----\n" +
+            '\n\n\n' +
             JSON.stringify(result.messages[1].content, null, 2) +
-            "\n-----\n" +
+            '\n\n\n' +
             JSON.stringify(result.messages[2].content, null, 2)
         );
+
+        console.log('messages.length:', result.messages.length);
 
         // Upload the file to GCP Cloud Storage
         await uploadFileToStorage(filePath, fileName);
@@ -79,7 +81,7 @@ export async function fooHelper(isWindows: boolean) {
         // Upload the file name to Firestore
         await uploadFileNameToFirestore(fileName);
     } catch (error) {
-        console.error("Error invoking graph:", error);
+        console.error('Error invoking graph:', error);
     }
 
 }

@@ -1,4 +1,4 @@
-import fooHandler from './foo.js';
+import fooHandler from './fooService.js';
 import express from 'express';
 import cors from 'cors';
 

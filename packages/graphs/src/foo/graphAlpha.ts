@@ -7,7 +7,7 @@ import { ChatOpenAI } from "@langchain/openai";
 
 const model = new ChatOpenAI({
     model: "gpt-4o-mini",
-    temperature: 0,
+    temperature: 1,
 });
 
 
@@ -27,7 +27,7 @@ const chatPromptTemplateSeed = ChatPromptTemplate.fromMessages([
 const chatPromptTemplateCandidate = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to output a technical yellopaper, in Norwegian, in which you suggest an experimental treatment for the target disease that is derived from the example of curing a random disease in the previous message.",
+        "Your job is to output a technical yellopaper, in Markdown, in which you suggest an experimental treatment for Lewy Body Dementia that is derived from how the reference disease can be cured.",
     ],
     new MessagesPlaceholder<typeof State['spec']>("messages"),
 ]);
@@ -64,10 +64,10 @@ const candidateNode = async (state: typeof State.State) => {
 
 
 const stateGraph = new StateGraph(MessagesAnnotation)
-    .addNode("seedNode", seedNode)
+    // .addNode("seedNode", seedNode)
     .addNode("candidateNode", candidateNode)
-    .addEdge("__start__", "seedNode")
-    .addEdge("seedNode", "candidateNode")
+    .addEdge("__start__", "candidateNode")
+    // .addEdge("seedNode", "candidateNode")
 
 
 export const graph = stateGraph.compile();

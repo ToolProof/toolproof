@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "test": "./src/soria-moria/test.ts:graph"
+      "fooGraph": "./src/foo/graphBeta.ts:graph"
     },
     "env": ".env"
   }
