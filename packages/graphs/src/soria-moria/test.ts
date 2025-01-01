@@ -13,55 +13,44 @@ const model = new ChatOpenAI({
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec, // Spread in the messages state
-    goal: Annotation<"cure" | "prevent">(),
-    disease: Annotation<string>(),
 });
 
 
-const chatPromptTemplateContent = ChatPromptTemplate.fromMessages([
+const chatPromptTemplateSeed = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to output everything you know about how to {goal} {disease}.", // ATTENTION: disease could be generalized
+        "Your job is to pick a random disease and suggest one of the ways it can be cured.",
     ],
-    // new MessagesPlaceholder("messages"),
+    // new MessagesPlaceholder("messages"), // ATTENTION: target disease is masked
 ]);
 
-const chatPromptTemplateStructure = ChatPromptTemplate.fromMessages([
+const chatPromptTemplateCandidate = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to output a technical yellopaper, in Markdown, based on the content of the previous message.",
+        "Your job is to output a technical yellopaper, in Markdown, in which you suggest an experimental treatment for the target disease that is derived from the example of curing a random disease in the previous message.",
     ],
     new MessagesPlaceholder<typeof State['spec']>("messages"),
 ]);
 
-const contentNode = async (state: typeof State.State) => {
+const seedNode = async (state: typeof State.State) => {
 
-    console.log("chatPromptTemplateContent:", JSON.stringify(chatPromptTemplateContent));
-
-    const chain = chatPromptTemplateContent.pipe(model);
-
-    const foo = "cure";
-    const bar = "Diabetes Type 1";
+    const chain = chatPromptTemplateSeed.pipe(model);
 
     try {
         const response = await chain.invoke({
             ...state,
-            goal: foo, // ATTENTION: hardcoded for now
-            disease: bar, // ATTENTION: hardcoded for now
         });
         // console.log("Model response:", response);
-        return { messages: [response], goal: foo, disease: bar };
+        return { messages: [response] };
     } catch (error) {
         console.error("Error invoking model:", error);
         throw error;
     }
 };
 
-const structureNode = async (state: typeof State.State) => {
-    // ATTENTION: goal and disease are not propagated to structureNode
-    console.log("structureNode received state:", JSON.stringify(state));
+const candidateNode = async (state: typeof State.State) => {
 
-    const chain = chatPromptTemplateStructure.pipe(model);
+    const chain = chatPromptTemplateCandidate.pipe(model);
 
     try {
         const response = await chain.invoke(state);
@@ -75,10 +64,10 @@ const structureNode = async (state: typeof State.State) => {
 
 
 const stateGraph = new StateGraph(MessagesAnnotation)
-    .addNode("contentNode", contentNode)
-    .addNode("structureNode", structureNode)
-    .addEdge("__start__", "contentNode")
-    .addEdge("contentNode", "structureNode")
+    .addNode("seedNode", seedNode)
+    .addNode("candidateNode", candidateNode)
+    .addEdge("__start__", "seedNode")
+    .addEdge("seedNode", "candidateNode")
 
 
 export const graph = stateGraph.compile();
