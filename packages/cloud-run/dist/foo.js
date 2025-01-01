@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = fooHandler;
 const langgraph_sdk_1 = require("@langchain/langgraph-sdk");
 const remote_1 = require("@langchain/langgraph/remote");
+const messages_1 = require("@langchain/core/messages");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const firebaseAdminHelpers_1 = require("./firebaseAdminHelpers");
-const url = `https://soria-moria-7d184b0bf5fe520bac52d32d73931339.default.us.langgraph.app`;
+const urlLocal = `https://toolproof.loca.lt`;
+const url = process.env.URL || urlLocal;
 const graphName = "test";
 const client = new langgraph_sdk_1.Client({
     apiUrl: url,
@@ -23,7 +25,7 @@ async function fooHandler(req, res) {
         // Invoke the graph with the thread config
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke({
-            messages: [{ role: "user", content: "" }],
+            messages: [new messages_1.HumanMessage("The target disease is Diabetes Type 2.")],
         });
         // Verify that the state was persisted to the thread (optional)
         // const threadState = await remoteGraph.getState(config);
@@ -37,7 +39,11 @@ async function fooHandler(req, res) {
         const now = new Date();
         const fileName = `${now.toISOString()}.md`;
         const filePath = path_1.default.join('/tmp', fileName);
-        fs_1.default.writeFileSync(filePath, JSON.stringify(result.messages[1].content, null, 2));
+        fs_1.default.writeFileSync(filePath, JSON.stringify(result.messages[0].content, null, 2) +
+            "\n-----\n" +
+            JSON.stringify(result.messages[1].content, null, 2) +
+            "\n-----\n" +
+            JSON.stringify(result.messages[2].content, null, 2));
         // Upload the file to GCP Cloud Storage
         await (0, firebaseAdminHelpers_1.uploadFileToStorage)(filePath, fileName);
         // Upload the file name to Firestore

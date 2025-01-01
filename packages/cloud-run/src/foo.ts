@@ -1,11 +1,13 @@
 import { Client } from "@langchain/langgraph-sdk";
 import { RemoteGraph } from "@langchain/langgraph/remote";
+import { HumanMessage } from "@langchain/core/messages";
 import fs from 'fs';
 import path from 'path';
-import { uploadFileToStorage, uploadFileNameToFirestore } from './firebaseAdminHelpers';
+import { uploadFileToStorage, uploadFileNameToFirestore } from './firebaseAdminHelpers.js';
 import { Request, Response } from 'express';
 
-const url = `https://soria-moria-7d184b0bf5fe520bac52d32d73931339.default.us.langgraph.app`;
+const urlLocal = `http://localhost:8123`;
+const url = process.env.URL || urlLocal;
 const graphName = "test";
 const client = new Client({
     apiUrl: url,
@@ -15,6 +17,24 @@ const remoteGraph = new RemoteGraph({ graphId: graphName, url });
 // ATTENTION: must ensure idempotency
 
 export default async function fooHandler(req: Request, res: Response) {
+
+    try {
+
+        await fooHelper(false);
+
+        // Send a success response to Pub/Sub
+        res.status(200).send("Task completed successfully");
+    } catch (error) {
+        console.error("Error invoking graph:", error);
+        // Send a failure response to Pub/Sub
+        res.status(500).send("Task failed");
+    }
+
+}
+
+
+export async function fooHelper(isWindows: boolean) {
+
     try {
         // Create a thread (or use an existing thread instead)
         const thread = await client.threads.create();
@@ -23,7 +43,7 @@ export default async function fooHandler(req: Request, res: Response) {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [{ role: "user", content: "" }],
+                messages: [new HumanMessage("The target disease is Diabetes Type 2.")],
             },
         );
 
@@ -34,29 +54,32 @@ export default async function fooHandler(req: Request, res: Response) {
         // console.log("Result:", result);
 
 
-        // Ensure the directory exists
-        if (!fs.existsSync('/tmp')) {
-            fs.mkdirSync('/tmp', { recursive: true });
+        // Determine the temporary directory based on the platform
+        const tmpDir = isWindows ? path.join(process.env.TEMP || 'C:\\temp') : '/tmp';
+
+        if (!fs.existsSync(tmpDir)) {
+            fs.mkdirSync(tmpDir, { recursive: true });
         }
 
-        // Save result to a .md file
         const now = new Date();
-        const fileName = `${now.toISOString()}.md`;
-        const filePath = path.join('/tmp', fileName);
-        fs.writeFileSync(filePath, JSON.stringify(result.messages[1].content, null, 2));
+        const fileName = `${now.toISOString().replace(/:/g, '-')}.md`;
+        const filePath = path.join(tmpDir, fileName);
+
+        fs.writeFileSync(filePath,
+            JSON.stringify(result.messages[0].content, null, 2) +
+            "\n-----\n" +
+            JSON.stringify(result.messages[1].content, null, 2) +
+            "\n-----\n" +
+            JSON.stringify(result.messages[2].content, null, 2)
+        );
 
         // Upload the file to GCP Cloud Storage
         await uploadFileToStorage(filePath, fileName);
 
         // Upload the file name to Firestore
         await uploadFileNameToFirestore(fileName);
-
-        // Send a success response to Pub/Sub
-        res.status(200).send("Task completed successfully");
     } catch (error) {
         console.error("Error invoking graph:", error);
-        // Send a failure response to Pub/Sub
-        res.status(500).send("Task failed");
     }
-    
+
 }

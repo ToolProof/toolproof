@@ -27,7 +27,7 @@ const chatPromptTemplateSeed = ChatPromptTemplate.fromMessages([
 const chatPromptTemplateCandidate = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to output a technical yellopaper, in Markdown, in which you suggest an experimental treatment for the target disease that is derived from the example of curing a random disease in the previous message.",
+        "Your job is to output a technical yellopaper, in Norwegian, in which you suggest an experimental treatment for the target disease that is derived from the example of curing a random disease in the previous message.",
     ],
     new MessagesPlaceholder<typeof State['spec']>("messages"),
 ]);
