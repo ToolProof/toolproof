@@ -13,62 +13,70 @@ const model = new ChatOpenAI({
 
 const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec, // Spread in the messages state
+    lastMessage: Annotation<string>(),
 });
 
 
-const chatPromptTemplateAntagonist = ChatPromptTemplate.fromMessages([
+const chatPromptTemplateOne = ChatPromptTemplate.fromMessages([
     [
         "system",
         "Your job is critizise the assertion in the opening message.",
     ],
-    new MessagesPlaceholder("messages"),
+    new MessagesPlaceholder<typeof GraphState['spec']>("messages"),
 ]);
 
-const chatPromptTemplateProtagonist = ChatPromptTemplate.fromMessages([
+const chatPromptTemplateTwo = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is to counter the assertion in the previous message.",
+        "Your job is to disagree with this assertion: {lastMessage}.",
     ],
     new MessagesPlaceholder<typeof GraphState['spec']>("messages"),
 ]);
 
 // ATTENTION: how to type node functions?
-const antagonistNode = async (state: typeof GraphState.State) => {
+const nodeOne = async (state: typeof GraphState.State) => {
 
-    const chain = chatPromptTemplateAntagonist.pipe(model);
+    const chain = chatPromptTemplateOne.pipe(model);
 
     try {
         const response = await chain.invoke(state);
         // console.log("Model response:", response);
-        return { messages: [response] };
+        return { messages: [response], lastMessage: response };
     } catch (error) {
         console.error("Error invoking model:", error);
         throw error;
     }
 };
 
-const protagonistNode = async (state: typeof GraphState.State) => {
+const nodeTwo = async (state: typeof GraphState.State) => {
 
-    const chain = chatPromptTemplateProtagonist.pipe(model);
-
-    const lastMessage = state.messages[state.messages.length - 1]; 
+    const chain = chatPromptTemplateTwo.pipe(model);
 
     try {
-        const response = await chain.invoke({ messages: [lastMessage] });
+        const response = await chain.invoke(state);
         // console.log("Model response:", response);
-        return { messages: [response] };
+        return { messages: [response], lastMessage: response };
     } catch (error) {
         console.error("Error invoking model:", error);
         throw error;
+    }
+};
+
+const shouldContinue = (state: typeof GraphState.State) => {
+    if (state.messages.length < 5) {
+        return "nodeTwo";
+    } else {
+        return "__end__";
     }
 };
 
 
 const stateGraph = new StateGraph(GraphState)
-    .addNode("antagonistNode", antagonistNode)
-    .addNode("protagonistNode", protagonistNode)
-    .addEdge("__start__", "antagonistNode")
-    .addEdge("antagonistNode", "protagonistNode")
+    .addNode("nodeOne", nodeOne)
+    .addNode("nodeTwo", nodeTwo)
+    .addEdge("__start__", "nodeOne")
+    .addEdge("nodeOne", "nodeTwo")
+    .addConditionalEdges("nodeTwo", shouldContinue);
 
 
 export const graph = stateGraph.compile();

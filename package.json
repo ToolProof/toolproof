@@ -1,5 +1,6 @@
 {
   "name": "toolproof",
+  "private": true,
   "workspaces": [
     "packages/web-app",
     "packages/graphs",
@@ -21,8 +22,6 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@langchain/langgraph": "^0.2.36",
-    "@types/node": "22.5.2",
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
     "firebase": "^10.13.1",

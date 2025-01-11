@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = void 0;
-const app_1 = require("firebase/app");
-const firestore_1 = require("firebase/firestore");
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -15,6 +12,6 @@ const firebaseConfig = {
     measurementId: 'G-TSXX163NNS'
 };
 // Initialize Firebase
-const app = (0, app_1.getApps)().length ? (0, app_1.getApp)() : (0, app_1.initializeApp)(firebaseConfig); // if already initialized, use that one
-const db = (0, firestore_1.getFirestore)(app);
-exports.db = db;
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig); // if already initialized, use that one
+const db = getFirestore(app);
+export { db };
