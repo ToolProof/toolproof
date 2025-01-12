@@ -5,21 +5,19 @@ import { usePathname } from 'next/navigation';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
 type Props = {
-    file: {
-        fileName: string;
-    };
+    fileName: string;
     selectedOption: string;
 }
 
-export default function ChatRow({ file, selectedOption }: Props) {
+export default function FileRow({ fileName, selectedOption }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
-    const href = `/file/${file.fileName}`;
+    const href = `/file/${fileName}`;
 
     useEffect(() => {
         if (!pathName) return;
-        setActive(pathName.includes(file.fileName));
-    }, [pathName, file.fileName]);
+        setActive(pathName.includes(fileName));
+    }, [pathName, fileName]);
 
     return (
         <div
@@ -31,7 +29,7 @@ export default function ChatRow({ file, selectedOption }: Props) {
             <Link href={href} passHref className='flex-1'>
                 <div className='flex-1 flex space-x-4'>
                     <p className='flex-1 hover:opacity-50 hidden md:inline-flex truncate'>
-                        {file.fileName}
+                        {fileName}
                     </p>
                 </div>
             </Link>

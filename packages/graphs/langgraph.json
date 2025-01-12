@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "fooGraph": "./src/foo/graphGamma.ts:graph"
+      "graph": "./src/tests/ligament.ts:graph"
     },
     "env": ".env"
   }

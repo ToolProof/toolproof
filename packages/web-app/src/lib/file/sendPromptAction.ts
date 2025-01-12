@@ -5,8 +5,8 @@ dotenv.config();
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 import { MessageRead } from 'shared/src/typings';
-import { updateChat, uploadFileToStorage } from './firebaseAdminHelpers';
-import { upsertVectors } from './pineconeHelpers';
+import { updateChat, uploadFileToStorage } from '../firebaseAdminHelpers';
+import { upsertVectors } from '../pineconeHelpers';
 
 import fs from 'fs';
 import path from 'path';
@@ -15,12 +15,12 @@ interface SendPromptResponse {
     modelResponse: string;
 }
 
-const url = `https://soria-moria-7d184b0bf5fe520bac52d32d73931339.default.us.langgraph.app`;
+const url = `http://localhost:8123`;
 const client = new Client({
     apiUrl: url,
 });
 
-const test = new RemoteGraph({ graphId: 'test', url });
+const test = new RemoteGraph({ graphId: 'fooGraph', url });
 
 // create a thread (or use an existing thread instead)
 const thread = await client.threads.create();
@@ -35,29 +35,30 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
     if (!chatId) {
         throw new Error('Chat ID is required');
     }
-
+    if (!userMessage)
+        throw new Error('User message is required');
     try {
 
         const result = await test.invoke({
-            messages: [{ role: 'user', content: '' }],
+            messages: [{ role: 'user', content: `${promptSeed}. Vocabulary list: bus, horse, cooler, wig, apprentice` }],
         }, config);
 
         const messagesLength = result.messages.length;
 
         const usageMetadata = result.messages[messagesLength - 1].usage_metadata;
 
-        console.log('Usage metadata:', JSON.stringify(usageMetadata));
+        // console.log('Usage metadata:', JSON.stringify(usageMetadata));
 
         const aiMessageContent = result.messages[messagesLength - 1].content;
 
-        // const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, 1); // ATTENTION: turnState should be decided by the AI
+        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage.id, 1); // ATTENTION: turnState should be decided by the AI
 
         // upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
 
         // How do I save aiMessageContent to an .md file and upload the file to GCP Cloud Storage?
 
         // Determine the appropriate directory for temporary files
-        const isVercel = process.env.VERCEL === '1' && false;
+        /* const isVercel = process.env.VERCEL === '1' && false;
         const tempDir = isVercel ? '/tmp' : path.join(process.env.TEMP || 'C:\\temp');
 
         // Ensure the directory exists in development
@@ -73,7 +74,7 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
         // Step 2: Upload the file to GCP Cloud Storage
         await uploadFileToStorage(filePath, fileName);
         
-        console.log('File uploaded to GCP Cloud Storage:', fileName);
+        console.log('File uploaded to GCP Cloud Storage:', fileName); */
 
         return { modelResponse: aiMessageContent };
     } catch (error) {

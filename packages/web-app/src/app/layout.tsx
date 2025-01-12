@@ -2,7 +2,7 @@ import * as Constants from 'shared/src/constants'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 //import ClientProvider from '@/components/ClientProvider'
 import StoreProvider from '@/components/providers/StoreProvider'
-import SideBar from '@/components/layout/SideBar'
+import SideBar from '@/components/layout/chat/SideBar'
 import { authOptions } from '@/setup/authOptions';
 import '@/setup/globals.css'
 import type { Metadata } from 'next'

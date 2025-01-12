@@ -1,5 +1,5 @@
 'use client';
-import ChatRow from '@/components/layout/ChatRow';
+import FileRow from '@/components/layout/file/FileRow';
 import { useFiles } from '@/lib/firebaseWebHelpers';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setUserEmail } from '@/redux/features/configSlice';
@@ -38,16 +38,10 @@ export default function SideBar() {
                         <option value={'DLB'}>DLB</option>
                     </select>
                 </div>
-                {/* <button
-                    onClick={handleAddChat}
-                    className='bg-blue-500 text-white px-0 py-2 w-full rounded-md hover:bg-blue-600'
-                >
-                    Add Chat
-                </button> */}
                 <div className='flex flex-col py-4 space-y-2'>
                     {files.map(file => (
                         true && (
-                            <ChatRow key={file.id} file={file} selectedOption={selectedOption} />
+                            <FileRow key={file.id} fileName={file.id} selectedOption={selectedOption} />
                         )
                     ))}
                 </div>

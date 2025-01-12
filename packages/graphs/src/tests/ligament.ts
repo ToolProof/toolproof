@@ -19,9 +19,9 @@ const State = Annotation.Root({
 const chatPromptTemplate = ChatPromptTemplate.fromMessages([
     [
         "system",
-        "Your job is make an analogy that helps the user understand the requested topic better. You should try to use as many words as possible in the provided vocabulary list.",
+        "Your job is make an analogy that helps the user understand the requested topic better. You should try to use as many words as possible from the provided vocabulary list.",
     ],
-    // new MessagesPlaceholder("messages"),
+    new MessagesPlaceholder("messages"),
 ]);
 
 const node = async (state: typeof State.State) => {

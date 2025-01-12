@@ -1,13 +1,12 @@
 'use client'
 // import * as Constants from 'shared/src/constants'
 import { ChatRead } from 'shared/src/typings';
-import sendPromptAction from '@/lib/sendPromptAction';
+import sendPromptAction from '@/lib/chat/ligament/sendPromptAction';
 import { addMessage } from '@/lib/firebaseWebHelpers';
 import { useAppSelector } from '@/redux/hooks';
 import { useState, useEffect, useRef } from 'react';
 // import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
-// import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -21,18 +20,17 @@ export default function ChatInput({ chat }: Props) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const { data: session } = useSession();
-    //const router = useRouter();
     // const toastIdRef = useRef<string | undefined>(undefined);
     const userEmail = session?.user?.email || '';
     const userName = session?.user?.name || '';
     const isTyping = useAppSelector(state => state.typewriter.isTyping);
 
     const submissionHelper = async (isMeta: boolean) => {
-        const content = input.trim();
+        const prompt = input.trim();
         setInput('');
-        const userMessage = await addMessage(chat.id, { userId: userEmail, content, isMeta, tags: [] });
+        const userMessage = await addMessage(chat.id, { userId: userEmail, content: prompt, isMeta, tags: [] });
 
-        const data = await sendPromptAction({ chatId: chat.id, promptSeed: content, userName, userMessage }); // ATTENTION: message order not secured
+        const data = await sendPromptAction({ chatId: chat.id, prompt, userName, userMessage }); // ATTENTION: message order not secured
         if (data) {
             /*
                 * Could interact with the Redux store here
@@ -171,7 +169,6 @@ export default function ChatInput({ chat }: Props) {
             </form>
         );
     };
-
 
     return renderHelper(turnState === -1);
 
