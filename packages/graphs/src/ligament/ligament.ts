@@ -12,7 +12,7 @@ const SyllablesResponse = z.object({
 });
 
 const StressResponse = z.object({
-    stress: z.number(),
+    stress: z.string(), // ATTENTION: use literal union based on the array of syllables
 });
 
 // Define your LangGraph state
