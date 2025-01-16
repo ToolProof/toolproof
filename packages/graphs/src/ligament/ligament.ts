@@ -11,6 +11,10 @@ const SyllablesResponse = z.object({
     syllables: z.array(z.string()),
 });
 
+const StressResponse = z.object({
+    stress: z.number(),
+});
+
 // Define your LangGraph state
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -44,9 +48,39 @@ const syllablesnode = async (state: typeof State.State) => {
     }
 };
 
+
+const stressNode = async (state: typeof State.State) => {
+    try {
+
+        const messageContent = state.messages[state.messages.length - 1]?.content;
+
+        // Use OpenAI's structured outputs feature
+        const response = await openai.beta.chat.completions.parse({
+            model: "gpt-4o-mini",
+            messages: [
+                { role: "system", content: "Your job is to determine which syllable is stressed according to American-English pronunciation." },
+                { role: "user", content: typeof messageContent === "string" ? messageContent : "" },
+            ],
+            response_format: zodResponseFormat(StressResponse, "stress"),
+        });
+
+        // Extract the parsed response
+        const parsedResponse = response.choices[0].message.parsed;
+        if (!parsedResponse) {
+            throw new Error("Failed to parse response");
+        }
+        return { messages: [{ role: "assistant", content: parsedResponse.stress }] };
+    } catch (error) {
+        console.error("Error invoking model:", error);
+        throw error;
+    }
+};
+
 // Create the LangGraph
 const stateGraph = new StateGraph(MessagesAnnotation)
     .addNode("syllablesnode", syllablesnode)
-    .addEdge("__start__", "syllablesnode");
+    .addNode("stressnode", stressNode)
+    .addEdge("__start__", "syllablesnode")
+    .addEdge("syllablesnode", "stressnode")
 
 export const graph = stateGraph.compile();

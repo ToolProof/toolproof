@@ -41,11 +41,11 @@ export async function ligamentHelper() {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('synechdoche')],
+                messages: [new HumanMessage('comprehension')],
             },
         );
 
-        console.log('result:', result.messages.length);
+        console.log('result:', JSON.stringify(result, null, 2));
     } catch (error) {
         console.error('Error invoking graph:', error);
     }
