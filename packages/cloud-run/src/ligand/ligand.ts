@@ -3,12 +3,12 @@ import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
 import fs from 'fs';
 import path from 'path';
-import { uploadFileToStorage, uploadFileNameToFirestore } from './firebaseAdminHelpers.js';
+import { uploadFileToStorage, uploadFileNameToFirestore } from '../firebaseAdminHelpers.js';
 import { Request, Response } from 'express';
 
 const urlLocal = `http://localhost:8123`;
 const url = process.env.URL || urlLocal;
-const graphName = 'fooGraph';
+const graphName = 'graph';
 const client = new Client({
     apiUrl: url,
 });
@@ -16,11 +16,11 @@ const remoteGraph = new RemoteGraph({ graphId: graphName, url });
 
 // ATTENTION: must ensure idempotency
 
-export default async function fooHandler(req: Request, res: Response) {
+export default async function ligandHandler(req: Request, res: Response) {
 
     try {
 
-        await fooHelper(false);
+        await ligandHelper(false);
 
         // Send a success response to Pub/Sub
         res.status(200).send('Task completed successfully');
@@ -33,7 +33,7 @@ export default async function fooHandler(req: Request, res: Response) {
 }
 
 
-export async function fooHelper(isWindows: boolean) {
+export async function ligandHelper(isWindows: boolean) {
 
     try {
         // Create a thread (or use an existing thread instead)
@@ -43,7 +43,7 @@ export async function fooHelper(isWindows: boolean) {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('Hydrogen is the most valuable element because it has the greatest potential for fusion.')],
+                messages: [new HumanMessage('')],
             },
         );
 
@@ -83,9 +83,10 @@ export async function fooHelper(isWindows: boolean) {
         // Upload the file name to Firestore
         await uploadFileNameToFirestore(fileName);
 
-        console.log('messages.length:', result.messages.length);
     } catch (error) {
         console.error('Error invoking graph:', error);
     }
 
 }
+
+

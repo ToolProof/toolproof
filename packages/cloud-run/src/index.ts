@@ -1,4 +1,4 @@
-import fooHandler from './fooService.js';
+import ligandHandler from './ligand/ligand.js';
 import express from 'express';
 import cors from 'cors';
 
@@ -17,7 +17,7 @@ app.options('*', cors()); // Allow preflight requests
 app.use(express.json());
 
 // Example endpoint
-app.post('/foo', fooHandler);
+app.post('/ligand', ligandHandler);
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
