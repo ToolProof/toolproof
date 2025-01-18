@@ -3,7 +3,7 @@
     "dockerfile_lines": [],
     "dependencies": ["."],
     "graphs": {
-      "graph": "./src/ligament/ligament.ts:graph"
+      "graph": "./src/ligament/ligamentTwo.ts:graph"
     },
     "env": ".env"
   }

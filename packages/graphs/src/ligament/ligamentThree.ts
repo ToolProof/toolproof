@@ -14,7 +14,7 @@ const State = Annotation.Root({
 });
 
 
-const syllablesNode = async (state: typeof State.State) => {
+export const syllablesNode = async (state: typeof State.State) => {
 
     try {
 
