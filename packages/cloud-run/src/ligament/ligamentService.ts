@@ -41,7 +41,7 @@ export async function ligamentHelper() {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('synecdoche')],
+                messages: [new HumanMessage('reassurance')],
             },
         );
 
