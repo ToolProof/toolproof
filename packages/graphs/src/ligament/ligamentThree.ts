@@ -59,14 +59,12 @@ const stressNode = async (state: typeof State.State) => {
         const syllablesResponse = Helpers.schemas.SyllablesSchema.parse(syllablesResponse_);
         const syllables = syllablesResponse.syllables;
 
-        const syllablesString = syllables.join(", ");
-
         // Use OpenAI's structured outputs feature
         const response = await openai.beta.chat.completions.parse({
             model: model,
             messages: [
                 { role: "system", content: Helpers.prompts.stress.system },
-                { role: "user", content: Helpers.prompts.stress.user(originalWord, syllablesString) },
+                { role: "user", content: Helpers.prompts.stress.user(originalWord, syllables.join(", ")) },
             ],
             response_format: zodResponseFormat(Helpers.schemas.StressSchema(syllables), "stress"),
         });

@@ -27,8 +27,6 @@ const stressAndSoundNode = async (state: typeof State.State) => {
         const syllablesResponse = Helpers.schemas.SyllablesSchema.parse(syllablesResponse_);
         const syllables = syllablesResponse.syllables;
 
-        const syllablesString = syllables.join(", ");
-
         const OutputSchema = z.object({
             stress: Helpers.schemas.StressSchema(syllables),
             sound: Helpers.schemas.SoundSchema,
@@ -41,7 +39,7 @@ const stressAndSoundNode = async (state: typeof State.State) => {
                     role: "system",
                     content: `First: ${Helpers.prompts.stress.system} Second: ${Helpers.prompts.sound.system}`
                 },
-                { role: "user", content: `Word: ${originalWord}. Syllables: ${syllablesString}` },
+                { role: "user", content: `Word: ${originalWord}. Syllables: ${syllables.join(", ")}` },
             ],
             response_format: zodResponseFormat(OutputSchema, "stressAndSoundNode"),
         });
