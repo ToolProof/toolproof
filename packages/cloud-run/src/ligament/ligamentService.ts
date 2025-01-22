@@ -38,13 +38,15 @@ export async function ligamentHelper() {
         const thread = await client.threads.create();
 
         // Invoke the graph with the thread config
-        const config = { configurable: { thread_id: thread.thread_id } };
+        const config = { configurable: { thread_id: "6967433d-8e66-41dc-b216-5f46326ccbc2" } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('reassurance')],
+                messages: [new HumanMessage('My name is Jarle Nilsen!')],
             },
+            config,
         );
 
+        console.log('threadId:', thread.thread_id);
         console.log('result:', JSON.stringify(result, null, 2));
 
     } catch (error) {
