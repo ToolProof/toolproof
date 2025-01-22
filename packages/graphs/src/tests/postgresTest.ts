@@ -18,9 +18,9 @@ const getWeather = tool(async (input: { city: "sf" | "nyc" }) => {
 });
 
 import { ChatOpenAI } from "@langchain/openai";
-import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 
+/* import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import pg from "pg";
 
 const { Pool } = pg;
@@ -33,12 +33,12 @@ const checkpointer = new PostgresSaver(pool);
 
 // NOTE: you need to call .setup() the first time you're using your checkpointer
 
-await checkpointer.setup();
+await checkpointer.setup(); */
 
 export const graph = createReactAgent({
   tools: [getWeather],
   llm: new ChatOpenAI({
     model: "gpt-4o-mini",
   }),
-  checkpointSaver: checkpointer,
+  // checkpointSaver: checkpointer,
 });
