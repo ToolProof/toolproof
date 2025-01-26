@@ -3,11 +3,12 @@ import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
 import fs from 'fs';
 import path from 'path';
-import { uploadFileToStorage, uploadFileNameToFirestore } from '../firebaseAdminHelpers.js';
+import { uploadFileToStorage, uploadFileNameToFirestore } from '../../firebaseAdminHelpers.js';
 import { Request, Response } from 'express';
 
 const urlLocal = `http://localhost:8123`;
-const url = process.env.URL || urlLocal;
+const urlRemote = `https://postgrestest-8035ddbf77dd5839843bf1093dfaed79.us.langgraph.app`
+const url = urlLocal; //process.env.URL || urlLocal;
 const graphName = 'graph';
 const client = new Client({
     apiUrl: url,
@@ -20,7 +21,7 @@ export default async function ligandHandler(req: Request, res: Response) {
 
     try {
 
-        await ligandHelper(false);
+        await ligandHelper();
 
         // Send a success response to Pub/Sub
         res.status(200).send('Task completed successfully');
@@ -33,7 +34,7 @@ export default async function ligandHandler(req: Request, res: Response) {
 }
 
 
-export async function ligandHelper(isWindows: boolean) {
+export async function ligandHelper() {
 
     try {
         // Create a thread (or use an existing thread instead)
@@ -43,7 +44,7 @@ export async function ligandHelper(isWindows: boolean) {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('')],
+                messages: [new HumanMessage('Hi, how are you?')],
             },
         );
 
@@ -51,37 +52,12 @@ export async function ligandHelper(isWindows: boolean) {
         // const threadState = await remoteGraph.getState(config);
         // console.log(threadState);
 
-        // console.log('Result:', result);
+        const length = result.messages.length;
 
+        console.log ('messages length: ', length);
 
-        // Determine the temporary directory based on the platform
-        const tmpDir = isWindows ? path.join(process.env.TEMP || 'C:\\temp') : '/tmp';
+        console.log('Result:', JSON.stringify(result.messages[length - 1], null, 2));
 
-        if (!fs.existsSync(tmpDir)) {
-            fs.mkdirSync(tmpDir, { recursive: true });
-        }
-
-        const now = new Date();
-        const fileName = `${now.toISOString().replace(/:/g, '-')}.md`;
-        const filePath = path.join(tmpDir, fileName);
-
-        fs.writeFileSync(filePath,
-            JSON.stringify(result.messages[0].content, null, 2) +
-            '\n\n\n' +
-            JSON.stringify(result.messages[1].content, null, 2) +
-            '\n\n\n' +
-            JSON.stringify(result.messages[2].content, null, 2) +
-            '\n\n\n' +
-            JSON.stringify(result.messages[3].content, null, 2) +
-            '\n\n\n' +
-            JSON.stringify(result.messages[4].content, null, 2)
-        );
-
-        // Upload the file to GCP Cloud Storage
-        await uploadFileToStorage(filePath, fileName);
-
-        // Upload the file name to Firestore
-        await uploadFileNameToFirestore(fileName);
 
     } catch (error) {
         console.error('Error invoking graph:', error);

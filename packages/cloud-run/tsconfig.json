@@ -4,9 +4,6 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "baseUrl": "./",
-    "paths": {
-      "@/lib/*": ["src/lib/*"]
-    },
     "resolveJsonModule": true,
     "outDir": "./dist",
     "esModuleInterop": true,

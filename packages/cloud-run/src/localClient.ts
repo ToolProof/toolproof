@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
-dotenv.config();
-import { ligamentHelper } from "./ligament/ligamentService.js";
-import { ligandHelper } from "./ligand/ligandService.js";
+import { testHelper } from "./services/testService.js";
+import { ligamentHelper } from "./services/ligament/ligamentService.js";
+import { ligandHelper } from "./services/ligand/ligandService.js";
 
-ligamentHelper();
+
+ligandHelper();

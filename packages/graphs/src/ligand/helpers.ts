@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const schemas = {
     RecordSchema: z.object({
-        record: z.array(z.string()),
+        record: z.string(),
     }),
 };
 
