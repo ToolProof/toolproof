@@ -1,4 +1,5 @@
-import { StateGraph, Annotation, MessagesAnnotation } from "@langchain/langgraph";
+import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
+import { HumanMessage } from "@langchain/core/messages";
 import OpenAI from "openai";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
@@ -8,48 +9,88 @@ import * as Helpers from "./helpers.js"
 const openai = new OpenAI();
 const model = "gpt-4o-mini";
 
-// Define your LangGraph state
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
+    goal: Annotation<string>({
+        reducer: (prev, next) => next, // Simple reducer that replaces the value
+        default: () => "Curing Dementia with Lewy Bodies", // Initial default value
+    }),
+
 });
 
 
-const publicUrl = "https://storage.googleapis.com/ligand/imatinib_protomer-1_out.pdbqt";
+const shouldContinue = async (state: typeof State.State) => {
+    const lastMessage = state.messages[state.messages.length - 1];
+    const isRelevant = lastMessage.response_metadata?.is_relevant;
 
-const fetchFile = async (url: string) => {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch file: ${response.statusText}`);
-        }
-        const fileData = await response.text(); // Use `.json()` for JSON files, `.arrayBuffer()` for binary
-        const fileExtract = fileData.substring(0, 10000);
-        console.log("File contents:", JSON.stringify(fileExtract, null, 2));
-        return fileExtract;
-    } catch (error) {
-        console.error("Error fetching file:", error);
-        throw error;
+    if (isRelevant === "no") {
+        return END;
+    } else {
+        return "masterNode";
     }
+
 };
 
 
-export const recordNode = async (state: typeof State.State) => {
+// Filter Node: Determines if the last message is relevant to the topic
+const filterNode = async (state: typeof State.State) => {
+
+    try {
+        const lastMessage = state.messages[state.messages.length - 1];
+
+        // console.log("Before update:", JSON.stringify(lastMessage, null, 2));
+
+        const content = z.string().parse(lastMessage.content);
+
+        // Call OpenAI to determine relevance
+        const response = await openai.beta.chat.completions.parse({
+            model: model,
+            messages: [
+                { role: "system", content: `Your task is to determine whether the user's message is relevant to the stated goal. Goal: ${state.goal}` },
+                { role: "user", content: content },
+            ],
+            response_format: zodResponseFormat(z.object({ isRelevant: z.union([z.literal("yes"), z.literal("no")]) }), "filter"),
+        });
+
+        const parsedResponse = response.choices[0].message.parsed;
+
+        // Create an updated version of lastMessage, preserving the ID
+        const updatedMessage = new HumanMessage({
+            id: lastMessage.id, // Ensure the same ID for correct replacement
+            content: lastMessage.content, // Preserve content
+            response_metadata: {
+                is_relevant: parsedResponse?.isRelevant, // Add new metadata
+            },
+        });
+
+        // Return the updated message
+        return { messages: [updatedMessage] };
+
+    }
+
+    catch (error) {
+        console.error("Error invoking model:", error);
+        throw error;
+    }
+
+};
+
+
+export const masterNode = async (state: typeof State.State) => {
 
     try {
 
-        const input_ = state.messages[state.messages.length - 1]?.content;
-        const InputSchema = z.string();
-        const input = InputSchema.parse(input_);
+        const lastMessage = state.messages[state.messages.length - 1];
 
-        const fileExtract = await fetchFile(publicUrl);
+        const content = z.string().parse(lastMessage.content); 
 
         const response = await openai.beta.chat.completions.parse({
             model: model,
             messages: [
-                { role: "system", content: "What is the provided file content about?" },
-                { role: "user", content: JSON.stringify(fileExtract) },
+                { role: "system", content: `Discuss the goal with the user. Goal: ${state.goal}` },
+                { role: "user", content: content }, // ATTENTION: only the last message is used here
             ],
-            response_format: zodResponseFormat(Helpers.schemas.RecordSchema, "record"),
+            response_format: zodResponseFormat(z.object({ response: z.string() }), "master"),
         });
 
         const parsedResponse = response.choices[0].message.parsed;
@@ -68,10 +109,11 @@ export const recordNode = async (state: typeof State.State) => {
 };
 
 
-const stateGraph = new StateGraph(MessagesAnnotation)
-    .addNode("recordNode", recordNode)
-    .addEdge("__start__", "recordNode")
-    .addEdge("recordNode", "__end__");
+const stateGraph = new StateGraph(State)
+    .addNode("filterNode", filterNode)
+    .addNode("masterNode", masterNode)
+    .addEdge(START, "filterNode")
+    .addConditionalEdges("filterNode", shouldContinue);
 
 
 export const graph = stateGraph.compile();

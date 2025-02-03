@@ -1,7 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
-import { Request, Response } from 'express';
 
 const urlLocal = `http://localhost:8123`;
 const urlRemote = `https://postgrestest-8035ddbf77dd5839843bf1093dfaed79.us.langgraph.app`
@@ -11,25 +12,6 @@ const client = new Client({
     apiUrl: url,
 });
 const remoteGraph = new RemoteGraph({ graphId: graphName, url });
-
-
-// ATTENTION: must ensure idempotency
-
-export default async function ligamentHandler(req: Request, res: Response) {
-
-    try {
-
-        await ligamentHelper();
-
-        // Send a success response to Pub/Sub
-        res.status(200).send('Task completed successfully');
-    } catch (error) {
-        console.error('Error invoking graph:', error);
-        // Send a failure response to Pub/Sub
-        res.status(500).send('Task failed');
-    }
-
-}
 
 
 export async function ligamentHelper() {

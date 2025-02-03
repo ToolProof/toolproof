@@ -1,4 +1,4 @@
-import ligandHandler from './services/ligand/ligandService.js';
+import ligandHandler from './services/ligand/helper.js';
 import express from 'express';
 import cors from 'cors';
 

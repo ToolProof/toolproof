@@ -1,37 +1,17 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
-import fs from 'fs';
-import path from 'path';
-import { uploadFileToStorage, uploadFileNameToFirestore } from '../../firebaseAdminHelpers.js';
-import { Request, Response } from 'express';
 
 const urlLocal = `http://localhost:8123`;
-const urlRemote = `https://postgrestest-8035ddbf77dd5839843bf1093dfaed79.us.langgraph.app`
-const url = urlLocal; //process.env.URL || urlLocal;
+const urlRemote = `https://ligandtest-50604cc56b085fd49885ad5d14c15452.us.langgraph.app`
+const url = urlRemote; //process.env.URL || urlLocal;
 const graphName = 'graph';
 const client = new Client({
     apiUrl: url,
 });
 const remoteGraph = new RemoteGraph({ graphId: graphName, url });
-
-// ATTENTION: must ensure idempotency
-
-export default async function ligandHandler(req: Request, res: Response) {
-
-    try {
-
-        await ligandHelper();
-
-        // Send a success response to Pub/Sub
-        res.status(200).send('Task completed successfully');
-    } catch (error) {
-        console.error('Error invoking graph:', error);
-        // Send a failure response to Pub/Sub
-        res.status(500).send('Task failed');
-    }
-
-}
 
 
 export async function ligandHelper() {
