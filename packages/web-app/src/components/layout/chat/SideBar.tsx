@@ -9,6 +9,19 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+import { Client } from '@langchain/langgraph-sdk';
+import { RemoteGraph } from '@langchain/langgraph/remote';
+
+
+const url = `http://localhost:8123`;
+const client = new Client({
+    apiUrl: url,
+});
+
+const ligandGraph = new RemoteGraph({ graphId: 'graph', url });
+
+const config = { configurable: { thread_id: 'cd8f8f15-abb9-4312-bec1-aa6fbfa3718f' } };
+
 
 export default function SideBar() {
     const { data: session } = useSession();
@@ -23,10 +36,15 @@ export default function SideBar() {
     }, [dispatch, userEmail]);
 
     const handleAddChat = async () => {
-        const result = await addChat({ userId: userEmail, turnState: 0, tags: [] });
+
+        const foo = await ligandGraph.getState(config);
+
+        console.log('foo:', JSON.stringify(foo));
+
+        /* const result = await addChat({ userId: userEmail, turnState: 0, tags: [] });
         if (result && result.chatId) {
             router.push(`/${CONSTANTS.chat}/${result.chatId}`);
-        }
+        } */
     }
 
     if (!isApproved) return <div />

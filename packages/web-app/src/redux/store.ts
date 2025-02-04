@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import navigationReducer from './features/navigationSlice'
 import typewriterReducer from './features/typewriterSlice'
 import configReducer from './features/configSlice'
+import messagesReducer from './features/messagesSlice'
 
 export const makeStore = () => {
     return configureStore({
@@ -9,6 +10,7 @@ export const makeStore = () => {
             navigation: navigationReducer,
             typewriter: typewriterReducer,
             config: configReducer,
+            messages: messagesReducer,
         },
     })
 }

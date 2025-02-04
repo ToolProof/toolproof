@@ -2,8 +2,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowDownCircleIcon } from '@heroicons/react/24/solid';
 import MessageDisplay from './MessageDisplay';
+import { useAppSelector } from '@/redux/hooks';
 import { ChatRead } from 'shared/src/typings';
-import { useMessages } from '@/lib/firebaseWebHelpers';
+
 
 type Props = {
     chat: ChatRead;
@@ -12,9 +13,9 @@ type Props = {
 export default function ChatDisplay({ chat }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
-    const { messages } = useMessages(chat.id);
-    
-    
+    const messages = useAppSelector(state => state.messages.messages);
+
+
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
@@ -30,9 +31,9 @@ export default function ChatDisplay({ chat }: Props) {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, []); // Empty dependency array ensures this runs only once on mount
-    
 
-    function isNewMessage(messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) {
+
+    const isNewMessage = (messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) => {
 
         // Check if it's the last message
         if (index !== arrayLength - 1) {
@@ -91,17 +92,17 @@ export default function ChatDisplay({ chat }: Props) {
                 </div>
             )}
             {messages?.map((message, index) => {
-                const isNew = isNewMessage(message.timestamp, index, messages.length);
+                const isNew = true; // isNewMessage(message.timestamp, index, messages.length);
                 //console.log('message', message.tags[0]);
                 const messageComponent = <MessageDisplay
-                    key={message.id}
+                    key={index}
                     message={message}
                     isNew={isNew}
                     onTextChange={handleTextChange}
                 />
                 return messageComponent;
             })}
-    
+
         </div>
     );
 

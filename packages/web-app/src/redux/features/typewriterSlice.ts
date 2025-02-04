@@ -1,7 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const typewriterSlice = createSlice({
-    name: "typewriter",
+    name: 'typewriter',
     initialState: {
         isTyping: false
     },

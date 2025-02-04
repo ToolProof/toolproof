@@ -25,13 +25,13 @@ export async function testHelper() {
         // const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('What is the official currency in Uganda?')],
+                messages: [new HumanMessage('What day comes after Tuesday?')],
             },
             config,
         );
 
         // console.log('threadId:', thread.thread_id);
-        console.log('result:', JSON.stringify(result, null, 2));
+        console.log('result:', result);
 
     } catch (error) {
         console.error('Error invoking graph:', error);

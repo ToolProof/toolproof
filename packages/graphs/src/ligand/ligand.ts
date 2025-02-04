@@ -1,5 +1,5 @@
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
-import { HumanMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import OpenAI from "openai";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
@@ -82,7 +82,7 @@ export const masterNode = async (state: typeof State.State) => {
 
         const lastMessage = state.messages[state.messages.length - 1];
 
-        const content = z.string().parse(lastMessage.content); 
+        const content = z.string().parse(lastMessage.content);
 
         const response = await openai.beta.chat.completions.parse({
             model: model,
@@ -99,7 +99,7 @@ export const masterNode = async (state: typeof State.State) => {
             throw new Error("Failed to parse response");
         }
 
-        return { messages: [{ role: "assistant", content: parsedResponse }] };
+        return { messages: [new AIMessage(parsedResponse.response)] };
 
     } catch (error) {
         console.error("Error invoking model:", error);
