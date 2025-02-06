@@ -3,7 +3,7 @@
 import { ChatRead } from 'shared/src/typings';
 import sendPromptAction from '@/lib/chat/ligand/sendPromptAction';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { setMessages } from '@/redux/features/messagesSlice';
+import { addMessages, setMessages } from '@/redux/features/messagesSlice';
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faArrowUp } from '@fortawesome/free-solid-svg-icons';

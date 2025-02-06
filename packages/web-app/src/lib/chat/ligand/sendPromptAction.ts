@@ -1,21 +1,13 @@
 'use server';
-import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
-import { BaseMessage, HumanMessage } from '@langchain/core/messages';
+import { BaseMessageWithType } from 'shared/src/typings';
 
 
-const url = `https://ligand-3366aaf1e09b5cf885f48533ba2ae831.us.langgraph.app`;
-const client = new Client({
-    apiUrl: url,
-});
-
+const url = `http://localhost:8123`;
 const ligandGraph = new RemoteGraph({ graphId: 'graph', url });
 
-// create a thread (or use an existing thread instead)
-const thread = await client.threads.create();
-
 // invoke the graph with the thread config
-const config = { configurable: { thread_id: thread.thread_id } };
+const config = { configurable: { thread_id: 'ff090f1f-30bf-494b-a343-46d066bead3f' } };
 
 export default async function sendPromptAction({ threadId, prompt }: { threadId: string, prompt: string; }) {
     if (!threadId) {
@@ -27,13 +19,13 @@ export default async function sendPromptAction({ threadId, prompt }: { threadId:
 
     try {
 
-        // ligandGraph.getStateHistory(config);
+        console.log('prompt:', prompt);
 
         const result = await ligandGraph.invoke({
-            messages: [new HumanMessage(prompt)],
+            messages: [{ role: 'user', content: prompt }],
         }, config);
 
-        const messages: BaseMessage[] = result.messages; // TODO: must be type-validated
+        const messages: BaseMessageWithType[] = result.messages; // TODO: must be type-validated
 
         return messages;
     } catch (error) {

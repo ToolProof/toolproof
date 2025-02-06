@@ -2,9 +2,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowDownCircleIcon } from '@heroicons/react/24/solid';
 import MessageDisplay from './MessageDisplay';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { setMessages } from '@/redux/features/messagesSlice';
 import { ChatRead } from 'shared/src/typings';
 
+// ***
+import { RemoteGraph } from '@langchain/langgraph/remote';
+
+
+const url = `http://localhost:8123`;
+const ligandGraph = new RemoteGraph({ graphId: 'graph', url });
+const config = { configurable: { thread_id: 'ff090f1f-30bf-494b-a343-46d066bead3f' } };
+// ***
 
 type Props = {
     chat: ChatRead;
@@ -14,6 +23,21 @@ export default function ChatDisplay({ chat }: Props) {
     const [componentMountTime, setComponentMountTime] = useState(new Date());
     const messageContainerRef = useRef<HTMLDivElement | null>(null);
     const messages = useAppSelector(state => state.messages.messages);
+    const dispatch = useAppDispatch();
+
+
+    useEffect(() => {
+
+        const foo = async () => {
+            const bar = await ligandGraph.getState(config);
+            dispatch(setMessages(bar.values?.messages));
+        };
+
+        if (messages.length === 0) {
+            foo();
+        }
+
+    }, [messages.length, dispatch]);
 
 
     useEffect(() => {
@@ -92,7 +116,7 @@ export default function ChatDisplay({ chat }: Props) {
                 </div>
             )}
             {messages?.map((message, index) => {
-                const isNew = true; // isNewMessage(message.timestamp, index, messages.length);
+                const isNew = false; // isNewMessage(message.timestamp, index, messages.length);
                 //console.log('message', message.tags[0]);
                 const messageComponent = <MessageDisplay
                     key={index}

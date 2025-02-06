@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BaseMessage } from '@langchain/core/messages';
+import { BaseMessageWithType } from 'shared/src/typings';
 
 export interface MessagesState {
-    messages: BaseMessage[];
+    messages: BaseMessageWithType[];
 }
 
 const initialState: MessagesState = {
@@ -13,11 +13,14 @@ const messagesSlice = createSlice({
     name: 'messages',
     initialState,
     reducers: {
-        setMessages: (state, action: PayloadAction<BaseMessage[]>) => {
+        setMessages: (state, action: PayloadAction<BaseMessageWithType[]>) => {
             state.messages = action.payload;
-        }
+        },
+        addMessages: (state, action: PayloadAction<BaseMessageWithType>) => {
+            state.messages = [...state.messages, action.payload];
+        },
     },
 });
 
-export const { setMessages } = messagesSlice.actions;
+export const { setMessages, addMessages } = messagesSlice.actions;
 export default messagesSlice.reducer;

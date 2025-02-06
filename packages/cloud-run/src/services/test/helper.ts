@@ -21,17 +21,17 @@ export async function testHelper() {
         const thread = await client.threads.create();
 
         // Invoke the graph with the thread config
-        const config = { configurable: { thread_id: "cd8f8f15-abb9-4312-bec1-aa6fbfa3718f" } };
+        const config = { configurable: { thread_id: "ff090f1f-30bf-494b-a343-46d066bead3f" } };
         // const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('What day comes after Tuesday?')],
+                messages: [new HumanMessage('What is the capital of Sweden?')],
             },
             config,
         );
 
         // console.log('threadId:', thread.thread_id);
-        console.log('result:', result);
+        console.log('result:', JSON.stringify(result, null, 2));
 
     } catch (error) {
         console.error('Error invoking graph:', error);

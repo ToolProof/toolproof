@@ -1,7 +1,7 @@
 'use client';
 import * as CONSTANTS from 'shared/src/constants';
 import { ChatRead } from 'shared/src/typings';
-import { useMessages, deleteChat } from '@/lib/firebaseWebHelpers';
+// import { useMessages, deleteChat } from '@/lib/firebaseWebHelpers';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -15,21 +15,20 @@ export default function ChatRow({ chat }: Props) {
     const pathName = usePathname();
     const [active, setActive] = useState(false);
     const href = `/${CONSTANTS.chat}/${chat.id}`;
-    const { messages } = useMessages(chat.id);
 
     useEffect(() => {
         if (!pathName) return;
         setActive(pathName.includes(chat.id));
     }, [pathName, chat.id]);
 
-    const handleDeleteChat = async () => {
+    /* const handleDeleteChat = async () => {
         try {
             await deleteChat(chat.id);
             // console.log(`Chat with id ${chat.id} deleted`);
         } catch (error) {
             console.error(`Failed to delete chat: ${error}`);
         }
-    }
+    } */
 
     return (
         <div
@@ -41,19 +40,18 @@ export default function ChatRow({ chat }: Props) {
             <Link href={href} passHref className='flex-1'>
                 <div className='flex-1 flex space-x-4'>
                     <p className='flex-1 hover:opacity-50 hidden md:inline-flex truncate'>
-                        {messages && messages.length > 0 ?
-                            `${messages[0].content.slice(0, 40)}...` :
-                            'Empty Chat'}
+                        Ligand
                     </p>
                 </div>
             </Link>
-            <TrashIcon
+            {/* <TrashIcon
                 className='h-6 w-6 text-gray-700 hover:text-red-700'
                 onClick={(e) => {
                     e.stopPropagation(); // Prevent Link navigation
                     handleDeleteChat();
                 }}
-            />
+            /> */}
         </div>
     );
+    
 }

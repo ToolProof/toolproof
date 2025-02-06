@@ -1,18 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-
-
-export interface MessageWrite {
-    userId: string;
-    content: string;
-    isMeta: boolean;
-    tags: string[];   
-}
-
-
-export interface MessageRead extends MessageWrite {
-    id: string;
-    timestamp: Timestamp;
-}
+import { BaseMessage } from '@langchain/core/messages';
 
 
 export interface ChatWrite {
@@ -25,4 +12,9 @@ export interface ChatWrite {
 export interface ChatRead extends ChatWrite {
     id: string;
     timestamp: Timestamp;
+}
+
+
+export interface BaseMessageWithType extends BaseMessage {
+    type: 'ai' | 'human';
 }

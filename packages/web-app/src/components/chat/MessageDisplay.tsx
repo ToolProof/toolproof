@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { BaseMessage } from '@langchain/core/messages';
+import { BaseMessageWithType } from 'shared/src/typings';
 import { useAppDispatch } from '@/redux/hooks';
 import { startTyping, stopTyping } from '@/redux/features/typewriterSlice';
 import { useSession } from 'next-auth/react';
 
 type Props = {
-  message: BaseMessage;
+  message: BaseMessageWithType;
   isNew: boolean;
   onTextChange: (text: string) => void;
 };
@@ -14,10 +14,9 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   const [displayedText, setDisplayedText] = useState('');
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
-  const userEmail = session?.user?.email || '';
   const userImg = session?.user?.image || '';
-  // const imageSource = (message.userId === userEmail) ? userImg : '/images/openai_logo.png';
-  const imageSource = '/images/openai_logo.png';
+  const imageSource = message.type  === 'human' ? userImg : '/images/openai_logo.png'; // ATTENTION: mistyping here
+
 
   useEffect(() => {
     if (isNew) {
@@ -29,7 +28,7 @@ export default function MessageDisplay({ message, isNew, onTextChange }: Props) 
   useEffect(() => {
     let timeoutId: number | undefined;
 
-    if (isNew && true) { // message.userId === 'ChatGPT'
+    if (isNew && message.type === 'ai') {
       dispatch(startTyping());
       const typeLetter = (index: number) => {
         if (index < message.content.length) {
