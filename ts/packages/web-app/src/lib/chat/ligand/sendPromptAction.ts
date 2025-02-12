@@ -7,7 +7,7 @@ const url = `http://localhost:8123`;
 const ligandGraph = new RemoteGraph({ graphId: 'graph', url });
 
 // invoke the graph with the thread config
-const config = { configurable: { thread_id: 'ff090f1f-30bf-494b-a343-46d066bead3f' } };
+const config = { configurable: { thread_id: 'a3be082e-59c5-4070-85af-c30093f71ce4' } };
 
 export default async function sendPromptAction({ threadId, prompt }: { threadId: string, prompt: string; }) {
     if (!threadId) {

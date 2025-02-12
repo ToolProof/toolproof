@@ -1,4 +1,5 @@
 'use client'
+import Lasagna from '@/components/lasagna/Lasagna';
 import { useAppSelector } from '@/redux/hooks';
 // import { createIndexWrapper } from '@/lib/pineconeHelpers';
 import { useEffect, useState } from 'react';
@@ -18,9 +19,13 @@ export default function Home() {
     }
   }, [isIndexCreated]);
 
-
-
   return (
+    <div>
+      <Lasagna />
+    </div>
+  );
+
+  /* return (
     <div className='bg-[#A22222] flex flex-col items-center justify-center h-full'>
       <h1 className='text-black text-5xl mb-4'>
         toolproof.com
@@ -33,7 +38,7 @@ export default function Home() {
         )
       }
     </div>
-  );
+  ); */
 
 }
 

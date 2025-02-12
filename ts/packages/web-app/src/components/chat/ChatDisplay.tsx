@@ -12,7 +12,7 @@ import { RemoteGraph } from '@langchain/langgraph/remote';
 
 const url = `http://localhost:8123`;
 const ligandGraph = new RemoteGraph({ graphId: 'graph', url });
-const config = { configurable: { thread_id: 'ff090f1f-30bf-494b-a343-46d066bead3f' } };
+const config = { configurable: { thread_id: 'a3be082e-59c5-4070-85af-c30093f71ce4' } };
 // ***
 
 type Props = {
