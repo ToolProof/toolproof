@@ -1,5 +1,5 @@
 'use client';
-import { ArrowPoints, ArrowPointsWithControlPoint, Cell, Diamond, DiamondPointType, KeyType, Point, } from './types';
+import { ArrowPoints, ArrowPointsWithControlPoint, Cell, Diamond, DiamondPointType, KeyType, Point, ArrowPointSpec, ArrowSpec, ArrowSpecOrdered } from './types';
 import { useState, useRef, useEffect } from 'react';
 
 
@@ -256,16 +256,134 @@ export default function Lasagna() {
         // strokeCellWithColor(cell.point.x, cell.point.y, 'green');
       }
 
-      const Agent_Human = getArrowPoints('Agent', 'top', 'Human', 'bottom');
-      const Human_Agent = getArrowPoints('Human', 'bottom', 'Agent', 'top');
-      const Agent_Candidates = getArrowPoints('Agent', 'right', 'Candidates', 'left');
-      const Anchors_Agent = getArrowPoints('Anchors', 'right', 'Agent', 'left');
-      const Agent_Papers = getArrowPoints('Agent', 'right', 'Papers', 'left');
-      const Papers_Human = getArrowPoints('Papers', 'left', 'Human', 'right');
+      const Agent_Human: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Agent',
+            location: 'top'
+          },
+          end: {
+            cellKey: 'Human',
+            location: 'bottom'
+          }
+        },
+        index: 0,
+      };
+
+      const Human_Agent: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Human',
+            location: 'bottom'
+          },
+          end: {
+            cellKey: 'Agent',
+            location: 'top'
+          }
+        },
+        index: 1,
+      };
+
+      const Agent_Candidates: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Agent',
+            location: 'right'
+          },
+          end: {
+            cellKey: 'Candidates',
+            location: 'left'
+          }
+        },
+        index: 2,
+      };
+
+      const Anchors_Agent: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Anchors',
+            location: 'right'
+          },
+          end: {
+            cellKey: 'Agent',
+            location: 'left'
+          }
+        },
+        index: 3,
+      };
+
+      const Agent_Papers: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Agent',
+            location: 'right'
+          },
+          end: {
+            cellKey: 'Papers',
+            location: 'left'
+          }
+        },
+        index: 4,
+      };
+
+      const Papers_Human: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Papers',
+            location: 'left'
+          },
+          end: {
+            cellKey: 'Human',
+            location: 'right'
+          }
+        },
+        index: 5,
+      };
+
       // Curvy arrows
-      const Candidates_Simulation = getArrowPoints('Candidates', 'right', 'Simulation', 'top');
-      const Simulation_Results = getArrowPoints('Simulation', 'bottom', 'Results', 'right');
-      const Results_Agent = getArrowPoints('Results', 'left', 'Agent', 'bottom');
+
+      const Candidates_Simulation: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Candidates',
+            location: 'right'
+          },
+          end: {
+            cellKey: 'Simulation',
+            location: 'top'
+          }
+        },
+        index: 6,
+      };
+
+      const Simulation_Results: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Simulation',
+            location: 'bottom'
+          },
+          end: {
+            cellKey: 'Results',
+            location: 'right'
+          }
+        },
+        index: 7,
+      };
+
+      const Results_Agent: ArrowSpecOrdered = {
+        arrow: {
+          start: {
+            cellKey: 'Results',
+            location: 'left'
+          },
+          end: {
+            cellKey: 'Agent',
+            location: 'bottom'
+          }
+        },
+        index: 8,
+      };
+   
 
       const arrowPointsWithControlPoint1 = addControlPointForStraightLine(Agent_Human);
       const arrowPointsWithControlPoint2 = addControlPointForStraightLine(Human_Agent);
