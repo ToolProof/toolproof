@@ -75,6 +75,23 @@ export default function Lasagna() {
       const Human_Candidates = new Arrow(['Agent', 'right'], ['Candidates', 'left'], resources, cellWidth, cellHeight);
       Human_Candidates.draw(context);
 
+      const Anchors_Agent = new Arrow(['Anchors', 'right'], ['Agent', 'left'], resources, cellWidth, cellHeight);
+      Anchors_Agent.draw(context);
+
+      const Agent_Human = new Arrow(['Agent', 'top'], ['Human', 'bottom'], resources, cellWidth, cellHeight);
+      Agent_Human.draw(context);
+
+      const Human_Agent = new Arrow(['Human', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight);
+      Human_Agent.draw(context);
+
+      const Agent_Papers = new Arrow(['Agent', 'right'], ['Papers', 'left'], resources, cellWidth, cellHeight);
+      Agent_Papers.draw(context);
+
+      const Papers_Human = new Arrow(['Papers', 'left'], ['Human', 'right'], resources, cellWidth, cellHeight);
+      Papers_Human.draw(context);
+
+      // Curvy arrows
+
       const Candidates_Simulation = new Arrow(['Candidates', 'right'], ['Simulation', 'top'], resources, cellWidth, cellHeight);
       Candidates_Simulation.drawCurvy(context, [new Cell(7, 3), 'bottom'], resources, cellWidth, cellHeight);
 
@@ -82,7 +99,7 @@ export default function Lasagna() {
       Simulation_Results.drawCurvy(context, [new Cell(7, 7), 'top'], resources, cellWidth, cellHeight);
 
       const Results_Agent = new Arrow(['Results', 'left'], ['Agent', 'bottom'], resources, cellWidth, cellHeight);
-      Results_Agent.drawCurvy(context, [new Cell(3, 6), 'bottom'], resources, cellWidth, cellHeight);
+      Results_Agent.drawCurvy(context, [new Cell(3, 7), 'bottom'], resources, cellWidth, cellHeight);
 
     }
 
