@@ -1,5 +1,5 @@
 'use client';
-import { ArrowPoints, ArrowPointsWithControlPoint, Cell, Diamond, DiamondPointType, KeyType, Point, ArrowPointSpec, ArrowSpec, ArrowSpecOrdered } from './types';
+import { Arrow, CurvableArrow, Cell, Diamond, DiamondPointType, KeyType, Point, PointSpec, ArrowSpec, OrderableArrowSpec } from './types';
 import { useState, useRef, useEffect } from 'react';
 
 
@@ -150,7 +150,7 @@ export default function Lasagna() {
       strokeCellWithColor(cell.point, 'yellow');
     };
 
-    const drawCurvyArrow = (apwcp: ArrowPointsWithControlPoint) => {
+    const drawCurvyArrow = (apwcp: CurvableArrow) => {
       const context = getContext();
       if (!context) return;
 
@@ -185,25 +185,8 @@ export default function Lasagna() {
       return { topLeft, topRight, bottomLeft, bottomRight };
     };
 
-    const getInnerDiamond = (point: Point): Diamond => {
-      const top = { x: point.x * cellWidth + cellWidth / 2, y: point.y * cellHeight + cellHeight * 0.15 };
-      const bottom = { x: point.x * cellWidth + cellWidth / 2, y: point.y * cellHeight + cellHeight * 0.85 };
-      const left = { x: point.x * cellWidth + cellWidth * 0.15, y: point.y * cellHeight + cellHeight / 2 };
-      const right = { x: point.x * cellWidth + cellWidth * 0.85, y: point.y * cellHeight + cellHeight / 2 };
 
-      return { top, bottom, left, right };
-    };
-
-    const getOuterDiamond = (point: Point): Diamond => {
-      const top = { x: point.x * cellWidth + cellWidth / 2, y: point.y * cellHeight };
-      const bottom = { x: point.x * cellWidth + cellWidth / 2, y: (point.y + 1) * cellHeight };
-      const left = { x: point.x * cellWidth, y: point.y * cellHeight + cellHeight / 2 };
-      const right = { x: (point.x + 1) * cellWidth, y: point.y * cellHeight + cellHeight / 2 };
-
-      return { top, bottom, left, right };
-    };
-
-    const getArrowPoints = (cell1Key: KeyType, diamondPoint1: DiamondPointType, cell2Key: KeyType, diamondPoint2: DiamondPointType): ArrowPoints => {
+    const getArrowPoints = (cell1Key: KeyType, diamondPoint1: DiamondPointType, cell2Key: KeyType, diamondPoint2: DiamondPointType): Arrow => {
       const cell1 = cells[cell1Key];
       const cell2 = cells[cell2Key];
 
@@ -217,7 +200,7 @@ export default function Lasagna() {
 
     };
 
-    const addControlPointForStraightLine = (arrowPoints: ArrowPoints): ArrowPointsWithControlPoint => {
+    const addControlPointForStraightLine = (arrowPoints: Arrow): CurvableArrow => {
       const x = (arrowPoints.startPoint.x + arrowPoints.endPoint.x) / 2;
       const y = (arrowPoints.startPoint.y + arrowPoints.endPoint.y) / 2;
       console.log('x:', x, 'y:', y);
@@ -227,7 +210,7 @@ export default function Lasagna() {
       };
     };
 
-    const addControlPointForCurvyLine = (arrowPoints: ArrowPoints): ArrowPointsWithControlPoint => {
+    const addControlPointForCurvyLine = (arrowPoints: Arrow): CurvableArrow => {
       const x = (arrowPoints.startPoint.x + arrowPoints.endPoint.x) / 2;
       const y = (arrowPoints.startPoint.y + arrowPoints.endPoint.y) / 2;
       return {
@@ -256,85 +239,85 @@ export default function Lasagna() {
         // strokeCellWithColor(cell.point.x, cell.point.y, 'green');
       }
 
-      const Agent_Human: ArrowSpecOrdered = {
+      const Agent_Human: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Agent',
-            location: 'top'
+            diamondPoint: 'top'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Human',
-            location: 'bottom'
+            diamondPoint: 'bottom'
           }
         },
         index: 0,
       };
 
-      const Human_Agent: ArrowSpecOrdered = {
+      const Human_Agent: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Human',
-            location: 'bottom'
+            diamondPoint: 'bottom'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Agent',
-            location: 'top'
+            diamondPoint: 'top'
           }
         },
         index: 1,
       };
 
-      const Agent_Candidates: ArrowSpecOrdered = {
+      const Agent_Candidates: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Agent',
-            location: 'right'
+            diamondPoint: 'right'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Candidates',
-            location: 'left'
+            diamondPoint: 'left'
           }
         },
         index: 2,
       };
 
-      const Anchors_Agent: ArrowSpecOrdered = {
+      const Anchors_Agent: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Anchors',
-            location: 'right'
+            diamondPoint: 'right'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Agent',
-            location: 'left'
+            diamondPoint: 'left'
           }
         },
         index: 3,
       };
 
-      const Agent_Papers: ArrowSpecOrdered = {
+      const Agent_Papers: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Agent',
-            location: 'right'
+            diamondPoint: 'right'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Papers',
-            location: 'left'
+            diamondPoint: 'left'
           }
         },
         index: 4,
       };
 
-      const Papers_Human: ArrowSpecOrdered = {
+      const Papers_Human: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Papers',
-            location: 'left'
+            diamondPoint: 'left'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Human',
-            location: 'right'
+            diamondPoint: 'right'
           }
         },
         index: 5,
@@ -342,43 +325,43 @@ export default function Lasagna() {
 
       // Curvy arrows
 
-      const Candidates_Simulation: ArrowSpecOrdered = {
+      const Candidates_Simulation: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Candidates',
-            location: 'right'
+            diamondPoint: 'right'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Simulation',
-            location: 'top'
+            diamondPoint: 'top'
           }
         },
         index: 6,
       };
 
-      const Simulation_Results: ArrowSpecOrdered = {
+      const Simulation_Results: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Simulation',
-            location: 'bottom'
+            diamondPoint: 'bottom'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Results',
-            location: 'right'
+            diamondPoint: 'right'
           }
         },
         index: 7,
       };
 
-      const Results_Agent: ArrowSpecOrdered = {
+      const Results_Agent: OrderableArrowSpec = {
         arrow: {
-          start: {
+          startPointSpec: {
             cellKey: 'Results',
-            location: 'left'
+            diamondPoint: 'left'
           },
-          end: {
+          endPointSpec: {
             cellKey: 'Agent',
-            location: 'bottom'
+            diamondPoint: 'bottom'
           }
         },
         index: 8,
