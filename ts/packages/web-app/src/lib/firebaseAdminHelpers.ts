@@ -2,10 +2,9 @@ import * as Constants from 'shared/src/constants';
 import dbAdmin from 'shared/src/firebaseAdminInit';
 import admin from 'firebase-admin';
 import { Storage, UploadResponse } from '@google-cloud/storage';
-import { MessageWrite, MessageRead } from 'shared/src/typings';
 
 
-export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, newTurnState: number): Promise<Omit<MessageRead, 'timestamp'>> => {
+/* export const updateChat = async (chatId: string, aiMessageContent: string, userMessageId: string, newTurnState: number): Promise<Omit<MessageRead, 'timestamp'>> => {
     try {
         const batch = dbAdmin.batch();
         const chatRef = dbAdmin.collection(Constants.chats).doc(chatId);
@@ -28,7 +27,7 @@ export const updateChat = async (chatId: string, aiMessageContent: string, userM
         console.error('Failed to execute batch operation:', error);
         throw new Error('An error occurred while executing batch operation');
     }
-};
+}; */
 
 
 

@@ -1,5 +1,5 @@
 import * as CONSTANTS from 'shared/src/constants';
-import { ChatWrite, MessageWrite, ChatRead, MessageRead } from 'shared/src/typings';
+import { ChatWrite, ChatRead } from 'shared/src/typings';
 import { db } from '@/lib/firebaseWebInit';
 import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
@@ -28,7 +28,7 @@ export const deleteChat = async (chatId: string) => {
 }
 
 
-export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<Omit<MessageRead, 'timestamp'>> => {
+/* export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<Omit<MessageRead, 'timestamp'>> => {
   try {
     const docRef = await addDoc(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), {
       ...messageWrite,
@@ -39,7 +39,7 @@ export const addMessage = async (chatId: string, messageWrite: MessageWrite): Pr
     console.error(e);
     throw new Error('An error occurred while adding message');
   }
-}
+} */
 
 
 export function useChats(userId: string) {
@@ -70,7 +70,7 @@ export function useChat(chatId: string) { // ATTENTION: be consistent with funct
 }
 
 
-export const useMessages = (chatId: string) => {
+/* export const useMessages = (chatId: string) => {
   const messagesQuery = query(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), orderBy(CONSTANTS.timestamp, CONSTANTS.asc));
   const [messagesSnapshot, loading, error] = useCollection(messagesQuery);
 
@@ -80,7 +80,7 @@ export const useMessages = (chatId: string) => {
   })) as MessageRead[] || [];
 
   return { messages, loading, error };
-}
+} */
 
 
 export async function getIdOfUsersFirstChat(userId: string) {

@@ -5,7 +5,7 @@ dotenv.config();
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 // import { MessageRead } from 'shared/src/typings';
-import { updateChat, uploadFileToStorage } from '../firebaseAdminHelpers';
+// import { updateChat, uploadFileToStorage } from '../firebaseAdminHelpers';
 import { upsertVectors } from '../pineconeHelpers';
 
 import fs from 'fs';
@@ -51,7 +51,7 @@ export default async function sendPromptAction({ chatId, promptSeed, userName, u
 
         const aiMessageContent = result.messages[messagesLength - 1].content;
 
-        const aiMessage = await updateChat(chatId, aiMessageContent, userMessage, 1); // ATTENTION: turnState should be decided by the AI
+        // const aiMessage = await updateChat(chatId, aiMessageContent, userMessage, 1); // ATTENTION: turnState should be decided by the AI
 
         // upsertVectors(chatId, [userMessage, aiMessage]); // ATTENTION: do I want to await this?
 
