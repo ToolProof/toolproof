@@ -262,7 +262,7 @@ export class Arrow extends GraphElement {
             return resource.cell.getOuterDiamond()[input[1]];
         } else {
             // Input is a Cell
-            return input[0].getOuterDiamond(cellWidth, cellHeight)[input[1]];
+            return input[0].getOuterDiamond()[input[1]];
         }
     }
 
