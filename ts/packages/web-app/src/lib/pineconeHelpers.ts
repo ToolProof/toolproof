@@ -1,6 +1,5 @@
 import * as CONSTANTS from 'shared/src/constants';
-import pc from '@/setup/pinecone';
-import { MessageRead } from 'shared/src/typings';
+import pc from '@/setup/pinecone';;
 import { OpenAIEmbeddings } from '@langchain/openai';
 
 const indexName = `${CONSTANTS.openai}-text-embedding-ada-002`; // ATTENTION: hardcoded
