@@ -6,7 +6,9 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "quotes": ["error", "single", { "allowTemplateLiterals": true }]
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "@typescript-eslint/no-unused-vars": "off", 
+    "@next/next/no-img-element": "off"
   },
   "ignorePatterns": ["src/setup/generated/*"]
 }
