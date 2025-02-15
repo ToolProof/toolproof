@@ -32,7 +32,7 @@ export default function Home() {
       if (timeoutRef.current) { // Ensures it stops when cleared
         playNext();
       }
-    }, 100);
+    }, 3000);
   };
 
   const handleClickPlay = () => {
@@ -89,6 +89,24 @@ export default function Home() {
           <li>Blue means Google Cloud Platform</li>
           <li>Green means Vercel-hosted web-application</li>
         </ul>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <p><b>Problem: moving data between LangGraph Platform and GCP Cloud Storage</b></p>
+        <ul>
+          <li>Maybe we need intermediate workers, as indicated by the <em>small</em> blue rectangles</li>
+          <li>These workers could be implemented by Python-scripts hosted on GCP Cloud Run</li>
+          <li>They will convert data in various file formats to JSON and feed it to the Agent</li>
+        </ul>
+        <br />
+        <p><b>Det er her du kommer inn i bildet, Kenneth!</b></p>
       </div>
       <div className="fixed top-0 right-0 p-4">
 
