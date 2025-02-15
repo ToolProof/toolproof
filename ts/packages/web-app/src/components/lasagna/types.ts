@@ -259,7 +259,7 @@ export class Arrow extends GraphElement {
             // Input is a ResourceNameType
             const resource = resources[input[0]];
             if (!resource) throw new Error(`Resource ${input[0]} not found.`);
-            return resource.cell.getOuterDiamond(cellWidth, cellHeight)[input[1]];
+            return resource.cell.getOuterDiamond()[input[1]];
         } else {
             // Input is a Cell
             return input[0].getOuterDiamond(cellWidth, cellHeight)[input[1]];
