@@ -6,7 +6,7 @@ import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 // import { MessageRead } from 'shared/src/typings';
 // import { updateChat, uploadFileToStorage } from '../firebaseAdminHelpers';
-import { upsertVectors } from '../pineconeHelpers';
+// import { upsertVectors } from '../pineconeHelpers';
 
 import fs from 'fs';
 import path from 'path';
