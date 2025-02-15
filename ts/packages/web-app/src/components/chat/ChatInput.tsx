@@ -1,7 +1,7 @@
 'use client'
 // import * as Constants from 'shared/src/constants'
 import { ChatRead } from 'shared/src/typings';
-import sendPromptAction from '@/lib/chat/ligand/sendPromptAction';
+import sendPromptAction from '@/lib/chat/sendPromptAction';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { addMessages, setMessages } from '@/redux/features/messagesSlice';
 import { useState, useEffect, useRef } from 'react';
