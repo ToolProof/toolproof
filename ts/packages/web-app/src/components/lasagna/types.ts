@@ -1,8 +1,48 @@
 
+// ATTENTION: could be a more powerful type to allow for aliases
+export type ResourceNameType =
+    | 'Agent'
+    | 'Human'
+    | 'Simulation'
+    | 'Anchors'
+    | 'AnchorsGlue'
+    | 'Candidates'
+    | 'CandidatesGlue'
+    | 'Results'
+    | 'ResultsGlue'
+    | 'Papers'
+    | 'PapersGlue';
+
+
+export type ArrowNameType =
+    | 'Agent_Candidates'
+    | 'Candidates_Simulation'
+    | 'Simulation_Results'
+    | 'Results_Agent'
+    | 'Agent_Anchors'
+    | 'Anchors_Agent'
+    | 'Agent_Human'
+    | 'Human_Agent'
+    | 'Agent_Papers'
+    | 'Papers_Human'
+    | 'Agent_Agent';
+
+
+export type GraphElementNameType = ResourceNameType | ArrowNameType;
+
+
+export class GraphElement {
+    draw(context: CanvasRenderingContext2D, color: string) {
+        // Placeholder method to be overridden by subclasses
+        console.log('Drawing a graph element');
+    }
+}
+
 
 export class Point {
     constructor(public x: number, public y: number) { }
 }
+
 
 export interface Corners {
     topLeft: Point;
@@ -21,77 +61,64 @@ export interface Diamond {
 
 
 export class Cell {
-    constructor(public col: number, public row: number) {
-        this.col = col;
-        this.row = row;
-    }
+    constructor(
+        public col: number,
+        public row: number,
+        public width: number,
+        public height: number
+    ) { }
 
-    getCenter(width: number, height: number): Point {
+    getCenter(): Point {
         return new Point(
-            this.col * width + width / 2,
-            this.row * height + height / 2
+            this.col * this.width + this.width / 2,
+            this.row * this.height + this.height / 2
         );
     }
 
-    getCorners = (width: number, height: number): Corners => {
-        const topLeft = { x: this.col * width, y: this.row * height };
-        const topRight = { x: (this.col + 1) * width, y: this.row * height };
-        const bottomLeft = { x: this.col * width, y: (this.row + 1) * height };
-        const bottomRight = { x: (this.col + 1) * width, y: (this.row + 1) * height };
+    getCorners(): Corners {
+        return {
+            topLeft: { x: this.col * this.width, y: this.row * this.height },
+            topRight: { x: (this.col + 1) * this.width, y: this.row * this.height },
+            bottomLeft: { x: this.col * this.width, y: (this.row + 1) * this.height },
+            bottomRight: { x: (this.col + 1) * this.width, y: (this.row + 1) * this.height }
+        };
+    }
 
-        return { topLeft, topRight, bottomLeft, bottomRight };
-    };
+    getInnerDiamond(): Diamond {
+        return {
+            top: { x: this.col * this.width + this.width / 2, y: this.row * this.height + this.height * 0.15 },
+            bottom: { x: this.col * this.width + this.width / 2, y: this.row * this.height + this.height * 0.85 },
+            left: { x: this.col * this.width + this.width * 0.15, y: this.row * this.height + this.height / 2 },
+            right: { x: this.col * this.width + this.width * 0.85, y: this.row * this.height + this.height / 2 }
+        };
+    }
 
-    getInnerDiamond = (width: number, height: number): Diamond => {
-        const top = { x: this.col * width + width / 2, y: this.row * height + height * 0.15 };
-        const bottom = { x: this.col * width + width / 2, y: this.row * height + height * 0.85 };
-        const left = { x: this.col * width + width * 0.15, y: this.row * height + height / 2 };
-        const right = { x: this.col * width + width * 0.85, y: this.row * height + height / 2 };
-
-        return { top, bottom, left, right };
-    };
-
-    getOuterDiamond = (width: number, height: number): Diamond => {
-        const top = { x: this.col * width + width / 2, y: this.row * height };
-        const bottom = { x: this.col * width + width / 2, y: (this.row + 1) * height };
-        const left = { x: this.col * width, y: this.row * height + height / 2 };
-        const right = { x: (this.col + 1) * width, y: this.row * height + height / 2 };
-
-        return { top, bottom, left, right };
-    };
-
-
+    getOuterDiamond(): Diamond {
+        return {
+            top: { x: this.col * this.width + this.width / 2, y: this.row * this.height },
+            bottom: { x: this.col * this.width + this.width / 2, y: (this.row + 1) * this.height },
+            left: { x: this.col * this.width, y: this.row * this.height + this.height / 2 },
+            right: { x: (this.col + 1) * this.width, y: this.row * this.height + this.height / 2 }
+        };
+    }
 }
-
-
-// ATTENTION: could be a more powerful type to allow for aliases
-export type ResourceNameType =
-    | 'Agent'
-    | 'Human'
-    | 'Simulation'
-    | 'Anchors'
-    | 'AnchorsGlue'
-    | 'Candidates'
-    | 'CandidatesGlue'
-    | 'Results'
-    | 'ResultsGlue'
-    | 'Papers'
-    | 'PapersGlue';
 
 
 export type Environment = 'lg' | 'vercel' | 'gcp';
 export type Nature = 'code' | 'code_glue' | 'data';
 
 
-export class Resource {
+export class Resource extends GraphElement {
     constructor(
         public cell: Cell,
         public environment: Environment,
         public nature: Nature,
         public isActive: boolean
-    ) { }
+    ) {
+        super();
+    }
 
-    getColor(): string {
+    getFillColor(): string {
         let color: string;
         if (this.environment === 'lg') {
             color = '255, 0, 0'; // red
@@ -107,49 +134,48 @@ export class Resource {
         return `rgba(${color}, ${alpha})`;
     }
 
-    draw(context: CanvasRenderingContext2D, cellWidth: number, cellHeight: number) {
+    fill(context: CanvasRenderingContext2D) {
         if (!context) return;
 
-        const x = this.cell.col * cellWidth;
-        const y = this.cell.row * cellHeight;
-        const radius = Math.min(cellWidth, cellHeight) / 2 + 10; // Adjust the radius as needed
+        const x = this.cell.col * this.cell.width;
+        const y = this.cell.row * this.cell.height;
+        const radius = Math.min(this.cell.width, this.cell.height) / 2 + 10; // Adjust the radius as needed
 
-        context.fillStyle = this.getColor();
+        context.fillStyle = this.getFillColor();
 
         if (this.nature === 'data') {
             context.beginPath();
-            context.ellipse(x + cellWidth / 2, y + cellHeight / 2, cellWidth / 2, radius, 0, 0, 2 * Math.PI);
+            context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
             context.fill();
-            context.stroke();
         } else if (this.nature === 'code') {
-            context.fillRect(x, y, cellWidth, cellHeight);
-            context.strokeRect(x, y, cellWidth, cellHeight);
+            context.fillRect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            const quarterWidth = cellWidth / 4;
-            const halfHeight = cellHeight / 2;
-            const centeredX = x + (cellWidth - quarterWidth) / 2;
-            const centeredY = y + (cellHeight - halfHeight) / 2;
+            // return; // No fill for code_glue
+
+            const quarterWidth = this.cell.width / 4;
+            const halfHeight = this.cell.height / 2;
+            const centeredX = x + (this.cell.width - quarterWidth) / 2;
+            const centeredY = y + (this.cell.height - halfHeight) / 2;
             context.fillRect(centeredX, centeredY, quarterWidth, halfHeight);
-            context.strokeRect(centeredX, centeredY, quarterWidth, halfHeight);
         }
     }
 
-    drawText(context: CanvasRenderingContext2D, key: string, cellWidth: number, cellHeight: number, z: boolean) {
+    drawText(context: CanvasRenderingContext2D, key: string) {
         if (!context) return;
 
-        const x = this.cell.col * cellWidth;
-        const y = this.cell.row * cellHeight;
+        const x = this.cell.col * this.cell.width;
+        const y = this.cell.row * this.cell.height;
         context.font = '16px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
-        let displayText = this.nature === 'code_glue' ? '' : key;
-        if (displayText === 'Simulation') {
-            displayText = z ? 'AutoDock' : 'Schrödinger';
-        }
+        const displayText = this.nature === 'code_glue' ? '' : key;
+        /* if (displayText === 'Simulation') {
+            displayText = true ? 'AutoDock' : 'Schrödinger';
+        } */
 
-        context.fillText(displayText, x + cellWidth / 2, y + cellHeight / 2);
+        context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
 
         let subText = '';
         if (this.nature === 'code' && this.environment === 'lg') {
@@ -164,17 +190,17 @@ export class Resource {
 
         if (subText) {
             context.font = '10px Arial';
-            context.fillText(subText, x + cellWidth / 2, y + cellHeight / 2 + 20);
+            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 20);
         }
     }
 
-    stroke(context: CanvasRenderingContext2D, cellWidth: number, cellHeight: number, color: string) {
+    draw(context: CanvasRenderingContext2D, color: string) {
         if (!context) return;
 
         const { col, row } = this.cell;
-        const x = col * cellWidth;
-        const y = row * cellHeight;
-        const radius = Math.min(cellWidth, cellHeight) / 2 + 10; // Adjust radius for ellipse
+        const x = col * this.cell.width;
+        const y = row * this.cell.height;
+        const radius = Math.min(this.cell.width, this.cell.height) / 2 + 10; // Adjust radius for ellipse
 
         context.strokeStyle = color;
         context.lineWidth = 2; // Adjust as needed
@@ -183,16 +209,18 @@ export class Resource {
 
         if (this.nature === 'data') {
             // Ellipse stroke
-            context.ellipse(x + cellWidth / 2, y + cellHeight / 2, cellWidth / 2, radius, 0, 0, 2 * Math.PI);
+            context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
         } else if (this.nature === 'code') {
             // Full cell rectangle stroke
-            context.rect(x, y, cellWidth, cellHeight);
+            context.rect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
+            // return; // No stroke for code_glue
+
             // Smaller centered rectangle stroke
-            const quarterWidth = cellWidth / 4;
-            const halfHeight = cellHeight / 2;
-            const centeredX = x + (cellWidth - quarterWidth) / 2;
-            const centeredY = y + (cellHeight - halfHeight) / 2;
+            const quarterWidth = this.cell.width / 4;
+            const halfHeight = this.cell.height / 2;
+            const centeredX = x + (this.cell.width - quarterWidth) / 2;
+            const centeredY = y + (this.cell.height - halfHeight) / 2;
             context.rect(centeredX, centeredY, quarterWidth, halfHeight);
         }
 
@@ -203,7 +231,9 @@ export class Resource {
 
 export type DiamondPointType = 'top' | 'bottom' | 'left' | 'right';
 
-export class Arrow {
+
+
+export class Arrow extends GraphElement {
     public startPoint: Point;
     public endPoint: Point;
 
@@ -214,6 +244,7 @@ export class Arrow {
         cellWidth: number,
         cellHeight: number
     ) {
+        super();
         this.startPoint = Arrow.resolvePoint(start, resources, cellWidth, cellHeight);
         this.endPoint = Arrow.resolvePoint(end, resources, cellWidth, cellHeight);
     }
@@ -235,18 +266,26 @@ export class Arrow {
         }
     }
 
-    draw(context: CanvasRenderingContext2D) {
+    draw(context: CanvasRenderingContext2D, color: string) {
         if (!context) return;
 
+        // Draw black outline
         context.strokeStyle = 'black';
-        context.lineWidth = 2;
-
+        context.lineWidth = 4;
         context.beginPath();
         context.moveTo(this.startPoint.x, this.startPoint.y);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        this.drawArrowhead(context, this.startPoint, this.endPoint);
+        // Draw colored line
+        context.strokeStyle = color;
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(this.startPoint.x, this.startPoint.y);
+        context.lineTo(this.endPoint.x, this.endPoint.y);
+        context.stroke();
+
+        this.drawArrowhead(context, this.startPoint, this.endPoint, color);
     }
 
     drawCurvy(
@@ -254,7 +293,8 @@ export class Arrow {
         control: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         resources: Record<ResourceNameType, Resource>,
         cellWidth: number,
-        cellHeight: number
+        cellHeight: number,
+        color: string
     ) {
         if (!context) return;
 
@@ -263,34 +303,44 @@ export class Arrow {
 
         // Draw the quadratic Bézier curve
         context.strokeStyle = 'black';
-        context.lineWidth = 2;
-
+        context.lineWidth = 4;
         context.beginPath();
         context.moveTo(this.startPoint.x, this.startPoint.y);
         context.quadraticCurveTo(controlPoint.x, controlPoint.y, this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        this.drawCurvedArrowhead(context, this.startPoint, controlPoint, this.endPoint);
+        // Draw colored line
+        context.strokeStyle = color;
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(this.startPoint.x, this.startPoint.y);
+        context.quadraticCurveTo(controlPoint.x, controlPoint.y, this.endPoint.x, this.endPoint.y);
+        context.stroke();
+
+        this.drawCurvedArrowhead(context, this.startPoint, controlPoint, this.endPoint, color);
     }
 
-    private drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point) {
+    private drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
         const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        this.drawArrowheadAtAngle(context, end, angle);
+        this.drawArrowheadAtAngle(context, end, angle, color);
     }
 
-    private drawCurvedArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point) {
+    private drawCurvedArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
         // Compute tangent direction at endpoint of the quadratic Bézier curve
         const t = 1; // At the endpoint
         const dx = 2 * (1 - t) * (control.x - start.x) + 2 * t * (end.x - control.x);
         const dy = 2 * (1 - t) * (control.y - start.y) + 2 * t * (end.y - control.y);
         const angle = Math.atan2(dy, dx);
 
-        this.drawArrowheadAtAngle(context, end, angle);
+        this.drawArrowheadAtAngle(context, end, angle, color);
     }
 
-    private drawArrowheadAtAngle(context: CanvasRenderingContext2D, position: Point, angle: number) {
+    private drawArrowheadAtAngle(context: CanvasRenderingContext2D, position: Point, angle: number, color: string) {
         const arrowSize = 10;
 
+        // Draw black outline
+        context.strokeStyle = 'black';
+        context.lineWidth = 2;
         context.beginPath();
         context.moveTo(position.x, position.y);
         context.lineTo(
@@ -302,6 +352,10 @@ export class Arrow {
             position.y - arrowSize * Math.sin(angle + Math.PI / 6)
         );
         context.closePath();
+        context.stroke();
+
+        // Draw colored fill
+        context.fillStyle = color;
         context.fill();
     }
 }

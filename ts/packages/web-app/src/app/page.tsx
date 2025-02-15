@@ -1,45 +1,107 @@
 'use client'
 import Lasagna from '@/components/lasagna/Lasagna';
-import { useAppSelector } from '@/redux/hooks';
-// import { createIndexWrapper } from '@/lib/pineconeHelpers';
-import { useEffect, useState } from 'react';
-import { signIn, useSession } from 'next-auth/react';
-
+import { sequence } from '@/components/lasagna/constants';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Home() {
-  const { data: session } = useSession();
-  const isApproved = useAppSelector(state => state.config.isApproved);
-  const [isIndexCreated, setIsIndexCreated] = useState(false);
+  const [playButtonText, setPlayButtonText] = useState<'Play' | 'Stop'>('Play');
+  const [detailsText, setDetailsText] = useState('');
+  const [z, setZ] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => { // ATTENTION: temporary hack to create index
-    if (!isIndexCreated) {
-      // createIndexWrapper();
-      setIsIndexCreated(true);
-      // console.log('Index created', isIndexCreated);
+  useEffect(() => {
+    const index = z % 2 === 0 ? z : z - 1;
+    setDetailsText(sequence[index][1]);
+  }, [z]);
+
+  const handleClickPrevious = () => {
+    if (z > 0) {
+      if (z % 2 === 0) {
+        setZ(z - 2);
+      } else {
+        setZ(z - 1);
+      }
+    } else {
+      setZ(sequence.length - 2);
     }
-  }, [isIndexCreated]);
+  }
+
+  const playNext = () => {
+    setZ((prevZ) => (prevZ < sequence.length - 2 ? prevZ + 2 : 0));
+    timeoutRef.current = setTimeout(() => {
+      if (timeoutRef.current) { // Ensures it stops when cleared
+        playNext();
+      }
+    }, 100);
+  };
+
+  const handleClickPlay = () => {
+    if (playButtonText === 'Stop') {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      setPlayButtonText('Play');
+    } else {
+      setPlayButtonText('Stop');
+      timeoutRef.current = setTimeout(playNext, 1000);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleClickNext = () => {
+    console.log('z', z);
+    console.log('sequence.length', sequence.length);
+    if (z < sequence.length - 2) {
+      if (z % 2 === 0) {
+        setZ(z + 2);
+      } else {
+        setZ(z + 1);
+      }
+    } else {
+      setZ(0);
+    }
+  }
 
   return (
-    <div>
-      <Lasagna />
+    <div className="relative">
+      <div className="fixed top-0 left-0 w-full text-center p-4 text-xl font-bold">
+        ToolProof Drug Discovery
+      </div>
+      <div className="fixed top-0 left-0 p-4 text-xs" style={{ marginTop: '3rem' }}>
+        <p><b>Shape indicates <em>nature</em> (what the resource is)</b></p>
+        <ul>
+          <li>Rectangle means execution of business logic</li>
+          <li>Ellipse means static data storage</li>
+        </ul>
+        <br />
+        <p><b>Color indicates <em>platform</em> (where the code/data runs/resides)</b></p>
+        <ul>
+          <li>Red means LangGraph Platform</li>
+          <li>Blue means Google Cloud Platform</li>
+          <li>Green means Vercel-hosted web-application</li>
+        </ul>
+      </div>
+      <div className="fixed top-0 right-0 p-4">
+
+      </div>
+      <Lasagna z={z} />
+      <div className="fixed bottom-20 left-0 w-full bg-white p-4 text-center">
+        <p>{detailsText}</p>
+      </div>
+      <div className="fixed bottom-0 left-0 w-full flex justify-center p-4 bg-blue-50">
+        <button className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPrevious}>Previous</button>
+        <button className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>{playButtonText}</button>
+        <button className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickNext}>Next</button>
+      </div>
     </div>
   );
-
-  /* return (
-    <div className='bg-[#A22222] flex flex-col items-center justify-center h-full'>
-      <h1 className='text-black text-5xl mb-4'>
-        toolproof.com
-      </h1>
-      {
-        (isApproved && !session) && (
-          <button onClick={() => signIn('google')} className='text-black font-bold text-3xl animate-pulse'>
-            Sign In
-          </button>
-        )
-      }
-    </div>
-  ); */
-
 }
-
-// ATTENTION: project-number, not project-name, is shown in google sign-in

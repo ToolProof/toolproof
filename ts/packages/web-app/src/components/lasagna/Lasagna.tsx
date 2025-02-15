@@ -1,30 +1,14 @@
 'use client';
-import { ResourceNameType, Resource, Cell, Arrow } from './types';
-import { useState, useRef, useEffect } from 'react';
+import { resources, arrows, sequence, gridSize, cellWidth, cellHeight } from './constants';
+import { Cell } from './types';
+import { useRef, useEffect } from 'react';
 
+interface LasagnaProps {
+  z: number;
+}
 
-const resources: Record<ResourceNameType, Resource> = {
-  Agent: new Resource(new Cell(3, 3), 'lg', 'code', true),
-  Human: new Resource(new Cell(3, 1), 'vercel', 'code', true),
-  Simulation: new Resource(new Cell(7, 5), 'gcp', 'code', true),
-  Anchors: new Resource(new Cell(1, 3), 'gcp', 'data', true),
-  AnchorsGlue: new Resource(new Cell(2, 3), 'gcp', 'code_glue', true),
-  Candidates: new Resource(new Cell(5, 3), 'gcp', 'data', true),
-  CandidatesGlue: new Resource(new Cell(4, 3), 'gcp', 'code_glue', true),
-  Results: new Resource(new Cell(5, 7), 'gcp', 'data', false),
-  ResultsGlue: new Resource(new Cell(3, 5), 'gcp', 'code_glue', false),
-  Papers: new Resource(new Cell(5, 1), 'gcp', 'data', true),
-  PapersGlue: new Resource(new Cell(4, 2), 'gcp', 'code_glue', true),
-} as const;
-
-
-export default function Lasagna() {
+export default function Lasagna({ z }: LasagnaProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [z, setZ] = useState(false);
-
-  const gridSize = 10;
-  const cellWidth = 140;
-  const cellHeight = 70;
 
   const getContext = () => {
     const canvas = canvasRef.current;
@@ -53,62 +37,51 @@ export default function Lasagna() {
       }
     };
 
-    const foo = () => {
+    const run = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const context = canvas.getContext('2d');
       if (!context) return;
       canvas.width = gridSize * cellWidth;
       canvas.height = gridSize * cellHeight;
-      clearCanvas();
+      // clearCanvas();
       // drawGrid();
 
+      // Draw resources
       Object.entries(resources).forEach(([key, resource]) => {
-        resource.draw(context, cellWidth, cellHeight);
-        // resource.stroke(context, cellWidth, cellHeight, 'yellow');
-        resource.drawText(context, key, cellWidth, cellHeight, z);
+        resource.fill(context);
+        const color = sequence[z][0] === key ? 'yellow' : 'black';
+        resource.draw(context, color);
+        resource.drawText(context, key);
       });
 
+      // Draw arrows
+      Object.entries(arrows).forEach(([key, arrow]) => {
+        if (key !== 'Candidates_Simulation' && key !== 'Simulation_Results' && key !== 'Results_Agent' && key !== 'Agent_Agent') {
+          const color = sequence[z + 1][0] === key ? 'yellow' : 'black';
+          const keyFirst = key.split('_')[0];
+          const keySecond = key.split('_')[1];
+          const keyReverse = keySecond + '_' + keyFirst;
+          const reverseIsActive = sequence[z + 1][0] === keyReverse;
+          if (!reverseIsActive) {
+            arrow.draw(context, color);
+          }
+        }
+      });
 
-      // Arrows
+      // Draw curvy arrows
+      const color1 = sequence[z + 1][0] === 'Candidates_Simulation' ? 'yellow' : 'black';
+      arrows['Candidates_Simulation'].drawCurvy(context, [new Cell(7, 3, cellWidth, cellHeight), 'top'], resources, cellWidth, cellHeight, color1);
 
-      const Human_Candidates = new Arrow(['Agent', 'right'], ['Candidates', 'left'], resources, cellWidth, cellHeight);
-      Human_Candidates.draw(context);
+      const color2 = sequence[z + 1][0] === 'Simulation_Results' ? 'yellow' : 'black';
+      arrows['Simulation_Results'].drawCurvy(context, [new Cell(7, 6, cellWidth, cellHeight), 'top'], resources, cellWidth, cellHeight, color2);
 
-      const Anchors_Agent = new Arrow(['Anchors', 'right'], ['Agent', 'left'], resources, cellWidth, cellHeight);
-      Anchors_Agent.draw(context);
-
-      const Agent_Human = new Arrow(['Agent', 'top'], ['Human', 'bottom'], resources, cellWidth, cellHeight);
-      Agent_Human.draw(context);
-
-      const Human_Agent = new Arrow(['Human', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight);
-      Human_Agent.draw(context);
-
-      const Agent_Papers = new Arrow(['Agent', 'right'], ['Papers', 'left'], resources, cellWidth, cellHeight);
-      Agent_Papers.draw(context);
-
-      const Papers_Human = new Arrow(['Papers', 'left'], ['Human', 'right'], resources, cellWidth, cellHeight);
-      Papers_Human.draw(context);
-
-      // Curvy arrows
-
-      const Candidates_Simulation = new Arrow(['Candidates', 'right'], ['Simulation', 'top'], resources, cellWidth, cellHeight);
-      Candidates_Simulation.drawCurvy(context, [new Cell(7, 3), 'bottom'], resources, cellWidth, cellHeight);
-
-      const Simulation_Results = new Arrow(['Simulation', 'bottom'], ['Results', 'right'], resources, cellWidth, cellHeight);
-      Simulation_Results.drawCurvy(context, [new Cell(7, 7), 'top'], resources, cellWidth, cellHeight);
-
-      const Results_Agent = new Arrow(['Results', 'left'], ['Agent', 'bottom'], resources, cellWidth, cellHeight);
-      Results_Agent.drawCurvy(context, [new Cell(3, 7), 'bottom'], resources, cellWidth, cellHeight);
+      const color3 = sequence[z + 1][0] === 'Results_Agent' ? 'yellow' : 'black';
+      arrows['Results_Agent'].drawCurvy(context, [new Cell(3, 6, cellWidth, cellHeight), 'bottom'], resources, cellWidth, cellHeight, color3);
 
     }
 
-    /* setTimeout(() => {
-      setZ(!z);
-      foo();
-    }, 1000); */
-
-    foo();
+    run();
 
   }, [z]);
 
