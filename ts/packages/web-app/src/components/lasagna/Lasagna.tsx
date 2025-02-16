@@ -1,6 +1,6 @@
 'use client';
 import { resources, arrows, sequence, gridSize, cellWidth, cellHeight } from './constants';
-import { Cell } from './types';
+import { Cell, ResourceNameType } from './types';
 import { useRef, useEffect } from 'react';
 
 interface LasagnaProps {
@@ -50,34 +50,64 @@ export default function Lasagna({ z }: LasagnaProps) {
       // Draw resources
       Object.entries(resources).forEach(([key, resource]) => {
         resource.fill(context);
-        const color = sequence[z][0] === key ? 'yellow' : 'black';
+        const color = sequence[z][0].includes(key as ResourceNameType) ? 'yellow' : 'black';
         resource.draw(context, color);
         resource.drawText(context, key);
       });
 
       // Draw arrows
-      Object.entries(arrows).forEach(([key, arrow]) => {
-        if (key !== 'Candidates_Simulation' && key !== 'Simulation_Results' && key !== 'Results_Agent' && key !== 'Agent_Agent') {
-          const color = sequence[z + 1][0] === key ? 'yellow' : 'black';
-          const keyFirst = key.split('_')[0];
-          const keySecond = key.split('_')[1];
-          const keyReverse = keySecond + '_' + keyFirst;
-          const reverseIsActive = sequence[z + 1][0] === keyReverse;
-          if (!reverseIsActive) {
-            arrow.draw(context, color);
-          }
-        }
-      });
+      const color0 = sequence[z][0].includes('Human_Anchors') ? 'yellow' : 'black';
+      arrows['Human_Anchors'].drawCurvy(context, [new Cell(0, 7, cellWidth, cellHeight), 'left'], resources, color0);
 
-      // Draw curvy arrows
-      const color1 = sequence[z + 1][0] === 'Candidates_Simulation' ? 'yellow' : 'black';
-      arrows['Candidates_Simulation'].drawCurvy(context, [new Cell(7, 3, cellWidth, cellHeight), 'top'], resources, cellWidth, cellHeight, color1);
+      const color1 = sequence[z][0].includes('Agent_Anchors') ? 'yellow' : 'black';
+      const reverseIsActive1 = sequence[z][0].includes('Anchors_Agent');
+      if (!reverseIsActive1) {
+        arrows['Agent_Anchors'].drawCurvy(context, [new Cell(2, 5, cellWidth, cellHeight), 'top'], resources, color1);
+      };
 
-      const color2 = sequence[z + 1][0] === 'Simulation_Results' ? 'yellow' : 'black';
-      arrows['Simulation_Results'].drawCurvy(context, [new Cell(7, 6, cellWidth, cellHeight), 'top'], resources, cellWidth, cellHeight, color2);
+      const color2 = sequence[z][0].includes('Anchors_Agent') ? 'yellow' : 'black';
+      const reverseIsActive2 = sequence[z][0].includes('Agent_Anchors');
+      if (!reverseIsActive2) {
+        arrows['Anchors_Agent'].drawCurvy(context, [new Cell(2, 5, cellWidth, cellHeight), 'top'], resources, color2);
+      };
 
-      const color3 = sequence[z + 1][0] === 'Results_Agent' ? 'yellow' : 'black';
-      arrows['Results_Agent'].drawCurvy(context, [new Cell(3, 6, cellWidth, cellHeight), 'bottom'], resources, cellWidth, cellHeight, color3);
+      const color3 = sequence[z][0].includes('Agent_Candidates') ? 'yellow' : 'black';
+      arrows['Agent_Candidates'].drawCurvy(context, [new Cell(4, 3, cellWidth, cellHeight), 'bottom'], resources, color3);
+
+      const color4 = sequence[z][0].includes('Candidates_Simulation') ? 'yellow' : 'black';
+      const color5 = sequence[z][0].includes('Simulation_Results') ? 'yellow' : 'black';
+
+      if (color4 === 'yellow') {
+        arrows['Simulation_Results'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color5);
+
+        arrows['Candidates_Simulation'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color4);
+
+      } else {
+        arrows['Candidates_Simulation'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color4);
+
+        arrows['Simulation_Results'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color5);
+      }
+
+      const color6 = sequence[z][0].includes('Results_Agent') ? 'yellow' : 'black';
+      arrows['Results_Agent'].drawCurvy(context, [new Cell(6, 3, cellWidth, cellHeight), 'bottom'], resources, color6);
+
+      const color7 = sequence[z][0].includes('Agent_Papers') ? 'yellow' : 'black';
+      arrows['Agent_Papers'].drawCurvy(context, [new Cell(8, 3, cellWidth, cellHeight), 'bottom'], resources, color7);
+
+      const color8 = sequence[z][0].includes('Agent_Human') ? 'yellow' : 'black';
+      const reverseIsActive8 = sequence[z][0].includes('Human_Agent');
+      if (!reverseIsActive8) {
+        arrows['Agent_Human'].draw(context, color8);
+      };
+
+      const color9 = sequence[z][0].includes('Human_Agent') ? 'yellow' : 'black';
+      const reverseIsActive9 = sequence[z][0].includes('Agent_Human');
+      if (!reverseIsActive9) {
+        arrows['Human_Agent'].draw(context, color9);
+      };
+
+      const color10 = sequence[z][0].includes('Papers_Human') ? 'yellow' : 'black';
+      arrows['Papers_Human'].drawCurvy(context, [new Cell(10, 7, cellWidth, cellHeight), 'bottom'], resources, color10);
 
     }
 

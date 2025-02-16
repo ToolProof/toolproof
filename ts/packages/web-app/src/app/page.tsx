@@ -14,27 +14,23 @@ export default function Home() {
     setDetailsText(sequence[index][1]);
   }, [z]);
 
-  const handleClickPrevious = () => {
+    const handleClickPrevious = () => {
     if (z > 0) {
-      if (z % 2 === 0) {
-        setZ(z - 2);
-      } else {
-        setZ(z - 1);
-      }
+      setZ(z - 1);
     } else {
-      setZ(sequence.length - 2);
+      setZ(sequence.length - 1);
     }
   }
-
+  
   const playNext = () => {
-    setZ((prevZ) => (prevZ < sequence.length - 2 ? prevZ + 2 : 0));
+    setZ((prevZ) => (prevZ < sequence.length - 1 ? prevZ + 1 : 0));
     timeoutRef.current = setTimeout(() => {
       if (timeoutRef.current) { // Ensures it stops when cleared
         playNext();
       }
-    }, 3000);
+    }, 100);
   };
-
+  
   const handleClickPlay = () => {
     if (playButtonText === 'Stop') {
       if (timeoutRef.current) {
@@ -47,7 +43,7 @@ export default function Home() {
       timeoutRef.current = setTimeout(playNext, 1000);
     }
   };
-
+  
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -56,16 +52,12 @@ export default function Home() {
       }
     };
   }, []);
-
+  
   const handleClickNext = () => {
     console.log('z', z);
     console.log('sequence.length', sequence.length);
-    if (z < sequence.length - 2) {
-      if (z % 2 === 0) {
-        setZ(z + 2);
-      } else {
-        setZ(z + 1);
-      }
+    if (z < sequence.length - 1) {
+      setZ(z + 1);
     } else {
       setZ(0);
     }
@@ -73,7 +65,7 @@ export default function Home() {
 
   return (
     <div className="relative">
-      <div className="fixed top-0 left-0 w-full text-center p-4 text-xl font-bold">
+      {/* <div className="fixed top-0 left-0 w-full text-center p-4 text-xl font-bold">
         ToolProof Drug Discovery
       </div>
       <div className="fixed top-0 left-0 p-4 text-xs" style={{ marginTop: '3rem' }}>
@@ -106,12 +98,12 @@ export default function Home() {
           <li>These workers could be implemented by Python-scripts hosted on GCP Cloud Run</li>
           <li>They will convert data in various file formats to JSON, and feed it to the Agent via a Rest API</li>
         </ul>
-      </div>
+      </div> */}
       <div className="fixed top-0 right-0 p-4">
 
       </div>
       <Lasagna z={z} />
-      <div className="fixed bottom-20 left-0 w-full bg-white p-4 text-center">
+      <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
         <p>{detailsText}</p>
       </div>
       <div className="fixed bottom-0 left-0 w-full flex justify-center p-4 bg-blue-50">

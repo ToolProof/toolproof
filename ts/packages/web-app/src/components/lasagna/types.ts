@@ -15,6 +15,7 @@ export type ResourceNameType =
 
 
 export type ArrowNameType =
+    | 'Human_Anchors'
     | 'Agent_Candidates'
     | 'Candidates_Simulation'
     | 'Simulation_Results'
@@ -150,7 +151,7 @@ export class Resource extends GraphElement {
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            // return; // No fill for code_glue
+            return; // No fill for code_glue
 
             const quarterWidth = this.cell.width / 4;
             const halfHeight = this.cell.height / 2;
@@ -189,7 +190,7 @@ export class Resource extends GraphElement {
         }
 
         if (subText) {
-            context.font = '10px Arial';
+            context.font = '9px Arial';
             context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 20);
         }
     }
@@ -214,7 +215,7 @@ export class Resource extends GraphElement {
             // Full cell rectangle stroke
             context.rect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            // return; // No stroke for code_glue
+            return; // No stroke for code_glue
 
             // Smaller centered rectangle stroke
             const quarterWidth = this.cell.width / 4;
@@ -240,26 +241,27 @@ export class Arrow extends GraphElement {
     constructor(
         start: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         end: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        resources: Record<ResourceNameType, Resource>,
-        cellWidth: number,
-        cellHeight: number
+        resources: Record<ResourceNameType, Resource>
     ) {
         super();
-        this.startPoint = Arrow.resolvePoint(start, resources, cellWidth, cellHeight);
-        this.endPoint = Arrow.resolvePoint(end, resources, cellWidth, cellHeight);
+        this.startPoint = Arrow.resolvePoint(start, resources);
+        this.endPoint = Arrow.resolvePoint(end, resources);
     }
 
     private static resolvePoint(
         input: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        resources: Record<ResourceNameType, Resource>,
-        cellWidth: number,
-        cellHeight: number
+        resources: Record<ResourceNameType, Resource>
     ): Point {
         if (typeof input[0] === 'string') {
             // Input is a ResourceNameType
             const resource = resources[input[0]];
             if (!resource) throw new Error(`Resource ${input[0]} not found.`);
-            return resource.cell.getOuterDiamond()[input[1]];
+            const rectangleHack = resource.cell.getOuterDiamond()[input[1]];
+            if (resource.nature === 'data' && input[1] === 'bottom') {
+                // Adjust the bottom point for ellipses
+                return { x: rectangleHack.x, y: rectangleHack.y + 10 }; // ATTENTION: should depend on cellHeight
+            }
+            return rectangleHack;
         } else {
             // Input is a Cell
             return input[0].getOuterDiamond()[input[1]];
@@ -285,21 +287,21 @@ export class Arrow extends GraphElement {
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        this.drawArrowhead(context, this.startPoint, this.endPoint, color);
+        if (color === 'yellow') {
+            this.drawArrowhead(context, this.startPoint, this.endPoint, color);
+        }
     }
 
     drawCurvy(
         context: CanvasRenderingContext2D,
         control: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         resources: Record<ResourceNameType, Resource>,
-        cellWidth: number,
-        cellHeight: number,
         color: string
     ) {
         if (!context) return;
 
         // Get control point
-        const controlPoint = Arrow.resolvePoint(control, resources, cellWidth, cellHeight);
+        const controlPoint = Arrow.resolvePoint(control, resources);
 
         // Draw the quadratic Bézier curve
         context.strokeStyle = 'black';
@@ -317,7 +319,9 @@ export class Arrow extends GraphElement {
         context.quadraticCurveTo(controlPoint.x, controlPoint.y, this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        this.drawCurvedArrowhead(context, this.startPoint, controlPoint, this.endPoint, color);
+        if (color === 'yellow') {
+            this.drawCurvedArrowhead(context, this.startPoint, controlPoint, this.endPoint, color);
+        }
     }
 
     private drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
