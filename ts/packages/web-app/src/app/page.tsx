@@ -14,6 +14,7 @@ export default function Home() {
   }, [z]);
 
   const handleClickPrevious = () => {
+    if (playButtonText === 'Stop') return;
     if (z > 0) {
       setZ(z - 1);
     } else {
@@ -31,7 +32,6 @@ export default function Home() {
   };
 
   const handleClickPlay = () => {
-    // ATTENTION: consider disabling previous/next buttons when playing
     if (playButtonText === 'Stop') {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -54,6 +54,7 @@ export default function Home() {
   }, []);
 
   const handleClickNext = () => {
+    if (playButtonText === 'Stop') return;
     console.log('z', z);
     console.log('sequence.length', sequence.length);
     if (z < sequence.length - 1) {
@@ -107,9 +108,19 @@ export default function Home() {
         <p>{detailsText}</p>
       </div>
       <div className="fixed bottom-0 left-0 w-full flex justify-center p-4 bg-blue-50">
-        <button className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPrevious}>Previous</button>
+        <button
+          className={`mx-2 px-4 py-2 bg-gray-300 rounded ${playButtonText === 'Play' ? 'hover:bg-gray-400' : ''}`}
+          onClick={handleClickPrevious}
+        >
+          Previous
+        </button>
         <button className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>{playButtonText}</button>
-        <button className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickNext}>Next</button>
+        <button
+          className={`mx-2 px-4 py-2 bg-gray-300 rounded ${playButtonText === 'Play' ? 'hover:bg-gray-400' : ''}`}
+          onClick={handleClickNext}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
