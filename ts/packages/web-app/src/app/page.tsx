@@ -27,10 +27,11 @@ export default function Home() {
       if (timeoutRef.current) { // Ensures it stops when cleared
         playNext();
       }
-    }, 100);
+    }, 5000);
   };
 
   const handleClickPlay = () => {
+    // ATTENTION: consider disabling previous/next buttons when playing
     if (playButtonText === 'Stop') {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

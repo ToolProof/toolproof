@@ -190,7 +190,7 @@ export class Resource extends GraphElement {
         }
 
         if (subText) {
-            context.font = '9px Arial';
+            context.font = '10px Arial';
             context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 20);
         }
     }
