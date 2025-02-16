@@ -10,18 +10,17 @@ export default function Home() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const index = z % 2 === 0 ? z : z - 1;
-    setDetailsText(sequence[index][1]);
+    setDetailsText(sequence[z][1]);
   }, [z]);
 
-    const handleClickPrevious = () => {
+  const handleClickPrevious = () => {
     if (z > 0) {
       setZ(z - 1);
     } else {
       setZ(sequence.length - 1);
     }
   }
-  
+
   const playNext = () => {
     setZ((prevZ) => (prevZ < sequence.length - 1 ? prevZ + 1 : 0));
     timeoutRef.current = setTimeout(() => {
@@ -30,7 +29,7 @@ export default function Home() {
       }
     }, 100);
   };
-  
+
   const handleClickPlay = () => {
     if (playButtonText === 'Stop') {
       if (timeoutRef.current) {
@@ -43,7 +42,7 @@ export default function Home() {
       timeoutRef.current = setTimeout(playNext, 1000);
     }
   };
-  
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -52,7 +51,7 @@ export default function Home() {
       }
     };
   }, []);
-  
+
   const handleClickNext = () => {
     console.log('z', z);
     console.log('sequence.length', sequence.length);

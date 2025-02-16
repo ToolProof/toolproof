@@ -43,9 +43,10 @@ export const sequence: Array<[GraphElementNameType[], string]> = [
     [['Anchors', 'Anchors_Agent', 'Agent', 'Agent_Candidates', 'Candidates'],
         'The Agent retrieves one or more Anchors. Using its parametric knowledge, the Agent suggests modifications to an Anchor and generates a Candidate.'],
     [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
-        ''],
+        'This stage involves specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.'],
     [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers'],
-        'Simulation results, available in various file formats depending on the Simulation tools used, are presented to the Agent for analysis.'],
+        'Simulation results, available in various file formats depending on the Simulation tools used, are presented to the Agent for analysis. If the results are promising, the Agent decides to draft an academic Paper. A Paper documents the Agent’s reasoning, the Simulation process, and outcomes, offering suggestions for further action or future research.'],
     [['Papers', 'Papers_Human', 'Human'],
-        'A Paper documents the Agent’s reasoning, the Simulation process, and outcomes, offering suggestions for further action or future research.'],
+        'Humans can retrieve Papers via the web interface.'],
 ];
+
