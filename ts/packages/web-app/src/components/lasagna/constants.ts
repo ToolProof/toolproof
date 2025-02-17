@@ -45,10 +45,10 @@ export const sequence: Array<[GraphElementNameType[], string]> = [
     [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
         'This stage involves specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.'],
     [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers'],
-        'Simulation results, available in various file formats depending on the tools used, are presented to the Agent. If the results are promising, the Agent decides to draft an academic Paper to document its reasoning when crafting the Candidate, the Simulation process, and Results, offering suggestions for further action or future research.'],
+        'Results, available in various file formats depending on the Simulation tools used, are presented to the Agent. If the results are promising, the Agent decides to draft an academic Paper to document its reasoning when crafting the Candidate, the Simulation process, and Results, offering suggestions for further action or future research.'],
     [['Papers', 'Papers_Human', 'Human'],
         'Humans can retrieve Papers via the web interface.'],
     [['Human', 'Human_Agent', 'Agent', 'Agent_Human'],
-        'Humans and the Agent can talk about anything related to the process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. The Agent might for example request to interview a Human expert.'],
+        'Humans and the Agent can talk about anything related to the drug discovery process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. A human might for example want to discuss a Paper, or the Agent might request to interview a Human expert.'],
 ];
 

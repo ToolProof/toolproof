@@ -87,15 +87,15 @@ export default function Home() {
           {showGlue ? 'Hide Glue' : 'Show Glue'}
         </button>
         <div className="flex-grow flex justify-center">
-          <button className="w-32 mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>{
-            isPlaying ? 'Stop' : 'Play'
-          }</button>
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickPrevious}
           >
             Previous
           </button>
+          <button className="w-32 mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>{
+            isPlaying ? 'Stop' : 'Play'
+          }</button>
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickNext}
