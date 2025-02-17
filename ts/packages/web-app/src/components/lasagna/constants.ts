@@ -39,19 +39,19 @@ export const arrows: Record<ArrowNameType, Arrow> = {
 
 export const sequence: Array<[GraphElementNameType[], string]> = [
     [[],
-        'The Agent is pre-configured to collaborate with Humans and tools to ',
+        'Welcome to a visualization of ToolProof Drug Discovery! The Agent is pre-configured to collaborate with humans and tools for drug discovery focused on a specified disease.',
     ],
     [['Human', 'Human_Anchors', 'Anchors'],
         'Humans interact with the process via a web interface. Humans can upload Anchors, which serve as starting points for the drug discovery process. An Anchor is usually an existing, though suboptimal, drug (also known as a ligand) for the target disease. Anchors are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.'],
     [['Anchors', 'Anchors_Agent', 'Agent', 'Agent_Candidates', 'Candidates'],
-        'The Agent retrieves one or more Anchors. The Agent is built around a highly capable reflective GPT-style LLM, such as Open AI\'s o3, that uses its parametric knowledge to suggest modifications to an Anchor and generate a Candidate. Like Anchors, Candidates are represented as .pdb files or SMILES strings.'],
+        'The Agent retrieves one or more Anchors. Built around a highly capable, reflective GPT-style LLM, such as OpenAI\'s o3, it leverages its parametric knowledge to suggest modifications to an Anchor and generate a Candidate—a drug potentially better suited to treat the disease. Like Anchors, Candidates are represented as .pdb files or SMILES strings.'],
     [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
         'This stage involves specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.'],
     [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers'],
-        'Results, available in various file formats depending on the Simulation tools used, are presented to the Agent. If the Results are promising, the Agent decides to draft an academic Paper to document its reasoning behind crafting the Candidate, the Simulation process, and the Results, offering suggestions for further action or future research.'],
+        'Simulation results, available in various file formats depending on the simulation tools used, are presented to the Agent. If the results are promising, the Agent decides to draft an academic paper to document its reasoning behind crafting the Candidate, the simulation process, and the results, offering suggestions for further action or future research.'],
     [['Papers', 'Papers_Human', 'Human'],
-        'Humans can retrieve Papers via the web interface.'],
+        'Humans can retrieve papers via the web interface.'],
     [['Human', 'Human_Agent', 'Agent', 'Agent_Human'],
-        'Humans and the Agent can talk about anything related to the drug discovery process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. A human might for example want to discuss a Paper, or the Agent might request to interview a Human expert.'],
+        'Humans and the Agent can talk about anything related to the drug discovery process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. A human might for example want to discuss a paper, or the Agent might request to interview a human expert.'],
 ];
 

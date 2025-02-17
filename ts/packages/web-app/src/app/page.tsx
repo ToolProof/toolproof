@@ -65,7 +65,7 @@ export default function Home() {
     }
   }
 
-  const glueText = 'Glue, as indicated by the small rectangles, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage';
+  const glueText = 'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage';
   const topText = showGlue ? glueText : 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
 
   return (
