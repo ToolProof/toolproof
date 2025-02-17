@@ -11,13 +11,13 @@ export const resources: Record<ResourceNameType, Resource> = {
     Human: new Resource(new Cell(5, 7, cellWidth, cellHeight), 'vercel', 'code', true),
     Simulation: new Resource(new Cell(5, 3, cellWidth, cellHeight), 'gcp', 'code', true),
     Anchors: new Resource(new Cell(2, 1, cellWidth, cellHeight), 'gcp', 'data', true),
-    AnchorsGlue: new Resource(new Cell(3, 3, cellWidth, cellHeight), 'gcp', 'code_glue', true),
+    AnchorsGlue: new Resource(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
     Candidates: new Resource(new Cell(4, 1, cellWidth, cellHeight), 'gcp', 'data', true),
-    CandidatesGlue: new Resource(new Cell(5, 3, cellWidth, cellHeight), 'gcp', 'code_glue', true),
+    CandidatesGlue: new Resource(new Cell(4, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
     Results: new Resource(new Cell(6, 1, cellWidth, cellHeight), 'gcp', 'data', false),
-    ResultsGlue: new Resource(new Cell(4, 4, cellWidth, cellHeight), 'gcp', 'code_glue', false),
+    ResultsGlue: new Resource(new Cell(6, 2, cellWidth, cellHeight), 'gcp', 'code_glue', false),
     Papers: new Resource(new Cell(8, 1, cellWidth, cellHeight), 'gcp', 'data', true),
-    PapersGlue: new Resource(new Cell(5, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
+    PapersGlue: new Resource(new Cell(8, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
 } as const;
 
 
@@ -48,5 +48,7 @@ export const sequence: Array<[GraphElementNameType[], string]> = [
         'Simulation results, available in various file formats depending on the Simulation tools used, are presented to the Agent for analysis. If the results are promising, the Agent decides to draft an academic Paper. A Paper documents the Agent’s reasoning, the Simulation process, and outcomes, offering suggestions for further action or future research.'],
     [['Papers', 'Papers_Human', 'Human'],
         'Humans can retrieve Papers via the web interface.'],
+    [['Human', 'Human_Agent', 'Agent', 'Agent_Human'],
+        'Humans and the Agent can talk about anything related to the process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. The Agent might for example request to interview a Human expert.'],
 ];
 

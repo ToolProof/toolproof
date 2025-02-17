@@ -5,9 +5,10 @@ import { useRef, useEffect } from 'react';
 
 interface LasagnaProps {
   z: number;
+  showGlue: boolean;
 }
 
-export default function Lasagna({ z }: LasagnaProps) {
+export default function Lasagna({ z, showGlue }: LasagnaProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const getContext = () => {
@@ -45,13 +46,12 @@ export default function Lasagna({ z }: LasagnaProps) {
       canvas.width = gridSize * cellWidth;
       canvas.height = gridSize * cellHeight;
       // clearCanvas();
-      drawGrid();
+      // drawGrid();
 
       // Draw resources
       Object.entries(resources).forEach(([key, resource]) => {
-        resource.fill(context);
         const color = sequence[z][0].includes(key as ResourceNameType) ? 'yellow' : 'black';
-        resource.draw(context, color);
+        resource.draw(context, color, showGlue);
         resource.drawText(context, key);
       });
 
@@ -96,14 +96,14 @@ export default function Lasagna({ z }: LasagnaProps) {
 
       const color8 = sequence[z][0].includes('Agent_Human') ? 'yellow' : 'black';
       const reverseIsActive8 = sequence[z][0].includes('Human_Agent');
-      if (!reverseIsActive8) {
-        arrows['Agent_Human'].draw(context, color8);
+      if (!reverseIsActive8 || true) {
+        arrows['Agent_Human'].draw(context, color8, false);
       };
 
       const color9 = sequence[z][0].includes('Human_Agent') ? 'yellow' : 'black';
       const reverseIsActive9 = sequence[z][0].includes('Agent_Human');
-      if (!reverseIsActive9) {
-        arrows['Human_Agent'].draw(context, color9);
+      if (!reverseIsActive9 || true) {
+        arrows['Human_Agent'].draw(context, color9, true);
       };
 
       const color10 = sequence[z][0].includes('Papers_Human') ? 'yellow' : 'black';
@@ -113,7 +113,7 @@ export default function Lasagna({ z }: LasagnaProps) {
 
     run();
 
-  }, [z]);
+  }, [z, showGlue]);
 
   return <canvas ref={canvasRef} />;
 

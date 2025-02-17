@@ -33,7 +33,7 @@ export type GraphElementNameType = ResourceNameType | ArrowNameType;
 
 
 export class GraphElement {
-    draw(context: CanvasRenderingContext2D, color: string) {
+    draw(context: CanvasRenderingContext2D, color: string, showGlue?: boolean) {
         // Placeholder method to be overridden by subclasses
         console.log('Drawing a graph element');
     }
@@ -135,7 +135,7 @@ export class Resource extends GraphElement {
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D) {
+    fill(context: CanvasRenderingContext2D, showGlue: boolean) {
         if (!context) return;
 
         const x = this.cell.col * this.cell.width;
@@ -151,13 +151,15 @@ export class Resource extends GraphElement {
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            return; // No fill for code_glue
+            if (showGlue) {
 
-            const quarterWidth = this.cell.width / 4;
-            const halfHeight = this.cell.height / 2;
-            const centeredX = x + (this.cell.width - quarterWidth) / 2;
-            const centeredY = y + (this.cell.height - halfHeight) / 2;
-            context.fillRect(centeredX, centeredY, quarterWidth, halfHeight);
+                const quarterWidth = this.cell.width / 4;
+                const halfHeight = this.cell.height / 2;
+                const centeredX = x + (this.cell.width - quarterWidth) / 2;
+                const centeredY = y + (this.cell.height - halfHeight) / 2;
+                context.fillRect(centeredX, centeredY, quarterWidth, halfHeight);
+            }
+
         }
     }
 
@@ -195,8 +197,10 @@ export class Resource extends GraphElement {
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string) {
+    draw(context: CanvasRenderingContext2D, color: string, showGlue: boolean) {
         if (!context) return;
+
+        this.fill(context, showGlue);
 
         const { col, row } = this.cell;
         const x = col * this.cell.width;
@@ -215,14 +219,14 @@ export class Resource extends GraphElement {
             // Full cell rectangle stroke
             context.rect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            return; // No stroke for code_glue
-
-            // Smaller centered rectangle stroke
-            const quarterWidth = this.cell.width / 4;
-            const halfHeight = this.cell.height / 2;
-            const centeredX = x + (this.cell.width - quarterWidth) / 2;
-            const centeredY = y + (this.cell.height - halfHeight) / 2;
-            context.rect(centeredX, centeredY, quarterWidth, halfHeight);
+            if (showGlue) {
+                // Smaller centered rectangle stroke
+                const quarterWidth = this.cell.width / 4;
+                const halfHeight = this.cell.height / 2;
+                const centeredX = x + (this.cell.width - quarterWidth) / 2;
+                const centeredY = y + (this.cell.height - halfHeight) / 2;
+                context.rect(centeredX, centeredY, quarterWidth, halfHeight);
+            }
         }
 
         context.stroke();
@@ -268,14 +272,16 @@ export class Arrow extends GraphElement {
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string) {
+    draw(context: CanvasRenderingContext2D, color: string, showGlue: boolean) {
         if (!context) return;
+
+        const yHack = showGlue ? this.startPoint.y - 10 : this.startPoint.y; // ATTENTION: temporary hack to prevent tail-head overlap between opposite arrows
 
         // Draw black outline
         context.strokeStyle = 'black';
         context.lineWidth = 4;
         context.beginPath();
-        context.moveTo(this.startPoint.x, this.startPoint.y);
+        context.moveTo(this.startPoint.x, yHack);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
@@ -283,7 +289,7 @@ export class Arrow extends GraphElement {
         context.strokeStyle = color;
         context.lineWidth = 2;
         context.beginPath();
-        context.moveTo(this.startPoint.x, this.startPoint.y);
+        context.moveTo(this.startPoint.x, yHack);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
