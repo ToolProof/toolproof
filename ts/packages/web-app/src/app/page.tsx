@@ -29,7 +29,7 @@ export default function Home() {
       if (timeoutRef.current) { // Ensures it stops when cleared
         playNext();
       }
-    }, 200);
+    }, 1000);
   };
 
   const handleClickPlay = () => {
