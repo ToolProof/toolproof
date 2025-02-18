@@ -1,6 +1,6 @@
 'use client';
 import { resources, arrows, sequence, gridSize, cellWidth, cellHeight } from './constants';
-import { Cell, ResourceNameType } from './types';
+import { Cell, ResourceNameType, ArrowNameType } from './types';
 import { useRef, useEffect } from 'react';
 
 interface LasagnaProps {
@@ -56,6 +56,17 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
       });
 
       // Draw arrows
+      /* Object.entries(arrows).forEach(([key, arrow, config]) => {
+        const color = sequence[z][0].includes(key as ArrowNameType) ? 'yellow' : 'black';
+        if (config.controlPoint) {
+          arrow.drawCurvy(context, config.controlPoint, resources, color);
+        } else {
+          arrow.draw(context, color, false);
+        }
+
+      }); */
+
+
       const color0 = sequence[z][0].includes('Human_Anchors') ? 'yellow' : 'black';
       arrows['Human_Anchors'].drawCurvy(context, [new Cell(0, 7, cellWidth, cellHeight), 'left'], resources, color0);
 
@@ -120,7 +131,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
       if (!reverseIsActive12 || true) {
         arrows['Agent_Checkpoints'].draw(context, color12, true);
       };
-      
+
     }
 
     run();
