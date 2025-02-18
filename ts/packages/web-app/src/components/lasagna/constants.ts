@@ -14,10 +14,11 @@ export const resources: Record<ResourceNameType, Resource> = {
     AnchorsGlue: new Resource(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
     Candidates: new Resource(new Cell(4, 1, cellWidth, cellHeight), 'gcp', 'data', true),
     CandidatesGlue: new Resource(new Cell(4, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
-    Results: new Resource(new Cell(6, 1, cellWidth, cellHeight), 'gcp', 'data', false),
-    ResultsGlue: new Resource(new Cell(6, 2, cellWidth, cellHeight), 'gcp', 'code_glue', false),
+    Results: new Resource(new Cell(6, 1, cellWidth, cellHeight), 'gcp', 'data', true),
+    ResultsGlue: new Resource(new Cell(6, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
     Papers: new Resource(new Cell(8, 1, cellWidth, cellHeight), 'gcp', 'data', true),
     PapersGlue: new Resource(new Cell(8, 2, cellWidth, cellHeight), 'gcp', 'code_glue', true),
+    Checkpoints: new Resource(new Cell(5, 1, cellWidth, cellHeight), 'lg', 'data', true),
 } as const;
 
 
@@ -34,6 +35,8 @@ export const arrows: Record<ArrowNameType, Arrow> = {
     Human_Agent: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
     Papers_Human: new Arrow(['Papers', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
     Agent_Agent: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
+    Agent_Checkpoints: new Arrow(['Agent', 'top'], ['Checkpoints', 'bottom'], resources, cellWidth, cellHeight),
+    Checkpoints_Agent: new Arrow(['Checkpoints', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
 };
 
 
@@ -53,5 +56,8 @@ export const sequence: Array<[GraphElementNameType[], string]> = [
         'Humans can retrieve papers via the web interface.'],
     [['Human', 'Human_Agent', 'Agent', 'Agent_Human'],
         'Humans and the Agent can talk about anything related to the drug discovery process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. A human might for example want to discuss a paper, or the Agent might request to interview a human expert.'],
+    [['Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+        ''
+    ],
 ];
 

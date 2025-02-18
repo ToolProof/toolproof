@@ -109,6 +109,18 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
       const color10 = sequence[z][0].includes('Papers_Human') ? 'yellow' : 'black';
       arrows['Papers_Human'].drawCurvy(context, [new Cell(10, 7, cellWidth, cellHeight), 'bottom'], resources, color10);
 
+      const color11 = sequence[z][0].includes('Checkpoints_Agent') ? 'yellow' : 'black';
+      const reverseIsActive11 = sequence[z][0].includes('Agent_Checkpoints');
+      if (!reverseIsActive11 || true) {
+        arrows['Checkpoints_Agent'].draw(context, color11, false);
+      };
+
+      const color12 = sequence[z][0].includes('Agent_Checkpoints') ? 'yellow' : 'black';
+      const reverseIsActive12 = sequence[z][0].includes('Checkpoints_Agent');
+      if (!reverseIsActive12 || true) {
+        arrows['Agent_Checkpoints'].draw(context, color12, true);
+      };
+      
     }
 
     run();

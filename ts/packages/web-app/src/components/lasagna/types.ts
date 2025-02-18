@@ -12,7 +12,8 @@ export type ResourceNameType =
     | 'Results'
     | 'ResultsGlue'
     | 'Papers'
-    | 'PapersGlue';
+    | 'PapersGlue'
+    | 'Checkpoints';
 
 
 export type ArrowNameType =
@@ -27,7 +28,9 @@ export type ArrowNameType =
     | 'Human_Agent'
     | 'Agent_Papers'
     | 'Papers_Human'
-    | 'Agent_Agent';
+    | 'Agent_Agent'
+    | 'Agent_Checkpoints'
+    | 'Checkpoints_Agent';
 
 
 export type GraphElementNameType = ResourceNameType | ArrowNameType;
@@ -192,6 +195,8 @@ export class Resource extends GraphElement {
             subText = 'GCP Cloud Run';
         } else if (this.nature === 'data' && this.environment === 'gcp') {
             subText = 'GCP Cloud Storage';
+        } else if (this.nature === 'data' && this.environment === 'lg') {
+            subText = 'LangGraph Platform';
         }
 
         if (subText) {
