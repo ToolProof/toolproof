@@ -46,7 +46,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
       canvas.width = gridSize * cellWidth;
       canvas.height = gridSize * cellHeight;
       // clearCanvas();
-      // drawGrid();
+      drawGrid();
 
       // Draw resources
       Object.entries(resources).forEach(([key, resource]) => {

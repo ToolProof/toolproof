@@ -22,18 +22,18 @@ export const resources: Record<ResourceNameType, Resource> = {
 
 
 export const arrows: Record<ArrowNameType, Arrow> = {
-    Human_Anchors: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources),
-    Agent_Anchors: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources),
-    Anchors_Agent: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources),
-    Agent_Candidates: new Arrow(['Agent', 'top'], ['Candidates', 'bottom'], resources),
-    Candidates_Simulation: new Arrow(['Candidates', 'right'], ['Simulation', 'top'], resources),
-    Simulation_Results: new Arrow(['Simulation', 'top'], ['Results', 'left'], resources),
-    Results_Agent: new Arrow(['Results', 'bottom'], ['Agent', 'top'], resources),
-    Agent_Papers: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources),
-    Agent_Human: new Arrow(['Agent', 'bottom'], ['Human', 'top'], resources),
-    Human_Agent: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources),
-    Papers_Human: new Arrow(['Papers', 'right'], ['Human', 'right'], resources),
-    Agent_Agent: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources),
+    Human_Anchors: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources, cellWidth, cellHeight),
+    Agent_Anchors: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources, cellWidth, cellHeight),
+    Anchors_Agent: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources, cellWidth, cellHeight),
+    Agent_Candidates: new Arrow(['Agent', 'top'], ['Candidates', 'bottom'], resources, cellWidth, cellHeight),
+    Candidates_Simulation: new Arrow(['Candidates', 'right'], ['Simulation', 'top'], resources, cellWidth, cellHeight),
+    Simulation_Results: new Arrow(['Simulation', 'top'], ['Results', 'left'], resources, cellWidth, cellHeight),
+    Results_Agent: new Arrow(['Results', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
+    Agent_Papers: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources, cellWidth, cellHeight),
+    Agent_Human: new Arrow(['Agent', 'bottom'], ['Human', 'top'], resources, cellWidth, cellHeight),
+    Human_Agent: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
+    Papers_Human: new Arrow(['Papers', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
+    Agent_Agent: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
 };
 
 

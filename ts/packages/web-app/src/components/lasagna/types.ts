@@ -1,3 +1,4 @@
+import { cellHeight } from './constants';
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
@@ -33,7 +34,7 @@ export type GraphElementNameType = ResourceNameType | ArrowNameType;
 
 
 export class GraphElement {
-    draw(context: CanvasRenderingContext2D, color: string, showGlue?: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, helperSwitch?: boolean) {
         // Placeholder method to be overridden by subclasses
         console.log('Drawing a graph element');
     }
@@ -173,10 +174,12 @@ export class Resource extends GraphElement {
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
-        const displayText = this.nature === 'code_glue' ? '' : key;
-        /* if (displayText === 'Simulation') {
-            displayText = true ? 'AutoDock' : 'Schrödinger';
-        } */
+        let displayText = this.nature === 'code_glue' ? '' : key;
+        if (displayText === 'Agent') {
+            displayText = 'OpenAI o3';
+        } else if (displayText === 'Simulation') {
+            displayText = false ? 'AutoDock' : 'Schrödinger';
+        }
 
         context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
 
@@ -243,45 +246,51 @@ export class Arrow extends GraphElement {
     public endPoint: Point;
 
     constructor(
-        start: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        end: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        resources: Record<ResourceNameType, Resource>
+        startPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
+        endPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
+        resources: Record<ResourceNameType, Resource>,
+        cellWidth: number,
+        cellHeight: number
     ) {
         super();
-        this.startPoint = Arrow.resolvePoint(start, resources);
-        this.endPoint = Arrow.resolvePoint(end, resources);
+        this.startPoint = Arrow.resolvePoint(startPointSpec, resources);
+        this.endPoint = Arrow.resolvePoint(endPointSpec, resources);
     }
 
     private static resolvePoint(
         input: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         resources: Record<ResourceNameType, Resource>
     ): Point {
-        if (typeof input[0] === 'string') {
+        if (typeof input[0] === 'string') { // ATTENTION: could use stricter type checking
             // Input is a ResourceNameType
             const resource = resources[input[0]];
             if (!resource) throw new Error(`Resource ${input[0]} not found.`);
-            const rectangleHack = resource.cell.getOuterDiamond()[input[1]];
-            if (resource.nature === 'data' && input[1] === 'bottom') {
-                // Adjust the bottom point for ellipses
-                return { x: rectangleHack.x, y: rectangleHack.y + 10 }; // ATTENTION: should depend on cellHeight
+            const point = resource.cell.getOuterDiamond()[input[1]];
+            if (resource.nature === 'data') {
+                // Adjust top/bottom point for ellipses
+                if (input[1] === 'top') {
+                    return { x: point.x, y: point.y - (cellHeight / 6) };
+                } else if (input[1] === 'bottom') {
+                    return { x: point.x, y: point.y + (cellHeight / 6) };
+                }
             }
-            return rectangleHack;
+            return point;
         } else {
             // Input is a Cell
             return input[0].getOuterDiamond()[input[1]];
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, showGlue: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, shouldAdjust: boolean) {
         if (!context) return;
 
-        const yHack = showGlue ? this.startPoint.y - 10 : this.startPoint.y; // ATTENTION: temporary hack to prevent tail-head overlap between opposite arrows
+        const adjustedStartPointY = shouldAdjust ? this.startPoint.y - (cellHeight / 6) : this.startPoint.y; // ATTENTION: adjustment to prevent tail-head overlap between opposite arrows
 
         // Draw black outline
         context.strokeStyle = 'black';
         context.lineWidth = 4;
         context.beginPath();
-        context.moveTo(this.startPoint.x, yHack);
+        context.moveTo(this.startPoint.x, adjustedStartPointY);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
@@ -289,7 +298,7 @@ export class Arrow extends GraphElement {
         context.strokeStyle = color;
         context.lineWidth = 2;
         context.beginPath();
-        context.moveTo(this.startPoint.x, yHack);
+        context.moveTo(this.startPoint.x, adjustedStartPointY);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
