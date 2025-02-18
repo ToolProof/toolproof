@@ -289,7 +289,7 @@ export class Arrow extends GraphElement {
     draw(context: CanvasRenderingContext2D, color: string, shouldAdjust: boolean) {
         if (!context) return;
 
-        const adjustedStartPointY = shouldAdjust ? this.startPoint.y - (cellHeight / 6) : this.startPoint.y; // ATTENTION: adjustment to prevent tail-head overlap between opposite arrows
+        const adjustedStartPointY = shouldAdjust ? this.startPoint.y + (cellHeight / 6) : this.startPoint.y; // ATTENTION: adjustment to prevent tail-head overlap between opposite arrows
 
         // Draw black outline
         context.strokeStyle = 'black';
@@ -383,3 +383,18 @@ export class Arrow extends GraphElement {
         context.fill();
     }
 }
+
+
+export interface ArrowConfig {
+    controlPoint: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType] | null;
+    reverse: ArrowNameType | null;
+    shouldAdjust?: boolean;
+    drawInOrder(fn: (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => void, key: ArrowNameType, arrowWithConfig: ArrowWithConfig,): void;
+    next: (z: number) => ArrowNameType | null;
+}
+
+
+export interface ArrowWithConfig {
+    arrow: Arrow;
+    config: ArrowConfig;
+};

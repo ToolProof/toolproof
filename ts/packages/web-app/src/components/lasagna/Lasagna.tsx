@@ -1,6 +1,6 @@
 'use client';
-import { resources, arrows, sequence, gridSize, cellWidth, cellHeight } from './constants';
-import { Cell, ResourceNameType, ArrowNameType } from './types';
+import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './constants';
+import { Cell, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
 import { useRef, useEffect } from 'react';
 
 interface LasagnaProps {
@@ -46,7 +46,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
       canvas.width = gridSize * cellWidth;
       canvas.height = gridSize * cellHeight;
       // clearCanvas();
-      drawGrid();
+      // drawGrid();
 
       // Draw resources
       Object.entries(resources).forEach(([key, resource]) => {
@@ -56,81 +56,26 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
       });
 
       // Draw arrows
-      /* Object.entries(arrows).forEach(([key, arrow, config]) => {
-        const color = sequence[z][0].includes(key as ArrowNameType) ? 'yellow' : 'black';
-        if (config.controlPoint) {
-          arrow.drawCurvy(context, config.controlPoint, resources, color);
+
+
+      const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
+        const isActive = sequence[z][0].includes(key as ArrowNameType)
+        const color = isActive ? 'yellow' : 'black';
+        if (arrowWithConfig.config.controlPoint) {
+          arrowWithConfig.arrow.drawCurvy(context, arrowWithConfig.config.controlPoint, resources, color);
         } else {
-          arrow.draw(context, color, false);
+          arrowWithConfig.arrow.draw(context, color, arrowWithConfig.config.shouldAdjust ?? false);
         }
-
-      }); */
-
-
-      const color0 = sequence[z][0].includes('Human_Anchors') ? 'yellow' : 'black';
-      arrows['Human_Anchors'].drawCurvy(context, [new Cell(0, 7, cellWidth, cellHeight), 'left'], resources, color0);
-
-      const color1 = sequence[z][0].includes('Agent_Anchors') ? 'yellow' : 'black';
-      const reverseIsActive1 = sequence[z][0].includes('Anchors_Agent');
-      if (!reverseIsActive1) {
-        arrows['Agent_Anchors'].drawCurvy(context, [new Cell(2, 5, cellWidth, cellHeight), 'top'], resources, color1);
+        const nextKey = arrowWithConfig.config.next(z);
+        if (nextKey) {
+          const nextArrowWithConfig = arrowsWithConfig[nextKey];
+          nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
+        }
       };
 
-      const color2 = sequence[z][0].includes('Anchors_Agent') ? 'yellow' : 'black';
-      const reverseIsActive2 = sequence[z][0].includes('Agent_Anchors');
-      if (!reverseIsActive2) {
-        arrows['Anchors_Agent'].drawCurvy(context, [new Cell(2, 5, cellWidth, cellHeight), 'top'], resources, color2);
-      };
-
-      const color3 = sequence[z][0].includes('Agent_Candidates') ? 'yellow' : 'black';
-      arrows['Agent_Candidates'].drawCurvy(context, [new Cell(4, 3, cellWidth, cellHeight), 'bottom'], resources, color3);
-
-      const color4 = sequence[z][0].includes('Candidates_Simulation') ? 'yellow' : 'black';
-      const color5 = sequence[z][0].includes('Simulation_Results') ? 'yellow' : 'black';
-
-      if (color4 === 'yellow') {
-        arrows['Simulation_Results'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color5);
-
-        arrows['Candidates_Simulation'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color4);
-
-      } else {
-        arrows['Candidates_Simulation'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color4);
-
-        arrows['Simulation_Results'].drawCurvy(context, [new Cell(5, 1, cellWidth, cellHeight), 'bottom'], resources, color5);
-      }
-
-      const color6 = sequence[z][0].includes('Results_Agent') ? 'yellow' : 'black';
-      arrows['Results_Agent'].drawCurvy(context, [new Cell(6, 3, cellWidth, cellHeight), 'bottom'], resources, color6);
-
-      const color7 = sequence[z][0].includes('Agent_Papers') ? 'yellow' : 'black';
-      arrows['Agent_Papers'].drawCurvy(context, [new Cell(8, 3, cellWidth, cellHeight), 'bottom'], resources, color7);
-
-      const color8 = sequence[z][0].includes('Agent_Human') ? 'yellow' : 'black';
-      const reverseIsActive8 = sequence[z][0].includes('Human_Agent');
-      if (!reverseIsActive8 || true) {
-        arrows['Agent_Human'].draw(context, color8, false);
-      };
-
-      const color9 = sequence[z][0].includes('Human_Agent') ? 'yellow' : 'black';
-      const reverseIsActive9 = sequence[z][0].includes('Agent_Human');
-      if (!reverseIsActive9 || true) {
-        arrows['Human_Agent'].draw(context, color9, true);
-      };
-
-      const color10 = sequence[z][0].includes('Papers_Human') ? 'yellow' : 'black';
-      arrows['Papers_Human'].drawCurvy(context, [new Cell(10, 7, cellWidth, cellHeight), 'bottom'], resources, color10);
-
-      const color11 = sequence[z][0].includes('Checkpoints_Agent') ? 'yellow' : 'black';
-      const reverseIsActive11 = sequence[z][0].includes('Agent_Checkpoints');
-      if (!reverseIsActive11 || true) {
-        arrows['Checkpoints_Agent'].draw(context, color11, false);
-      };
-
-      const color12 = sequence[z][0].includes('Agent_Checkpoints') ? 'yellow' : 'black';
-      const reverseIsActive12 = sequence[z][0].includes('Checkpoints_Agent');
-      if (!reverseIsActive12 || true) {
-        arrows['Agent_Checkpoints'].draw(context, color12, true);
-      };
+      const key = 'Human_Anchors';
+      const genesisArrowWithConfig = arrowsWithConfig[key];
+      genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
 
     }
 
