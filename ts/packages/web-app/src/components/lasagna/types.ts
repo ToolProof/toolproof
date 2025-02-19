@@ -262,7 +262,7 @@ export class Arrow extends GraphElement {
         this.endPoint = Arrow.resolvePoint(endPointSpec, resources);
     }
 
-    private static resolvePoint(
+    static resolvePoint(
         input: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         resources: Record<ResourceNameType, Resource>
     ): Point {
@@ -289,13 +289,11 @@ export class Arrow extends GraphElement {
     draw(context: CanvasRenderingContext2D, color: string, shouldAdjust: boolean) {
         if (!context) return;
 
-        const adjustedStartPointY = shouldAdjust ? this.startPoint.y + (cellHeight / 6) : this.startPoint.y; // ATTENTION: adjustment to prevent tail-head overlap between opposite arrows
-
         // Draw black outline
         context.strokeStyle = 'black';
         context.lineWidth = 4;
         context.beginPath();
-        context.moveTo(this.startPoint.x, adjustedStartPointY);
+        context.moveTo(this.startPoint.x, this.startPoint.y);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
@@ -303,20 +301,21 @@ export class Arrow extends GraphElement {
         context.strokeStyle = color;
         context.lineWidth = 2;
         context.beginPath();
-        context.moveTo(this.startPoint.x, adjustedStartPointY);
+        context.moveTo(this.startPoint.x, this.startPoint.y);
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        if (color === 'yellow') {
+        /* if (color === 'yellow') {
             this.drawArrowhead(context, this.startPoint, this.endPoint, color);
-        }
+        } */
     }
 
     drawCurvy(
         context: CanvasRenderingContext2D,
         control: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         resources: Record<ResourceNameType, Resource>,
-        color: string
+        color: string,
+        shouldAdjust: boolean
     ) {
         if (!context) return;
 
@@ -339,17 +338,17 @@ export class Arrow extends GraphElement {
         context.quadraticCurveTo(controlPoint.x, controlPoint.y, this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        if (color === 'yellow') {
+        /* if (color === 'yellow') {
             this.drawCurvedArrowhead(context, this.startPoint, controlPoint, this.endPoint, color);
-        }
+        } */
     }
 
-    private drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
+    drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
         const angle = Math.atan2(end.y - start.y, end.x - start.x);
         this.drawArrowheadAtAngle(context, end, angle, color);
     }
 
-    private drawCurvedArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
+    drawCurvedArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
         // Compute tangent direction at endpoint of the quadratic Bézier curve
         const t = 1; // At the endpoint
         const dx = 2 * (1 - t) * (control.x - start.x) + 2 * t * (end.x - control.x);

@@ -76,7 +76,7 @@ export default function Home() {
       <Lasagna z={z} showGlue={showGlue} />
       {!isPlaying && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
-          <p>{detailsText}</p>
+          {/* <p>{detailsText}</p> */}
         </div>
       )}
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
