@@ -1,7 +1,7 @@
 'use client';
 import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './constants';
-import { Arrow, Point, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
-import { useRef, useEffect } from 'react';
+import { Cell, Resource, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig, DiamondPointType } from './types';
+import React from 'react';
 
 interface LasagnaProps {
   z: number;
@@ -9,104 +9,127 @@ interface LasagnaProps {
 }
 
 export default function Lasagna({ z, showGlue }: LasagnaProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Get active elements for the current step
+  const activeResources = Object.entries(resources).map(([key, resource]) => ({
+    key,
+    resource,
+    isActive: sequence[z][0].includes(key as ResourceNameType),
+  }));
 
-  const getContext = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    return canvas.getContext('2d');
+  const arrowElements: JSX.Element[] = [];
+
+  // Function to process arrows
+  const processArrows = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
+    const isActive = sequence[z][0].includes(key as ArrowNameType);
+    const color = isActive ? 'yellow' : 'black';
+
+    // Store arrow JSX instead of drawing on canvas
+    arrowElements.push(
+      <ArrowComponent key={key} arrow={arrowWithConfig.arrow} color={color} controlPoint={arrowWithConfig.config.controlPoint} />
+    );
+
+    const nextKey = arrowWithConfig.config.next(z);
+    if (nextKey) {
+      const nextArrowWithConfig = arrowsWithConfig[nextKey];
+      nextArrowWithConfig.config.drawInOrder(processArrows, nextKey, nextArrowWithConfig);
+    }
   };
 
-  useEffect(() => {
+  // Start processing arrows
+  const key = 'Human_Anchors';
+  const genesisArrowWithConfig = arrowsWithConfig[key];
+  genesisArrowWithConfig.config.drawInOrder(processArrows, key, genesisArrowWithConfig);
 
-    const drawGrid = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const context = canvas.getContext('2d');
-      if (!context) return;
+  return (
+    <svg width={gridSize * cellWidth} height={gridSize * cellHeight} style={{ border: '1px solid black' }}>
+      {/* Draw Grid */}
+      {[...Array(gridSize)].map((_, col) =>
+        [...Array(gridSize)].map((_, row) => (
+          <rect
+            key={`${col}-${row}`}
+            x={col * cellWidth}
+            y={row * cellHeight}
+            width={cellWidth}
+            height={cellHeight}
+            stroke="gray"
+            fill="none"
+          />
+        ))
+      )}
 
-      for (let col = 0; col < gridSize; col++) {
-        for (let row = 0; row < gridSize; row++) {
-          context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
-        }
-      }
-    };
+      {/* Draw Resources */}
+      {activeResources.map(({ key, resource, isActive }) => (
+        <ResourceComponent key={key} resource={resource} isActive={isActive} showGlue={showGlue} />
+      ))}
+
+      {/* Draw Arrows */}
+      {arrowElements}
+    </svg>
+  );
+}
 
 
-    const run = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const context = canvas.getContext('2d');
-      if (!context) return;
-      canvas.width = gridSize * cellWidth;
-      canvas.height = gridSize * cellHeight;
 
-      // drawGrid();
+interface ResourceProps {
+  resource: Resource;
+  isActive: boolean;
+  showGlue: boolean;
+}
 
-      // Draw resources
-      Object.entries(resources).forEach(([key, resource]) => {
-        const color = sequence[z][0].includes(key as ResourceNameType) ? 'yellow' : 'black';
-        resource.draw(context, color, showGlue);
-        resource.drawText(context, key);
-      });
 
-      const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
-        const isActive = sequence[z][0].includes(key as ArrowNameType);
-        const color = isActive ? 'yellow' : 'black';
+export function ResourceComponent({ resource, isActive, showGlue }: ResourceProps) {
+  const { col, row, width, height } = resource.cell;
+  const x = col * width;
+  const y = row * height;
 
-        if (arrowWithConfig.config.controlPoint) {
-          // Draw curved arrow line
-          arrowWithConfig.arrow.drawCurvy(
-            context,
-            arrowWithConfig.config.controlPoint,
-            resources,
-            color,
-            arrowWithConfig.config.shouldAdjust ?? false
-          );
-          // Store arrowhead for later
-          if (isActive) {
-            const controlPoint = Arrow.resolvePoint(arrowWithConfig.config.controlPoint, resources);
-            arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: true, control: controlPoint });
-          }
-        } else {
-          // Draw straight arrow line
-          arrowWithConfig.arrow.draw(context, color, arrowWithConfig.config.shouldAdjust ?? false);
-          // Store arrowhead for later
-          if (isActive) {
-            arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
-          }
-        }
+  const fillColor = isActive ? 'yellow' : resource.getFillColor();
 
-        const nextKey = arrowWithConfig.config.next(z);
-        if (nextKey) {
-          const nextArrowWithConfig = arrowsWithConfig[nextKey];
-          nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
-        }
-      };
+  return (
+    <>
+      <rect x={x} y={y} width={width} height={height} fill={fillColor} stroke="black" />
+      <text x={x + width / 2} y={y + height / 2} fontSize="16px" textAnchor="middle" fill="black">
+        {resource.nature !== 'code_glue' ? resource.environment : ''}
+      </text>
+    </>
+  );
+}
 
-      // Store arrowheads separately
-      const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
-      // Draw arrows and queue arrowheads
-      const key = 'Human_Anchors';
-      const genesisArrowWithConfig = arrowsWithConfig[key];
-      genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
+interface ArrowProps {
+  arrow: Arrow;
+  color: string;
+  controlPoint?: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType] | null;
+}
 
-      // Draw all arrowheads after all lines
-      arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
-        // return;
-        if (isCurvy && control) {
-          Arrow.prototype.drawCurvedArrowhead(context, start, control, end, color);
-        } else {
-          Arrow.prototype.drawArrowhead(context, start, end, color);
-        }
-      });
-    };
+export function ArrowComponent({ arrow, color, controlPoint }: ArrowProps) {
+  const { startPoint, endPoint } = arrow;
+  
+  if (controlPoint) {
+    // Get control point for curved arrows
+    const control = Arrow.resolvePoint(controlPoint, resources);
+    
+    return (
+      <>
+        <path
+          d={`M ${startPoint.x} ${startPoint.y} Q ${control.x} ${control.y} ${endPoint.x} ${endPoint.y}`}
+          stroke="black"
+          strokeWidth="4"
+          fill="none"
+        />
+        <path
+          d={`M ${startPoint.x} ${startPoint.y} Q ${control.x} ${control.y} ${endPoint.x} ${endPoint.y}`}
+          stroke={color}
+          strokeWidth="2"
+          fill="none"
+        />
+      </>
+    );
+  }
 
-    run();
-
-  }, [z, showGlue]);
-
-  return <canvas ref={canvasRef} />;
-
+  return (
+    <>
+      <line x1={startPoint.x} y1={startPoint.y} x2={endPoint.x} y2={endPoint.y} stroke="black" strokeWidth="4" />
+      <line x1={startPoint.x} y1={startPoint.y} x2={endPoint.x} y2={endPoint.y} stroke={color} strokeWidth="2" />
+    </>
+  );
 }
