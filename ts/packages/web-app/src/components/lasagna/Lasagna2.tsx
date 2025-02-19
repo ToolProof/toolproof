@@ -20,16 +20,19 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
         return canvas.getContext('2d');
     };
 
-    useEffect(() => {
+        useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const context = canvas.getContext('2d');
         if (!context) return;
-
+    
+        // Clear the canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    
         const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
             const isActive = sequence[z][0].includes(key as ArrowNameType);
             const color = isActive ? 'yellow' : 'black';
-
+    
             if (arrowWithConfig.config.controlPoint) {
                 // Draw curved arrow line
                 arrowWithConfig.arrow.drawCurvy(
@@ -52,73 +55,80 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
                 }
             }
-
+    
             const nextKey = arrowWithConfig.config.next(z);
             if (nextKey) {
                 const nextArrowWithConfig = arrowsWithConfig[nextKey];
                 nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
             }
         };
-
+    
         // Store arrowheads separately
         const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
-
+    
         // Draw arrows and queue arrowheads
         const key = 'Human_Anchors';
         const genesisArrowWithConfig = arrowsWithConfig[key];
         genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
-
+    
         // Draw all arrowheads after all lines
         arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
-            // return;
             if (isCurvy && control) {
                 Arrow.prototype.drawCurvedArrowhead(context, start, control, end, color);
             } else {
                 Arrow.prototype.drawArrowhead(context, start, end, color);
             }
         });
-
+    
     }, [z]);
 
     return (
-        
-        <svg width={gridSize * cellWidth} height={gridSize * cellHeight} style={{ border: '1px solid black' }}>
-            {/* Grid */}
-            {Array.from({ length: gridSize }).map((_, col) =>
-                Array.from({ length: gridSize }).map((_, row) => (
-                    <rect
-                        key={`grid-${col}-${row}`}
-                        x={col * cellWidth}
-                        y={row * cellHeight}
-                        width={cellWidth}
-                        height={cellHeight}
-                        stroke="gray"
-                        fill="transparent"
-                    />
-                ))
-            )}
-
-            {/* Draw Resources */}
-            {Object.entries(resources).map(([key, resource]) => {
-                const color = resource.getFillColor();
-                return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} showGlue={showGlue} />;
-            })}
-
-            {/* Draw Arrows */}
-            {/* {Object.entries(arrowsWithConfig).map(([key, arrowWithConfig]) => {
-                const isActive = activeArrows.includes(key as ArrowNameType);
-                const color = isActive ? 'yellow' : 'black';
-
-                return (
-                    <ArrowSVG
-                        key={key}
-                        arrowWithConfig={arrowWithConfig}
-                        color={color}
-                        z={z}
-                    />
-                );
-            })} */}
-        </svg>
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <canvas
+                ref={canvasRef}
+                width={gridSize * cellWidth}
+                height={gridSize * cellHeight}
+                style={{ position: 'absolute', top: 0, left: 0, background: 'transparent', width: '100%', height: '100%' }}
+            />
+            <svg
+                width={gridSize * cellWidth}
+                height={gridSize * cellHeight}
+                style={{ border: '1px solid black', zIndex: 1, background: 'transparent', position: 'relative', width: '100%', height: '100%' }}
+            >
+                {/* Grid */}
+                {/* {Array.from({ length: gridSize }).map((_, col) =>
+                    Array.from({ length: gridSize }).map((_, row) => (
+                        <rect
+                            key={`grid-${col}-${row}`}
+                            x={col * cellWidth}
+                            y={row * cellHeight}
+                            width={cellWidth}
+                            height={cellHeight}
+                            stroke="gray"
+                            fill="transparent"
+                        />
+                    ))
+                )} */}
+                {/* Draw Resources */}
+                {Object.entries(resources).map(([key, resource]) => {
+                    const color = resource.getFillColor();
+                    return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} showGlue={showGlue} />;
+                })}
+                {/* Draw Arrows */}
+                {/* {Object.entries(arrowsWithConfig).map(([key, arrowWithConfig]) => {
+                    const isActive = activeArrows.includes(key as ArrowNameType);
+                    const color = isActive ? 'yellow' : 'black';
+                    return (
+                        <ArrowSVG
+                            key={key}
+                            arrowWithConfig={arrowWithConfig}
+                            color={color}
+                            z={z}
+                        />
+                    );
+                })} */}
+            </svg>
+        </div>
     );
 }
 
