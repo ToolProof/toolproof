@@ -216,7 +216,7 @@ export class Resource extends GraphElement {
         const radius = Math.min(this.cell.width, this.cell.height) / 2 + 10; // Adjust radius for ellipse
 
         context.strokeStyle = color;
-        context.lineWidth = 2; // Adjust as needed
+        context.lineWidth = 3; // Adjust as needed
 
         context.beginPath();
 

@@ -1,5 +1,5 @@
 'use client'
-import Lasagna from '@/components/lasagna/Lasagna2';
+import Lasagna from '@/components/lasagna/Lasagna';
 import { sequence } from '@/components/lasagna/constants';
 import { useState, useRef, useEffect } from 'react';
 
