@@ -1,7 +1,7 @@
 'use client';
 import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './constants';
 import { Point, Resource, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
-import { use, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 interface LasagnaProps {
     z: number;
@@ -12,67 +12,76 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
     // Compute the list of elements to render in SVG
     const activeResources = sequence[z][0] as ResourceNameType[];
     const activeArrows = sequence[z][0] as ArrowNameType[];
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const getContext = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return null;
+        return canvas.getContext('2d');
+    };
 
     useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const context = canvas.getContext('2d');
+        if (!context) return;
 
         const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
-                const isActive = sequence[z][0].includes(key as ArrowNameType);
-                const color = isActive ? 'yellow' : 'black';
-        
-                if (arrowWithConfig.config.controlPoint) {
-                  // Draw curved arrow line
-                  arrowWithConfig.arrow.drawCurvy(
+            const isActive = sequence[z][0].includes(key as ArrowNameType);
+            const color = isActive ? 'yellow' : 'black';
+
+            if (arrowWithConfig.config.controlPoint) {
+                // Draw curved arrow line
+                arrowWithConfig.arrow.drawCurvy(
                     context,
                     arrowWithConfig.config.controlPoint,
                     resources,
                     color,
                     arrowWithConfig.config.shouldAdjust ?? false
-                  );
-                  // Store arrowhead for later
-                  if (isActive) {
+                );
+                // Store arrowhead for later
+                if (isActive) {
                     const controlPoint = Arrow.resolvePoint(arrowWithConfig.config.controlPoint, resources);
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: true, control: controlPoint });
-                  }
-                } else {
-                  // Draw straight arrow line
-                  arrowWithConfig.arrow.draw(context, color, arrowWithConfig.config.shouldAdjust ?? false);
-                  // Store arrowhead for later
-                  if (isActive) {
+                }
+            } else {
+                // Draw straight arrow line
+                arrowWithConfig.arrow.draw(context, color, arrowWithConfig.config.shouldAdjust ?? false);
+                // Store arrowhead for later
+                if (isActive) {
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
-                  }
                 }
-        
-                const nextKey = arrowWithConfig.config.next(z);
-                if (nextKey) {
-                  const nextArrowWithConfig = arrowsWithConfig[nextKey];
-                  nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
-                }
-              };
-        
-              // Store arrowheads separately
-              const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
-        
-              // Draw arrows and queue arrowheads
-              const key = 'Human_Anchors';
-              const genesisArrowWithConfig = arrowsWithConfig[key];
-              genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
-        
-              // Draw all arrowheads after all lines
-              arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
-                // return;
-                if (isCurvy && control) {
-                  Arrow.prototype.drawCurvedArrowhead(context, start, control, end, color);
-                } else {
-                  Arrow.prototype.drawArrowhead(context, start, end, color);
-                }
-              });
+            }
 
-        
-        
-        
+            const nextKey = arrowWithConfig.config.next(z);
+            if (nextKey) {
+                const nextArrowWithConfig = arrowsWithConfig[nextKey];
+                nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
+            }
+        };
+
+        // Store arrowheads separately
+        const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
+
+        // Draw arrows and queue arrowheads
+        const key = 'Human_Anchors';
+        const genesisArrowWithConfig = arrowsWithConfig[key];
+        genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
+
+        // Draw all arrowheads after all lines
+        arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
+            // return;
+            if (isCurvy && control) {
+                Arrow.prototype.drawCurvedArrowhead(context, start, control, end, color);
+            } else {
+                Arrow.prototype.drawArrowhead(context, start, end, color);
+            }
+        });
+
     }, [z]);
 
     return (
+        
         <svg width={gridSize * cellWidth} height={gridSize * cellHeight} style={{ border: '1px solid black' }}>
             {/* Grid */}
             {Array.from({ length: gridSize }).map((_, col) =>
@@ -96,7 +105,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
             })}
 
             {/* Draw Arrows */}
-            {Object.entries(arrowsWithConfig).map(([key, arrowWithConfig]) => {
+            {/* {Object.entries(arrowsWithConfig).map(([key, arrowWithConfig]) => {
                 const isActive = activeArrows.includes(key as ArrowNameType);
                 const color = isActive ? 'yellow' : 'black';
 
@@ -108,7 +117,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                         z={z}
                     />
                 );
-            })}
+            })} */}
         </svg>
     );
 }
