@@ -21,8 +21,8 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
         }
     }, [resourceText]);
 
-    const handleResourceClick = (name: string, x: number, y: number) => {
-        setResourceText(name);
+    const handleResourceClick = (text: string, x: number, y: number) => {
+        setResourceText(text);
         setBoxPosition({ top: y + cellHeight, left: x - cellWidth / 1.5 }); // Adjusted top value to position the box below the resource
     };
 
@@ -117,12 +117,12 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                 {Object.entries(resources).map(([key, resource]) => {
                     if (resource.nature === 'code_glue' && !showGlue) return null;
                     const color = resource.getFillColor();
-                    return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} setResourceText={(name) => handleResourceClick(name as string, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
+                    return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} setResourceText={(text) => handleResourceClick(text as string, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
                 })}
             </svg>
             {isBoxVisible && (
-                // ATTENTION: temporary hack
-                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (!resourceText.startsWith('Actionable')) ? '350px' : '250px', height: resourceText.startsWith('Humans') ? '100px' : '250px', overflowY: 'auto' }}>
+                // ATTENTION: temporary hack, use key instead
+                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (!resourceText.startsWith('Actionable') && !resourceText.startsWith('Glue')) ? '350px' : '250px', height: resourceText.startsWith('Humans') ? '100px' : '250px', overflowY: 'auto' }}>
                     <button onClick={() => setIsBoxVisible(false)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>
                     <p>{resourceText}</p>
                 </div>
