@@ -253,9 +253,7 @@ export class Arrow extends GraphElement {
     constructor(
         startPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         endPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        resources: Record<ResourceNameType, Resource>,
-        cellWidth: number,
-        cellHeight: number
+        resources: Record<ResourceNameType, Resource>
     ) {
         super();
         this.startPoint = Arrow.resolvePoint(startPointSpec, resources);
@@ -286,7 +284,7 @@ export class Arrow extends GraphElement {
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, shouldAdjust: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string) {
         if (!context) return;
 
         // Draw black outline
@@ -305,17 +303,13 @@ export class Arrow extends GraphElement {
         context.lineTo(this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        /* if (color === 'yellow') {
-            this.drawArrowhead(context, this.startPoint, this.endPoint, color);
-        } */
     }
 
     drawCurvy(
         context: CanvasRenderingContext2D,
         control: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         resources: Record<ResourceNameType, Resource>,
-        color: string,
-        shouldAdjust: boolean
+        color: string
     ) {
         if (!context) return;
 
@@ -338,9 +332,6 @@ export class Arrow extends GraphElement {
         context.quadraticCurveTo(controlPoint.x, controlPoint.y, this.endPoint.x, this.endPoint.y);
         context.stroke();
 
-        /* if (color === 'yellow') {
-            this.drawCurvedArrowhead(context, this.startPoint, controlPoint, this.endPoint, color);
-        } */
     }
 
     drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
@@ -348,7 +339,7 @@ export class Arrow extends GraphElement {
         this.drawArrowheadAtAngle(context, end, angle, color);
     }
 
-    drawCurvedArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
+    drawCurvyArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
         // Compute tangent direction at endpoint of the quadratic Bézier curve
         const t = 1; // At the endpoint
         const dx = 2 * (1 - t) * (control.x - start.x) + 2 * t * (end.x - control.x);
@@ -387,7 +378,6 @@ export class Arrow extends GraphElement {
 export interface ArrowConfig {
     controlPoint: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType] | null;
     reverse: ArrowNameType | null;
-    shouldAdjust?: boolean;
     drawInOrder(fn: (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => void, key: ArrowNameType, arrowWithConfig: ArrowWithConfig,): void;
     next: (z: number) => ArrowNameType | null;
 }

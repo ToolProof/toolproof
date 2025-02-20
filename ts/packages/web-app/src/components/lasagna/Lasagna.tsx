@@ -1,6 +1,7 @@
 'use client';
+import ResourceSVG from './ResourceSVG';
 import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './constants';
-import { Point, Resource, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
+import { Point, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
 import { useRef, useEffect } from 'react';
 
 interface LasagnaProps {
@@ -38,8 +39,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                     context,
                     arrowWithConfig.config.controlPoint,
                     resources,
-                    color,
-                    arrowWithConfig.config.shouldAdjust ?? false
+                    color
                 );
                 // Store arrowhead for later
                 if (isActive) {
@@ -48,7 +48,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                 }
             } else {
                 // Draw straight arrow line
-                arrowWithConfig.arrow.draw(context, color, arrowWithConfig.config.shouldAdjust ?? false);
+                arrowWithConfig.arrow.draw(context, color);
                 // Store arrowhead for later
                 if (isActive) {
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
@@ -73,7 +73,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
         // Draw all arrowheads after all lines
         arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
             if (isCurvy && control) {
-                Arrow.prototype.drawCurvedArrowhead(context, start, control, end, color);
+                Arrow.prototype.drawCurvyArrowhead(context, start, control, end, color);
             } else {
                 Arrow.prototype.drawArrowhead(context, start, end, color);
             }
@@ -87,7 +87,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                 ref={canvasRef}
                 width={gridSize * cellWidth}
                 height={gridSize * cellHeight}
-                style={{ position: 'absolute', top: 0, left: 0, background: 'transparent',  pointerEvents: 'none'}}
+                style={{ position: 'absolute', top: 0, left: 0, background: 'transparent', pointerEvents: 'none' }}
             />
             <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={`0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}`}>
                 {/* Grid */}
@@ -110,126 +110,9 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                     const color = resource.getFillColor();
                     return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} />;
                 })}
-                {/* Draw Arrows */}
-                {/* {Object.entries(arrowsWithConfig).map(([key, arrowWithConfig]) => {
-                    const isActive = activeArrows.includes(key as ArrowNameType);
-                    const color = isActive ? 'yellow' : 'black';
-                    return (
-                        <ArrowSVG
-                            key={key}
-                            arrowWithConfig={arrowWithConfig}
-                            color={color}
-                            z={z}
-                        />
-                    );
-                })} */}
             </svg>
         </div>
     );
 }
 
 
-interface ResourceSVGProps {
-    name: ResourceNameType;
-    resource: Resource;
-    color: string;
-}
-
-const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color }) => {
-    const { col, row, width, height } = resource.cell;
-    const x = col * width;
-    const y = row * height;
-
-    // Calculate smaller size for `code_glue`
-    const isGlue = resource.nature === 'code_glue';
-    const smallWidth = width / 4;
-    const smallHeight = height / 2;
-    const smallX = x + (width - smallWidth) / 2;
-    const smallY = y + (height - smallHeight) / 2;
-
-    const handleClick = () => {
-        console.log(`Resource ${name} clicked`);
-    };
-
-    return (
-        <>
-            {resource.nature === 'data' ? (
-                <ellipse
-                    cx={x + width / 2}
-                    cy={y + height / 2}
-                    rx={width / 2}
-                    ry={height / 2 + 10}
-                    fill={color}
-                    stroke="black"
-                    onClick={handleClick}
-                    pointerEvents="visible"
-                />
-            ) : (
-                <rect
-                    x={isGlue ? smallX : x}
-                    y={isGlue ? smallY : y}
-                    width={isGlue ? smallWidth : width}
-                    height={isGlue ? smallHeight : height}
-                    fill={color}
-                    stroke="black"
-                    onClick={handleClick}
-                    pointerEvents="visible"
-                />
-            )}
-
-            {/* Ensure text does not interfere with clickability */}
-            {!isGlue && (
-                <text
-                    x={x + width / 2}
-                    y={y + height / 2}
-                    fontSize="16px"
-                    textAnchor="middle"
-                    alignmentBaseline="middle"
-                    fill="black"
-                    pointerEvents="none" // Prevents text from intercepting clicks
-                >
-                    {name}
-                </text>
-            )}
-        </>
-    );
-};
-
-
-
-interface ArrowSVGProps {
-    arrowWithConfig: ArrowWithConfig;
-    color: string;
-    z: number;
-}
-
-const ArrowSVG: React.FC<ArrowSVGProps> = ({ arrowWithConfig, color }) => {
-    const { arrow, config } = arrowWithConfig;
-    const { startPoint, endPoint } = arrow;
-
-    if (config.controlPoint) {
-        // Curved Arrow (Quadratic Bézier)
-        const control = Arrow.resolvePoint(config.controlPoint, resources);
-        return (
-            <path
-                d={`M ${startPoint.x} ${startPoint.y} Q ${control.x} ${control.y}, ${endPoint.x} ${endPoint.y}`}
-                stroke={color}
-                fill="transparent"
-                strokeWidth="2"
-            />
-        );
-    } else {
-        // Straight Arrow
-        return (
-            <line
-                x1={startPoint.x}
-                y1={startPoint.y}
-                x2={endPoint.x}
-                y2={endPoint.y}
-                stroke={color}
-                strokeWidth="2"
-                markerEnd="url(#arrowhead)"
-            />
-        );
-    }
-};

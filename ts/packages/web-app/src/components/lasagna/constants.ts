@@ -30,7 +30,7 @@ export const resources: Record<ResourceNameType, Resource> = {
 
 export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Human_Anchors: {
-        arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources),
         config: {
             controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
             reverse: null,
@@ -42,7 +42,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Anchors: {
-        arrow: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources),
         config: {
             controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -53,7 +53,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Anchors_Agent: {
-        arrow: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources),
         config: {
             controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -65,7 +65,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Candidates: {
-        arrow: new Arrow(['Agent', 'top'], ['Candidates', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'top'], ['Candidates', 'bottom'], resources),
         config: {
             controlPoint: [new Cell(4, 4, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -76,7 +76,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Candidates_Simulation: {
-        arrow: new Arrow(['Candidates', 'top'], ['Simulation', 'left'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Candidates', 'top'], ['Simulation', 'left'], resources),
         config: {
             controlPoint: [new Cell(3, 1, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -87,7 +87,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Simulation_Results: {
-        arrow: new Arrow(['Simulation', 'right'], ['Results', 'top'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Simulation', 'right'], ['Results', 'top'], resources),
         config: {
             controlPoint: [new Cell(7, 1, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -98,7 +98,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Results_Agent: {
-        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'top'], resources),
         config: {
             controlPoint: [new Cell(6, 4, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -109,7 +109,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Papers: {
-        arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources),
         config: {
             controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -120,7 +120,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Papers_Human: {
-        arrow: new Arrow(['Papers', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Papers', 'right'], ['Human', 'right'], resources),
         config: {
             controlPoint: [new Cell(10, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -131,7 +131,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Human_Agent: {
-        arrow: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources),
         config: {
             controlPoint: null,
             reverse: null,
@@ -142,11 +142,10 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Human: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Human', 'top'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'bottom'], ['Human', 'top'], resources),
         config: {
             controlPoint: null,
             reverse: null,
-            shouldAdjust: true,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
@@ -154,7 +153,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Agent: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources),
         config: {
             controlPoint: null,
             reverse: null,
@@ -165,7 +164,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Checkpoints: {
-        arrow: new Arrow(['Agent', 'top'], ['Checkpoints', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'top'], ['Checkpoints', 'bottom'], resources),
         config: {
             controlPoint: null,
             reverse: null,
@@ -176,11 +175,10 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Checkpoints_Agent: {
-        arrow: new Arrow(['Checkpoints', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Checkpoints', 'bottom'], ['Agent', 'top'], resources),
         config: {
             controlPoint: null,
             reverse: null,
-            shouldAdjust: true,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
