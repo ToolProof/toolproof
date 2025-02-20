@@ -1,4 +1,4 @@
-import { cellHeight } from './constants';
+import { cellWidth, cellHeight } from './constants';
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
@@ -27,6 +27,7 @@ export type ArrowNameType =
     | 'Agent_Human'
     | 'Human_Agent'
     | 'Agent_Papers'
+    | 'Papers_Agent'
     | 'Papers_Human'
     | 'Agent_Agent'
     | 'Agent_Checkpoints'
@@ -106,6 +107,16 @@ export class Cell {
             right: { x: (this.col + 1) * this.width, y: this.row * this.height + this.height / 2 }
         };
     }
+
+    getExternalDiamond(): Diamond {
+        return {
+            top: { x: this.col * this.width + this.width / 2, y: this.row * this.height - cellHeight / 6 },
+            bottom: { x: this.col * this.width + this.width / 2, y: (this.row + 1) * this.height + cellHeight / 6 },
+            left: { x: this.col * this.width - cellWidth / 6, y: this.row * this.height + this.height / 2 },
+            right: { x: (this.col + 1) * this.width + cellWidth / 6, y: this.row * this.height + this.height / 2 }
+        };
+    }
+
 }
 
 
@@ -118,7 +129,8 @@ export class Resource extends GraphElement {
         public cell: Cell,
         public environment: Environment,
         public nature: Nature,
-        public isActive: boolean
+        public isActive: boolean,
+        public description: string
     ) {
         super();
     }
@@ -177,12 +189,12 @@ export class Resource extends GraphElement {
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
-        let displayText = this.nature === 'code_glue' ? '' : key;
-        if (displayText === 'Agent') {
+        const displayText = this.nature === 'code_glue' ? '' : key;
+        /* if (displayText === 'Agent') {
             displayText = 'OpenAI o3';
         } else if (displayText === 'Simulation') {
             displayText = false ? 'AutoDock' : 'Schrödinger';
-        }
+        } */
 
         context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
 

@@ -2,7 +2,7 @@
 import ResourceSVG from './ResourceSVG';
 import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './constants';
 import { Point, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface LasagnaProps {
     z: number;
@@ -11,6 +11,20 @@ interface LasagnaProps {
 
 export default function Lasagna({ z, showGlue }: LasagnaProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [resourceText, setResourceText] = useState('');
+    const [isBoxVisible, setIsBoxVisible] = useState(false);
+    const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
+
+    useEffect(() => {
+        if (resourceText) {
+            setIsBoxVisible(true);
+        }
+    }, [resourceText]);
+
+    const handleResourceClick = (name: string, x: number, y: number) => {
+        setResourceText(name);
+        setBoxPosition({ top: y + cellHeight, left: x - cellWidth / 1.5 }); // Adjusted top value to position the box below the resource
+    };
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -18,8 +32,17 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
         const context = canvas.getContext('2d');
         if (!context) return;
 
+        const drawGrid = () => {
+            for (let col = 0; col < gridSize; col++) {
+                for (let row = 0; row < gridSize; row++) {
+                    context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+                }
+            }
+        };
+
         // Clear the canvas
         context.clearRect(0, 0, canvas.width, canvas.height);
+        // drawGrid();
 
         // Draw resources
         Object.entries(resources).forEach(([key, resource]) => {
@@ -90,29 +113,20 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                 style={{ position: 'absolute', top: 0, left: 0, background: 'transparent', pointerEvents: 'none' }}
             />
             <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={`0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}`}>
-                {/* Grid */}
-                {/* {Array.from({ length: gridSize }).map((_, col) =>
-                    Array.from({ length: gridSize }).map((_, row) => (
-                        <rect
-                            key={`grid-${col}-${row}`}
-                            x={col * cellWidth}
-                            y={row * cellHeight}
-                            width={cellWidth}
-                            height={cellHeight}
-                            stroke="gray"
-                            fill="transparent"
-                        />
-                    ))
-                )} */}
                 {/* Draw Resources */}
                 {Object.entries(resources).map(([key, resource]) => {
                     if (resource.nature === 'code_glue' && !showGlue) return null;
                     const color = resource.getFillColor();
-                    return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} />;
+                    return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} setResourceText={(name) => handleResourceClick(name as string, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
                 })}
             </svg>
+            {isBoxVisible && (
+                // ATTENTION: temporary hack
+                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (!resourceText.startsWith('Actionable')) ? '350px' : '250px', height: resourceText.startsWith('Humans') ? '100px' : '250px', overflowY: 'auto' }}>
+                    <button onClick={() => setIsBoxVisible(false)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>
+                    <p>{resourceText}</p>
+                </div>
+            )}
         </div>
     );
 }
-
-

@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showGlue, setShowGlue] = useState(false);
-  const [detailsText, setDetailsText] = useState('');
+  const [iterationText, setDetailsText] = useState('');
   const [z, setZ] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -70,13 +70,16 @@ export default function Home() {
 
   return (
     <div className="relative">
-      <div className="fixed top-0 left-0 w-full text-center p-4 font-bold text-xs">
+      <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
+        Welcome to a visualization of ToolProof Drug Discovery
+      </div>
+      <div className="fixed top-4 left-0 w-full text-center p-4 font-bold text-[10px] bg-transparent">
         {topText}
       </div>
       <Lasagna z={z} showGlue={showGlue} />
       {!isPlaying && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
-          {/* <p>{detailsText}</p> */}
+          <p>{iterationText}</p>
         </div>
       )}
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">

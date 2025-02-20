@@ -4,9 +4,10 @@ interface ResourceSVGProps {
     name: ResourceNameType;
     resource: Resource;
     color: string;
+    setResourceText: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color }) => {
+const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color, setResourceText }) => {
     const { col, row, width, height } = resource.cell;
     const x = col * width;
     const y = row * height;
@@ -19,7 +20,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color }) => {
     const smallY = y + (height - smallHeight) / 2;
 
     const handleClick = () => {
-        console.log(`Resource ${name} clicked`);
+        setResourceText(resource.description);
     };
 
     return (

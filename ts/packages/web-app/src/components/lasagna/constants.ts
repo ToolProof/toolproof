@@ -13,18 +13,30 @@ const glueX = 0;
 const glueY = 2;
 
 export const resources: Record<ResourceNameType, Resource> = {
-    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true),
-    Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true),
-    Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true),
-    Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true),
-    AnchorsGlue: new Resource(new Cell(1 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true),
-    Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true),
-    CandidatesGlue: new Resource(new Cell(3 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true),
-    Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true),
-    ResultsGlue: new Resource(new Cell(7 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true),
-    Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true),
-    PapersGlue: new Resource(new Cell(9 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true),
-    Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true),
+    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true,
+        'Built around a powerful, reflective GPT-style LLM, such as OpenAI\'s o3, the Agent is pre-configured to use its parametric capabilities to collaborate with humans and tools for drug discovery focused on a specified disease.'),
+    Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true,
+        'Humans interact with the process via a web interface. A human in the loop will typically be an expert on the target disease.'),
+    Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true,
+        'Simulation involves specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.'),
+    Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
+        'Anchors serve as starting points for the drug discovery process. An Anchor is usually an existing, though suboptimal, drug (also known as a ligand) for the target disease. Anchors are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.'),
+    AnchorsGlue: new Resource(new Cell(1 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
+        'dummy description'),
+    Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
+        'Candidates are drugs that the Agent suggests. Candidates are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.'),
+    CandidatesGlue: new Resource(new Cell(3 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
+        'dummy description'),
+    Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
+        'Simulation results, which include files in various formats depending on the simulation tools used.'),
+    ResultsGlue: new Resource(new Cell(7 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
+        'dummy description'),
+    Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
+        'Actionable academic papers that document the Agent\'s reasoning behind crafting the Candidate, the simulation process, and the results, offering suggestions for further action or future research.'),
+    PapersGlue: new Resource(new Cell(9 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
+        'dummy description'),
+    Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true,
+        'Checkpoints record the agent\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.'),
 } as const;
 
 
@@ -32,13 +44,18 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Human_Anchors: {
         arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources),
         config: {
-            controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
+            controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
-                return () => 'AgentAnchors';
             },
-            next: (z: number) => 'Agent_Anchors'
+            next: (z: number) => {
+                if (z === 7) {
+                    return 'Agent_Anchors';
+                } else {
+                    return 'Anchors_Agent';
+                }
+            }
         }
     },
     Agent_Anchors: {
@@ -49,7 +66,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Anchors_Agent'
+            next: (z: number) => 'Agent_Candidates'
         }
     },
     Anchors_Agent: {
@@ -65,9 +82,9 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Candidates: {
-        arrow: new Arrow(['Agent', 'top'], ['Candidates', 'bottom'], resources),
+        arrow: new Arrow(['Agent', 'left'], ['Candidates', 'bottom'], resources),
         config: {
-            controlPoint: [new Cell(4, 4, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(3, 5, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -98,18 +115,35 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Results_Agent: {
-        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'top'], resources),
+        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'right'], resources),
         config: {
-            controlPoint: [new Cell(6, 4, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(7, 5, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Agent_Papers'
+            next: (z: number) => {
+                if (z === 7) {
+                    return 'Papers_Agent';
+                } else {
+                    return 'Agent_Papers';
+                }
+            }
         }
     },
     Agent_Papers: {
         arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources),
+        config: {
+            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (z: number) => 'Papers_Human'
+        }
+    },
+    Papers_Agent: {
+        arrow: new Arrow(['Papers', 'bottom'], ['Agent', 'right'], resources),
         config: {
             controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -190,19 +224,20 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
 
 export const sequence: Array<[GraphElementNameType[], string]> = [
     [[],
-        'Welcome to a visualization of ToolProof Drug Discovery! The Agent is pre-configured to collaborate with humans and tools for drug discovery focused on a specified disease.',
+        'Click on a Resource (rectangle or ellipse) to learn more about it, or use the bottom panel to navigate through a typical process iteration.',
     ],
     [['Human', 'Human_Anchors', 'Anchors'],
-        'Humans interact with the process via a web interface. Humans can upload Anchors, which serve as starting points for the drug discovery process. An Anchor is usually an existing, though suboptimal, drug (also known as a ligand) for the target disease. Anchors are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.'],
-    [['Anchors', 'Anchors_Agent', 'Agent_Anchors', 'Agent', 'Agent_Candidates', 'Candidates', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'The Agent retrieves one or more Anchors. Built around a highly capable, reflective GPT-style LLM, such as OpenAI\'s o3, it leverages its parametric knowledge to suggest modifications to an Anchor and generate a Candidate—a drug potentially better suited to treat the disease. Like Anchors, Candidates are represented as .pdb files or SMILES strings.'],
+        'Human uploads an Anchor.'],
+    [['Anchors', 'Anchors_Agent', 'Agent', 'Agent_Candidates', 'Candidates', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+        'The Agent retrieves one or more Anchors and generates a Candidate.'],
     [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
-        'This stage involves specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.'],
+        'Specialized tools stress-test the Candidate’s ability to bind to target molecules, usually proteins.'],
     [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'Simulation results, available in various file formats depending on the simulation tools used, are presented to the Agent. If the results are promising, the Agent decides to draft an academic paper to document its reasoning behind crafting the Candidate, the simulation process, and the results, offering suggestions for further action or future research.'],
+        'Simulation results are presented to the Agent. If they are promising, the Agent decides to draft a Paper.'],
     [['Papers', 'Papers_Human', 'Human'],
-        'Humans can retrieve papers via the web interface.'],
+        'Human retrieves the Paper to read it.'],
     [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'Humans and the Agent can talk about anything related to the drug discovery process. Although shown here as a seperate stage, this interaction can happen at any time and be initiated by either party. A human might for example want to discuss a paper, or the Agent might request to interview a human expert.'],
+        'Human and Agent discuss the Paper.'],
+    [['Agent', 'Agent_Anchors', 'Papers_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+        'The Agent can retrieve Papers and generate Anchors for new iterations.'],
 ];
-
