@@ -1,7 +1,9 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { sequence } from '@/components/lasagna/specs/alfa/specs';
+import { GraphElementNameType } from '@/components/lasagna/types';
+import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './specs';
 import { useState, useRef, useEffect } from 'react';
+
 
 export default function Frame() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -13,6 +15,14 @@ export default function Frame() {
   useEffect(() => {
     setSequenceDescription(sequence[z][1]);
   }, [z]);
+
+  const checkIfActive = (key: GraphElementNameType) => {
+    return sequence[z][0].includes(key);
+  };
+
+  const bar = () => {
+    return z === 7;
+  };
 
   const handleClickPrevious = () => {
     if (isPlaying) return;
@@ -76,7 +86,17 @@ export default function Frame() {
       <div className="fixed top-4 left-0 w-full text-center p-4 font-bold text-[10px] bg-transparent">
         {subHeadline}
       </div>
-      <Painting z={z} showGlue={showGlue} />
+      <Painting
+        resources={resources}
+        arrowsWithConfig={arrowsWithConfig}
+        sequence={sequence}
+        gridSize={gridSize}
+        cellWidth={cellWidth}
+        cellHeight={cellHeight}
+        checkIfActive={checkIfActive}
+        bar={bar}
+        showGlue={showGlue}
+      />
       {!isPlaying && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
           <p>{sequenceDescription}</p>

@@ -1,15 +1,21 @@
 'use client';
 import ResourceSVG from './ResourceSVG';
-import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './specs/alfa/specs';
-import { Point, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
+import { Point, Resource, Arrow, GraphElementNameType, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
 import { useState, useRef, useEffect } from 'react';
 
 interface PaintingProps {
-    z: number;
+    resources: Record<ResourceNameType, Resource>;
+    arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig>
+    sequence: Array<[GraphElementNameType[], string]>
+    gridSize: number;
+    cellWidth: number;
+    cellHeight: number;
+    checkIfActive: (key: GraphElementNameType) => boolean;
+    bar: () => boolean;
     showGlue: boolean;
 }
 
-export default function Painting({ z, showGlue }: PaintingProps) {
+export default function Painting({ resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight, checkIfActive, bar, showGlue }: PaintingProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
@@ -39,13 +45,14 @@ export default function Painting({ z, showGlue }: PaintingProps) {
 
         // Draw resources stroke
         Object.entries(resources).forEach(([key, resource]) => {
-            const color = sequence[z][0].includes(key as ResourceNameType) ? 'yellow' : 'black';
+            const isActive = checkIfActive(key as ArrowNameType);
+            const color = isActive ? 'yellow' : 'black';
             resource.draw(context, color, false);
             resource.drawText(context, key);
         });
 
         const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
-            const isActive = sequence[z][0].includes(key as ArrowNameType);
+            const isActive = checkIfActive(key);
             let color = isActive ? 'yellow' : 'black';
             color = (isActive && key.includes('Checkpoints')) ? 'red' : color;
 
@@ -71,7 +78,7 @@ export default function Painting({ z, showGlue }: PaintingProps) {
                 }
             }
 
-            const nextKey = arrowWithConfig.config.next(z);
+            const nextKey = arrowWithConfig.config.next(bar); // ATTENTION_Z
             if (nextKey) {
                 const nextArrowWithConfig = arrowsWithConfig[nextKey];
                 nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
@@ -95,7 +102,7 @@ export default function Painting({ z, showGlue }: PaintingProps) {
             }
         });
 
-    }, [z]);
+    }, [arrowsWithConfig, cellHeight, cellWidth, gridSize, resources, sequence, checkIfActive, bar]);
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>

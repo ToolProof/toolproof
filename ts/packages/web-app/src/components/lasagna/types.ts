@@ -1,4 +1,4 @@
-import { cellWidth, cellHeight } from './specs/alfa/specs';
+
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
@@ -71,7 +71,7 @@ export class Cell {
         public col: number,
         public row: number,
         public width: number,
-        public height: number
+        public height: number,
     ) { }
 
     getCenter(): Point {
@@ -110,10 +110,10 @@ export class Cell {
 
     getExternalDiamond(): Diamond {
         return {
-            top: { x: this.col * this.width + this.width / 2, y: this.row * this.height - cellHeight / 6 },
-            bottom: { x: this.col * this.width + this.width / 2, y: (this.row + 1) * this.height + cellHeight / 6 },
-            left: { x: this.col * this.width - cellWidth / 6, y: this.row * this.height + this.height / 2 },
-            right: { x: (this.col + 1) * this.width + cellWidth / 6, y: this.row * this.height + this.height / 2 }
+            top: { x: this.col * this.width + this.width / 2, y: this.row * this.height - this.height / 6 },
+            bottom: { x: this.col * this.width + this.width / 2, y: (this.row + 1) * this.height + this.height / 6 },
+            left: { x: this.col * this.width - this.width / 6, y: this.row * this.height + this.height / 2 },
+            right: { x: (this.col + 1) * this.width + this.width / 6, y: this.row * this.height + this.height / 2 }
         };
     }
 
@@ -261,13 +261,19 @@ export type DiamondPointType = 'top' | 'bottom' | 'left' | 'right';
 export class Arrow extends GraphElement {
     public startPoint: Point;
     public endPoint: Point;
+    private static cellWidth: number;
+    private static cellHeight: number;
 
     constructor(
         startPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
         endPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        resources: Record<ResourceNameType, Resource>
+        resources: Record<ResourceNameType, Resource>,
+        cellWidth: number,
+        cellHeight: number,
     ) {
         super();
+        Arrow.cellWidth = cellWidth;
+        Arrow.cellHeight = cellHeight;
         this.startPoint = Arrow.resolvePoint(startPointSpec, resources);
         this.endPoint = Arrow.resolvePoint(endPointSpec, resources);
     }
@@ -284,9 +290,9 @@ export class Arrow extends GraphElement {
             if (resource.nature === 'data') {
                 // Adjust top/bottom point for ellipses
                 if (input[1] === 'top') {
-                    return { x: point.x, y: point.y - (cellHeight / 6) };
+                    return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
                 } else if (input[1] === 'bottom') {
-                    return { x: point.x, y: point.y + (cellHeight / 6) };
+                    return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
                 }
             }
             return point;
@@ -391,7 +397,7 @@ export interface ArrowConfig {
     controlPoint: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType] | null;
     reverse: ArrowNameType | null;
     drawInOrder(fn: (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => void, key: ArrowNameType, arrowWithConfig: ArrowWithConfig,): void;
-    next: (z: number) => ArrowNameType | null;
+    next: (fn: () => boolean) => ArrowNameType | null;
 }
 
 

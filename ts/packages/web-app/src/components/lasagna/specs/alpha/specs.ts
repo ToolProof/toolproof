@@ -1,5 +1,5 @@
 import { resourceDescriptions, sequenceDescriptions } from '../texts';
-import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '../../types';
+import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '@/components/lasagna/types';
 
 
 export const gridSize = 12;
@@ -31,15 +31,16 @@ export const resources: Record<ResourceNameType, Resource> = {
 
 export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Human_Anchors: {
-        arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources),
+        arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => {
-                if (z === 7) {
+            next: (bar: () => boolean) => {
+                const barResult = bar();
+                if (barResult) {
                     return 'Agent_Anchors';
                 } else {
                     return 'Anchors_Agent';
@@ -48,18 +49,18 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Anchors: {
-        arrow: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources),
+        arrow: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Agent_Candidates'
+            next: (bar: () => boolean) => 'Agent_Candidates'
         }
     },
     Anchors_Agent: {
-        arrow: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources),
+        arrow: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
@@ -67,52 +68,53 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Agent_Candidates'
+            next: (bar: () => boolean) => 'Agent_Candidates'
         }
     },
     Agent_Candidates: {
-        arrow: new Arrow(['Agent', 'left'], ['Candidates', 'bottom'], resources),
+        arrow: new Arrow(['Agent', 'left'], ['Candidates', 'bottom'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(3, 5, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Candidates_Simulation'
+            next: (bar: () => boolean) => 'Candidates_Simulation'
         }
     },
     Candidates_Simulation: {
-        arrow: new Arrow(['Candidates', 'top'], ['Simulation', 'left'], resources),
+        arrow: new Arrow(['Candidates', 'top'], ['Simulation', 'left'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(3, 1, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Simulation_Results'
+            next: (bar: () => boolean) => 'Simulation_Results'
         }
     },
     Simulation_Results: {
-        arrow: new Arrow(['Simulation', 'right'], ['Results', 'top'], resources),
+        arrow: new Arrow(['Simulation', 'right'], ['Results', 'top'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(7, 1, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Results_Agent'
+            next: (bar: () => boolean) => 'Results_Agent'
         }
     },
     Results_Agent: {
-        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'right'], resources),
+        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(7, 5, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => {
-                if (z === 7) {
+            next: (bar: () => boolean) => {
+                const barResult = bar();
+                if (barResult) {
                     return 'Papers_Agent';
                 } else {
                     return 'Agent_Papers';
@@ -121,91 +123,91 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Agent_Papers: {
-        arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources),
+        arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Papers_Human'
+            next: (bar: () => boolean) => 'Papers_Human'
         }
     },
     Papers_Agent: {
-        arrow: new Arrow(['Papers', 'bottom'], ['Agent', 'right'], resources),
+        arrow: new Arrow(['Papers', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Papers_Human'
+            next: (bar: () => boolean) => 'Papers_Human'
         }
     },
     Papers_Human: {
-        arrow: new Arrow(['Papers', 'right'], ['Human', 'right'], resources),
+        arrow: new Arrow(['Papers', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: [new Cell(10, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Human_Agent'
+            next: (bar: () => boolean) => 'Human_Agent'
         }
     },
     Human_Agent: {
-        arrow: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources),
+        arrow: new Arrow(['Human', 'top'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Agent_Human'
+            next: (bar: () => boolean) => 'Agent_Human'
         }
     },
     Agent_Human: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Human', 'top'], resources),
+        arrow: new Arrow(['Agent', 'bottom'], ['Human', 'top'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Agent_Checkpoints'
+            next: (bar: () => boolean) => 'Agent_Checkpoints'
         }
     },
     Agent_Agent: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources),
+        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Agent_Checkpoints'
+            next: (bar: () => boolean) => 'Agent_Checkpoints'
         }
     },
     Agent_Checkpoints: {
-        arrow: new Arrow(['Agent', 'top'], ['Checkpoints', 'bottom'], resources),
+        arrow: new Arrow(['Agent', 'top'], ['Checkpoints', 'bottom'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => 'Checkpoints_Agent'
+            next: (bar: () => boolean) => 'Checkpoints_Agent'
         }
     },
     Checkpoints_Agent: {
-        arrow: new Arrow(['Checkpoints', 'bottom'], ['Agent', 'top'], resources),
+        arrow: new Arrow(['Checkpoints', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (z: number) => null
+            next: (bar: () => boolean) => null
         }
     }
 };
