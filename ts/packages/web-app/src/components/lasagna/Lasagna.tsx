@@ -11,18 +11,11 @@ interface LasagnaProps {
 
 export default function Lasagna({ z, showGlue }: LasagnaProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [resourceText, setResourceText] = useState('');
-    const [isBoxVisible, setIsBoxVisible] = useState(false);
+    const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
 
-    useEffect(() => {
-        if (resourceText) {
-            setIsBoxVisible(true);
-        }
-    }, [resourceText]);
-
-    const handleResourceClick = (text: string, x: number, y: number) => {
-        setResourceText(text);
+    const handleResourceClick = (resourceName: ResourceNameType, x: number, y: number) => {
+        setResourceName(resourceName);
         setBoxPosition({ top: y + cellHeight, left: x - cellWidth / 1.5 }); // Adjusted top value to position the box below the resource
     };
 
@@ -117,14 +110,13 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
                 {Object.entries(resources).map(([key, resource]) => {
                     if (resource.nature === 'code_glue' && !showGlue) return null;
                     const color = resource.getFillColor();
-                    return <ResourceSVG key={key} name={key as ResourceNameType} resource={resource} color={color} setResourceText={(text) => handleResourceClick(text as string, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
+                    return <ResourceSVG key={key} resourceName={key as ResourceNameType} resource={resource} color={color} handleResourceClickHelper={(resourceName) => handleResourceClick(resourceName as ResourceNameType, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
                 })}
             </svg>
-            {isBoxVisible && (
-                // ATTENTION: temporary hack, use key instead
-                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (!resourceText.startsWith('Actionable') && !resourceText.startsWith('Glue')) ? '350px' : '250px', height: resourceText.startsWith('Humans') ? '100px' : '250px', overflowY: 'auto' }}>
-                    <button onClick={() => setIsBoxVisible(false)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>
-                    <p>{resourceText}</p>
+            {(resourceName) && (
+                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (resourceName !== 'Papers' && !resourceName.includes('Glue')) ? '350px' : '250px', height: resourceName === 'Human' ? '100px' : '250px', overflowY: 'auto' }}>
+                    <button onClick={() => setResourceName(null)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>
+                    <p>{resources[resourceName].description}</p>
                 </div>
             )}
         </div>

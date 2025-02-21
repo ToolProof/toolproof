@@ -1,13 +1,13 @@
 import { Resource, ResourceNameType } from './types';
 
 interface ResourceSVGProps {
-    name: ResourceNameType;
+    resourceName: ResourceNameType;
     resource: Resource;
     color: string;
-    setResourceText: React.Dispatch<React.SetStateAction<string>>;
+    handleResourceClickHelper: (resourceName: ResourceNameType) => void;
 }
 
-const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color, setResourceText }) => {
+const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper }) => {
     const { col, row, width, height } = resource.cell;
     const x = col * width;
     const y = row * height;
@@ -20,7 +20,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color, setRes
     const smallY = y + (height - smallHeight) / 2;
 
     const handleClick = () => {
-        setResourceText(resource.description);
+        handleResourceClickHelper(resourceName);
     };
 
     return (
@@ -60,7 +60,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ name, resource, color, setRes
                     fill="black"
                     pointerEvents="none" // Prevents text from intercepting clicks
                 >
-                    {name}
+                    {resourceName}
                 </text>
             )}
         </>
