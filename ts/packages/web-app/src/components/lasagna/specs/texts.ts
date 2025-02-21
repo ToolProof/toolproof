@@ -1,4 +1,4 @@
-import { ResourceNameType } from '../../types';
+import { ResourceNameType } from '../types';
 
 
 export const resourceDescriptions: Record<ResourceNameType, string> = {

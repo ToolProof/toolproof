@@ -4,12 +4,12 @@ import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight 
 import { Point, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
 import { useState, useRef, useEffect } from 'react';
 
-interface LasagnaProps {
+interface PaintingProps {
     z: number;
     showGlue: boolean;
 }
 
-export default function Painting({ z, showGlue }: LasagnaProps) {
+export default function Painting({ z, showGlue }: PaintingProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
@@ -37,7 +37,7 @@ export default function Painting({ z, showGlue }: LasagnaProps) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         // drawGrid();
 
-        // Draw resources outline
+        // Draw resources stroke
         Object.entries(resources).forEach(([key, resource]) => {
             const color = sequence[z][0].includes(key as ResourceNameType) ? 'yellow' : 'black';
             resource.draw(context, color, false);
