@@ -213,29 +213,4 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
 };
 
 
-export const sequence: Array<[GraphElementNameType[], string]> = [
-    [[],
-    sequenceDescriptions[0]
-    ],
-    [['Human', 'Human_Anchors', 'Anchors'],
-    sequenceDescriptions[1]
-    ],
-    [['Anchors', 'Anchors_Agent', 'Agent', 'Agent_Candidates', 'Candidates', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-    sequenceDescriptions[2]
-    ],
-    [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
-    sequenceDescriptions[3]
-    ],
-    [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-    sequenceDescriptions[4]
-    ],
-    [['Papers', 'Papers_Human', 'Human'],
-    sequenceDescriptions[5]
-    ],
-    [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-    sequenceDescriptions[6]
-    ],
-    [['Agent', 'Agent_Anchors', 'Papers_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-    sequenceDescriptions[7]
-    ],
-];
+export const sequence: Array<[GraphElementNameType[], string]> = [];
