@@ -1,4 +1,5 @@
-import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from './types';
+import { resourceDescriptions, sequenceDescriptions } from './texts';
+import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '../../types';
 
 
 export const gridSize = 12;
@@ -13,30 +14,18 @@ const glueX = 0;
 const glueY = 2;
 
 export const resources: Record<ResourceNameType, Resource> = {
-    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true,
-        'Built around a powerful, reflective GPT-style LLM, such as OpenAI\'s o3, the Agent is pre-configured to use its parametric capabilities to collaborate with humans and tools for drug discovery focused on a specified disease.'),
-    Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true,
-        'Humans interact with the process via a web interface. A human in the loop will typically be an expert on the target disease.'),
-    Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true,
-        'Simulation involves specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.'),
-    Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
-        'Anchors serve as starting points for the drug discovery process. An Anchor is usually an existing, though suboptimal, drug (also known as a ligand) for the target disease. Anchors are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.'),
-    AnchorsGlue: new Resource(new Cell(1 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
-        'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage'),
-    Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
-        'Candidates are drugs that the Agent suggests. Candidates are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.'),
-    CandidatesGlue: new Resource(new Cell(3 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
-        'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage'),
-    Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
-        'Simulation results, which include files in various formats depending on the simulation tools used.'),
-    ResultsGlue: new Resource(new Cell(7 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
-        'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage'),
-    Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true,
-        'Actionable academic papers that document the Agent\'s reasoning behind crafting the Candidate, the simulation process, and the results, offering suggestions for further action or future research (e.g. lab experiments).'),
-    PapersGlue: new Resource(new Cell(9 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true,
-        'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage'),
-    Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true,
-        'Checkpoints record the agent\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.'),
+    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true, resourceDescriptions['Agent']),
+    Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
+    Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Simulation']),
+    Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Anchors']),
+    AnchorsGlue: new Resource(new Cell(1 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['AnchorsGlue']),
+    Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Candidates']),
+    CandidatesGlue: new Resource(new Cell(3 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['CandidatesGlue']),
+    Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Results']),
+    ResultsGlue: new Resource(new Cell(7 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['ResultsGlue']),
+    Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Papers']),
+    PapersGlue: new Resource(new Cell(9 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['PapersGlue']),
+    Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true, resourceDescriptions['Checkpoints']),
 } as const;
 
 
@@ -224,20 +213,30 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
 
 export const sequence: Array<[GraphElementNameType[], string]> = [
     [[],
-        'Click on a Resource (rectangle or ellipse) to learn more about it, or use the bottom panel to navigate through a typical process iteration.',
+    sequenceDescriptions[0]
     ],
     [['Human', 'Human_Anchors', 'Anchors'],
-        'A Human uploads an Anchor.'],
+    sequenceDescriptions[1]
+    ],
     [['Anchors', 'Anchors_Agent', 'Agent', 'Agent_Candidates', 'Candidates', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'The Agent retrieves the Anchor and generates a Candidate.'],
+    sequenceDescriptions[2]
+    ],
     [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
-        'The Simulation tool retrieves the Candidate and generates Results.'],
+    sequenceDescriptions[3]
+    ],
     [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'The Agent retrieves the Results. If they are promising, it decides to draft a Paper.'],
+    sequenceDescriptions[4]
+    ],
     [['Papers', 'Papers_Human', 'Human'],
-        'The Human retrieves the Paper to read it.'],
+    sequenceDescriptions[5]
+    ],
     [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'The Human and the Agent discuss the Paper.'],
+    sequenceDescriptions[6]
+    ],
     [['Agent', 'Agent_Anchors', 'Papers_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
-        'In addition: the Agent can retrieve Papers and generate Anchors for new iterations.'],
+    sequenceDescriptions[7]
+    ],
 ];
+
+
+

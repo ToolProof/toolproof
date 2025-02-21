@@ -1,6 +1,6 @@
 'use client';
 import ResourceSVG from './ResourceSVG';
-import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './constants';
+import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './specs/alfa/specs';
 import { Point, Arrow, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
 import { useState, useRef, useEffect } from 'react';
 
@@ -9,7 +9,7 @@ interface LasagnaProps {
     showGlue: boolean;
 }
 
-export default function Lasagna({ z, showGlue }: LasagnaProps) {
+export default function Painting({ z, showGlue }: LasagnaProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
@@ -37,7 +37,7 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         // drawGrid();
 
-        // Draw resources
+        // Draw resources outline
         Object.entries(resources).forEach(([key, resource]) => {
             const color = sequence[z][0].includes(key as ResourceNameType) ? 'yellow' : 'black';
             resource.draw(context, color, false);
@@ -99,20 +99,22 @@ export default function Lasagna({ z, showGlue }: LasagnaProps) {
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            {/* Add Canvas */}
             <canvas
                 ref={canvasRef}
                 width={gridSize * cellWidth}
                 height={gridSize * cellHeight}
                 style={{ position: 'absolute', top: 0, left: 0, background: 'transparent', pointerEvents: 'none' }}
             />
+            {/* Draw ResourceSVGs */}
             <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={`0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}`}>
-                {/* Draw Resources */}
                 {Object.entries(resources).map(([key, resource]) => {
                     if (resource.nature === 'code_glue' && !showGlue) return null;
                     const color = resource.getFillColor();
                     return <ResourceSVG key={key} resourceName={key as ResourceNameType} resource={resource} color={color} handleResourceClickHelper={(resourceName) => handleResourceClick(resourceName as ResourceNameType, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
                 })}
             </svg>
+            {/* Draw ResourceDescription */}
             {(resourceName) && (
                 <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (resourceName !== 'Papers' && !resourceName.includes('Glue')) ? '350px' : '250px', height: resourceName === 'Human' ? '100px' : '250px', overflowY: 'auto' }}>
                     <button onClick={() => setResourceName(null)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>

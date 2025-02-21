@@ -1,4 +1,4 @@
-import { cellWidth, cellHeight } from './constants';
+import { cellWidth, cellHeight } from './specs/alfa/specs';
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
