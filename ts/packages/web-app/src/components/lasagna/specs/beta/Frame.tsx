@@ -1,6 +1,6 @@
 'use client';
 import Painting from '@/components/lasagna/Painting';
-import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './specs';
+import { resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight } from './specs';
 
 export default function Frame() {
 
@@ -9,7 +9,7 @@ export default function Frame() {
             <Painting
                 resources={resources}
                 arrowsWithConfig={arrowsWithConfig}
-                sequence={sequence}
+                path={path}
                 gridSize={gridSize}
                 cellWidth={cellWidth}
                 cellHeight={cellHeight}

@@ -1,23 +1,23 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { GraphElementNameType } from '@/components/lasagna/types';
-import { resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight } from './specs';
+import { GraphElementNameType } from '@/components/lasagna/classes';
+import { resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight } from './specs';
 import { useState, useRef, useEffect } from 'react';
 
 
 export default function Frame() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showGlue, setShowGlue] = useState(false);
-  const [sequenceDescription, setSequenceDescription] = useState('');
+  const [pathDescription, setPathDescription] = useState('');
   const [z, setZ] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    setSequenceDescription(sequence[z][1]);
+    setPathDescription(path[z][1]);
   }, [z]);
 
   const checkIfActive = (key: GraphElementNameType) => {
-    return sequence[z][0].includes(key);
+    return path[z][0].includes(key);
   };
 
   const bar = () => {
@@ -29,12 +29,12 @@ export default function Frame() {
     if (z > 0) {
       setZ(z - 1);
     } else {
-      setZ(sequence.length - 1);
+      setZ(path.length - 1);
     }
   }
 
   const playNext = () => {
-    setZ((prevZ) => (prevZ < sequence.length - 1 ? prevZ + 1 : 0));
+    setZ((prevZ) => (prevZ < path.length - 1 ? prevZ + 1 : 0));
     timeoutRef.current = setTimeout(() => {
       if (timeoutRef.current) { // Ensures it stops when cleared
         playNext();
@@ -67,8 +67,8 @@ export default function Frame() {
   const handleClickNext = () => {
     if (isPlaying) return;
     console.log('z', z);
-    console.log('sequence.length', sequence.length);
-    if (z < sequence.length - 1) {
+    // console.log('path.length', path.length);
+    if (z < path.length - 1) {
       setZ(z + 1);
     } else {
       setZ(0);
@@ -89,7 +89,7 @@ export default function Frame() {
       <Painting
         resources={resources}
         arrowsWithConfig={arrowsWithConfig}
-        sequence={sequence}
+        path={path}
         gridSize={gridSize}
         cellWidth={cellWidth}
         cellHeight={cellHeight}
@@ -99,7 +99,7 @@ export default function Frame() {
       />
       {!isPlaying && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
-          <p>{sequenceDescription}</p>
+          <p>{pathDescription}</p>
         </div>
       )}
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">

@@ -1,4 +1,4 @@
-import { ResourceNameType } from '../types';
+import { ResourceNameType } from '../classes';
 
 
 export const resourceDescriptions: Record<ResourceNameType, string> = {
@@ -17,7 +17,7 @@ export const resourceDescriptions: Record<ResourceNameType, string> = {
 };
 
 
-export const sequenceDescriptions: Record<number, string> = {
+export const pathDescriptions: Record<number, string> = {
     0: 'Click on a Resource (rectangle or ellipse) to learn more about it, or use the bottom panel to navigate through a typical process iteration.',
     1: 'A Human uploads an Anchor.',
     2: 'The Agent retrieves the Anchor and generates a Candidate.',

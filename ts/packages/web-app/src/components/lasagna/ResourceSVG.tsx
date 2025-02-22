@@ -1,4 +1,4 @@
-import { Resource, ResourceNameType } from './types';
+import { Resource, ResourceNameType } from './classes';
 
 interface ResourceSVGProps {
     resourceName: ResourceNameType;

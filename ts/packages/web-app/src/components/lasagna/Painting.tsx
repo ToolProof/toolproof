@@ -1,12 +1,12 @@
 'use client';
 import ResourceSVG from './ResourceSVG';
-import { Point, Resource, Arrow, GraphElementNameType, ResourceNameType, ArrowNameType, ArrowWithConfig } from './types';
+import { Point, Resource, Arrow, GraphElementNameType, ResourceNameType, ArrowNameType, ArrowWithConfig } from './classes';
 import { useState, useRef, useEffect } from 'react';
 
 interface PaintingProps {
     resources: Record<ResourceNameType, Resource>;
     arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig>
-    sequence: Array<[GraphElementNameType[], string]>
+    path: Array<[GraphElementNameType[], string]>
     gridSize: number;
     cellWidth: number;
     cellHeight: number;
@@ -15,7 +15,7 @@ interface PaintingProps {
     showGlue: boolean;
 }
 
-export default function Painting({ resources, arrowsWithConfig, sequence, gridSize, cellWidth, cellHeight, checkIfActive, bar, showGlue }: PaintingProps) {
+export default function Painting({ resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight, checkIfActive, bar, showGlue }: PaintingProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
@@ -102,7 +102,7 @@ export default function Painting({ resources, arrowsWithConfig, sequence, gridSi
             }
         });
 
-    }, [arrowsWithConfig, cellHeight, cellWidth, gridSize, resources, sequence, checkIfActive, bar]);
+    }, [arrowsWithConfig, cellHeight, cellWidth, gridSize, resources, path, checkIfActive, bar]);
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>

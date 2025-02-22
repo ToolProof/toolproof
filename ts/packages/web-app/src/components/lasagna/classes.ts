@@ -1,50 +1,5 @@
 
 
-// ATTENTION: could be a more powerful type to allow for aliases
-export type ResourceNameType =
-    | 'Agent'
-    | 'Human'
-    | 'Simulation'
-    | 'Anchors'
-    | 'AnchorsGlue'
-    | 'Candidates'
-    | 'CandidatesGlue'
-    | 'Results'
-    | 'ResultsGlue'
-    | 'Papers'
-    | 'PapersGlue'
-    | 'Checkpoints';
-
-
-export type ArrowNameType =
-    | 'Human_Anchors'
-    | 'Agent_Candidates'
-    | 'Candidates_Simulation'
-    | 'Simulation_Results'
-    | 'Results_Agent'
-    | 'Agent_Anchors'
-    | 'Anchors_Agent'
-    | 'Agent_Human'
-    | 'Human_Agent'
-    | 'Agent_Papers'
-    | 'Papers_Agent'
-    | 'Papers_Human'
-    | 'Agent_Agent'
-    | 'Agent_Checkpoints'
-    | 'Checkpoints_Agent';
-
-
-export type GraphElementNameType = ResourceNameType | ArrowNameType;
-
-
-export class GraphElement {
-    draw(context: CanvasRenderingContext2D, color: string, helperSwitch?: boolean) {
-        // Placeholder method to be overridden by subclasses
-        console.log('Drawing a graph element');
-    }
-}
-
-
 export class Point {
     constructor(public x: number, public y: number) { }
 }
@@ -120,8 +75,53 @@ export class Cell {
 }
 
 
+// ATTENTION: could be a more powerful type to allow for aliases
+export type ResourceNameType =
+    | 'Agent'
+    | 'Human'
+    | 'Simulation'
+    | 'Anchors'
+    | 'AnchorsGlue'
+    | 'Candidates'
+    | 'CandidatesGlue'
+    | 'Results'
+    | 'ResultsGlue'
+    | 'Papers'
+    | 'PapersGlue'
+    | 'Checkpoints';
+
+
+export type ArrowNameType =
+    | 'Human_Anchors'
+    | 'Agent_Candidates'
+    | 'Candidates_Simulation'
+    | 'Simulation_Results'
+    | 'Results_Agent'
+    | 'Agent_Anchors'
+    | 'Anchors_Agent'
+    | 'Agent_Human'
+    | 'Human_Agent'
+    | 'Agent_Papers'
+    | 'Papers_Agent'
+    | 'Papers_Human'
+    | 'Agent_Agent'
+    | 'Agent_Checkpoints'
+    | 'Checkpoints_Agent';
+
+
+export type GraphElementNameType = ResourceNameType | ArrowNameType;
+
+
 export type Environment = 'lg' | 'vercel' | 'gcp';
 export type Nature = 'code' | 'code_glue' | 'data';
+
+
+export class GraphElement {
+    draw(context: CanvasRenderingContext2D, color: string, helperSwitch?: boolean) {
+        // Placeholder method to be overridden by subclasses
+        console.log('Drawing a graph element');
+    }
+}
 
 
 export class Resource extends GraphElement {

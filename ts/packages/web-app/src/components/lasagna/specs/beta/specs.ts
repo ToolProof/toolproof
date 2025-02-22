@@ -1,5 +1,5 @@
-import { resourceDescriptions, sequenceDescriptions } from '../texts';
-import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '@/components/lasagna/types';
+import { resourceDescriptions, pathDescriptions } from '../texts';
+import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '@/components/lasagna/classes';
 
 
 export const gridSize = 12;
@@ -213,4 +213,4 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
 };
 
 
-export const sequence: Array<[GraphElementNameType[], string]> = [];
+export const path: Array<[GraphElementNameType[], string]> = [];
