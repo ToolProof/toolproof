@@ -13,23 +13,19 @@ const dataY = 2;
 const glueX = 0;
 const glueY = 2;
 
-export const resources: Record<ResourceNameType, Resource> = {
+export const resources: Record<string, Resource> = {
     Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true, resourceDescriptions['Agent']),
     Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
     Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Simulation']),
     Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Anchors']),
-    AnchorsGlue: new Resource(new Cell(1 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['AnchorsGlue']),
     Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Candidates']),
-    CandidatesGlue: new Resource(new Cell(3 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['CandidatesGlue']),
     Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Results']),
-    ResultsGlue: new Resource(new Cell(7 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['ResultsGlue']),
     Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Papers']),
-    PapersGlue: new Resource(new Cell(9 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['PapersGlue']),
     Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true, resourceDescriptions['Checkpoints']),
 } as const;
 
 
-export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
+export const arrowsWithConfig: Record<string, ArrowWithConfig> = {
     Human_Anchors: {
         arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources, cellWidth, cellHeight),
         config: {

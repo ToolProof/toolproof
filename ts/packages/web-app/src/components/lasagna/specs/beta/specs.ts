@@ -17,19 +17,17 @@ export const resources: Record<ResourceNameType, Resource> = {
     Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true, resourceDescriptions['Agent']),
     Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
     Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Simulation']),
+    AgentX: new Resource(new Cell(2 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Simulation']),
+    AgentY: new Resource(new Cell(8 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Simulation']),
     Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Anchors']),
-    AnchorsGlue: new Resource(new Cell(1 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['AnchorsGlue']),
     Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Candidates']),
-    CandidatesGlue: new Resource(new Cell(3 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['CandidatesGlue']),
     Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Results']),
-    ResultsGlue: new Resource(new Cell(7 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['ResultsGlue']),
     Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Papers']),
-    PapersGlue: new Resource(new Cell(9 + x + glueX, 2 + y + glueY, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['PapersGlue']),
     Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true, resourceDescriptions['Checkpoints']),
 } as const;
 
 
-export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
+export const arrowsWithConfig: Record<string, ArrowWithConfig> = {
     Human_Anchors: {
         arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources, cellWidth, cellHeight),
         config: {
@@ -38,44 +36,26 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => {
-                const barResult = bar();
-                if (barResult) {
-                    return 'Agent_Anchors';
-                } else {
-                    return 'Anchors_Agent';
-                }
-            }
+            next: (bar: () => boolean) => 'Anchors_AgentX'
         }
     },
-    Agent_Anchors: {
-        arrow: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources, cellWidth, cellHeight),
+    Anchors_AgentX: {
+        arrow: new Arrow(['Anchors', 'right'], ['AgentX', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(1, 1, cellWidth, cellHeight), 'right'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Agent_Candidates'
+            next: (bar: () => boolean) => 'AgentX_Candidates'
         }
     },
-    Anchors_Agent: {
-        arrow: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources, cellWidth, cellHeight),
+    AgentX_Candidates: {
+        arrow: new Arrow(['AgentX', 'right'], ['Candidates', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(3, 1, cellWidth, cellHeight), 'left'],
             reverse: null,
             // shouldAdjust: true,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_Candidates'
-        }
-    },
-    Agent_Candidates: {
-        arrow: new Arrow(['Agent', 'left'], ['Candidates', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(3, 5, cellWidth, cellHeight), 'top'],
-            reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
@@ -101,31 +81,24 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Results_Agent'
+            next: (bar: () => boolean) => 'Results_AgentY'
         }
     },
-    Results_Agent: {
-        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
+    Results_AgentY: {
+        arrow: new Arrow(['Results', 'right'], ['AgentY', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(7, 5, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(7, 1, cellWidth, cellHeight), 'right'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => {
-                const barResult = bar();
-                if (barResult) {
-                    return 'Papers_Agent';
-                } else {
-                    return 'Agent_Papers';
-                }
-            }
+            next: (bar: () => boolean) => 'AgentY_Papers'
         }
     },
-    Agent_Papers: {
-        arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources, cellWidth, cellHeight),
+    AgentY_Papers: {
+        arrow: new Arrow(['AgentY', 'right'], ['Papers', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(9, 1, cellWidth, cellHeight), 'left'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -207,10 +180,57 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
+            next: (bar: () => boolean) => 'Agent_AgentX'
+        }
+    },
+    Agent_AgentX: {
+        arrow: new Arrow(['Agent', 'left'], ['AgentX', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Agent_AgentY'
+        }
+    },
+    Agent_AgentY: {
+        arrow: new Arrow(['Agent', 'right'], ['AgentY', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
             next: (bar: () => boolean) => null
         }
     }
 };
 
 
-export const path: Array<[GraphElementNameType[], string]> = [];
+export const path: Array<[GraphElementNameType[], string]> = [
+    [[],
+    pathDescriptions[0]
+    ],
+    [['Human', 'Human_Anchors', 'Anchors'],
+    pathDescriptions[1]
+    ],
+    [['Anchors', 'Anchors_AgentX', 'AgentX', 'AgentX_Candidates', 'Candidates', 'Agent', 'Agent_AgentX', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    pathDescriptions[2]
+    ],
+    [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
+    pathDescriptions[3]
+    ],
+    [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    pathDescriptions[4]
+    ],
+    [['Papers', 'Papers_Human', 'Human'],
+    pathDescriptions[5]
+    ],
+    [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    pathDescriptions[6]
+    ],
+    [['Agent', 'Agent_Anchors', 'Papers_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    pathDescriptions[7]
+    ],
+];

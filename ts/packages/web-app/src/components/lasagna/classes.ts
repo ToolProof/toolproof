@@ -81,14 +81,12 @@ export type ResourceNameType =
     | 'Human'
     | 'Simulation'
     | 'Anchors'
-    | 'AnchorsGlue'
     | 'Candidates'
-    | 'CandidatesGlue'
     | 'Results'
-    | 'ResultsGlue'
     | 'Papers'
-    | 'PapersGlue'
-    | 'Checkpoints';
+    | 'Checkpoints'
+    | 'AgentX' // ATTENTION
+    | 'AgentY' // ATTENTION
 
 
 export type ArrowNameType =
@@ -106,7 +104,13 @@ export type ArrowNameType =
     | 'Papers_Human'
     | 'Agent_Agent'
     | 'Agent_Checkpoints'
-    | 'Checkpoints_Agent';
+    | 'Checkpoints_Agent'
+    | 'Anchors_AgentX' // ATTENTION
+    | 'AgentX_Candidates' // ATTENTION
+    | 'Results_AgentY' // ATTENTION
+    | 'AgentY_Papers' // ATTENTION
+    | 'Agent_AgentX' // ATTENTION
+    | 'Agent_AgentY' // ATTENTION
 
 
 export type GraphElementNameType = ResourceNameType | ArrowNameType;
@@ -147,11 +151,11 @@ export class Resource extends GraphElement {
             color = '0, 0, 0'; // black
         }
 
-        const alpha = this.nature === 'code_glue' ? 0.5 : 1.0;
+        const alpha = 1.0;
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, showGlue: boolean) {
+    fill(context: CanvasRenderingContext2D, showBeta: boolean) {
         if (!context) return;
 
         const x = this.cell.col * this.cell.width;
@@ -167,13 +171,12 @@ export class Resource extends GraphElement {
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            if (showGlue) {
-
-                const quarterWidth = this.cell.width / 4;
-                const halfHeight = this.cell.height / 2;
-                const centeredX = x + (this.cell.width - quarterWidth) / 2;
-                const centeredY = y + (this.cell.height - halfHeight) / 2;
-                context.fillRect(centeredX, centeredY, quarterWidth, halfHeight);
+            if (true) {
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + (this.cell.width - smallerWidth) / 2;
+                const centeredY = y + (this.cell.height - smallerHeight) / 2;
+                context.fillRect(centeredX, centeredY, smallerWidth, smallerHeight);
             }
 
         }
@@ -181,6 +184,7 @@ export class Resource extends GraphElement {
 
     drawText(context: CanvasRenderingContext2D, key: string) {
         if (!context) return;
+        if (this.nature === 'code_glue') return;
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
@@ -189,7 +193,7 @@ export class Resource extends GraphElement {
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
-        const displayText = this.nature === 'code_glue' ? '' : key;
+        const displayText = key;
         /* if (displayText === 'Agent') {
             displayText = 'OpenAI o3';
         } else if (displayText === 'Simulation') {
@@ -217,10 +221,10 @@ export class Resource extends GraphElement {
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, showGlue: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, showBeta: boolean) {
         if (!context) return;
 
-        this.fill(context, showGlue);
+        this.fill(context, showBeta);
 
         const { col, row } = this.cell;
         const x = col * this.cell.width;
@@ -239,13 +243,13 @@ export class Resource extends GraphElement {
             // Full cell rectangle stroke
             context.rect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_glue') {
-            if (showGlue) {
+            if (true) {
                 // Smaller centered rectangle stroke
-                const quarterWidth = this.cell.width / 4;
-                const halfHeight = this.cell.height / 2;
-                const centeredX = x + (this.cell.width - quarterWidth) / 2;
-                const centeredY = y + (this.cell.height - halfHeight) / 2;
-                context.rect(centeredX, centeredY, quarterWidth, halfHeight);
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + (this.cell.width - smallerWidth) / 2;
+                const centeredY = y + (this.cell.height - smallerHeight) / 2;
+                context.rect(centeredX, centeredY, smallerWidth, smallerHeight);
             }
         }
 
@@ -293,6 +297,19 @@ export class Arrow extends GraphElement {
                     return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
                 } else if (input[1] === 'bottom') {
                     return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
+                }
+            } if (resource.nature === 'code_glue') {
+                // ATTENTION: for some reason, this asymmetry works
+                const smallerWidth = Arrow.cellWidth / 2;
+                const smallerHeight = Arrow.cellHeight / 1.5;
+                if (input[1] === 'left') {
+                    return { x: point.x + (smallerWidth / 2), y: point.y };
+                } else if (input[1] === 'right') {
+                    return { x: point.x - (smallerWidth / 2), y: point.y };
+                } else if (input[1] === 'top') {
+                    return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
+                } else if (input[1] === 'bottom') {
+                    return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
                 }
             }
             return point;

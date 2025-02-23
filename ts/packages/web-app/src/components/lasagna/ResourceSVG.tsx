@@ -12,16 +12,20 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
     const x = col * width;
     const y = row * height;
 
-    // Calculate smaller size for `code_glue`
-    const isGlue = resource.nature === 'code_glue';
-    const smallWidth = width / 4;
-    const smallHeight = height / 2;
+    // Calculate smaller size for 'code_glue' resources
+    const shouldBeSmall = resource.nature === 'code_glue';
+    const smallWidth = width / 2;
+    const smallHeight = height / 1.5;
     const smallX = x + (width - smallWidth) / 2;
     const smallY = y + (height - smallHeight) / 2;
 
     const handleClick = () => {
         handleResourceClickHelper(resourceName);
     };
+
+    /* if (shouldBeSmall) {
+        return null;
+    } */
 
     return (
         <>
@@ -38,10 +42,10 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                 />
             ) : (
                 <rect
-                    x={isGlue ? smallX : x}
-                    y={isGlue ? smallY : y}
-                    width={isGlue ? smallWidth : width}
-                    height={isGlue ? smallHeight : height}
+                    x={shouldBeSmall ? smallX : x}
+                    y={shouldBeSmall ? smallY : y}
+                    width={shouldBeSmall ? smallWidth : width}
+                    height={shouldBeSmall ? smallHeight : height}
                     fill={color}
                     stroke="black"
                     onClick={handleClick}
@@ -50,7 +54,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
             )}
 
             {/* Ensure text does not interfere with clickability */}
-            {!isGlue && (
+            {!shouldBeSmall && (
                 <text
                     x={x + width / 2}
                     y={y + height / 2}

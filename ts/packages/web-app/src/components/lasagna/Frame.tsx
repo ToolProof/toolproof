@@ -1,23 +1,47 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { GraphElementNameType } from '@/components/lasagna/classes';
-import { resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight } from './specs';
+import { GraphElementNameType, Resource, ArrowWithConfig } from '@/components/lasagna/classes';
 import { useState, useRef, useEffect } from 'react';
-
 
 export default function Frame() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showGlue, setShowGlue] = useState(false);
+  const [showBeta, setShowBeta] = useState(false);
   const [pathDescription, setPathDescription] = useState('');
   const [z, setZ] = useState(0);
+  const [specs, setSpecs] = useState({
+    resources: {} as Record<string, Resource>,
+    arrowsWithConfig: {} as Record<string, ArrowWithConfig>,
+    path: [] as Array<[GraphElementNameType[], string]>,
+    gridSize: 0,
+    cellWidth: 0,
+    cellHeight: 0,
+  });
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    setPathDescription(path[z][1]);
-  }, [z]);
+    const importSpecs = async () => {
+      const specsModule = showBeta
+        ? await import('./specs/beta/specs')
+        : await import('./specs/alpha/specs');
+      setSpecs({
+        resources: specsModule.resources,
+        arrowsWithConfig: specsModule.arrowsWithConfig,
+        path: specsModule.path,
+        gridSize: specsModule.gridSize,
+        cellWidth: specsModule.cellWidth,
+        cellHeight: specsModule.cellHeight,
+      });
+    };
 
-  const checkIfActive = (key: GraphElementNameType) => {
-    return path[z][0].includes(key);
+    importSpecs();
+  }, [showBeta]);
+
+  useEffect(() => {
+    setPathDescription(specs.path[z]?.[1] || '');
+  }, [z, specs.path]);
+
+  const isElementActive = (key: GraphElementNameType) => {
+    return specs.path[z]?.[0]?.includes(key) || false;
   };
 
   const bar = () => {
@@ -29,14 +53,14 @@ export default function Frame() {
     if (z > 0) {
       setZ(z - 1);
     } else {
-      setZ(path.length - 1);
+      setZ(specs.path.length - 1);
     }
-  }
+  };
 
   const playNext = () => {
-    setZ((prevZ) => (prevZ < path.length - 1 ? prevZ + 1 : 0));
+    setZ((prevZ) => (prevZ < specs.path.length - 1 ? prevZ + 1 : 0));
     timeoutRef.current = setTimeout(() => {
-      if (timeoutRef.current) { // Ensures it stops when cleared
+      if (timeoutRef.current) {
         playNext();
       }
     }, 1000);
@@ -66,16 +90,14 @@ export default function Frame() {
 
   const handleClickNext = () => {
     if (isPlaying) return;
-    console.log('z', z);
-    // console.log('path.length', path.length);
-    if (z < path.length - 1) {
+    if (z < specs.path.length - 1) {
       setZ(z + 1);
     } else {
       setZ(0);
     }
-  }
+  };
 
-  const headline = 'Welcome to a visualization of ToolProof Drug Discovery';
+  const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showBeta ? ' - Version 2' : ' - Version 1');
   const subHeadline = 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
 
   return (
@@ -87,15 +109,15 @@ export default function Frame() {
         {subHeadline}
       </div>
       <Painting
-        resources={resources}
-        arrowsWithConfig={arrowsWithConfig}
-        path={path}
-        gridSize={gridSize}
-        cellWidth={cellWidth}
-        cellHeight={cellHeight}
-        checkIfActive={checkIfActive}
+        resources={specs.resources}
+        arrowsWithConfig={specs.arrowsWithConfig}
+        path={specs.path}
+        gridSize={specs.gridSize}
+        cellWidth={specs.cellWidth}
+        cellHeight={specs.cellHeight}
+        checkIfActive={isElementActive}
         bar={bar}
-        showGlue={showGlue}
+        showBeta={showBeta}
       />
       {!isPlaying && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
@@ -105,9 +127,9 @@ export default function Frame() {
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
         <button
           className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          onClick={() => setShowGlue((prev) => !prev)}
+          onClick={() => setShowBeta((prev) => !prev)}
         >
-          {showGlue ? 'Hide Glue' : 'Show Glue'}
+          {showBeta ? 'Show V.1' : 'Show V.2'}
         </button>
         <div className="flex-grow flex justify-center">
           <button
@@ -116,9 +138,9 @@ export default function Frame() {
           >
             Previous
           </button>
-          <button className="w-32 mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>{
-            isPlaying ? 'Stop' : 'Play'
-          }</button>
+          <button className="w-32 mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>
+            {isPlaying ? 'Stop' : 'Play'}
+          </button>
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickNext}

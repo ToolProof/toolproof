@@ -12,10 +12,10 @@ interface PaintingProps {
     cellHeight: number;
     checkIfActive: (key: GraphElementNameType) => boolean;
     bar: () => boolean;
-    showGlue: boolean;
+    showBeta: boolean;
 }
 
-export default function Painting({ resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight, checkIfActive, bar, showGlue }: PaintingProps) {
+export default function Painting({ resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight, checkIfActive, bar, showBeta }: PaintingProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
@@ -91,7 +91,11 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
         // Draw arrows and queue arrowheads
         const key = 'Human_Anchors';
         const genesisArrowWithConfig = arrowsWithConfig[key];
-        genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
+        if (genesisArrowWithConfig && genesisArrowWithConfig.config) {
+            genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
+        } else {
+            console.error(`Arrow with config for key '${key}' is undefined or missing config.`);
+        }
 
         // Draw all arrowheads after all lines
         arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
@@ -116,7 +120,6 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
             {/* Draw ResourceSVGs */}
             <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={`0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}`}>
                 {Object.entries(resources).map(([key, resource]) => {
-                    if (resource.nature === 'code_glue' && !showGlue) return null;
                     const color = resource.getFillColor();
                     return <ResourceSVG key={key} resourceName={key as ResourceNameType} resource={resource} color={color} handleResourceClickHelper={(resourceName) => handleResourceClick(resourceName as ResourceNameType, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
                 })}
