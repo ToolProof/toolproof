@@ -117,7 +117,7 @@ export type GraphElementNameType = ResourceNameType | ArrowNameType;
 
 
 export type Environment = 'lg' | 'vercel' | 'gcp';
-export type Nature = 'code' | 'code_glue' | 'data';
+export type Nature = 'code' | 'code_glue' | 'code_ai' | 'data';
 
 
 export class GraphElement {
@@ -201,6 +201,8 @@ export class Resource extends GraphElement {
         } */
 
         context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
+
+        return;
 
         let subText = '';
         if (this.nature === 'code' && this.environment === 'lg') {

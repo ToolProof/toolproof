@@ -9,6 +9,7 @@ interface ResourceSVGProps {
 
 const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper }) => {
     const { col, row, width, height } = resource.cell;
+    const { top, bottom, left, right } = resource.cell.getOuterDiamond();
     const x = col * width;
     const y = row * height;
 
@@ -35,6 +36,14 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     cy={y + height / 2}
                     rx={width / 2}
                     ry={height / 2 + 10}
+                    fill={color}
+                    stroke="black"
+                    onClick={handleClick}
+                    pointerEvents="visible"
+                />
+            ) : resource.nature === 'code_ai' ? (
+                <polygon
+                    points={`${x + width / 2},${y} ${x + width},${y + height / 2} ${x + width / 2},${y + height} ${x},${y + height / 2}`}
                     fill={color}
                     stroke="black"
                     onClick={handleClick}
@@ -70,6 +79,5 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
         </>
     );
 };
-
 
 export default ResourceSVG;

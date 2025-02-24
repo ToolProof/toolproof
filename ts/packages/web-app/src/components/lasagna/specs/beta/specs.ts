@@ -14,11 +14,11 @@ const glueX = 0;
 const glueY = 2;
 
 export const resources: Record<ResourceNameType, Resource> = {
-    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code', true, resourceDescriptions['Agent']),
+    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
     Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
     Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Simulation']),
-    AgentX: new Resource(new Cell(2 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Simulation']),
-    AgentY: new Resource(new Cell(8 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Simulation']),
+    AgentX: new Resource(new Cell(2 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Simulation']),
+    AgentY: new Resource(new Cell(8 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Simulation']),
     Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Anchors']),
     Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Candidates']),
     Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Results']),
