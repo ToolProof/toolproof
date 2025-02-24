@@ -78,50 +78,53 @@ export class Cell {
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
     | 'Agent'
+    | 'Assistant'
     | 'Human'
-    | 'Simulation'
-    | 'Anchors'
-    | 'Candidates'
-    | 'Results'
-    | 'Papers'
+    | 'Tools'
+    | 'InternalToolsLeft'
+    | 'InternalToolsRight'
+    | 'OuterInput'
+    | 'InnerInput'
+    | 'InnerOutput'
+    | 'OuterOutput'
     | 'Checkpoints'
-    | 'AgentX' // ATTENTION
-    | 'AgentY' // ATTENTION
 
 
 export type ArrowNameType =
-    | 'Human_Anchors'
-    | 'Agent_Candidates'
-    | 'Candidates_Simulation'
-    | 'Simulation_Results'
-    | 'Results_Agent'
-    | 'Agent_Anchors'
-    | 'Anchors_Agent'
+    | 'Human_OuterInput'
+    | 'Agent_InnerInput'
+    | 'InnerInput_Tools'
+    | 'Tools_InnerOutput'
+    | 'InnerOutput_Agent'
+    | 'Agent_OuterInput'
+    | 'OuterInput_Agent'
     | 'Agent_Human'
     | 'Human_Agent'
-    | 'Agent_Papers'
-    | 'Papers_Agent'
-    | 'Papers_Human'
+    | 'Agent_OuterOutput'
+    | 'OuterOutput_Agent'
+    | 'OuterOutput_Human'
     | 'Agent_Agent'
     | 'Agent_Checkpoints'
     | 'Checkpoints_Agent'
-    | 'Anchors_AgentX' // ATTENTION
-    | 'AgentX_Candidates' // ATTENTION
-    | 'Results_AgentY' // ATTENTION
-    | 'AgentY_Papers' // ATTENTION
-    | 'Agent_AgentX' // ATTENTION
-    | 'Agent_AgentY' // ATTENTION
+    | 'Checkpoints_Assistant'
+    | 'Assistant_Checkpoints'
+    | 'Agent_Assistant'
+    | 'Assistant_Agent'
+    | 'Agent_InternalToolsLeft'
+    | 'InternalToolsLeft_Agent'
+    | 'Agent_InternalToolsRight'
+    | 'InternalToolsRight_Agent'
 
 
 export type GraphElementNameType = ResourceNameType | ArrowNameType;
 
 
 export type Environment = 'lg' | 'vercel' | 'gcp';
-export type Nature = 'code' | 'code_glue' | 'code_ai' | 'data';
+export type Nature = 'code' | 'code_ai' | 'code_glue' | 'data';
 
 
 export class GraphElement {
-    draw(context: CanvasRenderingContext2D, color: string, helperSwitch?: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, key?: GraphElementNameType, helperSwitch?: boolean) {
         // Placeholder method to be overridden by subclasses
         console.log('Drawing a graph element');
     }
@@ -155,8 +158,11 @@ export class Resource extends GraphElement {
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, showBeta: boolean) {
+    fill(context: CanvasRenderingContext2D, key: ResourceNameType, showBeta: boolean) {
         if (!context) return;
+        if (!showBeta && key === 'Assistant') {
+            return null;
+        }
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
@@ -170,8 +176,16 @@ export class Resource extends GraphElement {
             context.fill();
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
+        } else if (this.nature === 'code_ai') {
+            context.beginPath();
+            context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
+            context.lineTo(x + this.cell.width + this.cell.width / 6, y + this.cell.height / 2);
+            context.lineTo(x + this.cell.width / 2, y + this.cell.height + this.cell.height / 6);
+            context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
+            context.closePath();
+            context.fill();
         } else if (this.nature === 'code_glue') {
-            if (true) {
+            if (false) {
                 const smallerWidth = this.cell.width / 2;
                 const smallerHeight = this.cell.height / 1.5;
                 const centeredX = x + (this.cell.width - smallerWidth) / 2;
@@ -182,21 +196,83 @@ export class Resource extends GraphElement {
         }
     }
 
-    drawText(context: CanvasRenderingContext2D, key: string) {
+    draw(context: CanvasRenderingContext2D, color: string, key: ResourceNameType, showBeta: boolean) {
         if (!context) return;
-        if (this.nature === 'code_glue') return;
+        if (!showBeta && key === 'Assistant') {
+            // console.log(showBeta);
+            // console.log(key);
+            return null;
+        }
+
+        this.fill(context, key, showBeta);
+
+        const { col, row } = this.cell;
+        const x = col * this.cell.width;
+        const y = row * this.cell.height;
+        const radius = Math.min(this.cell.width, this.cell.height) / 2 + 10; // Adjust radius for ellipse
+
+        context.strokeStyle = color;
+        context.lineWidth = 3; // Adjust as needed
+
+        context.beginPath();
+
+        if (this.nature === 'data') {
+            // Ellipse stroke
+            context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
+        } else if (this.nature === 'code') {
+            // Full cell rectangle stroke
+            context.rect(x, y, this.cell.width, this.cell.height);
+        } else if (this.nature === 'code_ai') {
+            // Diamond stroke
+            context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
+            context.lineTo(x + this.cell.width + this.cell.width / 6, y + this.cell.height / 2);
+            context.lineTo(x + this.cell.width / 2, y + this.cell.height + this.cell.height / 6);
+            context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
+            context.closePath();
+        } else if (this.nature === 'code_glue') {
+            if (false) {
+                // Smaller centered rectangle stroke
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + (this.cell.width - smallerWidth) / 2;
+                const centeredY = y + (this.cell.height - smallerHeight) / 2;
+                context.rect(centeredX, centeredY, smallerWidth, smallerHeight);
+            }
+        }
+
+        context.stroke();
+    }
+
+    drawText(context: CanvasRenderingContext2D, key: string, showBeta: boolean) {
+        if (!context) return;
+        if (!showBeta && key === 'Assistant') {
+            return null;
+        }
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
-        context.font = '16px Arial';
+        context.font = '14px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
-        const displayText = key;
+        let displayText = key;
+        if (key === 'InnerInput') {
+            displayText = 'Inner Input';
+        } else if (key === 'InnerOutput') {
+            displayText = 'Inner Output';
+        } else if (key === 'OuterInput') {
+            displayText = 'Outer Input';
+        } else if (key === 'OuterOutput') {
+            displayText = 'Outer Output';
+        } else if (key === 'InternalToolsLeft') {
+            displayText = 'Tools';
+        } else if (key === 'InternalToolsRight') {
+            displayText = 'Tools';
+        }
         /* if (displayText === 'Agent') {
             displayText = 'OpenAI o3';
-        } else if (displayText === 'Simulation') {
+        } else if (displayText === 'Tools') {
             displayText = false ? 'AutoDock' : 'Schrödinger';
         } */
 
@@ -223,45 +299,13 @@ export class Resource extends GraphElement {
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, showBeta: boolean) {
-        if (!context) return;
-
-        this.fill(context, showBeta);
-
-        const { col, row } = this.cell;
-        const x = col * this.cell.width;
-        const y = row * this.cell.height;
-        const radius = Math.min(this.cell.width, this.cell.height) / 2 + 10; // Adjust radius for ellipse
-
-        context.strokeStyle = color;
-        context.lineWidth = 3; // Adjust as needed
-
-        context.beginPath();
-
-        if (this.nature === 'data') {
-            // Ellipse stroke
-            context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
-        } else if (this.nature === 'code') {
-            // Full cell rectangle stroke
-            context.rect(x, y, this.cell.width, this.cell.height);
-        } else if (this.nature === 'code_glue') {
-            if (true) {
-                // Smaller centered rectangle stroke
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + (this.cell.width - smallerWidth) / 2;
-                const centeredY = y + (this.cell.height - smallerHeight) / 2;
-                context.rect(centeredX, centeredY, smallerWidth, smallerHeight);
-            }
-        }
-
-        context.stroke();
-    }
 }
 
 
+export type CornerPointType = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 export type DiamondPointType = 'top' | 'bottom' | 'left' | 'right';
-
+export type DiamondCornerPointType = 'topLeftD' | 'topRightD' | 'bottomLeftD' | 'bottomRightD';
+export type ArrowPointType = CornerPointType | DiamondPointType | DiamondCornerPointType;
 
 
 export class Arrow extends GraphElement {
@@ -271,8 +315,8 @@ export class Arrow extends GraphElement {
     private static cellHeight: number;
 
     constructor(
-        startPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        endPointSpec: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
+        startPointSpec: [ResourceNameType, ArrowPointType] | [Cell, ArrowPointType],
+        endPointSpec: [ResourceNameType, ArrowPointType] | [Cell, ArrowPointType],
         resources: Record<ResourceNameType, Resource>,
         cellWidth: number,
         cellHeight: number,
@@ -285,40 +329,95 @@ export class Arrow extends GraphElement {
     }
 
     static resolvePoint(
-        input: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
+        input: [ResourceNameType, ArrowPointType] | [Cell, ArrowPointType],
         resources: Record<ResourceNameType, Resource>
     ): Point {
-        if (typeof input[0] === 'string') { // ATTENTION: could use stricter type checking
-            // Input is a ResourceNameType
-            const resource = resources[input[0]];
-            if (!resource) throw new Error(`Resource ${input[0]} not found.`);
-            const point = resource.cell.getOuterDiamond()[input[1]];
+        // Helper to adjust diamond points for resource-based inputs.
+        function resolveDiamondPoint(resource: Resource, diamondKey: DiamondPointType): Point {
+            const point = resource.cell.getOuterDiamond()[diamondKey];
             if (resource.nature === 'data') {
-                // Adjust top/bottom point for ellipses
-                if (input[1] === 'top') {
+                if (diamondKey === 'top') {
                     return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
-                } else if (input[1] === 'bottom') {
+                } else if (diamondKey === 'bottom') {
                     return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
                 }
-            } if (resource.nature === 'code_glue') {
-                // ATTENTION: for some reason, this asymmetry works
-                const smallerWidth = Arrow.cellWidth / 2;
-                const smallerHeight = Arrow.cellHeight / 1.5;
-                if (input[1] === 'left') {
-                    return { x: point.x + (smallerWidth / 2), y: point.y };
-                } else if (input[1] === 'right') {
-                    return { x: point.x - (smallerWidth / 2), y: point.y };
-                } else if (input[1] === 'top') {
+            } else if (resource.nature === 'code_ai') {
+                if (diamondKey === 'left') {
+                    return { x: point.x - (Arrow.cellWidth / 6), y: point.y };
+                } else if (diamondKey === 'right') {
+                    return { x: point.x + (Arrow.cellWidth / 6), y: point.y };
+                } else if (diamondKey === 'top') {
+                    return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
+                } else if (diamondKey === 'bottom') {
                     return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
-                } else if (input[1] === 'bottom') {
+                }
+            } else if (resource.nature === 'code_glue') {
+                const smallerWidth = Arrow.cellWidth / 2;
+                if (diamondKey === 'left') {
+                    return { x: point.x + (smallerWidth / 2), y: point.y };
+                } else if (diamondKey === 'right') {
+                    return { x: point.x - (smallerWidth / 2), y: point.y };
+                } else if (diamondKey === 'top') {
+                    return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
+                } else if (diamondKey === 'bottom') {
                     return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
                 }
             }
             return point;
-        } else {
-            // Input is a Cell
-            return input[0].getOuterDiamond()[input[1]];
         }
+    
+        const key = input[1];
+        const isCorner = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].includes(key);
+        const isDiamondCorner = ['topLeftD', 'topRightD', 'bottomLeftD', 'bottomRightD'].includes(key);
+        // If it's not a corner and not a diamond-corner, assume it's a diamond point key
+    
+        if (typeof input[0] === 'string') {
+            const resource = resources[input[0]];
+            if (!resource) throw new Error(`Resource ${input[0]} not found.`);
+    
+            if (isCorner) {
+                return resource.cell.getCorners()[key as CornerPointType];
+            } else if (isDiamondCorner) {
+                // For diamond-corner types, compute the average of two adjusted diamond points.
+                const topPoint = resolveDiamondPoint(resource, 'top');
+                const bottomPoint = resolveDiamondPoint(resource, 'bottom');
+                const leftPoint = resolveDiamondPoint(resource, 'left');
+                const rightPoint = resolveDiamondPoint(resource, 'right');
+                switch (key) {
+                    case 'topLeftD':
+                        return { x: (topPoint.x + leftPoint.x) / 2, y: (topPoint.y + leftPoint.y) / 2 };
+                    case 'topRightD':
+                        return { x: (topPoint.x + rightPoint.x) / 2, y: (topPoint.y + rightPoint.y) / 2 };
+                    case 'bottomLeftD':
+                        return { x: (bottomPoint.x + leftPoint.x) / 2, y: (bottomPoint.y + leftPoint.y) / 2 };
+                    case 'bottomRightD':
+                        return { x: (bottomPoint.x + rightPoint.x) / 2, y: (bottomPoint.y + rightPoint.y) / 2 };
+                }
+            } else {
+                // Diamond point type
+                return resolveDiamondPoint(resource, key as DiamondPointType);
+            }
+        } else {
+            // Cell-based input: no adjustments are applied.
+            if (isCorner) {
+                return input[0].getCorners()[key as CornerPointType];
+            } else if (isDiamondCorner) {
+                const diamond = input[0].getOuterDiamond();
+                switch (key) {
+                    case 'topLeftD':
+                        return { x: (diamond.top.x + diamond.left.x) / 2, y: (diamond.top.y + diamond.left.y) / 2 };
+                    case 'topRightD':
+                        return { x: (diamond.top.x + diamond.right.x) / 2, y: (diamond.top.y + diamond.right.y) / 2 };
+                    case 'bottomLeftD':
+                        return { x: (diamond.bottom.x + diamond.left.x) / 2, y: (diamond.bottom.y + diamond.left.y) / 2 };
+                    case 'bottomRightD':
+                        return { x: (diamond.bottom.x + diamond.right.x) / 2, y: (diamond.bottom.y + diamond.right.y) / 2 };
+                }
+            } else {
+                return input[0].getOuterDiamond()[key as DiamondPointType];
+            }
+        }
+        return { x: 0, y: 0 }; // ATTENTION: hack to make TypeScript happy
     }
 
     draw(context: CanvasRenderingContext2D, color: string) {

@@ -1,6 +1,7 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { GraphElementNameType, Resource, ArrowWithConfig } from '@/components/lasagna/classes';
+import { Cell, GraphElementNameType, Resource, ArrowWithConfig } from '@/components/lasagna/classes';
+import { resourceDescriptions } from '@/components/lasagna/specs/texts';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Frame() {
@@ -20,11 +21,16 @@ export default function Frame() {
 
   useEffect(() => {
     const importSpecs = async () => {
-      const specsModule = showBeta
+      /* const specsModule = showBeta && false
         ? await import('./specs/beta/specs')
-        : await import('./specs/alpha/specs');
+        : await import('./specs/alpha/specs'); */
+      const specsModule = await import('./specs/alpha/specs');
       setSpecs({
-        resources: specsModule.resources,
+        resources: !showBeta ? specsModule.resources : {
+          ...specsModule.resources,
+          Agent: new Resource(new Cell(6, 5, specsModule.cellWidth, specsModule.cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+          Assistant: new Resource(new Cell(6, 7, specsModule.cellWidth, specsModule.cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
+        },
         arrowsWithConfig: specsModule.arrowsWithConfig,
         path: specsModule.path,
         gridSize: specsModule.gridSize,
@@ -45,7 +51,8 @@ export default function Frame() {
   };
 
   const bar = () => {
-    return z === 7;
+    // return z === 7;
+    return showBeta;
   };
 
   const handleClickPrevious = () => {
@@ -115,7 +122,7 @@ export default function Frame() {
         gridSize={specs.gridSize}
         cellWidth={specs.cellWidth}
         cellHeight={specs.cellHeight}
-        checkIfActive={isElementActive}
+        isElementActive={isElementActive}
         bar={bar}
         showBeta={showBeta}
       />

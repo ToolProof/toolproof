@@ -2,148 +2,132 @@ import { resourceDescriptions, pathDescriptions } from '../texts';
 import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '@/components/lasagna/classes';
 
 
-export const gridSize = 12;
-export const cellWidth = 120;
-export const cellHeight = 60;
+export const gridSize = 14;
+export const cellWidth = 100;
+export const cellHeight = 50;
 
-const x = 0;
-const y = 0;
-const dataX = 0;
-const dataY = 2;
-const glueX = 0;
-const glueY = 2;
 
-export const resources: Record<string, Resource> = {
-    Agent: new Resource(new Cell(5 + x, 5 + y, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-    Human: new Resource(new Cell(5 + x, 7 + y, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
-    Simulation: new Resource(new Cell(5 + x, 1 + y, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Simulation']),
-    Anchors: new Resource(new Cell(1 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Anchors']),
-    Candidates: new Resource(new Cell(3 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Candidates']),
-    Results: new Resource(new Cell(7 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Results']),
-    Papers: new Resource(new Cell(9 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Papers']),
-    Checkpoints: new Resource(new Cell(5 + x + dataX, 1 + y + dataY, cellWidth, cellHeight), 'lg', 'data', true, resourceDescriptions['Checkpoints']),
+export const resources: Record<ResourceNameType, Resource> = {
+    Agent: new Resource(new Cell(6, 7, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+    Assistant: new Resource(new Cell(6, 5, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
+    Human: new Resource(new Cell(6, 9, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
+    Tools: new Resource(new Cell(6, 1, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    InternalToolsLeft: new Resource(new Cell(4, 6, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Tools']),
+    InternalToolsRight: new Resource(new Cell(8, 6, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Tools']),
+    OuterInput: new Resource(new Cell(2, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['OuterInput']),
+    InnerInput: new Resource(new Cell(4, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['InnerInput']),
+    InnerOutput: new Resource(new Cell(8, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['InnerOutput']),
+    OuterOutput: new Resource(new Cell(10, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['OuterOutput']),
+    Checkpoints: new Resource(new Cell(6, 3, cellWidth, cellHeight), 'lg', 'data', true, resourceDescriptions['Checkpoints']),
 } as const;
 
 
-export const arrowsWithConfig: Record<string, ArrowWithConfig> = {
-    Human_Anchors: {
-        arrow: new Arrow(['Human', 'left'], ['Anchors', 'left'], resources, cellWidth, cellHeight),
+export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
+    Human_OuterInput: {
+        arrow: new Arrow(['Human', 'left'], ['OuterInput', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(1, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => {
-                const barResult = bar();
-                if (barResult) {
-                    return 'Agent_Anchors';
-                } else {
-                    return 'Anchors_Agent';
-                }
-            }
+            next: (bar: () => boolean) => 'OuterInput_Agent'
         }
     },
-    Agent_Anchors: {
-        arrow: new Arrow(['Agent', 'left'], ['Anchors', 'bottom'], resources, cellWidth, cellHeight),
+    OuterInput_Agent: {
+        arrow: new Arrow(['OuterInput', 'bottom'], ['Agent', 'bottomLeftD'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(3, 8, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Agent_Candidates'
+            next: (bar: () => boolean) => 'Agent_InnerInput'
         }
     },
-    Anchors_Agent: {
-        arrow: new Arrow(['Anchors', 'bottom'], ['Agent', 'left'], resources, cellWidth, cellHeight),
+    // Won't be drawn in the normal flow
+    Agent_OuterInput: {
+        arrow: new Arrow(['Agent', 'left'], ['OuterInput', 'bottom'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
-            reverse: null,
-            // shouldAdjust: true,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_Candidates'
-        }
-    },
-    Agent_Candidates: {
-        arrow: new Arrow(['Agent', 'left'], ['Candidates', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(3, 5, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(3, 5, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Candidates_Simulation'
+            next: (bar: () => boolean) => 'Agent_InnerInput'
         }
     },
-    Candidates_Simulation: {
-        arrow: new Arrow(['Candidates', 'top'], ['Simulation', 'left'], resources, cellWidth, cellHeight),
+    Agent_InnerInput: {
+        arrow: new Arrow(['Agent', 'topLeftD'], ['InnerInput', 'bottom'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(3, 1, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Simulation_Results'
+            next: (bar: () => boolean) => 'InnerInput_Tools'
         }
     },
-    Simulation_Results: {
-        arrow: new Arrow(['Simulation', 'right'], ['Results', 'top'], resources, cellWidth, cellHeight),
+    InnerInput_Tools: {
+        arrow: new Arrow(['InnerInput', 'top'], ['Tools', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(7, 1, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(4, 1, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Results_Agent'
+            next: (bar: () => boolean) => 'Tools_InnerOutput'
         }
     },
-    Results_Agent: {
-        arrow: new Arrow(['Results', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
+    Tools_InnerOutput: {
+        arrow: new Arrow(['Tools', 'right'], ['InnerOutput', 'top'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(7, 5, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(8, 1, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => {
-                const barResult = bar();
-                if (barResult) {
-                    return 'Papers_Agent';
-                } else {
-                    return 'Agent_Papers';
-                }
-            }
+            next: (bar: () => boolean) => 'InnerOutput_Agent'
         }
     },
-    Agent_Papers: {
-        arrow: new Arrow(['Agent', 'right'], ['Papers', 'bottom'], resources, cellWidth, cellHeight),
+    InnerOutput_Agent: {
+        arrow: new Arrow(['InnerOutput', 'bottom'], ['Agent', 'topRightD'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Papers_Human'
+            next: (bar: () => boolean) => 'Agent_OuterOutput'
         }
     },
-    Papers_Agent: {
-        arrow: new Arrow(['Papers', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
+    Agent_OuterOutput: {
+        arrow: new Arrow(['Agent', 'bottomRightD'], ['OuterOutput', 'bottom'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(9, 8, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Papers_Human'
+            next: (bar: () => boolean) => 'OuterOutput_Human'
         }
     },
-    Papers_Human: {
-        arrow: new Arrow(['Papers', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
+    // Won't be drawn in the normal flow
+    OuterOutput_Agent: {
+        arrow: new Arrow(['OuterOutput', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(10, 7, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(9, 5, cellWidth, cellHeight), 'bottom'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'OuterOutput_Human'
+        }
+    },
+    OuterOutput_Human: {
+        arrow: new Arrow(['OuterOutput', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: [new Cell(11, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -170,18 +154,13 @@ export const arrowsWithConfig: Record<string, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Agent_Checkpoints'
-        }
-    },
-    Agent_Agent: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_Checkpoints'
+            next: (bar: () => boolean) => {
+                if (bar()) {
+                    return 'Agent_Assistant';
+                } else {
+                    return 'Agent_Checkpoints';
+                }
+            }
         }
     },
     Agent_Checkpoints: {
@@ -203,9 +182,109 @@ export const arrowsWithConfig: Record<string, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
+            next: (bar: () => boolean) => 'Agent_InternalToolsLeft'
+        }
+    },
+    Agent_Assistant: {
+        arrow: new Arrow(['Agent', 'top'], ['Assistant', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Assistant_Agent'
+        }
+    },
+    Assistant_Agent: {
+        arrow: new Arrow(['Assistant', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Assistant_Checkpoints'
+        }
+    },
+    Assistant_Checkpoints: {
+        arrow: new Arrow(['Assistant', 'top'], ['Checkpoints', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Checkpoints_Assistant'
+        }
+    },
+    Checkpoints_Assistant: {
+        arrow: new Arrow(['Checkpoints', 'bottom'], ['Assistant', 'top'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Agent_InternalToolsLeft'
+        }
+    },
+    Agent_InternalToolsLeft: {
+        arrow: new Arrow(['Agent', 'left'], ['InternalToolsLeft', 'right'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'InternalToolsLeft_Agent'
+        }
+    },
+    InternalToolsLeft_Agent: {
+        arrow: new Arrow(['InternalToolsLeft', 'right'], ['Agent', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Agent_InternalToolsRight'
+        }
+    },
+    Agent_InternalToolsRight: {
+        arrow: new Arrow(['Agent', 'right'], ['InternalToolsRight', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'InternalToolsRight_Agent'
+        }
+    },
+    InternalToolsRight_Agent: {
+        arrow: new Arrow(['InternalToolsRight', 'left'], ['Agent', 'right'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
             next: (bar: () => boolean) => null
         }
-    }
+    },
+    // Won't be drawn in the normal flow
+    Agent_Agent: {
+        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => null
+        }
+    },
 };
 
 
@@ -213,27 +292,27 @@ export const path: Array<[GraphElementNameType[], string]> = [
     [[],
     pathDescriptions[0]
     ],
-    [['Human', 'Human_Anchors', 'Anchors'],
+    [['Human', 'Human_OuterInput', 'OuterInput'],
     pathDescriptions[1]
     ],
-    [['Anchors', 'Anchors_Agent', 'Agent', 'Agent_Candidates', 'Candidates', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    [['OuterInput', 'OuterInput_Agent', 'Agent', 'Agent_InnerInput', 'InnerInput', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent', 'Agent_Assistant', 'Assistant_Agent', 'Assistant', 'Assistant_Checkpoints', 'Checkpoints_Assistant', 'Agent_InternalToolsLeft', 'InternalToolsLeft', 'InternalToolsLeft_Agent', 'Agent_Human', 'Human', 'Human_Agent'],
     pathDescriptions[2]
     ],
-    [['Candidates', 'Candidates_Simulation', 'Simulation', 'Simulation_Results', 'Results'],
+    [['InnerInput', 'InnerInput_Tools', 'Tools', 'Tools_InnerOutput', 'InnerOutput'],
     pathDescriptions[3]
     ],
-    [['Results', 'Results_Agent', 'Agent', 'Agent_Papers', 'Papers', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    [['InnerOutput', 'InnerOutput_Agent', 'Agent', 'Agent_OuterOutput', 'OuterOutput', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent', 'Agent_Assistant', 'Assistant_Agent', 'Assistant', 'Assistant_Checkpoints', 'Checkpoints_Assistant', 'Checkpoints_Assistant', 'Agent_InternalToolsRight', 'InternalToolsRight', 'InternalToolsRight_Agent', 'Agent_Human', 'Human', 'Human_Agent'],
     pathDescriptions[4]
     ],
-    [['Papers', 'Papers_Human', 'Human'],
+    [['OuterOutput', 'OuterOutput_Human', 'Human'],
     pathDescriptions[5]
     ],
-    [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    /* [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent', 'Agent_Assistant', 'Assistant_Agent', 'Assistant', 'Assistant_Checkpoints'],
     pathDescriptions[6]
-    ],
-    [['Agent', 'Agent_Anchors', 'Papers_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    ], */
+    /* [['Agent', 'Agent_OuterInput', 'OuterOutput_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
     pathDescriptions[7]
-    ],
+    ], */
 ];
 
 

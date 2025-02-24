@@ -10,12 +10,12 @@ interface PaintingProps {
     gridSize: number;
     cellWidth: number;
     cellHeight: number;
-    checkIfActive: (key: GraphElementNameType) => boolean;
+    isElementActive: (key: GraphElementNameType) => boolean;
     bar: () => boolean;
     showBeta: boolean;
 }
 
-export default function Painting({ resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight, checkIfActive, bar, showBeta }: PaintingProps) {
+export default function Painting({ resources, arrowsWithConfig, path, gridSize, cellWidth, cellHeight, isElementActive, bar, showBeta }: PaintingProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
@@ -45,16 +45,20 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
 
         // Draw resources stroke
         Object.entries(resources).forEach(([key, resource]) => {
-            const isActive = checkIfActive(key as ArrowNameType);
+            const isActive = isElementActive(key as ResourceNameType);
             const color = isActive ? 'yellow' : 'black';
-            resource.draw(context, color, false);
-            resource.drawText(context, key);
+            resource.draw(context, color, key as ResourceNameType, showBeta);
+            resource.drawText(context, key, showBeta);
         });
 
         const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
-            const isActive = checkIfActive(key);
+            const isActive = isElementActive(key);
             let color = isActive ? 'yellow' : 'black';
-            color = (isActive && key.includes('Checkpoints')) ? 'red' : color;
+            color = (isActive && (key.includes('Checkpoints') || key.includes('Agent_Human') || key.includes('Human_Agent') || key.includes('InternalTools'))) ? 'red' : color;
+            if (color === 'red') {
+                console.log('red', isActive);
+                console.log('red', key);
+            }
 
             if (arrowWithConfig.config.controlPoint) {
                 // Draw curved arrow line
@@ -89,13 +93,13 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
         const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
         // Draw arrows and queue arrowheads
-        const key = 'Human_Anchors';
+        const key = 'Human_OuterInput';
         const genesisArrowWithConfig = arrowsWithConfig[key];
         if (genesisArrowWithConfig && genesisArrowWithConfig.config) {
             genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
-        } else {
+        } /* else {
             console.error(`Arrow with config for key '${key}' is undefined or missing config.`);
-        }
+        } */
 
         // Draw all arrowheads after all lines
         arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
@@ -106,7 +110,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
             }
         });
 
-    }, [arrowsWithConfig, cellHeight, cellWidth, gridSize, resources, path, checkIfActive, bar]);
+    }, [arrowsWithConfig, cellHeight, cellWidth, gridSize, resources, path, isElementActive, bar, showBeta]);
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -121,12 +125,12 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
             <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={`0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}`}>
                 {Object.entries(resources).map(([key, resource]) => {
                     const color = resource.getFillColor();
-                    return <ResourceSVG key={key} resourceName={key as ResourceNameType} resource={resource} color={color} handleResourceClickHelper={(resourceName) => handleResourceClick(resourceName as ResourceNameType, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} />;
+                    return <ResourceSVG key={key} resourceName={key as ResourceNameType} resource={resource} color={color} handleResourceClickHelper={(resourceName) => handleResourceClick(resourceName as ResourceNameType, resource.cell.col * cellWidth, resource.cell.row * cellHeight)} showBeta={showBeta} />;
                 })}
             </svg>
             {/* Draw ResourceDescription */}
             {(resourceName) && (
-                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (resourceName !== 'Papers' && !resourceName.includes('Glue')) ? '350px' : '250px', height: resourceName === 'Human' ? '100px' : '250px', overflowY: 'auto' }}>
+                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: (resourceName !== 'OuterOutput' && !resourceName.includes('Glue')) ? '350px' : '250px', height: resourceName === 'Human' ? '100px' : '250px', overflowY: 'auto' }}>
                     <button onClick={() => setResourceName(null)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>
                     <p>{resources[resourceName].description}</p>
                 </div>

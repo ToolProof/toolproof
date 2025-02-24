@@ -5,11 +5,11 @@ interface ResourceSVGProps {
     resource: Resource;
     color: string;
     handleResourceClickHelper: (resourceName: ResourceNameType) => void;
+    showBeta: boolean;
 }
 
-const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper }) => {
+const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper, showBeta }) => {
     const { col, row, width, height } = resource.cell;
-    const { top, bottom, left, right } = resource.cell.getOuterDiamond();
     const x = col * width;
     const y = row * height;
 
@@ -28,6 +28,10 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
         return null;
     } */
 
+    if (!showBeta && resourceName === 'Assistant') {
+        return null;
+    }
+
     return (
         <>
             {resource.nature === 'data' ? (
@@ -43,7 +47,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                 />
             ) : resource.nature === 'code_ai' ? (
                 <polygon
-                    points={`${x + width / 2},${y} ${x + width},${y + height / 2} ${x + width / 2},${y + height} ${x},${y + height / 2}`}
+                    points={`${x + width / 2},${y - height / 6} ${x + width + width / 6},${y + height / 2} ${x + width / 2},${y + height + height / 6} ${x - width / 6},${y + height / 2}`}
                     fill={color}
                     stroke="black"
                     onClick={handleClick}
@@ -73,7 +77,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     fill="black"
                     pointerEvents="none" // Prevents text from intercepting clicks
                 >
-                    {resourceName}
+                    {/* {resourceName} ATTENTION */}
                 </text>
             )}
         </>
