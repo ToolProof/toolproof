@@ -8,15 +8,15 @@ export const cellHeight = 50;
 
 
 export const resources: Record<ResourceNameType, Resource> = {
-    Agent: new Resource(new Cell(6, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-    Assistant: new Resource(new Cell(6, 7, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
-    Human: new Resource(new Cell(6, 9, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
-    Tools: new Resource(new Cell(6, 3, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
-    Input: new Resource(new Cell(3, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Input']),
-    Output: new Resource(new Cell(9, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Output']),
-    Checkpoints: new Resource(new Cell(9, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, resourceDescriptions['Output']),
-    DummyRight: new Resource(new Cell(9, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
-    DummyLeft: new Resource(new Cell(3, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Agent: new Resource(new Cell(7, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+    Assistant: new Resource(new Cell(7, 7, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
+    Human: new Resource(new Cell(7, 9, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
+    Tools: new Resource(new Cell(7, 3, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Input: new Resource(new Cell(4, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Input']),
+    Output: new Resource(new Cell(10, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Output']),
+    Checkpoints: new Resource(new Cell(10, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, resourceDescriptions['Output']),
+    DummyRight: new Resource(new Cell(10, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    DummyLeft: new Resource(new Cell(4, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
 } as const;
 
 
@@ -24,7 +24,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Human_Input: {
         arrow: new Arrow(['Human', 'left'], ['Input', 'bottom'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(3, 7, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(4, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -74,7 +74,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Output_Human: {
         arrow: new Arrow(['Output', 'bottom'], ['Human', 'right'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(9, 7, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(10, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -107,7 +107,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Input_Tools: {
         arrow: new Arrow(['Input', 'top'], ['Tools', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(3, 3, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -118,7 +118,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Tools_Output: {
         arrow: new Arrow(['Tools', 'right'], ['Output', 'top'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(9, 3, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(10, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -129,7 +129,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Output_DummyRight: {
         arrow: new Arrow(['Output', 'right'], ['DummyRight', 'right'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(11, 3, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(12, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -151,7 +151,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     DummyLeft_Input: {
         arrow: new Arrow(['DummyLeft', 'left'], ['Input', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(1, 3, cellWidth, cellHeight), 'top'],
+            controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -234,7 +234,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
     Assistant_Checkpoints: {
         arrow: new Arrow(['Assistant', 'right'], ['Checkpoints', 'bottomLeftD'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(8, 6, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(9, 6, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);

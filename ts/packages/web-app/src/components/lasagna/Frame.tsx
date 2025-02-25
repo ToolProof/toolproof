@@ -28,8 +28,8 @@ export default function Frame() {
       setSpecs({
         resources: !showAssistant ? specsModule.resources : {
           ...specsModule.resources,
-          Agent: new Resource(new Cell(6, 7, specsModule.cellWidth, specsModule.cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-          Assistant: new Resource(new Cell(6, 5, specsModule.cellWidth, specsModule.cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
+          Agent: new Resource(new Cell(7, 7, specsModule.cellWidth, specsModule.cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+          Assistant: new Resource(new Cell(7, 5, specsModule.cellWidth, specsModule.cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
         },
         arrowsWithConfig: specsModule.arrowsWithConfig,
         path: specsModule.path,
