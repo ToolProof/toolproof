@@ -59,6 +59,14 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
+            ) : resource.nature === 'code_ai' && resourceName === 'Agent' && showAssistant ? (
+                <polygon
+                    points={`${x + width / 2},${y} ${x + width},${y + height / 2} ${x + width / 2},${y + height} ${x},${y + height / 2}`}
+                    fill={color}
+                    stroke="black"
+                    onClick={handleClick}
+                    pointerEvents="visible"
+                />
             ) : resource.nature === 'code_ai' ? (
                 <polygon
                     points={`${x + width / 2},${y - height / 6} ${x + width + width / 6},${y + height / 2} ${x + width / 2},${y + height + height / 6} ${x - width / 6},${y + height / 2}`}
@@ -91,7 +99,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     fill="black"
                     pointerEvents="none" // Prevents text from intercepting clicks
                 >
-                    {/* {resourceName} ATTENTION */}
+                    {/* {resourceName} */}
                 </text>
             )}
         </>

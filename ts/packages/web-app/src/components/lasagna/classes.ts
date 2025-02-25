@@ -111,10 +111,6 @@ export type ArrowNameType =
     | 'Output_DummyRight'
     | 'DummyRight_DummyLeft'
     | 'DummyLeft_Input'
-    | 'Assistant_Agent'
-    | 'Agent_Assistant'
-    | 'Assistant_Human'
-    | 'Human_Assistant'
 
 
 export type GraphElementNameType = ResourceNameType | ArrowNameType;
@@ -155,11 +151,11 @@ export class Resource extends GraphElement {
             color = '0, 0, 0'; // black
         }
 
-        const alpha = this.nature === 'data_meta' ? 0.3 : 1.0;
+        const alpha = this.nature === 'data_meta' ? 1.0 : 1.0;
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, key: ResourceNameType) {
+    fill(context: CanvasRenderingContext2D, key: ResourceNameType, showAssistant: boolean) {
         if (!context) return;
 
         const x = this.cell.col * this.cell.width;
@@ -185,6 +181,14 @@ export class Resource extends GraphElement {
             }
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
+        } else if (this.nature === 'code_ai' && key === 'Agent' && showAssistant) {
+            context.beginPath();
+            context.moveTo(x + this.cell.width / 2, y);
+            context.lineTo(x + this.cell.width, y + this.cell.height / 2);
+            context.lineTo(x + this.cell.width / 2, y + this.cell.height);
+            context.lineTo(x, y + this.cell.height / 2);
+            context.closePath();
+            context.fill();
         } else if (this.nature === 'code_ai') {
             context.beginPath();
             context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
@@ -207,7 +211,7 @@ export class Resource extends GraphElement {
             return null;
         }
 
-        this.fill(context, key);
+        this.fill(context, key, showAssistant);
 
         const { col, row } = this.cell;
         const x = col * this.cell.width;
@@ -234,6 +238,14 @@ export class Resource extends GraphElement {
         } else if (this.nature === 'code') {
             // Full cell rectangle stroke
             context.rect(x, y, this.cell.width, this.cell.height);
+        } else if (this.nature === 'code_ai' && key === 'Agent' && showAssistant) {
+            return null;
+            // Smaller diamond stroke
+            context.moveTo(x + this.cell.width / 2, y);
+            context.lineTo(x + this.cell.width, y + this.cell.height / 2);
+            context.lineTo(x + this.cell.width / 2, y + this.cell.height);
+            context.lineTo(x, y + this.cell.height / 2);
+            context.closePath();
         } else if (this.nature === 'code_ai') {
             // Diamond stroke
             context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
@@ -248,7 +260,7 @@ export class Resource extends GraphElement {
 
     drawText(context: CanvasRenderingContext2D, key: string, showAssistant: boolean) {
         if (!context) return;
-        if (!showAssistant && key === 'Assistant') {
+        if (key === 'Assistant') {
             return null;
         }
         if (key === 'DummyLeft' || key === 'DummyRight') {

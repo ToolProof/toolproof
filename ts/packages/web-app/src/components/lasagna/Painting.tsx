@@ -48,6 +48,9 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
             const isActive = isElementActive(key as ResourceNameType);
             const color = isActive ? 'yellow' : 'black';
             resource.draw(context, color, key as ResourceNameType, showAssistant);
+        });
+
+        Object.entries(resources).forEach(([key, resource]) => {
             resource.drawText(context, key, showAssistant);
         });
 
@@ -78,7 +81,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
                 }
             }
 
-            const nextKey = arrowWithConfig.config.next(bar); // ATTENTION_Z
+            const nextKey = arrowWithConfig.config.next(bar);
             if (nextKey) {
                 const nextArrowWithConfig = arrowsWithConfig[nextKey];
                 nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);

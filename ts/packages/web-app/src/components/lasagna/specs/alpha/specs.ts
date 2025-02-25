@@ -8,9 +8,9 @@ export const cellHeight = 50;
 
 
 export const resources: Record<ResourceNameType, Resource> = {
+    Assistant: new Resource(new Cell(7, 5, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
     Agent: new Resource(new Cell(7, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-    Assistant: new Resource(new Cell(7, 7, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
-    Human: new Resource(new Cell(7, 9, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
+    Human: new Resource(new Cell(7, 7, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
     Tools: new Resource(new Cell(7, 3, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
     Input: new Resource(new Cell(4, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Input']),
     Output: new Resource(new Cell(10, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Output']),
@@ -156,13 +156,7 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => {
-                if (bar()) {
-                    return 'Agent_Assistant'
-                } else {
-                    return 'Human_Agent';
-                }
-            }
+            next: (bar: () => boolean) => 'Human_Agent'
         }
     },
     Human_Agent: {
@@ -187,66 +181,11 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             next: (bar: () => boolean) => null
         }
     },
-    Agent_Assistant: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Assistant', 'top'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Assistant_Agent'
-        }
-    },
-    Assistant_Agent: {
-        arrow: new Arrow(['Assistant', 'top'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Human_Assistant'
-        }
-    },
-    Human_Assistant: {
-        arrow: new Arrow(['Human', 'top'], ['Assistant', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Assistant_Human'
-        }
-    },
-    Assistant_Human: {
-        arrow: new Arrow(['Assistant', 'bottom'], ['Human', 'top'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Assistant_Checkpoints'
-        }
-    },
-    Assistant_Checkpoints: {
-        arrow: new Arrow(['Assistant', 'right'], ['Checkpoints', 'bottomLeftD'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(9, 6, cellWidth, cellHeight), 'bottom'],
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => null
-        }
-    },
 };
 
 
 const Human_Input: GraphElementNameType[] = ['Human', 'Human_Input', 'Input'];
-const Input_Output_Agent_Tools: GraphElementNameType[] = ['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Agent_Assistant', 'Assistant', 'Assistant_Agent', 'Assistant_Checkpoints'];
+const Input_Output_Agent_Tools: GraphElementNameType[] = ['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Assistant', 'Assistant_Checkpoints'];
 const Output_Input: GraphElementNameType[] = ['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input']
 const Input_Output_Tools: GraphElementNameType[] = ['Input', 'Input_Tools', 'Tools', 'Tools_Output', 'Output']
 const Output_Human: GraphElementNameType[] = ['Output', 'Output_Human', 'Human']

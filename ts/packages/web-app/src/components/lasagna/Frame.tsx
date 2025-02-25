@@ -26,11 +26,7 @@ export default function Frame() {
         : await import('./specs/alpha/specs'); */
       const specsModule = await import('./specs/alpha/specs');
       setSpecs({
-        resources: !showAssistant ? specsModule.resources : {
-          ...specsModule.resources,
-          Agent: new Resource(new Cell(7, 7, specsModule.cellWidth, specsModule.cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-          Assistant: new Resource(new Cell(7, 5, specsModule.cellWidth, specsModule.cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
-        },
+        resources: specsModule.resources,
         arrowsWithConfig: specsModule.arrowsWithConfig,
         path: specsModule.path,
         gridSize: specsModule.gridSize,
