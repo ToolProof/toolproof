@@ -1,8 +1,7 @@
 {
     "concepts": {
         "passive": {
-            "whitepaper": "./whitepaper.json",
-            "yellowpaper": "./yellowpaper.json",
+            "self": "./concepts.json",
             "problems": [
                 {
                     "definition": "Remove_Diseases_Neurologicals_Dementia_LewyBody_@JaneDoe"
