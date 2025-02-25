@@ -1,0 +1,64 @@
+{
+    "concepts": {
+        "passive": {
+            "whitepaper": "./whitepaper.json",
+            "yellowpaper": "./yellowpaper.json",
+            "problems": [
+                {
+                    "definition": "Remove_Diseases_Neurologicals_Dementia_LewyBody_@JaneDoe"
+                }
+            ],
+            "ideas": [
+                {
+                    "problem": "Remove_Diseases_Neurologicals_Dementia_LewyBody_@JaneDoe",
+                    "human": "JohnDoe",
+                    "content": ""
+                }
+            ],
+            "inputs": [
+                {
+                    "problem": "Remove_Diseases_Neurologicals_Dementia_LewyBody_@JaneDoe",
+                    "description": "Anchor"
+                }
+            ],
+            "outputs": [
+                {
+                    "problem": "Remove_Diseases_Neurologicals_Dementia_LewyBody_@JaneDoe",
+                    "description": "Candidate"
+                }
+            ],
+            "keywords": []
+        },
+        "active": {
+            "tools": [
+                {
+                    "name": "AutoDock Vina",
+                    "problems": [
+                        {
+                            "definition": "Remove_Diseases"
+                        }
+                    ]
+                },
+                {
+                    "name": "Schrödinger Suite",
+                    "problems": [
+                        {
+                            "definition": "Remove_Diseases"
+                        }
+                    ]
+                }
+            ],
+            "agents": [
+                {
+                    "name": "OpenAI o3"
+                }
+            ],
+            "humans": [
+                {
+                    "name": "JohnDoe",
+                    "problems": []
+                }
+            ]
+        }
+    }
+}
