@@ -245,32 +245,39 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
 };
 
 
+const Human_Input: GraphElementNameType[] = ['Human', 'Human_Input', 'Input'];
+const Input_Output_Agent_Tools: GraphElementNameType[] = ['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Agent_Assistant', 'Assistant', 'Assistant_Agent', 'Assistant_Checkpoints'];
+const Output_Input: GraphElementNameType[] = ['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input']
+const Input_Output_Tools: GraphElementNameType[] = ['Input', 'Input_Tools', 'Tools', 'Tools_Output', 'Output']
+const Output_Human: GraphElementNameType[] = ['Output', 'Output_Human', 'Human']
+
 export const path: Array<[GraphElementNameType[], string]> = [
     [[],
     pathDescriptions[0]
     ],
-    [['Human', 'Human_Input'],
-    pathDescriptions[1]
+    [Human_Input,
+        pathDescriptions[1]
     ],
-    [['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Agent_Assistant', 'Assistant', 'Assistant_Agent', 'Assistant_Checkpoints'],
-    pathDescriptions[2]
+    [Input_Output_Agent_Tools,
+        pathDescriptions[2]
     ],
-    [['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input'],
-    pathDescriptions[3]
+    [Output_Input,
+        pathDescriptions[3]
     ],
-    [['Input', 'Input_Tools', 'Tools', 'Tools_Output', 'Output'],
-    pathDescriptions[4]
+    [Input_Output_Tools,
+        pathDescriptions[4]
     ],
-    [['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input'],
-    pathDescriptions[5]
+    [Output_Input,
+        pathDescriptions[5]
     ],
-    [['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Agent_Assistant', 'Assistant', 'Assistant_Agent', 'Assistant_Checkpoints'],
-    pathDescriptions[6]
+    [Input_Output_Agent_Tools,
+        pathDescriptions[6]
     ],
-    [['Output', 'Output_Human', 'Human'],
-    pathDescriptions[7]
+    [Output_Human,
+        pathDescriptions[7]
     ],
 ];
+
 
 
 
