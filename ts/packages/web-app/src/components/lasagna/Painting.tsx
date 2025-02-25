@@ -31,6 +31,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
         const context = canvas.getContext('2d');
         if (!context) return;
 
+        // ATTENTION: should loop through the cells, which should be able to show their index
         const drawGrid = () => {
             for (let col = 0; col < gridSize; col++) {
                 for (let row = 0; row < gridSize; row++) {
@@ -68,7 +69,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
                     color
                 );
                 // Store arrowhead for later
-                if (isActive && key !== 'Output_DummyRight') {
+                if (isActive) {
                     const controlPoint = Arrow.resolvePoint(arrowWithConfig.config.controlPoint, resources);
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: true, control: controlPoint });
                 }
@@ -76,7 +77,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
                 // Draw straight arrow line
                 arrowWithConfig.arrow.draw(context, color);
                 // Store arrowhead for later
-                if (isActive && key !== 'Output_DummyRight') {
+                if (isActive) {
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
                 }
             }
@@ -92,7 +93,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
         const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
         // Draw arrows and queue arrowheads
-        const key = 'Human_Input';
+        const key = 'Agent_Tools';
         const genesisArrowWithConfig = arrowsWithConfig[key];
         if (genesisArrowWithConfig && genesisArrowWithConfig.config) {
             genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);

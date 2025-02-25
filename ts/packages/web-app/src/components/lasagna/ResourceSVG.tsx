@@ -31,7 +31,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
     if (!showAssistant && resourceName === 'Assistant') {
         return null;
     }
-    if (resourceName === 'DummyLeft' || resourceName === 'DummyRight') {
+    if (resourceName.includes('Dummy')) {
         return null;
     }
 

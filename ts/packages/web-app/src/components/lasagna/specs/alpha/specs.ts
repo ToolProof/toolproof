@@ -8,80 +8,21 @@ export const cellHeight = 50;
 
 
 export const resources: Record<ResourceNameType, Resource> = {
-    Assistant: new Resource(new Cell(7, 5, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
-    Agent: new Resource(new Cell(7, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-    Human: new Resource(new Cell(7, 7, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
-    Tools: new Resource(new Cell(7, 3, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
-    Input: new Resource(new Cell(4, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Input']),
-    Output: new Resource(new Cell(10, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Output']),
-    Checkpoints: new Resource(new Cell(10, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, resourceDescriptions['Output']),
-    DummyRight: new Resource(new Cell(10, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
-    DummyLeft: new Resource(new Cell(4, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Agent: new Resource(new Cell(10, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+    Human: new Resource(new Cell(10, 8, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
+    Tools: new Resource(new Cell(10, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy0: new Resource(new Cell(7, 0, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy2: new Resource(new Cell(7, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy2B: new Resource(new Cell(8, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy5: new Resource(new Cell(7, 5, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy5B: new Resource(new Cell(8, 5, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy8: new Resource(new Cell(7, 8, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy8B: new Resource(new Cell(8, 8, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Dummy10: new Resource(new Cell(7, 10, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
 } as const;
 
 
 export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
-    Human_Input: {
-        arrow: new Arrow(['Human', 'left'], ['Input', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(4, 7, cellWidth, cellHeight), 'bottom'],
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Input_Agent'
-        }
-    },
-    Input_Agent: {
-        arrow: new Arrow(['Input', 'right'], ['Agent', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => {
-                if (bar()) { // ATTENTION
-                    return 'Agent_Output'
-                } else {
-                    return 'Agent_Output';
-                }
-            }
-        }
-    },
-    Agent_Output: {
-        arrow: new Arrow(['Agent', 'right'], ['Output', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Output_Human'
-        }
-    },
-    Agent_Checkpoints: {
-        arrow: new Arrow(['Agent', 'right'], ['Checkpoints', 'center'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Output_Human'
-        }
-    },
-    Output_Human: {
-        arrow: new Arrow(['Output', 'bottom'], ['Human', 'right'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(10, 7, cellWidth, cellHeight), 'bottom'],
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_Tools'
-        }
-    },
     Agent_Tools: {
         arrow: new Arrow(['Agent', 'top'], ['Tools', 'bottom'], resources, cellWidth, cellHeight),
         config: {
@@ -97,62 +38,6 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         arrow: new Arrow(['Tools', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Input_Tools'
-        }
-    },
-    Input_Tools: {
-        arrow: new Arrow(['Input', 'top'], ['Tools', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'top'],
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Tools_Output'
-        }
-    },
-    Tools_Output: {
-        arrow: new Arrow(['Tools', 'right'], ['Output', 'top'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(10, 3, cellWidth, cellHeight), 'top'],
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Output_DummyRight'
-        }
-    },
-    Output_DummyRight: {
-        arrow: new Arrow(['Output', 'right'], ['DummyRight', 'right'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(12, 3, cellWidth, cellHeight), 'top'],
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'DummyRight_DummyLeft'
-        }
-    },
-    DummyRight_DummyLeft: {
-        arrow: new Arrow(['DummyRight', 'right'], ['DummyLeft', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Human_Agent'
-        }
-    },
-    // Not drawn
-    DummyLeft_Input: {
-        arrow: new Arrow(['DummyLeft', 'left'], ['Input', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -179,17 +64,190 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
+            next: (bar: () => boolean) => 'Dummy0_Dummy2'
+        }
+    },
+    Dummy0_Dummy2: {
+        arrow: new Arrow(['Dummy0', 'topRight'], ['Dummy2', 'topRight'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy2_Dummy2BA'
+        }
+    },
+    Dummy2_Dummy2BA: {
+        arrow: new Arrow(['Dummy2', 'topRight'], ['Dummy2B', 'topLeftD'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: ['Dummy2B', 'left'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy2_Dummy2BB'
+        }
+    },
+    Dummy2_Dummy2BB: {
+        arrow: new Arrow(['Dummy2', 'bottomRight'], ['Dummy2B', 'bottomLeftD'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: ['Dummy2B', 'left'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy2_Dummy5'
+        }
+    },
+    Dummy2_Dummy5: {
+        arrow: new Arrow(['Dummy2', 'bottomRight'], ['Dummy5', 'topRight'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy5_Dummy5BA'
+        }
+    },
+    Dummy5_Dummy5BA: {
+        arrow: new Arrow(['Dummy5', 'topRight'], ['Dummy5B', 'topLeftD'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: ['Dummy5B', 'left'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy5_Dummy5BB'
+        }
+    },
+    Dummy5_Dummy5BB: {
+        arrow: new Arrow(['Dummy5', 'bottomRight'], ['Dummy5B', 'bottomLeftD'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: ['Dummy5B', 'left'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy5_Dummy8'
+        }
+    },
+    Dummy5_Dummy8: {
+        arrow: new Arrow(['Dummy5', 'bottomRight'], ['Dummy8', 'topRight'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy8_Dummy8BA'
+        }
+    },
+    Dummy8_Dummy8BA: {
+        arrow: new Arrow(['Dummy8', 'topRight'], ['Dummy8B', 'topLeftD'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: ['Dummy8B', 'left'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy8_Dummy8BB'
+        }
+    },
+    Dummy8_Dummy8BB: {
+        arrow: new Arrow(['Dummy8', 'bottomRight'], ['Dummy8B', 'bottomLeftD'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: ['Dummy8B', 'left'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy8_Dummy10'
+        }
+    },
+    Dummy8_Dummy10: {
+        arrow: new Arrow(['Dummy8', 'bottomRight'], ['Dummy10', 'bottomRight'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy2_Tools'
+        }
+    },
+    Dummy2_Tools: {
+        arrow: new Arrow(['Dummy2', 'center'], ['Tools', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Tools_Dummy2'
+        }
+    },
+    Tools_Dummy2: {
+        arrow: new Arrow(['Tools', 'left'], ['Dummy2', 'center'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy5_Agent'
+        }
+    },
+    Dummy5_Agent: {
+        arrow: new Arrow(['Dummy5', 'center'], ['Agent', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Agent_Dummy5'
+        }
+    },
+    Agent_Dummy5: {
+        arrow: new Arrow(['Agent', 'left'], ['Dummy5', 'center'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Dummy8_Human'
+        }
+    },
+    Dummy8_Human: {
+        arrow: new Arrow(['Dummy8', 'center'], ['Human', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Human_Dummy8'
+        }
+    },
+    Human_Dummy8: {
+        arrow: new Arrow(['Human', 'left'], ['Dummy8', 'center'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
             next: (bar: () => boolean) => null
         }
     },
 };
 
 
-const Human_Input: GraphElementNameType[] = ['Human', 'Human_Input', 'Input'];
-const Input_Output_Agent_Tools: GraphElementNameType[] = ['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Assistant', 'Assistant_Checkpoints'];
-const Output_Input: GraphElementNameType[] = ['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input']
-const Input_Output_Tools: GraphElementNameType[] = ['Input', 'Input_Tools', 'Tools', 'Tools_Output', 'Output']
-const Output_Human: GraphElementNameType[] = ['Output', 'Output_Human', 'Human']
+const Human_Input: GraphElementNameType[] = ['Human'];
+const Input_Output_Agent_Tools: GraphElementNameType[] = ['Agent'];
 
 export const path: Array<[GraphElementNameType[], string]> = [
     [[],
@@ -197,24 +255,6 @@ export const path: Array<[GraphElementNameType[], string]> = [
     ],
     [Human_Input,
         pathDescriptions[1]
-    ],
-    [Input_Output_Agent_Tools,
-        pathDescriptions[2]
-    ],
-    [Output_Input,
-        pathDescriptions[3]
-    ],
-    [Input_Output_Tools,
-        pathDescriptions[4]
-    ],
-    [Output_Input,
-        pathDescriptions[5]
-    ],
-    [Input_Output_Agent_Tools,
-        pathDescriptions[6]
-    ],
-    [Output_Human,
-        pathDescriptions[7]
     ],
 ];
 

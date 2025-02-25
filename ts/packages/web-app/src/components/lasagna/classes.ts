@@ -78,39 +78,44 @@ export class Cell {
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
     | 'Agent'
-    | 'Assistant'
     | 'Human'
     | 'Tools'
-    | 'Input'
-    | 'Output'
-    | 'Checkpoints'
-    | 'DummyLeft'
-    | 'DummyRight'
+    | 'Dummy0'
+    | 'Dummy2'
+    | 'Dummy5'
+    | 'Dummy8'
+    | 'Dummy10'
+    | 'Dummy2B'
+    | 'Dummy5B'
+    | 'Dummy8B'
 
 
 export type ArrowNameType =
-    | 'Human_Input'
-    | 'Input_Human'
-    | 'Input_Tools'
-    | 'Tools_Input'
-    | 'Tools_Output'
-    | 'Output_Tools'
     | 'Tools_Human'
     | 'Human_Tools'
-    | 'Input_Agent'
-    | 'Agent_Input'
     | 'Agent_Tools'
     | 'Tools_Agent'
-    | 'Agent_Output'
-    | 'Agent_Checkpoints'
-    | 'Assistant_Checkpoints'
     | 'Agent_Human'
     | 'Human_Agent'
-    | 'Human_Output'
-    | 'Output_Human'
-    | 'Output_DummyRight'
-    | 'DummyRight_DummyLeft'
-    | 'DummyLeft_Input'
+    | 'Tools_Dummy2'
+    | 'Dummy2_Tools'
+    | 'Agent_Dummy5'
+    | 'Dummy5_Agent'
+    | 'Human_Dummy8'
+    | 'Dummy8_Human'
+    | 'Dummy0_Dummy2'
+    | 'Dummy2_Dummy2'
+    | 'Dummy2_Dummy5'
+    | 'Dummy5_Dummy5'
+    | 'Dummy5_Dummy8'
+    | 'Dummy8_Dummy8'
+    | 'Dummy8_Dummy10'
+    | 'Dummy2_Dummy2BA'
+    | 'Dummy2_Dummy2BB'
+    | 'Dummy5_Dummy5BA'
+    | 'Dummy5_Dummy5BB'
+    | 'Dummy8_Dummy8BA'
+    | 'Dummy8_Dummy8BB'
 
 
 export type GraphElementNameType = ResourceNameType | ArrowNameType;
@@ -207,7 +212,7 @@ export class Resource extends GraphElement {
             // console.log(key);
             return null;
         }
-        if (key === 'DummyLeft' || key === 'DummyRight') {
+        if (key.includes('Dummy')) {
             return null;
         }
 
@@ -260,13 +265,7 @@ export class Resource extends GraphElement {
 
     drawText(context: CanvasRenderingContext2D, key: string, showAssistant: boolean) {
         if (!context) return;
-        if (key === 'Assistant') {
-            return null;
-        }
-        if (key === 'DummyLeft' || key === 'DummyRight') {
-            return null;
-        }
-        if (key === 'Checkpoints') {
+        if (key.includes('Dummy')) {
             return null;
         }
 

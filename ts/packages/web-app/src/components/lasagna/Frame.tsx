@@ -106,10 +106,10 @@ export default function Frame() {
   return (
     <div className="relative">
       <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
-        {headline}
+        {false && headline}
       </div>
       <div className="fixed top-4 left-0 w-full text-center p-4 font-bold text-[10px] bg-transparent">
-        {subHeadline}
+        {false && subHeadline}
       </div>
       <Painting
         resources={specs.resources}
@@ -122,7 +122,7 @@ export default function Frame() {
         bar={bar}
         showAssistant={showAssistant}
       />
-      {!isPlaying && (
+      {!isPlaying || false && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
           <p>{pathDescription}</p>
         </div>
