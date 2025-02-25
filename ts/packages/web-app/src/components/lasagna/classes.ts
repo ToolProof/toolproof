@@ -91,8 +91,8 @@ export type ResourceNameType =
 
 
 export type ArrowNameType =
-    | 'Tools_Human'
-    | 'Human_Tools'
+    // | 'Tools_Human'
+    // | 'Human_Tools'
     | 'Agent_Tools'
     | 'Tools_Agent'
     | 'Agent_Human'
@@ -104,11 +104,8 @@ export type ArrowNameType =
     | 'Human_Dummy8'
     | 'Dummy8_Human'
     | 'Dummy0_Dummy2'
-    | 'Dummy2_Dummy2'
     | 'Dummy2_Dummy5'
-    | 'Dummy5_Dummy5'
     | 'Dummy5_Dummy8'
-    | 'Dummy8_Dummy8'
     | 'Dummy8_Dummy10'
     | 'Dummy2_Dummy2BA'
     | 'Dummy2_Dummy2BB'
