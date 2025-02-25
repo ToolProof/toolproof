@@ -145,9 +145,10 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'DummyLeft_Input'
+            next: (bar: () => boolean) => 'Human_Agent'
         }
     },
+    // Not drawn
     DummyLeft_Input: {
         arrow: new Arrow(['DummyLeft', 'left'], ['Input', 'left'], resources, cellWidth, cellHeight),
         config: {

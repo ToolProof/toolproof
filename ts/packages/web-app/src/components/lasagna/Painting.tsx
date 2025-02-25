@@ -68,7 +68,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
                     color
                 );
                 // Store arrowhead for later
-                if (isActive && !key.includes('DummyRight')) {
+                if (isActive && key !== 'Output_DummyRight') {
                     const controlPoint = Arrow.resolvePoint(arrowWithConfig.config.controlPoint, resources);
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: true, control: controlPoint });
                 }
@@ -76,7 +76,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
                 // Draw straight arrow line
                 arrowWithConfig.arrow.draw(context, color);
                 // Store arrowhead for later
-                if (isActive && !key.includes('DummyRight')) {
+                if (isActive && key !== 'Output_DummyRight') {
                     arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
                 }
             }
