@@ -204,11 +204,6 @@ export class Resource extends GraphElement {
 
     draw(context: CanvasRenderingContext2D, color: string, key: ResourceNameType, showAssistant: boolean) {
         if (!context) return;
-        if (!showAssistant && key === 'Assistant') {
-            // console.log(showAssistant);
-            // console.log(key);
-            return null;
-        }
         if (key.includes('Dummy')) {
             return null;
         }
