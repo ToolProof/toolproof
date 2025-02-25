@@ -81,46 +81,47 @@ export type ResourceNameType =
     | 'Assistant'
     | 'Human'
     | 'Tools'
-    | 'InternalToolsLeft'
-    | 'InternalToolsRight'
-    | 'OuterInput'
-    | 'InnerInput'
-    | 'InnerOutput'
-    | 'OuterOutput'
+    | 'Input'
+    | 'Output'
     | 'Checkpoints'
+    | 'DummyLeft'
+    | 'DummyRight'
 
 
 export type ArrowNameType =
-    | 'Human_OuterInput'
-    | 'Agent_InnerInput'
-    | 'InnerInput_Tools'
-    | 'Tools_InnerOutput'
-    | 'InnerOutput_Agent'
-    | 'Agent_OuterInput'
-    | 'OuterInput_Agent'
+    | 'Human_Input'
+    | 'Input_Human'
+    | 'Input_Tools'
+    | 'Tools_Input'
+    | 'Tools_Output'
+    | 'Output_Tools'
+    | 'Tools_Human'
+    | 'Human_Tools'
+    | 'Input_Agent'
+    | 'Agent_Input'
+    | 'Agent_Tools'
+    | 'Tools_Agent'
+    | 'Agent_Output'
+    | 'Agent_Checkpoints'
+    | 'Assistant_Checkpoints'
     | 'Agent_Human'
     | 'Human_Agent'
-    | 'Agent_OuterOutput'
-    | 'OuterOutput_Agent'
-    | 'OuterOutput_Human'
-    | 'Agent_Agent'
-    | 'Agent_Checkpoints'
-    | 'Checkpoints_Agent'
-    | 'Checkpoints_Assistant'
-    | 'Assistant_Checkpoints'
-    | 'Agent_Assistant'
+    | 'Human_Output'
+    | 'Output_Human'
+    | 'Output_DummyRight'
+    | 'DummyRight_DummyLeft'
+    | 'DummyLeft_Input'
     | 'Assistant_Agent'
-    | 'Agent_InternalToolsLeft'
-    | 'InternalToolsLeft_Agent'
-    | 'Agent_InternalToolsRight'
-    | 'InternalToolsRight_Agent'
+    | 'Agent_Assistant'
+    | 'Assistant_Human'
+    | 'Human_Assistant'
 
 
 export type GraphElementNameType = ResourceNameType | ArrowNameType;
 
 
 export type Environment = 'lg' | 'vercel' | 'gcp';
-export type Nature = 'code' | 'code_ai' | 'code_glue' | 'data';
+export type Nature = 'code' | 'code_ai' | 'data' | 'data_meta' | 'dummy';
 
 
 export class GraphElement {
@@ -154,15 +155,12 @@ export class Resource extends GraphElement {
             color = '0, 0, 0'; // black
         }
 
-        const alpha = 1.0;
+        const alpha = this.nature === 'data_meta' ? 0.3 : 1.0;
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, key: ResourceNameType, showBeta: boolean) {
+    fill(context: CanvasRenderingContext2D, key: ResourceNameType) {
         if (!context) return;
-        if (!showBeta && key === 'Assistant') {
-            return null;
-        }
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
@@ -174,6 +172,17 @@ export class Resource extends GraphElement {
             context.beginPath();
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
             context.fill();
+        } else if (this.nature === 'data_meta') {
+            if (true) {
+                // Smaller centered ellipse
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + smallerWidth / 2; // Left-aligned
+                const centeredY = y + this.cell.height / 2;
+                context.beginPath();
+                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
+                context.fill();
+            }
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
         } else if (this.nature === 'code_ai') {
@@ -184,27 +193,21 @@ export class Resource extends GraphElement {
             context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
             context.closePath();
             context.fill();
-        } else if (this.nature === 'code_glue') {
-            if (false) {
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + (this.cell.width - smallerWidth) / 2;
-                const centeredY = y + (this.cell.height - smallerHeight) / 2;
-                context.fillRect(centeredX, centeredY, smallerWidth, smallerHeight);
-            }
-
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, key: ResourceNameType, showBeta: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, key: ResourceNameType, showAssistant: boolean) {
         if (!context) return;
-        if (!showBeta && key === 'Assistant') {
-            // console.log(showBeta);
+        if (!showAssistant && key === 'Assistant') {
+            // console.log(showAssistant);
             // console.log(key);
             return null;
         }
+        if (key === 'DummyLeft' || key === 'DummyRight') {
+            return null;
+        }
 
-        this.fill(context, key, showBeta);
+        this.fill(context, key);
 
         const { col, row } = this.cell;
         const x = col * this.cell.width;
@@ -219,6 +222,15 @@ export class Resource extends GraphElement {
         if (this.nature === 'data') {
             // Ellipse stroke
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
+        } else if (this.nature === 'data_meta') {
+            if (false) {
+                // Smaller centered ellipse stroke
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + smallerWidth / 2; // Left-aligned
+                const centeredY = y + this.cell.height / 2;
+                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
+            }
         } else if (this.nature === 'code') {
             // Full cell rectangle stroke
             context.rect(x, y, this.cell.width, this.cell.height);
@@ -229,23 +241,20 @@ export class Resource extends GraphElement {
             context.lineTo(x + this.cell.width / 2, y + this.cell.height + this.cell.height / 6);
             context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
             context.closePath();
-        } else if (this.nature === 'code_glue') {
-            if (false) {
-                // Smaller centered rectangle stroke
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + (this.cell.width - smallerWidth) / 2;
-                const centeredY = y + (this.cell.height - smallerHeight) / 2;
-                context.rect(centeredX, centeredY, smallerWidth, smallerHeight);
-            }
         }
 
         context.stroke();
     }
 
-    drawText(context: CanvasRenderingContext2D, key: string, showBeta: boolean) {
+    drawText(context: CanvasRenderingContext2D, key: string, showAssistant: boolean) {
         if (!context) return;
-        if (!showBeta && key === 'Assistant') {
+        if (!showAssistant && key === 'Assistant') {
+            return null;
+        }
+        if (key === 'DummyLeft' || key === 'DummyRight') {
+            return null;
+        }
+        if (key === 'Checkpoints') {
             return null;
         }
 
@@ -301,11 +310,11 @@ export class Resource extends GraphElement {
 
 }
 
-
+export type CenterPointType = 'center';
 export type CornerPointType = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 export type DiamondPointType = 'top' | 'bottom' | 'left' | 'right';
 export type DiamondCornerPointType = 'topLeftD' | 'topRightD' | 'bottomLeftD' | 'bottomRightD';
-export type ArrowPointType = CornerPointType | DiamondPointType | DiamondCornerPointType;
+export type ArrowPointType = CenterPointType | CornerPointType | DiamondPointType | DiamondCornerPointType;
 
 
 export class Arrow extends GraphElement {
@@ -351,7 +360,7 @@ export class Arrow extends GraphElement {
                 } else if (diamondKey === 'bottom') {
                     return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
                 }
-            } else if (resource.nature === 'code_glue') {
+            } else if (resource.nature === 'dummy') {
                 const smallerWidth = Arrow.cellWidth / 2;
                 if (diamondKey === 'left') {
                     return { x: point.x + (smallerWidth / 2), y: point.y };
@@ -365,16 +374,27 @@ export class Arrow extends GraphElement {
             }
             return point;
         }
-    
+
         const key = input[1];
+
+        // New branch: if the key is 'center', return the cell's center.
+        if (key === 'center') {
+            if (typeof input[0] === 'string') {
+                const resource = resources[input[0]];
+                if (!resource) throw new Error(`Resource ${input[0]} not found.`);
+                return resource.cell.getCenter();
+            } else {
+                return input[0].getCenter();
+            }
+        }
+
         const isCorner = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].includes(key);
         const isDiamondCorner = ['topLeftD', 'topRightD', 'bottomLeftD', 'bottomRightD'].includes(key);
-        // If it's not a corner and not a diamond-corner, assume it's a diamond point key
-    
+
         if (typeof input[0] === 'string') {
             const resource = resources[input[0]];
             if (!resource) throw new Error(`Resource ${input[0]} not found.`);
-    
+
             if (isCorner) {
                 return resource.cell.getCorners()[key as CornerPointType];
             } else if (isDiamondCorner) {
@@ -417,7 +437,7 @@ export class Arrow extends GraphElement {
                 return input[0].getOuterDiamond()[key as DiamondPointType];
             }
         }
-        return { x: 0, y: 0 }; // ATTENTION: hack to make TypeScript happy
+        return { x: 0, y: 0 }; // ATTENTION: hack to satisfy TypeScript
     }
 
     draw(context: CanvasRenderingContext2D, color: string) {

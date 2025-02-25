@@ -5,16 +5,16 @@ interface ResourceSVGProps {
     resource: Resource;
     color: string;
     handleResourceClickHelper: (resourceName: ResourceNameType) => void;
-    showBeta: boolean;
+    showAssistant: boolean;
 }
 
-const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper, showBeta }) => {
+const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper, showAssistant }) => {
     const { col, row, width, height } = resource.cell;
     const x = col * width;
     const y = row * height;
 
-    // Calculate smaller size for 'code_glue' resources
-    const shouldBeSmall = resource.nature === 'code_glue';
+    // Calculate smaller size for 'dummy' resources
+    const shouldBeSmall = resource.nature === 'data_meta';
     const smallWidth = width / 2;
     const smallHeight = height / 1.5;
     const smallX = x + (width - smallWidth) / 2;
@@ -28,7 +28,10 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
         return null;
     } */
 
-    if (!showBeta && resourceName === 'Assistant') {
+    if (!showAssistant && resourceName === 'Assistant') {
+        return null;
+    }
+    if (resourceName === 'DummyLeft' || resourceName === 'DummyRight') {
         return null;
     }
 
@@ -40,6 +43,17 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     cy={y + height / 2}
                     rx={width / 2}
                     ry={height / 2 + 10}
+                    fill={color}
+                    stroke="black"
+                    onClick={handleClick}
+                    pointerEvents="visible"
+                />
+            ) : resource.nature === 'data_meta' ? (
+                <ellipse
+                    cx={x + smallWidth / 2} // Left-aligned
+                    cy={y + height / 2}
+                    rx={smallWidth / 2}
+                    ry={smallHeight / 2}
                     fill={color}
                     stroke="black"
                     onClick={handleClick}

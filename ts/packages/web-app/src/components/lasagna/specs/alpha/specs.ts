@@ -8,131 +8,161 @@ export const cellHeight = 50;
 
 
 export const resources: Record<ResourceNameType, Resource> = {
-    Agent: new Resource(new Cell(6, 7, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-    Assistant: new Resource(new Cell(6, 5, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
+    Agent: new Resource(new Cell(6, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+    Assistant: new Resource(new Cell(6, 7, cellWidth, cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
     Human: new Resource(new Cell(6, 9, cellWidth, cellHeight), 'vercel', 'code', true, resourceDescriptions['Human']),
-    Tools: new Resource(new Cell(6, 1, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
-    InternalToolsLeft: new Resource(new Cell(4, 6, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Tools']),
-    InternalToolsRight: new Resource(new Cell(8, 6, cellWidth, cellHeight), 'gcp', 'code_glue', true, resourceDescriptions['Tools']),
-    OuterInput: new Resource(new Cell(2, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['OuterInput']),
-    InnerInput: new Resource(new Cell(4, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['InnerInput']),
-    InnerOutput: new Resource(new Cell(8, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['InnerOutput']),
-    OuterOutput: new Resource(new Cell(10, 3, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['OuterOutput']),
-    Checkpoints: new Resource(new Cell(6, 3, cellWidth, cellHeight), 'lg', 'data', true, resourceDescriptions['Checkpoints']),
+    Tools: new Resource(new Cell(6, 3, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    Input: new Resource(new Cell(3, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Input']),
+    Output: new Resource(new Cell(9, 5, cellWidth, cellHeight), 'gcp', 'data', true, resourceDescriptions['Output']),
+    Checkpoints: new Resource(new Cell(9, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, resourceDescriptions['Output']),
+    DummyRight: new Resource(new Cell(9, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
+    DummyLeft: new Resource(new Cell(3, 2, cellWidth, cellHeight), 'gcp', 'code', true, resourceDescriptions['Tools']),
 } as const;
 
 
 export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
-    Human_OuterInput: {
-        arrow: new Arrow(['Human', 'left'], ['OuterInput', 'left'], resources, cellWidth, cellHeight),
+    Human_Input: {
+        arrow: new Arrow(['Human', 'left'], ['Input', 'bottom'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(1, 7, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(3, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'OuterInput_Agent'
+            next: (bar: () => boolean) => 'Input_Agent'
         }
     },
-    OuterInput_Agent: {
-        arrow: new Arrow(['OuterInput', 'bottom'], ['Agent', 'bottomLeftD'], resources, cellWidth, cellHeight),
+    Input_Agent: {
+        arrow: new Arrow(['Input', 'right'], ['Agent', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(3, 8, cellWidth, cellHeight), 'bottom'],
+            controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Agent_InnerInput'
+            next: (bar: () => boolean) => {
+                if (bar()) { // ATTENTION
+                    return 'Agent_Output'
+                } else {
+                    return 'Agent_Output';
+                }
+            }
         }
     },
-    // Won't be drawn in the normal flow
-    Agent_OuterInput: {
-        arrow: new Arrow(['Agent', 'left'], ['OuterInput', 'bottom'], resources, cellWidth, cellHeight),
+    Agent_Output: {
+        arrow: new Arrow(['Agent', 'right'], ['Output', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(3, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Agent_InnerInput'
+            next: (bar: () => boolean) => 'Output_Human'
         }
     },
-    Agent_InnerInput: {
-        arrow: new Arrow(['Agent', 'topLeftD'], ['InnerInput', 'bottom'], resources, cellWidth, cellHeight),
+    Agent_Checkpoints: {
+        arrow: new Arrow(['Agent', 'right'], ['Checkpoints', 'center'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'top'],
+            controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'InnerInput_Tools'
+            next: (bar: () => boolean) => 'Output_Human'
         }
     },
-    InnerInput_Tools: {
-        arrow: new Arrow(['InnerInput', 'top'], ['Tools', 'left'], resources, cellWidth, cellHeight),
+    Output_Human: {
+        arrow: new Arrow(['Output', 'bottom'], ['Human', 'right'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(4, 1, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(9, 7, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Tools_InnerOutput'
+            next: (bar: () => boolean) => 'Agent_Tools'
         }
     },
-    Tools_InnerOutput: {
-        arrow: new Arrow(['Tools', 'right'], ['InnerOutput', 'top'], resources, cellWidth, cellHeight),
+    Agent_Tools: {
+        arrow: new Arrow(['Agent', 'top'], ['Tools', 'bottom'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(8, 1, cellWidth, cellHeight), 'bottom'],
+            controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'InnerOutput_Agent'
+            next: (bar: () => boolean) => 'Tools_Agent'
         }
     },
-    InnerOutput_Agent: {
-        arrow: new Arrow(['InnerOutput', 'bottom'], ['Agent', 'topRightD'], resources, cellWidth, cellHeight),
+    Tools_Agent: {
+        arrow: new Arrow(['Tools', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(8, 5, cellWidth, cellHeight), 'top'],
+            controlPoint: null,
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Agent_OuterOutput'
+            next: (bar: () => boolean) => 'Input_Tools'
         }
     },
-    Agent_OuterOutput: {
-        arrow: new Arrow(['Agent', 'bottomRightD'], ['OuterOutput', 'bottom'], resources, cellWidth, cellHeight),
+    Input_Tools: {
+        arrow: new Arrow(['Input', 'top'], ['Tools', 'left'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(9, 8, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(3, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'OuterOutput_Human'
+            next: (bar: () => boolean) => 'Tools_Output'
         }
     },
-    // Won't be drawn in the normal flow
-    OuterOutput_Agent: {
-        arrow: new Arrow(['OuterOutput', 'bottom'], ['Agent', 'right'], resources, cellWidth, cellHeight),
+    Tools_Output: {
+        arrow: new Arrow(['Tools', 'right'], ['Output', 'top'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(9, 5, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(9, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'OuterOutput_Human'
+            next: (bar: () => boolean) => 'Output_DummyRight'
         }
     },
-    OuterOutput_Human: {
-        arrow: new Arrow(['OuterOutput', 'right'], ['Human', 'right'], resources, cellWidth, cellHeight),
+    Output_DummyRight: {
+        arrow: new Arrow(['Output', 'right'], ['DummyRight', 'right'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: [new Cell(11, 7, cellWidth, cellHeight), 'bottom'],
+            controlPoint: [new Cell(11, 3, cellWidth, cellHeight), 'top'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => 'Human_Agent'
+            next: (bar: () => boolean) => 'DummyRight_DummyLeft'
+        }
+    },
+    DummyRight_DummyLeft: {
+        arrow: new Arrow(['DummyRight', 'right'], ['DummyLeft', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'DummyLeft_Input'
+        }
+    },
+    DummyLeft_Input: {
+        arrow: new Arrow(['DummyLeft', 'left'], ['Input', 'left'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: [new Cell(1, 3, cellWidth, cellHeight), 'top'],
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => {
+                if (bar()) {
+                    return 'Agent_Assistant'
+                } else {
+                    return 'Human_Agent';
+                }
+            }
         }
     },
     Human_Agent: {
@@ -154,39 +184,11 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
             },
-            next: (bar: () => boolean) => {
-                if (bar()) {
-                    return 'Agent_Assistant';
-                } else {
-                    return 'Agent_Checkpoints';
-                }
-            }
-        }
-    },
-    Agent_Checkpoints: {
-        arrow: new Arrow(['Agent', 'top'], ['Checkpoints', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Checkpoints_Agent'
-        }
-    },
-    Checkpoints_Agent: {
-        arrow: new Arrow(['Checkpoints', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_InternalToolsLeft'
+            next: (bar: () => boolean) => null
         }
     },
     Agent_Assistant: {
-        arrow: new Arrow(['Agent', 'top'], ['Assistant', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Agent', 'bottom'], ['Assistant', 'top'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
@@ -197,7 +199,29 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Assistant_Agent: {
-        arrow: new Arrow(['Assistant', 'bottom'], ['Agent', 'top'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Assistant', 'top'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Human_Assistant'
+        }
+    },
+    Human_Assistant: {
+        arrow: new Arrow(['Human', 'top'], ['Assistant', 'bottom'], resources, cellWidth, cellHeight),
+        config: {
+            controlPoint: null,
+            reverse: null,
+            drawInOrder: (foo, key, arrowWithConfig) => {
+                foo(key, arrowWithConfig);
+            },
+            next: (bar: () => boolean) => 'Assistant_Human'
+        }
+    },
+    Assistant_Human: {
+        arrow: new Arrow(['Assistant', 'bottom'], ['Human', 'top'], resources, cellWidth, cellHeight),
         config: {
             controlPoint: null,
             reverse: null,
@@ -208,76 +232,9 @@ export const arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig> = {
         }
     },
     Assistant_Checkpoints: {
-        arrow: new Arrow(['Assistant', 'top'], ['Checkpoints', 'bottom'], resources, cellWidth, cellHeight),
+        arrow: new Arrow(['Assistant', 'right'], ['Checkpoints', 'bottomLeftD'], resources, cellWidth, cellHeight),
         config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Checkpoints_Assistant'
-        }
-    },
-    Checkpoints_Assistant: {
-        arrow: new Arrow(['Checkpoints', 'bottom'], ['Assistant', 'top'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_InternalToolsLeft'
-        }
-    },
-    Agent_InternalToolsLeft: {
-        arrow: new Arrow(['Agent', 'left'], ['InternalToolsLeft', 'right'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'InternalToolsLeft_Agent'
-        }
-    },
-    InternalToolsLeft_Agent: {
-        arrow: new Arrow(['InternalToolsLeft', 'right'], ['Agent', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'Agent_InternalToolsRight'
-        }
-    },
-    Agent_InternalToolsRight: {
-        arrow: new Arrow(['Agent', 'right'], ['InternalToolsRight', 'left'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => 'InternalToolsRight_Agent'
-        }
-    },
-    InternalToolsRight_Agent: {
-        arrow: new Arrow(['InternalToolsRight', 'left'], ['Agent', 'right'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
-            reverse: null,
-            drawInOrder: (foo, key, arrowWithConfig) => {
-                foo(key, arrowWithConfig);
-            },
-            next: (bar: () => boolean) => null
-        }
-    },
-    // Won't be drawn in the normal flow
-    Agent_Agent: {
-        arrow: new Arrow(['Agent', 'bottom'], ['Agent', 'bottom'], resources, cellWidth, cellHeight),
-        config: {
-            controlPoint: null,
+            controlPoint: [new Cell(8, 6, cellWidth, cellHeight), 'bottom'],
             reverse: null,
             drawInOrder: (foo, key, arrowWithConfig) => {
                 foo(key, arrowWithConfig);
@@ -292,27 +249,27 @@ export const path: Array<[GraphElementNameType[], string]> = [
     [[],
     pathDescriptions[0]
     ],
-    [['Human', 'Human_OuterInput', 'OuterInput'],
+    [['Human', 'Human_Input'],
     pathDescriptions[1]
     ],
-    [['OuterInput', 'OuterInput_Agent', 'Agent', 'Agent_InnerInput', 'InnerInput', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent', 'Agent_Assistant', 'Assistant_Agent', 'Assistant', 'Assistant_Checkpoints', 'Checkpoints_Assistant', 'Agent_InternalToolsLeft', 'InternalToolsLeft', 'InternalToolsLeft_Agent', 'Agent_Human', 'Human', 'Human_Agent'],
+    [['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Agent_Assistant', 'Assistant', 'Assistant_Agent', 'Assistant_Checkpoints'],
     pathDescriptions[2]
     ],
-    [['InnerInput', 'InnerInput_Tools', 'Tools', 'Tools_InnerOutput', 'InnerOutput'],
+    [['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input'],
     pathDescriptions[3]
     ],
-    [['InnerOutput', 'InnerOutput_Agent', 'Agent', 'Agent_OuterOutput', 'OuterOutput', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent', 'Agent_Assistant', 'Assistant_Agent', 'Assistant', 'Assistant_Checkpoints', 'Checkpoints_Assistant', 'Checkpoints_Assistant', 'Agent_InternalToolsRight', 'InternalToolsRight', 'InternalToolsRight_Agent', 'Agent_Human', 'Human', 'Human_Agent'],
+    [['Input', 'Input_Tools', 'Tools', 'Tools_Output', 'Output'],
     pathDescriptions[4]
     ],
-    [['OuterOutput', 'OuterOutput_Human', 'Human'],
+    [['Output', 'Output_DummyRight', 'DummyRight', 'DummyRight_DummyLeft', 'DummyLeft', 'DummyLeft_Input', 'Input'],
     pathDescriptions[5]
     ],
-    /* [['Human', 'Human_Agent', 'Agent', 'Agent_Human', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent', 'Agent_Assistant', 'Assistant_Agent', 'Assistant', 'Assistant_Checkpoints'],
+    [['Input', 'Input_Agent', 'Agent', 'Agent_Output', 'Output', 'Checkpoints', 'Agent_Tools', 'Tools', 'Tools_Agent', 'Agent_Assistant', 'Assistant', 'Assistant_Agent', 'Assistant_Checkpoints'],
     pathDescriptions[6]
-    ], */
-    /* [['Agent', 'Agent_OuterInput', 'OuterOutput_Agent', 'Agent_Checkpoints', 'Checkpoints', 'Checkpoints_Agent'],
+    ],
+    [['Output', 'Output_Human', 'Human'],
     pathDescriptions[7]
-    ], */
+    ],
 ];
 
 

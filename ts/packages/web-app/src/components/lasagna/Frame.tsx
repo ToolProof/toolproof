@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function Frame() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showBeta, setShowBeta] = useState(false);
+  const [showAssistant, setshowAssistant] = useState(false);
   const [pathDescription, setPathDescription] = useState('');
   const [z, setZ] = useState(0);
   const [specs, setSpecs] = useState({
@@ -21,15 +21,15 @@ export default function Frame() {
 
   useEffect(() => {
     const importSpecs = async () => {
-      /* const specsModule = showBeta && false
+      /* const specsModule = showAssistant && false
         ? await import('./specs/beta/specs')
         : await import('./specs/alpha/specs'); */
       const specsModule = await import('./specs/alpha/specs');
       setSpecs({
-        resources: !showBeta ? specsModule.resources : {
+        resources: !showAssistant ? specsModule.resources : {
           ...specsModule.resources,
-          Agent: new Resource(new Cell(6, 5, specsModule.cellWidth, specsModule.cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
-          Assistant: new Resource(new Cell(6, 7, specsModule.cellWidth, specsModule.cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
+          Agent: new Resource(new Cell(6, 7, specsModule.cellWidth, specsModule.cellHeight), 'lg', 'code_ai', true, resourceDescriptions['Agent']),
+          Assistant: new Resource(new Cell(6, 5, specsModule.cellWidth, specsModule.cellHeight), 'gcp', 'code_ai', true, resourceDescriptions['Agent']),
         },
         arrowsWithConfig: specsModule.arrowsWithConfig,
         path: specsModule.path,
@@ -40,7 +40,7 @@ export default function Frame() {
     };
 
     importSpecs();
-  }, [showBeta]);
+  }, [showAssistant]);
 
   useEffect(() => {
     setPathDescription(specs.path[z]?.[1] || '');
@@ -52,7 +52,7 @@ export default function Frame() {
 
   const bar = () => {
     // return z === 7;
-    return showBeta;
+    return showAssistant;
   };
 
   const handleClickPrevious = () => {
@@ -104,7 +104,7 @@ export default function Frame() {
     }
   };
 
-  const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showBeta ? ' - Version 2' : ' - Version 1');
+  const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showAssistant ? ' - Version 2' : ' - Version 1');
   const subHeadline = 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
 
   return (
@@ -124,7 +124,7 @@ export default function Frame() {
         cellHeight={specs.cellHeight}
         isElementActive={isElementActive}
         bar={bar}
-        showBeta={showBeta}
+        showAssistant={showAssistant}
       />
       {!isPlaying && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
@@ -134,9 +134,9 @@ export default function Frame() {
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
         <button
           className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          onClick={() => setShowBeta((prev) => !prev)}
+          onClick={() => setshowAssistant((prev) => !prev)}
         >
-          {showBeta ? 'Show V.1' : 'Show V.2'}
+          {showAssistant ? 'Show V.1' : 'Show V.2'}
         </button>
         <div className="flex-grow flex justify-center">
           <button
