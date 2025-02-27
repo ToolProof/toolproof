@@ -14,26 +14,17 @@ export default function Frame() {
   const [specs, setSpecs] = useState({
     resources: {} as Record<string, Resource>,
     arrowsWithConfig: {} as Record<string, ArrowWithConfig>,
-    path: [] as Array<[GraphElementNameType[], string]>,
-    gridSize: 0,
-    cellWidth: 0,
-    cellHeight: 0,
+    path: [] as Array<[GraphElementNameType[], string]>
   });
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const importSpecs = async () => {
-      /* const specsModule = showAssistant && false
-        ? await import('./specs/beta/specs')
-        : await import('./specs/alpha/specs'); */
       const specsModule = await import('./specs/alpha/specs');
       setSpecs({
         resources: specsModule.resources,
         arrowsWithConfig: specsModule.arrowsWithConfig,
         path: specsModule.path,
-        gridSize: specsModule.gridSize,
-        cellWidth: specsModule.cellWidth,
-        cellHeight: specsModule.cellHeight,
       });
     };
 
@@ -106,36 +97,33 @@ export default function Frame() {
   const subHeadline = 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
 
   return (
-    <div className="relative">
-      <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
+    <div className='bg-transparent w-full h-full'>
+      {/* <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
         {true && files[0]?.path}
       </div>
       <div className="fixed top-4 left-0 w-full text-center p-4 font-bold text-[10px] bg-transparent">
         {false && subHeadline}
-      </div>
+      </div> */}
       <Painting
         resources={specs.resources}
         arrowsWithConfig={specs.arrowsWithConfig}
         path={specs.path}
-        gridSize={specs.gridSize}
-        cellWidth={specs.cellWidth}
-        cellHeight={specs.cellHeight}
         isElementActive={isElementActive}
         bar={bar}
         showAssistant={showAssistant}
       />
-      {!isPlaying || false && (
+      {/*!isPlaying || false && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
           <p>{pathDescription}</p>
         </div>
-      )}
-      <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
-        {/* <button
+      )*/}
+      {/* <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
+        <button
           className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
           onClick={() => setshowAssistant((prev) => !prev)}
         >
           {showAssistant ? 'Show V.1' : 'Show V.2'}
-        </button> */}
+        </button>
         <div className="flex-grow flex justify-center">
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
@@ -153,7 +141,7 @@ export default function Frame() {
             Next
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

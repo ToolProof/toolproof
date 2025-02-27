@@ -1,10 +1,8 @@
 import { resourceDescriptions, pathDescriptions } from '../texts';
 import { Cell, ResourceNameType, ArrowNameType, Resource, Arrow, GraphElementNameType, ArrowWithConfig } from '@/components/lasagna/classes';
 
-
-export const gridSize = 14;
-export const cellWidth = 100;
-export const cellHeight = 50;
+const cellWidth = 72.9; // ATTENTION: hack
+const cellHeight = 63.1;
 
 
 export const resources: Record<ResourceNameType, Resource> = {
