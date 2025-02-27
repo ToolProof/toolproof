@@ -58,7 +58,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
         const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
             const isActive = isElementActive(key);
             const color = isActive ? 'yellow' : 'black';
-            // color = (isActive && (key.includes('Checkpoints') || key.includes('Agent_Human') || key.includes('Human_Agent') || key.includes('InternalTools'))) ? 'red' : color;
+            // color = (isActive && (key.includes('Checkpoints') || key.includes('AI_Humans') || key.includes('Humans_AI') || key.includes('InternalTools'))) ? 'red' : color;
 
             if (arrowWithConfig.config.controlPoint) {
                 // Draw curved arrow line
@@ -93,7 +93,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
         const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
         // Draw arrows and queue arrowheads
-        const key = 'Agent_Tools';
+        const key = 'AI_Tools';
         const genesisArrowWithConfig = arrowsWithConfig[key];
         if (genesisArrowWithConfig && genesisArrowWithConfig.config) {
             genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
@@ -130,7 +130,7 @@ export default function Painting({ resources, arrowsWithConfig, path, gridSize, 
             </svg>
             {/* Draw ResourceDescription */}
             {(resourceName) && (
-                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: true ? '350px' : '250px', height: resourceName === 'Human' ? '100px' : '250px', overflowY: 'auto' }}>
+                <div style={{ position: 'absolute', top: boxPosition.top, left: boxPosition.left, backgroundColor: 'pink', padding: '10px', border: '1px solid black', zIndex: 10, borderRadius: '5px', width: true ? '350px' : '250px', height: resourceName === 'Humans' ? '100px' : '250px', overflowY: 'auto' }}>
                     <button onClick={() => setResourceName(null)} style={{ float: 'right', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>✖</button>
                     <p>{resources[resourceName].description}</p>
                 </div>

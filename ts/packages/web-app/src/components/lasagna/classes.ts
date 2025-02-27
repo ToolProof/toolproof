@@ -77,8 +77,8 @@ export class Cell {
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type ResourceNameType =
-    | 'Agent'
-    | 'Human'
+    | 'AI'
+    | 'Humans'
     | 'Tools'
     | 'Dummy0'
     | 'Dummy2'
@@ -91,18 +91,18 @@ export type ResourceNameType =
 
 
 export type ArrowNameType =
-    // | 'Tools_Human'
-    // | 'Human_Tools'
-    | 'Agent_Tools'
-    | 'Tools_Agent'
-    | 'Agent_Human'
-    | 'Human_Agent'
+    // | 'Tools_Humans'
+    // | 'Humans_Tools'
+    | 'AI_Tools'
+    | 'Tools_AI'
+    | 'AI_Humans'
+    | 'Humans_AI'
     | 'Tools_Dummy2'
     | 'Dummy2_Tools'
-    | 'Agent_Dummy5'
-    | 'Dummy5_Agent'
-    | 'Human_Dummy8'
-    | 'Dummy8_Human'
+    | 'AI_Dummy5'
+    | 'Dummy5_AI'
+    | 'Humans_Dummy8'
+    | 'Dummy8_Humans'
     | 'Dummy0_Dummy2'
     | 'Dummy2_Dummy5'
     | 'Dummy5_Dummy8'
@@ -183,7 +183,7 @@ export class Resource extends GraphElement {
             }
         } else if (this.nature === 'code') {
             context.fillRect(x, y, this.cell.width, this.cell.height);
-        } else if (this.nature === 'code_ai' && key === 'Agent' && showAssistant) {
+        } else if (this.nature === 'code_ai' && key === 'AI' && showAssistant) {
             context.beginPath();
             context.moveTo(x + this.cell.width / 2, y);
             context.lineTo(x + this.cell.width, y + this.cell.height / 2);
@@ -235,7 +235,7 @@ export class Resource extends GraphElement {
         } else if (this.nature === 'code') {
             // Full cell rectangle stroke
             context.rect(x, y, this.cell.width, this.cell.height);
-        } else if (this.nature === 'code_ai' && key === 'Agent' && showAssistant) {
+        } else if (this.nature === 'code_ai' && key === 'AI' && showAssistant) {
             return null;
             // Smaller diamond stroke
             context.moveTo(x + this.cell.width / 2, y);
@@ -282,7 +282,7 @@ export class Resource extends GraphElement {
         } else if (key === 'InternalToolsRight') {
             displayText = 'Tools';
         }
-        /* if (displayText === 'Agent') {
+        /* if (displayText === 'AI') {
             displayText = 'OpenAI o3';
         } else if (displayText === 'Tools') {
             displayText = false ? 'AutoDock' : 'Schrödinger';

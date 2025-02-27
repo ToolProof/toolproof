@@ -1,0 +1,15 @@
+{
+    "files": {
+        "init": {
+            "whitepaper": "./whitepaper.json",
+            "yellowpaper": "./yellowpaper.json"
+        },
+        "problems": "firestore_collection",
+        "resources": "firestore_collection"
+    },
+    "facilitators": {
+        "tools": "firestore_collection",
+        "ai": "firestore_collection",
+        "humans": "firestore_collection"
+    }
+}

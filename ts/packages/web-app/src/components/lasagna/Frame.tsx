@@ -1,10 +1,12 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { Cell, GraphElementNameType, Resource, ArrowWithConfig } from '@/components/lasagna/classes';
+import { GraphElementNameType, Resource, ArrowWithConfig } from '@/components/lasagna/classes';
 import { resourceDescriptions } from '@/components/lasagna/specs/texts';
+import { useFiles } from '@/lib/firebaseWebHelpers';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Frame() {
+  const { files } = useFiles();
   const [isPlaying, setIsPlaying] = useState(false);
   const [showAssistant, setshowAssistant] = useState(false);
   const [pathDescription, setPathDescription] = useState('');
@@ -106,7 +108,7 @@ export default function Frame() {
   return (
     <div className="relative">
       <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
-        {false && headline}
+        {true && files[0]?.path}
       </div>
       <div className="fixed top-4 left-0 w-full text-center p-4 font-bold text-[10px] bg-transparent">
         {false && subHeadline}
@@ -128,12 +130,12 @@ export default function Frame() {
         </div>
       )}
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
-        <button
+        {/* <button
           className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
           onClick={() => setshowAssistant((prev) => !prev)}
         >
           {showAssistant ? 'Show V.1' : 'Show V.2'}
-        </button>
+        </button> */}
         <div className="flex-grow flex justify-center">
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
