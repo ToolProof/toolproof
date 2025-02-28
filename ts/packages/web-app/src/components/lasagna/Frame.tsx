@@ -2,12 +2,14 @@
 import Painting from '@/components/lasagna/Painting';
 import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
 import { pathOfGenesis, validTransitions } from '@/components/lasagna/specs/alpha/specs';
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { set } from 'zod';
+import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 
-export default function Frame() {
+interface FrameProps {
+  setPathDescription: Dispatch<SetStateAction<string>>;
+}
+
+export default function Frame({ setPathDescription }: FrameProps) {
   const [showAssistant, setshowAssistant] = useState(false);
-  const [pathDescription, setPathDescription] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0);
   const [activeElement, setActiveElement] = useState<GraphElementNameType | null>(null);
@@ -17,11 +19,11 @@ export default function Frame() {
 
   useEffect(() => {
     setPathDescription(pathOfGenesis[counter]?.[1] || '');
-  }, [counter]);
+  }, [counter, setPathDescription]);
 
   const isElementActive = (key: GraphElementNameType) => {
-    // return path[counter]?.[0]?.includes(key) || false;
-    return key === activeElement;
+    return pathOfGenesis[counter]?.[0]?.includes(key) || false;
+    // return key === activeElement;
   };
 
   const handleClickPrevious = () => {
@@ -42,7 +44,16 @@ export default function Frame() {
     }
   };
 
-  const playNext = useCallback(() => {
+  const playNext = () => {
+    setCounter((prevCounter) => (prevCounter < pathOfGenesis.length - 1 ? prevCounter + 1 : 0));
+    timeoutRef.current = setTimeout(() => {
+      if (timeoutRef.current) {
+        playNext();
+      }
+    }, 1000);
+  };
+
+  /* const playNext = useCallback(() => {
     console.log('activeElement', activeElement);
     if (activeElement === null) {
       setActiveElement('Humans');
@@ -62,7 +73,7 @@ export default function Frame() {
         playNext();
       }
     }, 1000);
-  }, [activeElement]);
+  }, [activeElement]); */
 
   const handleClickPlay = () => {
     if (isPlaying) {
@@ -77,7 +88,7 @@ export default function Frame() {
     }
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     // return;
     setIsPlaying(true);
     timeoutRef.current = setTimeout(playNext, 1000);
@@ -88,7 +99,7 @@ export default function Frame() {
         timeoutRef.current = null;
       }
     };
-  }, [playNext]);
+  }, [playNext]); */
 
   const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showAssistant ? ' - Version 2' : ' - Version 1');
   const subHeadline = 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
@@ -111,13 +122,7 @@ export default function Frame() {
           <p>{pathDescription}</p>
         </div>
       )*/}
-      {/* <div className="fixed bottom-0 left-0 w-full flex p-4 bg-blue-50">
-        <button
-          className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          onClick={() => setshowAssistant((prev) => !prev)}
-        >
-          {showAssistant ? 'Show V.1' : 'Show V.2'}
-        </button>
+      <div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent">
         <div className="flex-grow flex justify-center">
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
@@ -135,7 +140,7 @@ export default function Frame() {
             Next
           </button>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

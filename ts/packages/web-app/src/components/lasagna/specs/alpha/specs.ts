@@ -173,29 +173,32 @@ export const pathOfGenesis: Array<[GraphElementNameType[], string]> = [
     [['Humans'],
         'In the beginning, there were only humans.'
     ],
-    [['AI'],
-        ''
+    [['Humans', 'Humans_Tools', 'Tools'],
+        'Then Humans made Tools.'
     ],
-    [['AI_Humans'],
-        ''
+    /* [['Humans', 'Tools_Humans', 'Tools'],
+        'Humans were using the Tools. They could create more Humans.'
     ],
-    [['Humans'],
-        ''
+    [['Humans', 'Humans_Tools', 'Tools'],
+        'Then Humans made more advanced Tools.'
     ],
-    [['Humans_Tools'],
-        ''
+    [['Humans', 'Tools_Humans', 'Tools'],
+        'Then Humans were using these more advanced Tools. They could create even more Humans.'
+    ], */
+    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data'],
+        'Then Humans made Tools that could store Data. We entered the Historical Period. We had books, later usepapers'
     ],
-    [['Tools'],
-        ''
+    /* [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data', 'Data_Humans'],
+        'Humans were consuming the Data that either themselves or other Humans had generated.'
+    ], */
+    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
+        'Humans put Data into Tools. We had computers.'
     ],
-    [['Tools_Humans'],
-        ''
+    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
+        'One trick. Humans could now primarily use computers to interact with the world.'
     ],
-    [['Humans'],
-        ''
-    ],
-    [['Humans'],
-        ''
+    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools', 'AI'],
+        'Humans put Data into Tools. We had computers.'
     ],
 ];
 

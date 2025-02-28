@@ -81,23 +81,22 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw the grid
-        /* for (let col = 0; col < gridSize.col; col++) {
+        for (let col = 0; col < gridSize.col; col++) {
             for (let row = 0; row < gridSize.row; row++) {
+                context.strokeStyle = 'black';
                 context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
             }
-        } */
+        }
 
         // Draw nodes
         Object.entries(nodes).forEach(([key, node]) => {
             const isActive = isElementActive(key as NodeNameType);
+            // if (!isActive) return;
             const color = isActive ? 'yellow' : 'black';
             node.draw(context, color, key as NodeNameType, showAssistant);
-        });
-
-        // Draw node labels
-        Object.entries(nodes).forEach(([key, node]) => {
             node.drawText(context, key, showAssistant);
         });
+
 
         // Draw edges
         const edgeheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
