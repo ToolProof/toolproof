@@ -1,14 +1,17 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
 import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
-import { path } from '@/components/lasagna/specs/alpha/specs';
+import { path, validTransitions } from '@/components/lasagna/specs/alpha/specs';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { set } from 'zod';
 
 export default function Frame() {
   const [showAssistant, setshowAssistant] = useState(false);
   const [pathDescription, setPathDescription] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0);
+  const [activeElement, setActiveElement] = useState<GraphElementNameType | null>(null);
+  const [lastActiveElement, setLastActiveElement] = useState<GraphElementNameType | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 
@@ -17,7 +20,8 @@ export default function Frame() {
   }, [counter]);
 
   const isElementActive = (key: GraphElementNameType) => {
-    return path[counter]?.[0]?.includes(key) || false;
+    // return path[counter]?.[0]?.includes(key) || false;
+    return key === activeElement;
   };
 
   const handleClickPrevious = () => {
@@ -39,13 +43,30 @@ export default function Frame() {
   };
 
   const playNext = useCallback(() => {
-    setCounter((prevCounter) => (prevCounter < path.length - 1 ? prevCounter + 1 : 0));
+    console.log('activeElement', activeElement);
+    if (activeElement === null) {
+      setActiveElement('Humans');
+      setLastActiveElement(null);
+    } else if (activeElement.includes('_Dummy')) {
+      const nextElement = activeElement ? activeElement.split('_').reverse().join('_') : 'Humans';
+      setActiveElement(nextElement as GraphElementNameType);
+      setLastActiveElement(activeElement);
+    } else if (activeElement === 'AI' || activeElement === 'Tools') {
+      const x = Math.floor(Math.random() * 3);
+      const nextElement = validTransitions[activeElement][x];
+      setActiveElement(nextElement);
+      setLastActiveElement(activeElement);
+    } else {
+      const nextElement = validTransitions[activeElement][0];
+      setActiveElement(nextElement);
+      setLastActiveElement(activeElement);
+    }
     timeoutRef.current = setTimeout(() => {
       if (timeoutRef.current) {
         playNext();
       }
     }, 1000);
-  }, []);
+  }, [activeElement]);
 
   const handleClickPlay = () => {
     if (isPlaying) {
@@ -61,6 +82,7 @@ export default function Frame() {
   };
 
   useEffect(() => {
+    return;
     setIsPlaying(true);
     timeoutRef.current = setTimeout(playNext, 1000);
 

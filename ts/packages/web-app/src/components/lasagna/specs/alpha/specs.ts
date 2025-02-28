@@ -7,14 +7,14 @@ export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeName
         AI: new Node(new Cell(2, 4, cellWidth, cellHeight), 'lg', 'code_ai', true, nodeDescriptions['AI']),
         Humans: new Node(new Cell(2, 7, cellWidth, cellHeight), 'vercel', 'code', true, nodeDescriptions['Humans']),
         Tools: new Node(new Cell(2, 1, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy0: new Node(new Cell(0, 0, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy2: new Node(new Cell(0, 1, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy2B: new Node(new Cell(1, 1, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy5: new Node(new Cell(0, 4, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy5B: new Node(new Cell(1, 4, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy8: new Node(new Cell(0, 7, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy8B: new Node(new Cell(1, 7, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Dummy10: new Node(new Cell(0, 9, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyTop: new Node(new Cell(0, 0, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyTools: new Node(new Cell(0, 1, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyToolsB: new Node(new Cell(1, 1, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyAI: new Node(new Cell(0, 4, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyAIB: new Node(new Cell(1, 4, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyHumans: new Node(new Cell(0, 7, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyHumansB: new Node(new Cell(1, 7, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        DummyBottom: new Node(new Cell(0, 9, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
     } as const;
 }
 
@@ -85,179 +85,179 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy0_Dummy2'
+                next: (bar: () => boolean) => 'DummyTop_DummyTools'
             }
         },
-        Dummy0_Dummy2: {
-            edge: new Edge(['Dummy0', 'topRight'], ['Dummy2', 'topRight'], nodes, cellWidth, cellHeight),
+        DummyTop_DummyTools: {
+            edge: new Edge(['DummyTop', 'topRight'], ['DummyTools', 'topRight'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy2_Dummy2BA'
+                next: (bar: () => boolean) => 'DummyTools_DummyToolsBA'
             }
         },
-        Dummy2_Dummy2BA: {
-            edge: new Edge(['Dummy2', 'topRight'], ['Dummy2B', 'topLeftD'], nodes, cellWidth, cellHeight),
+        DummyTools_DummyToolsBA: {
+            edge: new Edge(['DummyTools', 'topRight'], ['DummyToolsB', 'topLeftD'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: ['Dummy2B', 'left'],
+                controlPoint: ['DummyToolsB', 'left'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy2_Dummy2BB'
+                next: (bar: () => boolean) => 'DummyTools_DummyToolsBB'
             }
         },
-        Dummy2_Dummy2BB: {
-            edge: new Edge(['Dummy2', 'bottomRight'], ['Dummy2B', 'bottomLeftD'], nodes, cellWidth, cellHeight),
+        DummyTools_DummyToolsBB: {
+            edge: new Edge(['DummyTools', 'bottomRight'], ['DummyToolsB', 'bottomLeftD'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: ['Dummy2B', 'left'],
+                controlPoint: ['DummyToolsB', 'left'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy2_Dummy5'
+                next: (bar: () => boolean) => 'DummyTools_DummyAI'
             }
         },
-        Dummy2_Dummy5: {
-            edge: new Edge(['Dummy2', 'bottomRight'], ['Dummy5', 'topRight'], nodes, cellWidth, cellHeight),
+        DummyTools_DummyAI: {
+            edge: new Edge(['DummyTools', 'bottomRight'], ['DummyAI', 'topRight'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy5_Dummy5BA'
+                next: (bar: () => boolean) => 'DummyAI_DummyAIBA'
             }
         },
-        Dummy5_Dummy5BA: {
-            edge: new Edge(['Dummy5', 'topRight'], ['Dummy5B', 'topLeftD'], nodes, cellWidth, cellHeight),
+        DummyAI_DummyAIBA: {
+            edge: new Edge(['DummyAI', 'topRight'], ['DummyAIB', 'topLeftD'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: ['Dummy5B', 'left'],
+                controlPoint: ['DummyAIB', 'left'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy5_Dummy5BB'
+                next: (bar: () => boolean) => 'DummyAI_DummyAIBB'
             }
         },
-        Dummy5_Dummy5BB: {
-            edge: new Edge(['Dummy5', 'bottomRight'], ['Dummy5B', 'bottomLeftD'], nodes, cellWidth, cellHeight),
+        DummyAI_DummyAIBB: {
+            edge: new Edge(['DummyAI', 'bottomRight'], ['DummyAIB', 'bottomLeftD'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: ['Dummy5B', 'left'],
+                controlPoint: ['DummyAIB', 'left'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy5_Dummy8'
+                next: (bar: () => boolean) => 'DummyAI_DummyHumans'
             }
         },
-        Dummy5_Dummy8: {
-            edge: new Edge(['Dummy5', 'bottomRight'], ['Dummy8', 'topRight'], nodes, cellWidth, cellHeight),
+        DummyAI_DummyHumans: {
+            edge: new Edge(['DummyAI', 'bottomRight'], ['DummyHumans', 'topRight'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy8_Dummy8BA'
+                next: (bar: () => boolean) => 'DummyHumans_DummyHumansBA'
             }
         },
-        Dummy8_Dummy8BA: {
-            edge: new Edge(['Dummy8', 'topRight'], ['Dummy8B', 'topLeftD'], nodes, cellWidth, cellHeight),
+        DummyHumans_DummyHumansBA: {
+            edge: new Edge(['DummyHumans', 'topRight'], ['DummyHumansB', 'topLeftD'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: ['Dummy8B', 'left'],
+                controlPoint: ['DummyHumansB', 'left'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy8_Dummy8BB'
+                next: (bar: () => boolean) => 'DummyHumans_DummyHumansBB'
             }
         },
-        Dummy8_Dummy8BB: {
-            edge: new Edge(['Dummy8', 'bottomRight'], ['Dummy8B', 'bottomLeftD'], nodes, cellWidth, cellHeight),
+        DummyHumans_DummyHumansBB: {
+            edge: new Edge(['DummyHumans', 'bottomRight'], ['DummyHumansB', 'bottomLeftD'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: ['Dummy8B', 'left'],
+                controlPoint: ['DummyHumansB', 'left'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy8_Dummy10'
+                next: (bar: () => boolean) => 'DummyHumans_DummyBottom'
             }
         },
-        Dummy8_Dummy10: {
-            edge: new Edge(['Dummy8', 'bottomRight'], ['Dummy10', 'bottomRight'], nodes, cellWidth, cellHeight),
+        DummyHumans_DummyBottom: {
+            edge: new Edge(['DummyHumans', 'bottomRight'], ['DummyBottom', 'bottomRight'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy2_Tools'
+                next: (bar: () => boolean) => 'DummyTools_Tools'
             }
         },
-        Dummy2_Tools: {
-            edge: new Edge(['Dummy2', 'center'], ['Tools', 'left'], nodes, cellWidth, cellHeight),
+        DummyTools_Tools: {
+            edge: new Edge(['DummyTools', 'center'], ['Tools', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'Tools_DummyTools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_Dummy2'
+                next: (bar: () => boolean) => 'Tools_DummyTools'
             }
         },
-        Tools_Dummy2: {
-            edge: new Edge(['Tools', 'left'], ['Dummy2', 'center'], nodes, cellWidth, cellHeight),
+        Tools_DummyTools: {
+            edge: new Edge(['Tools', 'left'], ['DummyTools', 'center'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'DummyTools_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy5_AI'
+                next: (bar: () => boolean) => 'DummyAI_AI'
             }
         },
-        Dummy5_AI: {
-            edge: new Edge(['Dummy5', 'center'], ['AI', 'left'], nodes, cellWidth, cellHeight),
+        DummyAI_AI: {
+            edge: new Edge(['DummyAI', 'center'], ['AI', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'AI_DummyAI',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'AI_Dummy5'
+                next: (bar: () => boolean) => 'AI_DummyAI'
             }
         },
-        AI_Dummy5: {
-            edge: new Edge(['AI', 'left'], ['Dummy5', 'center'], nodes, cellWidth, cellHeight),
+        AI_DummyAI: {
+            edge: new Edge(['AI', 'left'], ['DummyAI', 'center'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'DummyAI_AI',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Dummy8_Humans'
+                next: (bar: () => boolean) => 'DummyHumans_Humans'
             }
         },
-        Dummy8_Humans: {
-            edge: new Edge(['Dummy8', 'center'], ['Humans', 'left'], nodes, cellWidth, cellHeight),
+        DummyHumans_Humans: {
+            edge: new Edge(['DummyHumans', 'center'], ['Humans', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'Humans_DummyHumans',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Humans_Dummy8'
+                next: (bar: () => boolean) => 'Humans_DummyHumans'
             }
         },
-        Humans_Dummy8: {
-            edge: new Edge(['Humans', 'left'], ['Dummy8', 'center'], nodes, cellWidth, cellHeight),
+        Humans_DummyHumans: {
+            edge: new Edge(['Humans', 'left'], ['DummyHumans', 'center'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'DummyHumans_Humans',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -267,6 +267,23 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
     }
 }
 
+export const validTransitions: Record<GraphElementNameType, GraphElementNameType[]> = {
+    AI: ['AI_Tools', 'AI_Humans', 'AI_DummyAI'],
+    Tools: ['Tools_AI', 'Tools_Humans', 'Tools_DummyTools'],
+    Humans: ['Humans_AI', 'Humans_Tools', 'Humans_DummyHumans'],
+    AI_Tools: ['Tools'],
+    Tools_AI: ['AI'],
+    AI_Humans: ['Humans'],
+    Humans_AI: ['AI'],
+    Tools_Humans: ['Humans'],
+    Humans_Tools: ['Tools'],
+    Tools_DummyTools: ['DummyTools'],
+    DummyTools_Tools: ['Tools'],
+    AI_DummyAI: ['DummyAI'],
+    DummyAI_AI: ['AI'],
+    Humans_DummyHumans: ['DummyHumans'],
+    DummyHumans_Humans: ['Humans'],
+};
 
 export const path: Array<[GraphElementNameType[], string]> = [
     [['Tools'],
@@ -291,6 +308,18 @@ export const path: Array<[GraphElementNameType[], string]> = [
         ''
     ],
     [['Tools_Humans'],
+        ''
+    ],
+    [['Humans'],
+        ''
+    ],
+    [['Humans_DummyHumans'],
+        ''
+    ],
+    [[],
+        ''
+    ],
+    [['DummyHumans_Humans'],
         ''
     ],
     [['Humans'],
