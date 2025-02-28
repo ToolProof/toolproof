@@ -1,7 +1,7 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
 import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
-import { path, validTransitions } from '@/components/lasagna/specs/alpha/specs';
+import { pathOfGenesis, validTransitions } from '@/components/lasagna/specs/alpha/specs';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { set } from 'zod';
 
@@ -16,7 +16,7 @@ export default function Frame() {
 
 
   useEffect(() => {
-    setPathDescription(path[counter]?.[1] || '');
+    setPathDescription(pathOfGenesis[counter]?.[1] || '');
   }, [counter]);
 
   const isElementActive = (key: GraphElementNameType) => {
@@ -29,13 +29,13 @@ export default function Frame() {
     if (counter > 0) {
       setCounter(counter - 1);
     } else {
-      setCounter(path.length - 1);
+      setCounter(pathOfGenesis.length - 1);
     }
   };
 
   const handleClickNext = () => {
     if (isPlaying) return;
-    if (counter < path.length - 1) {
+    if (counter < pathOfGenesis.length - 1) {
       setCounter(counter + 1);
     } else {
       setCounter(0);
@@ -47,11 +47,7 @@ export default function Frame() {
     if (activeElement === null) {
       setActiveElement('Humans');
       setLastActiveElement(null);
-    } else if (activeElement.includes('_Dummy')) {
-      const nextElement = activeElement ? activeElement.split('_').reverse().join('_') : 'Humans';
-      setActiveElement(nextElement as GraphElementNameType);
-      setLastActiveElement(activeElement);
-    } else if (activeElement === 'AI' || activeElement === 'Tools') {
+    } else if (activeElement === 'AI' || activeElement === 'Tools' || activeElement === 'Data') {
       const x = Math.floor(Math.random() * 3);
       const nextElement = validTransitions[activeElement][x];
       setActiveElement(nextElement);
@@ -82,7 +78,7 @@ export default function Frame() {
   };
 
   useEffect(() => {
-    return;
+    // return;
     setIsPlaying(true);
     timeoutRef.current = setTimeout(playNext, 1000);
 

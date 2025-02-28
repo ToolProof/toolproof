@@ -80,41 +80,22 @@ export type NodeNameType =
     | 'AI'
     | 'Humans'
     | 'Tools'
-    | 'DummyTop'
-    | 'DummyTools'
-    | 'DummyAI'
-    | 'DummyHumans'
-    | 'DummyBottom'
-    | 'DummyToolsB'
-    | 'DummyAIB'
-    | 'DummyHumansB'
+    | 'Data'
 
 
 export type EdgeNameType =
-    // | 'Tools_Humans'
-    // | 'Humans_Tools'
     | 'AI_Tools'
     | 'Tools_AI'
     | 'AI_Humans'
     | 'Humans_AI'
     | 'Tools_Humans'
     | 'Humans_Tools'
-    | 'Tools_DummyTools'
-    | 'DummyTools_Tools'
-    | 'AI_DummyAI'
-    | 'DummyAI_AI'
-    | 'Humans_DummyHumans'
-    | 'DummyHumans_Humans'
-    | 'DummyTop_DummyTools'
-    | 'DummyTools_DummyAI'
-    | 'DummyAI_DummyHumans'
-    | 'DummyHumans_DummyBottom'
-    | 'DummyTools_DummyToolsBA'
-    | 'DummyTools_DummyToolsBB'
-    | 'DummyAI_DummyAIBA'
-    | 'DummyAI_DummyAIBB'
-    | 'DummyHumans_DummyHumansBA'
-    | 'DummyHumans_DummyHumansBB'
+    | 'Tools_Data'
+    | 'Data_Tools'
+    | 'AI_Data'
+    | 'Data_AI'
+    | 'Humans_Data'
+    | 'Data_Humans'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
@@ -206,9 +187,9 @@ export class Node extends GraphElement {
 
     draw(context: CanvasRenderingContext2D, color: string, key: NodeNameType, showAssistant: boolean) {
         if (!context) return;
-        if (key.includes('Dummy')) {
+        /* if (key.includes('Dummy')) {
             return null;
-        }
+        } */
 
         this.fill(context, key, showAssistant);
 
@@ -259,9 +240,9 @@ export class Node extends GraphElement {
 
     drawText(context: CanvasRenderingContext2D, key: string, showAssistant: boolean) {
         if (!context) return;
-        if (key.includes('Dummy')) {
+        /* if (key.includes('Dummy')) {
             return null;
-        }
+        } */
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
