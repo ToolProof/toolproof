@@ -1,6 +1,6 @@
 'use client';
 import FileRow from '@/components/layout/file/FileRow';
-import { useFiles } from '@/lib/firebaseWebHelpers';
+import { useResources } from '@/lib/firebaseWebHelpers';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setUserEmail } from '@/redux/features/configSlice';
 import { useEffect, useState } from 'react';
@@ -12,7 +12,7 @@ import Image from 'next/image';
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
-    const { files } = useFiles();
+    const { files } = useResources();
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);

@@ -26,7 +26,7 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <StoreProvider>
             <div className='flex h-screen overflow-hidden bg-[#ffff00]'>
-              <div className='hidden sm:block sm:w-[300px] py-0 bg-transparent'><SideBar /></div>
+              {/* <div className='hidden sm:block sm:w-[300px] py-0 bg-transparent'><SideBar /></div> */}
               <div className='flex-1 p-0 bg-[#ffffff]'>
                 {children}
               </div>

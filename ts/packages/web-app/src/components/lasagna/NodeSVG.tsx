@@ -1,43 +1,43 @@
-import { Resource, ResourceNameType } from './classes';
+import { Node, NodeNameType } from './classes';
 
-interface ResourceSVGProps {
-    resourceName: ResourceNameType;
-    resource: Resource;
+interface NodeSVGProps {
+    nodeName: NodeNameType;
+    node: Node;
     color: string;
-    handleResourceClickHelper: (resourceName: ResourceNameType) => void;
+    handleNodeClickHelper: (nodeName: NodeNameType) => void;
     showAssistant: boolean;
 }
 
-const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color, handleResourceClickHelper, showAssistant }) => {
-    const { col, row, width, height } = resource.cell;
+const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClickHelper, showAssistant }) => {
+    const { col, row, width, height } = node.cell;
     const x = col * width;
     const y = row * height;
 
-    // Calculate smaller size for 'dummy' resources
-    const shouldBeSmall = resource.nature === 'data_meta';
+    // Calculate smaller size for 'dummy' nodes
+    const shouldBeSmall = node.nature === 'data_meta';
     const smallWidth = width / 2;
     const smallHeight = height / 1.5;
     const smallX = x + (width - smallWidth) / 2;
     const smallY = y + (height - smallHeight) / 2;
 
     const handleClick = () => {
-        handleResourceClickHelper(resourceName);
+        handleNodeClickHelper(nodeName);
     };
 
     /* if (shouldBeSmall) {
         return null;
     } */
 
-    if (!showAssistant && resourceName === 'Assistant') {
+    if (!showAssistant && nodeName === 'Assistant') {
         return null;
     }
-    if (resourceName.includes('Dummy')) {
+    if (nodeName.includes('Dummy')) {
         return null;
     }
 
     return (
         <>
-            {resource.nature === 'data' ? (
+            {node.nature === 'data' ? (
                 <ellipse
                     cx={x + width / 2}
                     cy={y + height / 2}
@@ -48,7 +48,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
-            ) : resource.nature === 'data_meta' ? (
+            ) : node.nature === 'data_meta' ? (
                 <ellipse
                     cx={x + smallWidth / 2} // Left-aligned
                     cy={y + height / 2}
@@ -59,7 +59,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
-            ) : resource.nature === 'code_ai' && resourceName === 'AI' && showAssistant ? (
+            ) : node.nature === 'code_ai' && nodeName === 'AI' && showAssistant ? (
                 <polygon
                     points={`${x + width / 2},${y} ${x + width},${y + height / 2} ${x + width / 2},${y + height} ${x},${y + height / 2}`}
                     fill={color}
@@ -67,7 +67,7 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
-            ) : resource.nature === 'code_ai' ? (
+            ) : node.nature === 'code_ai' ? (
                 <polygon
                     points={`${x + width / 2},${y - height / 6} ${x + width + width / 6},${y + height / 2} ${x + width / 2},${y + height + height / 6} ${x - width / 6},${y + height / 2}`}
                     fill={color}
@@ -99,11 +99,11 @@ const ResourceSVG: React.FC<ResourceSVGProps> = ({ resourceName, resource, color
                     fill="black"
                     pointerEvents="none" // Prevents text from intercepting clicks
                 >
-                    {/* {resourceName} */}
+                    {/* {nodeName} */}
                 </text>
             )}
         </>
     );
 };
 
-export default ResourceSVG;
+export default NodeSVG;

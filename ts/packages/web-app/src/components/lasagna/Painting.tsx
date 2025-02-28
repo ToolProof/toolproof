@@ -1,21 +1,19 @@
 'use client';
-import ResourceSVG from './ResourceSVG';
-import { Point, Resource, Arrow, GraphElementNameType, ResourceNameType, ArrowNameType, ArrowWithConfig } from './classes';
-import { useState, useRef, useEffect } from 'react';
+import NodeSVG from './NodeSVG';
+import { Point, Node, Edge, GraphElementNameType, NodeNameType, EdgeNameType, EdgeWithConfig } from './classes';
+import { getNodes, getEdgesWithConfig, path } from './specs/alpha/specs';
+import { useState, useRef, useEffect, useMemo } from 'react';
 
 interface PaintingProps {
-    resources: Record<ResourceNameType, Resource>;
-    arrowsWithConfig: Record<ArrowNameType, ArrowWithConfig>
-    path: Array<[GraphElementNameType[], string]>
     isElementActive: (key: GraphElementNameType) => boolean;
-    bar: () => boolean;
+    counter: number;
     showAssistant: boolean;
 }
 
-export default function Painting({ resources, arrowsWithConfig, path, isElementActive, bar, showAssistant }: PaintingProps) {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function Painting({ isElementActive, counter, showAssistant }: PaintingProps) {
     const parentRef = useRef<HTMLDivElement>(null);
-    const [resourceName, setResourceName] = useState<ResourceNameType | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [nodeName, setNodeName] = useState<NodeNameType | null>(null);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
 
     const cellWidthRef = useRef(0);
@@ -23,10 +21,16 @@ export default function Painting({ resources, arrowsWithConfig, path, isElementA
     const [cellWidth, setCellWidth] = useState(0);
     const [cellHeight, setCellHeight] = useState(0);
 
-    const gridSize = 5;
+    const [nodes, setNodes] = useState<Record<NodeNameType, Node>>();
+    const [edgesWithConfig, setEdgesWithConfig] = useState<Record<EdgeNameType, EdgeWithConfig>>();
 
-    const handleResourceClick = (resourceName: ResourceNameType, x: number, y: number) => {
-        setResourceName(resourceName);
+    const gridSize = useMemo(() => ({
+        col: 4,
+        row: 9
+    }), []);
+
+    const handleNodeClick = (nodeName: NodeNameType, x: number, y: number) => {
+        setNodeName(nodeName);
         setBoxPosition({ top: y + cellHeight, left: x - cellWidth / 1.5 });
     };
 
@@ -34,8 +38,10 @@ export default function Painting({ resources, arrowsWithConfig, path, isElementA
         const updateDimensions = () => {
             if (parentRef.current && canvasRef.current) {
                 const { clientWidth, clientHeight } = parentRef.current;
-                const newCellWidth = Math.floor(clientWidth / gridSize);
-                const newCellHeight = Math.floor(clientHeight / gridSize);
+                const newCellWidth = Math.floor(clientWidth / gridSize.col);
+                const newCellHeight = Math.floor(clientHeight / gridSize.row);
+
+                // console.log('newCellWidth', newCellWidth, 'newCellHeight', newCellHeight);
 
                 if (newCellWidth !== cellWidthRef.current || newCellHeight !== cellHeightRef.current) {
                     cellWidthRef.current = newCellWidth;
@@ -55,89 +61,113 @@ export default function Painting({ resources, arrowsWithConfig, path, isElementA
         return () => window.removeEventListener('resize', updateDimensions);
     }, [gridSize]);
 
+
+    useEffect(() => {
+        const nodes = getNodes(cellWidth, cellHeight);
+        setNodes(nodes);
+        const edgesWithConfig = getEdgesWithConfig(cellWidth, cellHeight);
+        setEdgesWithConfig(edgesWithConfig);
+    }, [cellHeight, cellWidth]);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const context = canvas.getContext('2d');
         if (!context) return;
+        if (!nodes) return;
+        if (!edgesWithConfig) return;
 
         // Clear the canvas before redrawing
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw the grid
-        for (let col = 0; col < gridSize; col++) {
-            for (let row = 0; row < gridSize; row++) {
+        /* for (let col = 0; col < gridSize.col; col++) {
+            for (let row = 0; row < gridSize.row; row++) {
                 context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
             }
-        }
+        } */
 
-        // Draw resources
-        Object.entries(resources).forEach(([key, resource]) => {
-            const isActive = isElementActive(key as ResourceNameType);
+        // Draw nodes
+        Object.entries(nodes).forEach(([key, node]) => {
+            const isActive = isElementActive(key as NodeNameType);
             const color = isActive ? 'yellow' : 'black';
-            resource.draw(context, color, key as ResourceNameType, showAssistant);
+            node.draw(context, color, key as NodeNameType, showAssistant);
         });
 
-        // Draw resource labels
-        Object.entries(resources).forEach(([key, resource]) => {
-            resource.drawText(context, key, showAssistant);
+        // Draw node labels
+        Object.entries(nodes).forEach(([key, node]) => {
+            node.drawText(context, key, showAssistant);
         });
 
-        // Draw arrows
-        const arrowheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
+        // Draw edges
+        const edgeheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
-        const foo = (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => {
+        const bar = () => {
+            return false;
+        };
+
+        const foo = (key: EdgeNameType, edgeWithConfig: EdgeWithConfig) => {
+            const isReverseActive = edgeWithConfig.config.reverse ? isElementActive(edgeWithConfig.config.reverse) : false;
             const isActive = isElementActive(key);
             const color = isActive ? 'yellow' : 'black';
 
-            if (arrowWithConfig.config.controlPoint) {
-                arrowWithConfig.arrow.drawCurvy(
-                    context,
-                    arrowWithConfig.config.controlPoint,
-                    resources,
-                    color
-                );
-                if (isActive) {
-                    const controlPoint = Arrow.resolvePoint(arrowWithConfig.config.controlPoint, resources);
-                    arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: true, control: controlPoint });
-                }
-            } else {
-                arrowWithConfig.arrow.draw(context, color);
-                if (isActive) {
-                    arrowheadQueue.push({ start: arrowWithConfig.arrow.startPoint, end: arrowWithConfig.arrow.endPoint, color, isCurvy: false });
+            if (!isReverseActive) {
+                if (edgeWithConfig.config.controlPoint) {
+                    edgeWithConfig.edge.drawCurvy(
+                        context,
+                        edgeWithConfig.config.controlPoint,
+                        nodes,
+                        color
+                    );
+                    if (isActive) {
+                        const controlPoint = Edge.resolvePoint(edgeWithConfig.config.controlPoint, nodes);
+                        edgeheadQueue.push({ start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: true, control: controlPoint });
+                    }
+                } else {
+                    edgeWithConfig.edge.draw(context, color);
+                    if (isActive) {
+                        edgeheadQueue.push({ start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: false });
+                    }
                 }
             }
 
-            const nextKey = arrowWithConfig.config.next(bar);
+            const nextKey = edgeWithConfig.config.next(bar);
             if (nextKey) {
-                const nextArrowWithConfig = arrowsWithConfig[nextKey];
-                nextArrowWithConfig.config.drawInOrder(foo, nextKey, nextArrowWithConfig);
+                const nextEdgeWithConfig = edgesWithConfig[nextKey];
+                nextEdgeWithConfig.config.drawInOrder(foo, nextKey, nextEdgeWithConfig);
             }
         };
 
         const key = 'AI_Tools';
-        const genesisArrowWithConfig = arrowsWithConfig[key];
-        if (genesisArrowWithConfig && genesisArrowWithConfig.config) {
-            genesisArrowWithConfig.config.drawInOrder(foo, key, genesisArrowWithConfig);
+        const genesisEdgeWithConfig = edgesWithConfig[key];
+        if (genesisEdgeWithConfig && genesisEdgeWithConfig.config) {
+            genesisEdgeWithConfig.config.drawInOrder(foo, key, genesisEdgeWithConfig);
         }
 
-        arrowheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
+        edgeheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
             if (isCurvy && control) {
-                Arrow.prototype.drawCurvyArrowhead(context, start, control, end, color);
+                Edge.prototype.drawCurvyEdgehead(context, start, control, end, color);
             } else {
-                Arrow.prototype.drawArrowhead(context, start, end, color);
+                Edge.prototype.drawEdgehead(context, start, end, color);
             }
         });
 
-    }, [arrowsWithConfig, cellHeight, cellWidth, gridSize, resources, path, isElementActive, bar, showAssistant]);
+    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showAssistant]);
 
     return (
         <div ref={parentRef} className="w-full h-full relative">
             <canvas
                 ref={canvasRef}
-                className="w-full h-full bg-pink-700 overflow-hidden pointer-events-none"
+                className="w-full h-full bg-transparent overflow-hidden pointer-events-none"
             />
-            {(resourceName) && (
+            {/* Draw NodeSVGs */}
+            {/* <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}}>
+                {Object.entries(nodes).map(([key, node]) => {
+                    const color = node.getFillColor();
+                    return <NodeSVG key={key} nodeName={key as NodeNameType} node={node} color={color} handleNodeClickHelper={(nodeName) => handleNodeClick(nodeName as NodeNameType, node.cell.col * cellWidth, node.cell.row * cellHeight)} showAssistant={showAssistant} />;
+                })}
+            </svg> */}
+            {/*(nodeName) && (
                 <div style={{
                     position: 'absolute',
                     top: boxPosition.top,
@@ -148,19 +178,19 @@ export default function Painting({ resources, arrowsWithConfig, path, isElementA
                     zIndex: 10,
                     borderRadius: '5px',
                     width: '350px',
-                    height: resourceName === 'Humans' ? '100px' : '250px',
+                    height: nodeName === 'Humans' ? '100px' : '250px',
                     overflowY: 'auto'
                 }}>
-                    <button onClick={() => setResourceName(null)} style={{
+                    <button onClick={() => setNodeName(null)} style={{
                         float: 'right',
                         background: 'none',
                         border: 'none',
                         fontSize: '16px',
                         cursor: 'pointer'
                     }}>✖</button>
-                    <p>{resources[resourceName].description}</p>
+                    <p>{nodes[nodeName].description}</p>
                 </div>
-            )}
+            )*/}
         </div>
     );
 }

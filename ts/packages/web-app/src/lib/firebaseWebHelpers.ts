@@ -100,16 +100,16 @@ export async function getIdOfUsersFirstChat(userId: string) {
 }
 
 
-export const useFiles = () => {
+export const useResources = () => {
   const parentDocRef = doc(db, CONSTANTS.files, 'HNYD03tW3olEiEaqVZwp');
-  const filesQuery = query(collection(parentDocRef, 'resources'));
-  const [filesSnapshot, loading, error] = useCollection(filesQuery);
+  const resourcesQuery = query(collection(parentDocRef, 'resources'));
+  const [resourcesSnapshot, loading, error] = useCollection(resourcesQuery);
 
-  const files = filesSnapshot?.docs.map((doc) => ({
+  const resources = resourcesSnapshot?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   })) || [];
 
-  return { files, loading, error };
+  return { resources, loading, error };
 }
 

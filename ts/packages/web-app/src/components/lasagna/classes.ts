@@ -76,7 +76,7 @@ export class Cell {
 
 
 // ATTENTION: could be a more powerful type to allow for aliases
-export type ResourceNameType =
+export type NodeNameType =
     | 'AI'
     | 'Humans'
     | 'Tools'
@@ -90,13 +90,15 @@ export type ResourceNameType =
     | 'Dummy8B'
 
 
-export type ArrowNameType =
+export type EdgeNameType =
     // | 'Tools_Humans'
     // | 'Humans_Tools'
     | 'AI_Tools'
     | 'Tools_AI'
     | 'AI_Humans'
     | 'Humans_AI'
+    | 'Tools_Humans'
+    | 'Humans_Tools'
     | 'Tools_Dummy2'
     | 'Dummy2_Tools'
     | 'AI_Dummy5'
@@ -115,7 +117,7 @@ export type ArrowNameType =
     | 'Dummy8_Dummy8BB'
 
 
-export type GraphElementNameType = ResourceNameType | ArrowNameType;
+export type GraphElementNameType = NodeNameType | EdgeNameType;
 
 
 export type Environment = 'lg' | 'vercel' | 'gcp';
@@ -130,7 +132,7 @@ export class GraphElement {
 }
 
 
-export class Resource extends GraphElement {
+export class Node extends GraphElement {
     constructor(
         public cell: Cell,
         public environment: Environment,
@@ -157,7 +159,7 @@ export class Resource extends GraphElement {
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, key: ResourceNameType, showAssistant: boolean) {
+    fill(context: CanvasRenderingContext2D, key: NodeNameType, showAssistant: boolean) {
         if (!context) return;
 
         const x = this.cell.col * this.cell.width;
@@ -202,7 +204,7 @@ export class Resource extends GraphElement {
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, key: ResourceNameType, showAssistant: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, key: NodeNameType, showAssistant: boolean) {
         if (!context) return;
         if (key.includes('Dummy')) {
             return null;
@@ -317,62 +319,62 @@ export type CenterPointType = 'center';
 export type CornerPointType = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 export type DiamondPointType = 'top' | 'bottom' | 'left' | 'right';
 export type DiamondCornerPointType = 'topLeftD' | 'topRightD' | 'bottomLeftD' | 'bottomRightD';
-export type ArrowPointType = CenterPointType | CornerPointType | DiamondPointType | DiamondCornerPointType;
+export type EdgePointType = CenterPointType | CornerPointType | DiamondPointType | DiamondCornerPointType;
 
 
-export class Arrow extends GraphElement {
+export class Edge extends GraphElement {
     public startPoint: Point;
     public endPoint: Point;
     private static cellWidth: number;
     private static cellHeight: number;
 
     constructor(
-        startPointSpec: [ResourceNameType, ArrowPointType] | [Cell, ArrowPointType],
-        endPointSpec: [ResourceNameType, ArrowPointType] | [Cell, ArrowPointType],
-        resources: Record<ResourceNameType, Resource>,
+        startPointSpec: [NodeNameType, EdgePointType] | [Cell, EdgePointType],
+        endPointSpec: [NodeNameType, EdgePointType] | [Cell, EdgePointType],
+        nodes: Record<NodeNameType, Node>,
         cellWidth: number,
         cellHeight: number,
     ) {
         super();
-        Arrow.cellWidth = cellWidth;
-        Arrow.cellHeight = cellHeight;
-        this.startPoint = Arrow.resolvePoint(startPointSpec, resources);
-        this.endPoint = Arrow.resolvePoint(endPointSpec, resources);
+        Edge.cellWidth = cellWidth;
+        Edge.cellHeight = cellHeight;
+        this.startPoint = Edge.resolvePoint(startPointSpec, nodes);
+        this.endPoint = Edge.resolvePoint(endPointSpec, nodes);
     }
 
     static resolvePoint(
-        input: [ResourceNameType, ArrowPointType] | [Cell, ArrowPointType],
-        resources: Record<ResourceNameType, Resource>
+        input: [NodeNameType, EdgePointType] | [Cell, EdgePointType],
+        nodes: Record<NodeNameType, Node>
     ): Point {
-        // Helper to adjust diamond points for resource-based inputs.
-        function resolveDiamondPoint(resource: Resource, diamondKey: DiamondPointType): Point {
-            const point = resource.cell.getOuterDiamond()[diamondKey];
-            if (resource.nature === 'data') {
+        // Helper to adjust diamond points for node-based inputs.
+        function resolveDiamondPoint(node: Node, diamondKey: DiamondPointType): Point {
+            const point = node.cell.getOuterDiamond()[diamondKey];
+            if (node.nature === 'data') {
                 if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
                 }
-            } else if (resource.nature === 'code_ai') {
+            } else if (node.nature === 'code_ai') {
                 if (diamondKey === 'left') {
-                    return { x: point.x - (Arrow.cellWidth / 6), y: point.y };
+                    return { x: point.x - (Edge.cellWidth / 6), y: point.y };
                 } else if (diamondKey === 'right') {
-                    return { x: point.x + (Arrow.cellWidth / 6), y: point.y };
+                    return { x: point.x + (Edge.cellWidth / 6), y: point.y };
                 } else if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
                 }
-            } else if (resource.nature === 'dummy') {
-                const smallerWidth = Arrow.cellWidth / 2;
+            } else if (node.nature === 'dummy') {
+                const smallerWidth = Edge.cellWidth / 2;
                 if (diamondKey === 'left') {
                     return { x: point.x + (smallerWidth / 2), y: point.y };
                 } else if (diamondKey === 'right') {
                     return { x: point.x - (smallerWidth / 2), y: point.y };
                 } else if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y + (Arrow.cellHeight / 6) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y - (Arrow.cellHeight / 6) };
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
                 }
             }
             return point;
@@ -383,9 +385,9 @@ export class Arrow extends GraphElement {
         // New branch: if the key is 'center', return the cell's center.
         if (key === 'center') {
             if (typeof input[0] === 'string') {
-                const resource = resources[input[0]];
-                if (!resource) throw new Error(`Resource ${input[0]} not found.`);
-                return resource.cell.getCenter();
+                const node = nodes[input[0]];
+                if (!node) throw new Error(`Node ${input[0]} not found.`);
+                return node.cell.getCenter();
             } else {
                 return input[0].getCenter();
             }
@@ -395,17 +397,17 @@ export class Arrow extends GraphElement {
         const isDiamondCorner = ['topLeftD', 'topRightD', 'bottomLeftD', 'bottomRightD'].includes(key);
 
         if (typeof input[0] === 'string') {
-            const resource = resources[input[0]];
-            if (!resource) throw new Error(`Resource ${input[0]} not found.`);
+            const node = nodes[input[0]];
+            if (!node) throw new Error(`Node ${input[0]} not found.`);
 
             if (isCorner) {
-                return resource.cell.getCorners()[key as CornerPointType];
+                return node.cell.getCorners()[key as CornerPointType];
             } else if (isDiamondCorner) {
                 // For diamond-corner types, compute the average of two adjusted diamond points.
-                const topPoint = resolveDiamondPoint(resource, 'top');
-                const bottomPoint = resolveDiamondPoint(resource, 'bottom');
-                const leftPoint = resolveDiamondPoint(resource, 'left');
-                const rightPoint = resolveDiamondPoint(resource, 'right');
+                const topPoint = resolveDiamondPoint(node, 'top');
+                const bottomPoint = resolveDiamondPoint(node, 'bottom');
+                const leftPoint = resolveDiamondPoint(node, 'left');
+                const rightPoint = resolveDiamondPoint(node, 'right');
                 switch (key) {
                     case 'topLeftD':
                         return { x: (topPoint.x + leftPoint.x) / 2, y: (topPoint.y + leftPoint.y) / 2 };
@@ -418,7 +420,7 @@ export class Arrow extends GraphElement {
                 }
             } else {
                 // Diamond point type
-                return resolveDiamondPoint(resource, key as DiamondPointType);
+                return resolveDiamondPoint(node, key as DiamondPointType);
             }
         } else {
             // Cell-based input: no adjustments are applied.
@@ -466,14 +468,14 @@ export class Arrow extends GraphElement {
 
     drawCurvy(
         context: CanvasRenderingContext2D,
-        control: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType],
-        resources: Record<ResourceNameType, Resource>,
+        control: [NodeNameType, DiamondPointType] | [Cell, DiamondPointType],
+        nodes: Record<NodeNameType, Node>,
         color: string
     ) {
         if (!context) return;
 
         // Get control point
-        const controlPoint = Arrow.resolvePoint(control, resources);
+        const controlPoint = Edge.resolvePoint(control, nodes);
 
         // Draw the quadratic Bézier curve
         context.strokeStyle = 'black';
@@ -493,23 +495,23 @@ export class Arrow extends GraphElement {
 
     }
 
-    drawArrowhead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
+    drawEdgehead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
         const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        this.drawArrowheadAtAngle(context, end, angle, color);
+        this.drawEdgeheadAtAngle(context, end, angle, color);
     }
 
-    drawCurvyArrowhead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
+    drawCurvyEdgehead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {
         // Compute tangent direction at endpoint of the quadratic Bézier curve
         const t = 1; // At the endpoint
         const dx = 2 * (1 - t) * (control.x - start.x) + 2 * t * (end.x - control.x);
         const dy = 2 * (1 - t) * (control.y - start.y) + 2 * t * (end.y - control.y);
         const angle = Math.atan2(dy, dx);
 
-        this.drawArrowheadAtAngle(context, end, angle, color);
+        this.drawEdgeheadAtAngle(context, end, angle, color);
     }
 
-    private drawArrowheadAtAngle(context: CanvasRenderingContext2D, position: Point, angle: number, color: string) {
-        const arrowSize = 10;
+    private drawEdgeheadAtAngle(context: CanvasRenderingContext2D, position: Point, angle: number, color: string) {
+        const edgeSize = 10;
 
         // Draw black outline
         context.strokeStyle = 'black';
@@ -517,12 +519,12 @@ export class Arrow extends GraphElement {
         context.beginPath();
         context.moveTo(position.x, position.y);
         context.lineTo(
-            position.x - arrowSize * Math.cos(angle - Math.PI / 6),
-            position.y - arrowSize * Math.sin(angle - Math.PI / 6)
+            position.x - edgeSize * Math.cos(angle - Math.PI / 6),
+            position.y - edgeSize * Math.sin(angle - Math.PI / 6)
         );
         context.lineTo(
-            position.x - arrowSize * Math.cos(angle + Math.PI / 6),
-            position.y - arrowSize * Math.sin(angle + Math.PI / 6)
+            position.x - edgeSize * Math.cos(angle + Math.PI / 6),
+            position.y - edgeSize * Math.sin(angle + Math.PI / 6)
         );
         context.closePath();
         context.stroke();
@@ -534,15 +536,15 @@ export class Arrow extends GraphElement {
 }
 
 
-export interface ArrowConfig {
-    controlPoint: [ResourceNameType, DiamondPointType] | [Cell, DiamondPointType] | null;
-    reverse: ArrowNameType | null;
-    drawInOrder(fn: (key: ArrowNameType, arrowWithConfig: ArrowWithConfig) => void, key: ArrowNameType, arrowWithConfig: ArrowWithConfig,): void;
-    next: (fn: () => boolean) => ArrowNameType | null;
+export interface EdgeConfig {
+    controlPoint: [NodeNameType, DiamondPointType] | [Cell, DiamondPointType] | null;
+    reverse: EdgeNameType | null;
+    drawInOrder(fn: (key: EdgeNameType, edgeWithConfig: EdgeWithConfig) => void, key: EdgeNameType, edgeWithConfig: EdgeWithConfig,): void;
+    next: (fn: () => boolean) => EdgeNameType | null;
 }
 
 
-export interface ArrowWithConfig {
-    arrow: Arrow;
-    config: ArrowConfig;
+export interface EdgeWithConfig {
+    edge: Edge;
+    config: EdgeConfig;
 };

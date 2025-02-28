@@ -1,66 +1,51 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { GraphElementNameType, Resource, ArrowWithConfig } from '@/components/lasagna/classes';
-import { resourceDescriptions } from '@/components/lasagna/specs/texts';
-import { useFiles } from '@/lib/firebaseWebHelpers';
-import { useState, useRef, useEffect } from 'react';
+import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
+import { path } from '@/components/lasagna/specs/alpha/specs';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 export default function Frame() {
-  const { files } = useFiles();
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showAssistant, setshowAssistant] = useState(false);
   const [pathDescription, setPathDescription] = useState('');
-  const [z, setZ] = useState(0);
-  const [specs, setSpecs] = useState({
-    resources: {} as Record<string, Resource>,
-    arrowsWithConfig: {} as Record<string, ArrowWithConfig>,
-    path: [] as Array<[GraphElementNameType[], string]>
-  });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [counter, setCounter] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const importSpecs = async () => {
-      const specsModule = await import('./specs/alpha/specs');
-      setSpecs({
-        resources: specsModule.resources,
-        arrowsWithConfig: specsModule.arrowsWithConfig,
-        path: specsModule.path,
-      });
-    };
-
-    importSpecs();
-  }, [showAssistant]);
 
   useEffect(() => {
-    setPathDescription(specs.path[z]?.[1] || '');
-  }, [z, specs.path]);
+    setPathDescription(path[counter]?.[1] || '');
+  }, [counter]);
 
   const isElementActive = (key: GraphElementNameType) => {
-    return specs.path[z]?.[0]?.includes(key) || false;
-  };
-
-  const bar = () => {
-    // return z === 7;
-    return showAssistant;
+    return path[counter]?.[0]?.includes(key) || false;
   };
 
   const handleClickPrevious = () => {
     if (isPlaying) return;
-    if (z > 0) {
-      setZ(z - 1);
+    if (counter > 0) {
+      setCounter(counter - 1);
     } else {
-      setZ(specs.path.length - 1);
+      setCounter(path.length - 1);
     }
   };
 
-  const playNext = () => {
-    setZ((prevZ) => (prevZ < specs.path.length - 1 ? prevZ + 1 : 0));
+  const handleClickNext = () => {
+    if (isPlaying) return;
+    if (counter < path.length - 1) {
+      setCounter(counter + 1);
+    } else {
+      setCounter(0);
+    }
+  };
+
+  const playNext = useCallback(() => {
+    setCounter((prevCounter) => (prevCounter < path.length - 1 ? prevCounter + 1 : 0));
     timeoutRef.current = setTimeout(() => {
       if (timeoutRef.current) {
         playNext();
       }
     }, 1000);
-  };
+  }, []);
 
   const handleClickPlay = () => {
     if (isPlaying) {
@@ -76,22 +61,16 @@ export default function Frame() {
   };
 
   useEffect(() => {
+    setIsPlaying(true);
+    timeoutRef.current = setTimeout(playNext, 1000);
+
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
     };
-  }, []);
-
-  const handleClickNext = () => {
-    if (isPlaying) return;
-    if (z < specs.path.length - 1) {
-      setZ(z + 1);
-    } else {
-      setZ(0);
-    }
-  };
+  }, [playNext]);
 
   const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showAssistant ? ' - Version 2' : ' - Version 1');
   const subHeadline = 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
@@ -105,11 +84,8 @@ export default function Frame() {
         {false && subHeadline}
       </div> */}
       <Painting
-        resources={specs.resources}
-        arrowsWithConfig={specs.arrowsWithConfig}
-        path={specs.path}
         isElementActive={isElementActive}
-        bar={bar}
+        counter={counter}
         showAssistant={showAssistant}
       />
       {/*!isPlaying || false && (
