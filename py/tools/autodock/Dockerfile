@@ -27,8 +27,8 @@ RUN micromamba run -n bd_env git clone --single-branch --branch develop https://
 
 RUN git clone https://github.com/phenix-project/geostd.git
 
-RUN git clone --branch docwork --depth=1 --filter=tree:0 https://github.com/rwxayheee/Meeko.git && \
-    cd Meeko && git sparse-checkout set --no-cone example && git checkout
+# RUN git clone --branch docwork --depth=1 --filter=tree:0 https://github.com/rwxayheee/Meeko.git && \
+    # cd Meeko && git sparse-checkout set --no-cone example && git checkout
 
 # Install ProDy within the micromamba environment
 RUN micromamba run -n bd_env pip install prody

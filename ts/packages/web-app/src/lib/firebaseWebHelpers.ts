@@ -1,7 +1,8 @@
 import * as CONSTANTS from 'shared/src/constants';
+import * as TYPES from 'shared/src/typings';
 import { ChatWrite, ChatRead } from 'shared/src/typings';
 import { db } from '@/lib/firebaseWebInit';
-import { doc, addDoc, getDocs, deleteDoc, serverTimestamp, collection, query, orderBy, where, limit } from 'firebase/firestore';
+import { doc, addDoc, deleteDoc, serverTimestamp, collection, query, where, limit } from 'firebase/firestore';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 
 
@@ -26,20 +27,6 @@ export const deleteChat = async (chatId: string) => {
     console.error(e);
   }
 }
-
-
-/* export const addMessage = async (chatId: string, messageWrite: MessageWrite): Promise<Omit<MessageRead, 'timestamp'>> => {
-  try {
-    const docRef = await addDoc(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), {
-      ...messageWrite,
-      [CONSTANTS.timestamp]: serverTimestamp(),
-    });
-    return { id: docRef.id, ...messageWrite };
-  } catch (e) {
-    console.error(e);
-    throw new Error('An error occurred while adding message');
-  }
-} */
 
 
 export function useChats(userId: string) {
@@ -70,46 +57,61 @@ export function useChat(chatId: string) { // ATTENTION: be consistent with funct
 }
 
 
-/* export const useMessages = (chatId: string) => {
-  const messagesQuery = query(collection(db, CONSTANTS.chats, chatId, CONSTANTS.messages), orderBy(CONSTANTS.timestamp, CONSTANTS.asc));
-  const [messagesSnapshot, loading, error] = useCollection(messagesQuery);
+export const useProblem = (problemId: string) => {
+  const parentDocRef = doc(db, 'data', 'MzqmiqTBo3QVYJmuN93o');
+  const problemDocRef = doc(parentDocRef, 'problems', problemId);
+  const [problemSnapshot, loading, error] = useDocument(problemDocRef);
 
-  const messages = messagesSnapshot?.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id,
-  })) as MessageRead[] || [];
+  const problem = problemSnapshot?.exists()
+    ? {
+      ...problemSnapshot.data(),
+      id: problemSnapshot.id,
+    } as TYPES.Problem
+    : null;
 
-  return { messages, loading, error };
-} */
+  return { problem, loading, error };
 
-
-export async function getIdOfUsersFirstChat(userId: string) {
-  const q = query(
-    collection(db, CONSTANTS.chats),
-    where(CONSTANTS.userId, '==', userId),
-    limit(1)
-  );
-  const querySnapshot = await getDocs(q);
-  if (!querySnapshot.empty) {
-    // Assuming there is at least one document, return its ID
-    return querySnapshot.docs[0].id;
-  } else {
-    // Return null or an empty string to indicate no documents found
-    return null; // or return '';
-  }
 }
 
 
-export const useResources = () => {
-  const parentDocRef = doc(db, CONSTANTS.files, 'HNYD03tW3olEiEaqVZwp');
-  const resourcesQuery = query(collection(parentDocRef, 'resources'));
+export const useProblems = () => {
+  const parentDocRef = doc(db, 'data', 'MzqmiqTBo3QVYJmuN93o');
+  const problemsQuery = query(collection(parentDocRef, 'problems'));
+  const [problemsSnapshot, loading, error] = useCollection(problemsQuery);
+
+  const problems = problemsSnapshot?.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  } as TYPES.Problem)) || [];
+
+  return { problems, loading, error };
+}
+
+
+export const useResources = (problemId: string) => {
+  const parentDocRef = doc(db, 'data', 'MzqmiqTBo3QVYJmuN93o');
+  const resourcesQuery = query(collection(parentDocRef, 'resources'), where('problemIds', 'array-contains', problemId));
   const [resourcesSnapshot, loading, error] = useCollection(resourcesQuery);
 
   const resources = resourcesSnapshot?.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
-  })) || [];
+  } as TYPES.Resource)) || [];
 
   return { resources, loading, error };
+}
+
+
+export const useTools = (problemId: string) => {
+  const parentDocRef = doc(db, 'directors', '14LbMft0sPWKSpaGE1qa');
+  const toolsQuery = query(collection(parentDocRef, 'tools'), where('problemIds', 'array-contains', problemId));
+  const [toolsSnapshot, loading, error] = useCollection(toolsQuery);
+
+  const tools = toolsSnapshot?.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  } as TYPES.Tool)) || [];
+
+  return { tools, loading, error };
 }
 

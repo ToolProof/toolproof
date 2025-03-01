@@ -4,10 +4,10 @@ import { Cell, NodeNameType, EdgeNameType, Node, Edge, GraphElementNameType, Edg
 
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
-        AI: new Node(new Cell(2, 4, cellWidth, cellHeight), 'lg', 'code_ai', true, nodeDescriptions['AI']),
-        Humans: new Node(new Cell(2, 7, cellWidth, cellHeight), 'vercel', 'code', true, nodeDescriptions['Humans']),
-        Tools: new Node(new Cell(2, 1, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Data: new Node(new Cell(0, 4, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Tools']),
+        AI: new Node(new Cell(2, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, nodeDescriptions['AI']),
+        Humans: new Node(new Cell(2, 8, cellWidth, cellHeight), 'vercel', 'code', true, nodeDescriptions['Humans']),
+        Tools: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        Data: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Tools']),
     } as const;
 }
 
@@ -62,7 +62,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Tools_Humans: {
             edge: new Edge(['Tools', 'right'], ['Humans', 'right'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(3, 4, cellWidth, cellHeight), 'right'],
+                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
                 reverse: 'Humans_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -73,7 +73,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Humans_Tools: {
             edge: new Edge(['Humans', 'right'], ['Tools', 'right'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(3, 4, cellWidth, cellHeight), 'right'],
+                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
                 reverse: 'Tools_Humans',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -106,7 +106,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Data_Tools: {
             edge: new Edge(['Data', 'top'], ['Tools', 'left'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(0, 2, cellWidth, cellHeight), 'left'],
+                controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
                 reverse: 'Tools_Data',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -117,7 +117,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Tools_Data: {
             edge: new Edge(['Tools', 'left'], ['Data', 'top'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(0, 2, cellWidth, cellHeight), 'left'],
+                controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
                 reverse: 'Data_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -128,7 +128,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Data_Humans: {
             edge: new Edge(['Data', 'bottom'], ['Humans', 'left'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(0, 6, cellWidth, cellHeight), 'left'],
+                controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
                 reverse: 'Humans_Data',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -139,7 +139,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Humans_Data: {
             edge: new Edge(['Humans', 'left'], ['Data', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(0, 6, cellWidth, cellHeight), 'left'],
+                controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
                 reverse: 'Data_Humans',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -171,12 +171,15 @@ export const validTransitions: Record<GraphElementNameType, GraphElementNameType
 
 export const pathOfGenesis: Array<[GraphElementNameType[], string]> = [
     [['Humans'],
-        'In the beginning, there were only humans.'
+        'In the beginning, there were only Humans.'
+    ],
+    [['Humans'],
+        'Humans could replicate to create other Humans.'
     ],
     [['Humans', 'Humans_Tools', 'Tools'],
         'Then Humans made Tools.'
     ],
-    /* [['Humans', 'Tools_Humans', 'Tools'],
+    [['Humans', 'Tools_Humans', 'Tools'],
         'Humans were using the Tools. They could create more Humans.'
     ],
     [['Humans', 'Humans_Tools', 'Tools'],
@@ -184,23 +187,61 @@ export const pathOfGenesis: Array<[GraphElementNameType[], string]> = [
     ],
     [['Humans', 'Tools_Humans', 'Tools'],
         'Then Humans were using these more advanced Tools. They could create even more Humans.'
-    ], */
+    ],
     [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data'],
         'Then Humans made Tools that could store Data. We entered the Historical Period. We had books, later usepapers'
     ],
-    /* [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data', 'Data_Humans'],
+    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data', 'Data_Humans'],
         'Humans were consuming the Data that either themselves or other Humans had generated.'
-    ], */
-    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
-        'Humans put Data into Tools. We had computers.'
+    ],
+    [['Humans', 'Humans_Tools', 'Tools', 'Data_Humans', 'Data', 'Tools_Data'],
+        'Humans used Tools to create a special type of Data, called instructions. Human then put these Data into Tools. We had computers.'
     ],
     [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
-        'One trick. Humans could now primarily use computers to interact with the world.'
+        'We now replace Tools and Humans with computers.'
     ],
     [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools', 'AI'],
-        'Humans put Data into Tools. We had computers.'
+        'Now we have AI.'
     ],
 ];
+
+export const pathOfDrugDiscovery: Array<[GraphElementNameType[], string]> = [
+    [['Humans'],
+        'In the beginning, there were only Humans.'
+    ],
+    [['Humans'],
+        'Humans could replicate to create other Humans.'
+    ],
+    [['Humans', 'Humans_Tools', 'Tools'],
+        'Then Humans made Tools.'
+    ],
+    [['Humans', 'Tools_Humans', 'Tools'],
+        'Humans were using the Tools. They could create more Humans.'
+    ],
+    [['Humans', 'Humans_Tools', 'Tools'],
+        'Then Humans made more advanced Tools.'
+    ],
+    [['Humans', 'Tools_Humans', 'Tools'],
+        'Then Humans were using these more advanced Tools. They could create even more Humans.'
+    ],
+    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data'],
+        'Then Humans made Tools that could store Data. We entered the Historical Period. We had books, later usepapers'
+    ],
+    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data', 'Data_Humans'],
+        'Humans were consuming the Data that either themselves or other Humans had generated.'
+    ],
+    [['Humans', 'Humans_Tools', 'Tools', 'Data_Humans', 'Data', 'Tools_Data'],
+        'Humans used Tools to create a special type of Data, called instructions. Human then put these Data into Tools. We had computers.'
+    ],
+    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
+        'We now replace Tools and Humans with computers.'
+    ],
+    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools', 'AI'],
+        'Now we have AI.'
+    ],
+];
+
+
 
 
 

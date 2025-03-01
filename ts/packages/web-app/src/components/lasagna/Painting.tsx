@@ -26,7 +26,7 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
 
     const gridSize = useMemo(() => ({
         col: 4,
-        row: 9
+        row: 11
     }), []);
 
     const handleNodeClick = (nodeName: NodeNameType, x: number, y: number) => {
@@ -81,17 +81,17 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw the grid
-        for (let col = 0; col < gridSize.col; col++) {
+        /* for (let col = 0; col < gridSize.col; col++) {
             for (let row = 0; row < gridSize.row; row++) {
                 context.strokeStyle = 'black';
                 context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
             }
-        }
+        } */
 
         // Draw nodes
         Object.entries(nodes).forEach(([key, node]) => {
             const isActive = isElementActive(key as NodeNameType);
-            // if (!isActive) return;
+            //if (!isActive) return;
             const color = isActive ? 'yellow' : 'black';
             node.draw(context, color, key as NodeNameType, showAssistant);
             node.drawText(context, key, showAssistant);

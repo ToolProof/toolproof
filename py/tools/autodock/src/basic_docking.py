@@ -41,58 +41,47 @@ def prepare_ligand(lig_smiles):
 
 def add_protomers(lig_smiles):
     output_path = "/tmp/lig_with_protomers.sdf"
-    run_command(f'micromamba run -n bd_env scrub.py "{lig_smiles}" -o {output_path} --skip_tautomers --ph_low 5 --ph_high 9')
+    
+    # Read the SMILES string from the file
+    try:
+        with open(lig_smiles, "r", encoding="utf-8") as file:
+            smiles_string = file.read().strip()
+    except Exception as e:
+        raise RuntimeError(f"Failed to read SMILES file {lig_smiles}: {e}")
+
+    # Run the command with the SMILES string
+    run_command(f'micromamba run -n bd_env scrub.py "{smiles_string}" -o {output_path} --skip_tautomers --ph_low 5 --ph_high 9')
+    
     return output_path
 
 
-def prepare_receptor(rec_raw):
+def prepare_receptor(rec_no_lig, lig_box):
     print("Preparing receptor...")
     intermediate_path = "/tmp/rec_prepared"
     output_path = f"{intermediate_path}.pdbqt" # ATTENTION
-    
-    # Step 1: Remove ligand from complex
-    rec_pure = remove_ligand_from_complex(rec_raw)
 
-    # Step 2: Extract receptor atoms
-    rec_atoms = extract_receptor_atoms(rec_pure)
+    # Step 1: Extract receptor atoms
+    rec_atoms = extract_receptor_atoms(rec_no_lig)
     
-    # Step 3: Combine CRYST1 and receptor atoms
-    rec_cryst1 = extract_and_combine_cryst1(rec_pure, rec_atoms)
+    # Step 2: Combine CRYST1 and receptor atoms
+    rec_cryst1 = extract_and_combine_cryst1(rec_no_lig, rec_atoms)
     print(f"CRYST1 combined: saved to {rec_cryst1}")
 
-    # Step 4: Add hydrogens and optimize
+    # Step 3: Add hydrogens and optimize
     rec_cryst1FH = add_hydrogens_and_optimize(rec_cryst1)
     print(f"Hydrogens added and optimized: saved to {rec_cryst1FH}")
 
-    # Step 5: Prepare receptor for docking
-    lig_box = "Meeko/example/tutorial1/input_files/xray-imatinib.pdb" # ATTENTION
+    # Step 4: Prepare receptor for docking
     run_command(f"micromamba run -n bd_env mk_prepare_receptor.py --read_pdb {rec_cryst1FH} -o {intermediate_path} -p -v --box_enveloping {lig_box} --padding 5")
     print("Receptor preparation complete.")
     return output_path
 
 
-def remove_ligand_from_complex(rec_raw):
-    
-    output_path = "/tmp/rec_pure.pdb"
-    
-    pymol_command = f"""
-    micromamba run -n bd_env pymol -qc -d "
-    load {rec_raw};
-    remove resn STI;
-    save {output_path};
-    quit
-    "
-    """
-    run_command(pymol_command)
-    print(f"Ligand removed: saved to {output_path}")
-    return output_path
-
-
-def extract_receptor_atoms(rec_pure):
+def extract_receptor_atoms(rec_no_lig):
     output_path = "/tmp/rec_atoms.pdb"
     run_command(f"""micromamba run -n bd_env python3 - <<EOF
 from prody import parsePDB, writePDB
-pdb_token = '{rec_pure}'
+pdb_token = '{rec_no_lig}'
 atoms_from_pdb = parsePDB(pdb_token)
 receptor_selection = "chain A and not water and not hetero"
 receptor_atoms = atoms_from_pdb.select(receptor_selection)
@@ -103,10 +92,10 @@ EOF
     return output_path
     
 
-def extract_and_combine_cryst1(rec_pure, rec_atoms):
+def extract_and_combine_cryst1(rec_no_lig, rec_atoms):
     print("Extracting CRYST1 and combining with receptor atoms...")
     output_path = "/tmp/rec_cryst1.pdb"
-    cryst1_line = run_command(f"grep 'CRYST1' {rec_pure}", check=False).stdout.strip()
+    cryst1_line = run_command(f"grep 'CRYST1' {rec_no_lig}", check=False).stdout.strip()
     with open(rec_atoms, "r", encoding="utf-8") as receptor_f, open(output_path, "w", encoding="utf-8") as combined_f:
         if cryst1_line:
             combined_f.write(cryst1_line + "\n")
@@ -175,18 +164,64 @@ def upload_to_gcs(local_path, bucket_name, destination_blob_name):
     except Exception as e:
         print(f"Failed to upload {local_path} to GCS: {e}")
         return False
-
-
-def run_automation(rec_raw):
+    
+    
+def download_from_gcs(gcs_path):
+    """Downloads a file from Google Cloud Storage to /tmp and returns the local path."""
     try:
-        lig_name = "imatinib"
-        lig_smiles = "CC1=C(C=C(C=C1)NC(=O)C2=CC=C(C=C2)CN3CCN(CC3)C)NC4=NC=CC(=N4)C5=CN=CC=C5"
+        # Extract the bucket name and blob name from the GCS path
+        if gcs_path.startswith("gs://"):
+            gcs_path = gcs_path[len("gs://"):]
+        bucket_name, blob_name = gcs_path.split("/", 1)
+        
+        # Define the local file path
+        local_path = f"/tmp/{os.path.basename(blob_name)}"
+
+        # Download the file
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        blob.download_to_filename(local_path)
+
+        print(f"Downloaded {gcs_path} to {local_path}")
+        return local_path
+    except Exception as e:
+        print(f"Failed to download {gcs_path}: {e}")
+        raise
+
+def retrieve_gcs_files(**kwargs):
+    """
+    Retrieves files from Cloud Storage for arguments ending in '_path' and stores them in /tmp.
+    Returns a dictionary with keys without '_path' and their corresponding local file paths.
+    """
+    local_files = {}
+    
+    for key, gcs_path in kwargs.items():
+        if key.endswith("_path"):
+            new_key = key[:-5]  # Remove "_path" suffix
+            local_files[new_key] = download_from_gcs(gcs_path)
+    
+    return local_files
+
+
+def run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path):
+    try:
+        # Download necessary files from Cloud Storage
+        local_files = retrieve_gcs_files(
+            lig_smiles_path=lig_smiles_path, 
+            lig_box_path=lig_box_path, 
+            rec_no_lig_path=rec_no_lig_path
+        )
+
+        # Extract local paths for function calls
+        lig_smiles = local_files["lig_smiles"]
+        lig_box = local_files["lig_box"]
+        rec_no_lig = local_files["rec_no_lig"]
         
         lig_prepared = prepare_ligand(lig_smiles)
         
         print(f"Prepared ligand: {lig_prepared}")
         
-        rec_prepared = prepare_receptor(rec_raw)
+        rec_prepared = prepare_receptor(rec_no_lig, lig_box)
         
         lig_docking = run_docking(lig_prepared, rec_prepared)
         
@@ -208,7 +243,7 @@ def run_automation(rec_raw):
         success_files = []
         failed_files = []
 
-        bucket_name = "ligand"
+        bucket_name = "tp_data"
 
         # Upload files to GCS
         for local_path, blob_name in files_to_upload:

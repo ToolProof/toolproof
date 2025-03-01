@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 import basic_docking
-import micro_flows
 
 app = Flask(__name__)
 
@@ -12,12 +11,15 @@ def handle_request():
             return jsonify({"error": "No JSON payload provided"}), 400
         
         try:
-            
-            rec_raw = "input_files/1iep.pdb"
-            
+            # Extract arguments from JSON payload
+            lig_name = data.get("lig_name")
+            lig_smiles_path = data.get("lig_smiles_path")
+            lig_box_path = data.get("lig_box_path")
+            rec_name = data.get("rec_name")
+            rec_no_lig_path = data.get("rec_no_lig_path")
+
             # Call the workflow from basic_docking
-            # result = basic_docking.run_automation(rec_raw)
-            result = micro_flows.alpha(rec_raw) # ATTENTION
+            result = basic_docking.run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path)
             return jsonify({"message": "Automation completed successfully", "result": result}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
