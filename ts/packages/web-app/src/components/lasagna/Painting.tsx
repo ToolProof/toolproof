@@ -7,10 +7,10 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 interface PaintingProps {
     isElementActive: (key: GraphElementNameType) => boolean;
     counter: number;
-    showAssistant: boolean;
+    showStandin: boolean;
 }
 
-export default function Painting({ isElementActive, counter, showAssistant }: PaintingProps) {
+export default function Painting({ isElementActive, counter, showStandin }: PaintingProps) {
     const parentRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [nodeName, setNodeName] = useState<NodeNameType | null>(null);
@@ -21,6 +21,8 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
     const [cellWidth, setCellWidth] = useState(0);
     const [cellHeight, setCellHeight] = useState(0);
 
+    const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
+
     const [nodes, setNodes] = useState<Record<NodeNameType, Node>>();
     const [edgesWithConfig, setEdgesWithConfig] = useState<Record<EdgeNameType, EdgeWithConfig>>();
 
@@ -30,6 +32,7 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
     }), []);
 
     const handleNodeClick = (nodeName: NodeNameType, x: number, y: number) => {
+        console.log('nodeName', nodeName);
         setNodeName(nodeName);
         setBoxPosition({ top: y + cellHeight, left: x - cellWidth / 1.5 });
     };
@@ -41,8 +44,6 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
                 const newCellWidth = Math.floor(clientWidth / gridSize.col);
                 const newCellHeight = Math.floor(clientHeight / gridSize.row);
 
-                // console.log('newCellWidth', newCellWidth, 'newCellHeight', newCellHeight);
-
                 if (newCellWidth !== cellWidthRef.current || newCellHeight !== cellHeightRef.current) {
                     cellWidthRef.current = newCellWidth;
                     cellHeightRef.current = newCellHeight;
@@ -52,6 +53,9 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
                     const canvas = canvasRef.current;
                     canvas.width = clientWidth;
                     canvas.height = clientHeight;
+
+                    // ✅ Update SVG dimensions dynamically
+                    setSvgSize({ width: clientWidth, height: clientHeight });
                 }
             }
         };
@@ -90,10 +94,20 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
         // Draw nodes
         Object.entries(nodes).forEach(([key, node]) => {
             const isActive = isElementActive(key as NodeNameType);
-            //if (!isActive) return;
+            if (!showStandin && key === 'Standin') return;
+            if (showStandin && key === 'Tools') return;
+            if (!showStandin && key === 'Meta') return;
+            if (showStandin && key === 'MetaInternal') return;
             const color = isActive ? 'yellow' : 'black';
-            node.draw(context, color, key as NodeNameType, showAssistant);
-            node.drawText(context, key, showAssistant);
+            node.draw(context, color, key as NodeNameType, showStandin);
+        });
+
+        Object.entries(nodes).forEach(([key, node]) => {
+            if (!showStandin && key === 'Standin') return;
+            if (showStandin && key === 'Tools') return;
+            if (!showStandin && key === 'Meta') return;
+            if (showStandin && key === 'MetaInternal') return;
+            node.drawText(context, key, showStandin);
         });
 
 
@@ -109,7 +123,21 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
             const isActive = isElementActive(key);
             const color = isActive ? 'yellow' : 'black';
 
-            if (!isReverseActive) {
+            let shouldDraw = true;
+            if (!showStandin && key.includes('Standin')) {
+                shouldDraw = false;
+            }
+            if (showStandin && key.includes('Tools')) {
+                shouldDraw = false;
+            }
+            if (!showStandin && key.includes('Meta')) {
+                shouldDraw = false;
+            }
+            if (showStandin && (key === 'AI_Data' || key === 'Data_AI')) {
+                shouldDraw = false;
+            }
+
+            if (!isReverseActive && shouldDraw) {
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
                         context,
@@ -150,7 +178,8 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
             }
         });
 
-    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showAssistant]);
+    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showStandin]);
+
 
     return (
         <div ref={parentRef} className="w-full h-full relative">
@@ -159,12 +188,12 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
                 className="w-full h-full bg-transparent overflow-hidden pointer-events-none"
             />
             {/* Draw NodeSVGs */}
-            {/* <svg width={gridSize * cellWidth} height={gridSize * cellHeight} viewBox={0 0 ${gridSize * cellWidth} ${gridSize * cellHeight}}>
+            {nodes && <svg width={svgSize.width} height={svgSize.height} className="absolute top-0 left-0 bg-transparent">
                 {Object.entries(nodes).map(([key, node]) => {
-                    const color = node.getFillColor();
-                    return <NodeSVG key={key} nodeName={key as NodeNameType} node={node} color={color} handleNodeClickHelper={(nodeName) => handleNodeClick(nodeName as NodeNameType, node.cell.col * cellWidth, node.cell.row * cellHeight)} showAssistant={showAssistant} />;
+                    const color = 'transparent'; //node.getFillColor(); // ATTENTION
+                    return <NodeSVG key={key} nodeName={key as NodeNameType} node={node} color={color} handleNodeClickHelper={(nodeName) => handleNodeClick(nodeName as NodeNameType, node.cell.col * cellWidth, node.cell.row * cellHeight)} showStandin={showStandin} />;
                 })}
-            </svg> */}
+            </svg>}
             {/*(nodeName) && (
                 <div style={{
                     position: 'absolute',

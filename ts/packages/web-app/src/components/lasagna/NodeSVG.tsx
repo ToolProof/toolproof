@@ -5,10 +5,10 @@ interface NodeSVGProps {
     node: Node;
     color: string;
     handleNodeClickHelper: (nodeName: NodeNameType) => void;
-    showAssistant: boolean;
+    showStandin: boolean;
 }
 
-const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClickHelper, showAssistant }) => {
+const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClickHelper, showStandin }) => {
     const { col, row, width, height } = node.cell;
     const x = col * width;
     const y = row * height;
@@ -28,12 +28,14 @@ const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClic
         return null;
     } */
 
-    if (!showAssistant && nodeName === 'Assistant') {
-        return null;
-    }
     if (nodeName.includes('Dummy')) {
         return null;
     }
+
+    if (!showStandin && nodeName === 'Standin') return;
+    if (showStandin && nodeName === 'Tools') return;
+    if (!showStandin && nodeName === 'Meta') return;
+    if (showStandin && nodeName === 'MetaInternal') return;
 
     return (
         <>
@@ -44,26 +46,29 @@ const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClic
                     rx={width / 2}
                     ry={height / 2 + 10}
                     fill={color}
-                    stroke="black"
+                    stroke="transparent"
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
-            ) : node.nature === 'data_meta' ? (
+            ) : node.nature === 'data_meta' && nodeName === 'Meta' ? (
                 <ellipse
                     cx={x + smallWidth / 2} // Left-aligned
                     cy={y + height / 2}
                     rx={smallWidth / 2}
                     ry={smallHeight / 2}
                     fill={color}
-                    stroke="black"
+                    stroke="transparent"
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
-            ) : node.nature === 'code_ai' && nodeName === 'AI' && showAssistant ? (
-                <polygon
-                    points={`${x + width / 2},${y} ${x + width},${y + height / 2} ${x + width / 2},${y + height} ${x},${y + height / 2}`}
+            ) : node.nature === 'data_meta' && nodeName === 'MetaInternal' ? (
+                <ellipse
+                    cx={x + width - smallWidth / 2} // Right-aligned
+                    cy={y + height / 2}
+                    rx={smallWidth / 2}
+                    ry={smallHeight / 2}
                     fill={color}
-                    stroke="black"
+                    stroke="transparent"
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
@@ -71,7 +76,7 @@ const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClic
                 <polygon
                     points={`${x + width / 2},${y - height / 6} ${x + width + width / 6},${y + height / 2} ${x + width / 2},${y + height + height / 6} ${x - width / 6},${y + height / 2}`}
                     fill={color}
-                    stroke="black"
+                    stroke="transparent"
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
@@ -82,7 +87,7 @@ const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClic
                     width={shouldBeSmall ? smallWidth : width}
                     height={shouldBeSmall ? smallHeight : height}
                     fill={color}
-                    stroke="black"
+                    stroke="transparent"
                     onClick={handleClick}
                     pointerEvents="visible"
                 />

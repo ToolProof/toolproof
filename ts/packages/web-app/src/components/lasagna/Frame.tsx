@@ -9,7 +9,7 @@ interface FrameProps {
 }
 
 export default function Frame({ setPathDescription }: FrameProps) {
-  const [showAssistant, setshowAssistant] = useState(false);
+  const [showStandin, setshowStandin] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0);
   const [activeElement, setActiveElement] = useState<GraphElementNameType | null>(null);
@@ -101,7 +101,7 @@ export default function Frame({ setPathDescription }: FrameProps) {
     };
   }, [playNext]); */
 
-  const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showAssistant ? ' - Version 2' : ' - Version 1');
+  const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showStandin ? ' - Version 2' : ' - Version 1');
   const subHeadline = 'Rectangles indicate execution of business logic | Ellipses indicate static data storage | Color indicates where the code/data runs/resides';
 
   return (
@@ -115,7 +115,7 @@ export default function Frame({ setPathDescription }: FrameProps) {
       <Painting
         isElementActive={isElementActive}
         counter={counter}
-        showAssistant={showAssistant}
+        showStandin={showStandin}
       />
       {/*!isPlaying || false && (
         <div className="fixed bottom-20 left-0 w-full bg-transparent p-4 text-center">
@@ -124,6 +124,12 @@ export default function Frame({ setPathDescription }: FrameProps) {
       )*/}
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent">
         <div className="flex-grow flex justify-center">
+          <button
+            className="fixed left-2 w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            onClick={() => setshowStandin((prev) => !prev)}
+          >
+            {showStandin ? 'Show V.1' : 'Show V.2'}
+          </button>
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickPrevious}

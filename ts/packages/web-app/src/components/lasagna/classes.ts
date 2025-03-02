@@ -80,22 +80,33 @@ export type NodeNameType =
     | 'AI'
     | 'Humans'
     | 'Tools'
+    | 'Standin'
     | 'Data'
+    | 'Meta'
+    | 'MetaInternal'
 
 
 export type EdgeNameType =
     | 'AI_Tools'
     | 'Tools_AI'
+    | 'AI_Standin'
+    | 'Standin_AI'
     | 'AI_Humans'
     | 'Humans_AI'
     | 'Tools_Humans'
     | 'Humans_Tools'
+    | 'Standin_Humans'
+    | 'Humans_Standin'
     | 'Tools_Data'
     | 'Data_Tools'
+    | 'Standin_Data'
+    | 'Data_Standin'
     | 'AI_Data'
     | 'Data_AI'
     | 'Humans_Data'
     | 'Data_Humans'
+    | 'Meta_AI'
+    | 'AI_Meta'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
@@ -124,7 +135,7 @@ export class Node extends GraphElement {
         super();
     }
 
-    getFillColor(): string {
+    getFillColor(key: GraphElementNameType): string {
         let color: string;
         if (this.environment === 'lg') {
             color = '255, 0, 0'; // red
@@ -136,25 +147,25 @@ export class Node extends GraphElement {
             color = '0, 0, 0'; // black
         }
 
-        const alpha = this.nature === 'data_meta' ? 1.0 : 1.0;
+        const alpha = key === 'MetaInternal' ? 0.1 : 1.0;
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, key: NodeNameType, showAssistant: boolean) {
+    fill(context: CanvasRenderingContext2D, key: NodeNameType, showStandin: boolean) {
         if (!context) return;
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
         const radius = Math.min(this.cell.width, this.cell.height) / 2 + 10; // Adjust the radius as needed
 
-        context.fillStyle = this.getFillColor();
+        context.fillStyle = this.getFillColor(key);
 
         if (this.nature === 'data') {
             context.beginPath();
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
             context.fill();
         } else if (this.nature === 'data_meta') {
-            if (true) {
+            if (key === 'Meta') {
                 // Smaller centered ellipse
                 const smallerWidth = this.cell.width / 2;
                 const smallerHeight = this.cell.height / 1.5;
@@ -163,18 +174,17 @@ export class Node extends GraphElement {
                 context.beginPath();
                 context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
                 context.fill();
+            } else if (key === 'MetaInternal') {
+                // Smaller centered ellipse
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + this.cell.width - smallerWidth / 2; // Right-aligned
+                const centeredY = y + this.cell.height / 2;
+                context.beginPath();
+                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
+                context.fill();
             }
-        } else if (this.nature === 'code') {
-            context.fillRect(x, y, this.cell.width, this.cell.height);
-        } else if (this.nature === 'code_ai' && key === 'AI' && showAssistant) {
-            context.beginPath();
-            context.moveTo(x + this.cell.width / 2, y);
-            context.lineTo(x + this.cell.width, y + this.cell.height / 2);
-            context.lineTo(x + this.cell.width / 2, y + this.cell.height);
-            context.lineTo(x, y + this.cell.height / 2);
-            context.closePath();
-            context.fill();
-        } else if (this.nature === 'code_ai') {
+        } else if ((this.nature === 'code_ai')) {
             context.beginPath();
             context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
             context.lineTo(x + this.cell.width + this.cell.width / 6, y + this.cell.height / 2);
@@ -182,16 +192,18 @@ export class Node extends GraphElement {
             context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
             context.closePath();
             context.fill();
+        } else if (this.nature === 'code') {
+            context.fillRect(x, y, this.cell.width, this.cell.height);
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, key: NodeNameType, showAssistant: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, key: NodeNameType, showStandin: boolean) {
         if (!context) return;
         /* if (key.includes('Dummy')) {
             return null;
         } */
 
-        this.fill(context, key, showAssistant);
+        this.fill(context, key, showStandin);
 
         const { col, row } = this.cell;
         const x = col * this.cell.width;
@@ -207,42 +219,44 @@ export class Node extends GraphElement {
             // Ellipse stroke
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
         } else if (this.nature === 'data_meta') {
-            if (false) {
+            if (key === 'Meta') {
                 // Smaller centered ellipse stroke
                 const smallerWidth = this.cell.width / 2;
                 const smallerHeight = this.cell.height / 1.5;
                 const centeredX = x + smallerWidth / 2; // Left-aligned
                 const centeredY = y + this.cell.height / 2;
                 context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
+            } else if (key === 'MetaInternal') {
+                // Smaller centered ellipse stroke
+                const smallerWidth = this.cell.width / 2;
+                const smallerHeight = this.cell.height / 1.5;
+                const centeredX = x + this.cell.width - smallerWidth / 2; // Right-aligned
+                const centeredY = y + this.cell.height / 2;
+                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
+
+                context.lineWidth = 1;
+                context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
             }
-        } else if (this.nature === 'code') {
-            // Full cell rectangle stroke
-            context.rect(x, y, this.cell.width, this.cell.height);
-        } else if (this.nature === 'code_ai' && key === 'AI' && showAssistant) {
-            return null;
-            // Smaller diamond stroke
-            context.moveTo(x + this.cell.width / 2, y);
-            context.lineTo(x + this.cell.width, y + this.cell.height / 2);
-            context.lineTo(x + this.cell.width / 2, y + this.cell.height);
-            context.lineTo(x, y + this.cell.height / 2);
-            context.closePath();
-        } else if (this.nature === 'code_ai') {
+        } else if ((this.nature === 'code_ai')) {
             // Diamond stroke
             context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
             context.lineTo(x + this.cell.width + this.cell.width / 6, y + this.cell.height / 2);
             context.lineTo(x + this.cell.width / 2, y + this.cell.height + this.cell.height / 6);
             context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
             context.closePath();
+        } else if (this.nature === 'code') {
+            // Full cell rectangle stroke
+            context.rect(x, y, this.cell.width, this.cell.height);
         }
 
         context.stroke();
     }
 
-    drawText(context: CanvasRenderingContext2D, key: string, showAssistant: boolean) {
+    drawText(context: CanvasRenderingContext2D, key: string, showStandin: boolean) {
         if (!context) return;
-        /* if (key.includes('Dummy')) {
+        if (key === 'MetaInternal') {
             return null;
-        } */
+        }
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
@@ -252,18 +266,10 @@ export class Node extends GraphElement {
         context.fillStyle = 'black';
 
         let displayText = key;
-        if (key === 'InnerInput') {
-            displayText = 'Inner Input';
-        } else if (key === 'InnerOutput') {
-            displayText = 'Inner Output';
-        } else if (key === 'OuterInput') {
-            displayText = 'Outer Input';
-        } else if (key === 'OuterOutput') {
-            displayText = 'Outer Output';
-        } else if (key === 'InternalToolsLeft') {
+        if (key === 'Standin') {
             displayText = 'Tools';
-        } else if (key === 'InternalToolsRight') {
-            displayText = 'Tools';
+        } else if (key === 'MetaInternal') {
+            displayText = 'Meta';
         }
         /* if (displayText === 'AI') {
             displayText = 'OpenAI o3';
@@ -271,13 +277,23 @@ export class Node extends GraphElement {
             displayText = false ? 'AutoDock' : 'Schrödinger';
         } */
 
-        context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
+        if (key === 'Meta') {
+            context.font = '12px Arial';
+            context.fillText(displayText, x + this.cell.width / 4, y + this.cell.height / 2);
+        } else if (key === 'MetaInternal') {
+            context.font = '12px Arial';
+            context.fillText(displayText, x + this.cell.width / 1.3, y + this.cell.height / 2);
+        } else {
+            context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2 - 4);
+        }
 
         // return;
 
         let subText = '';
         if (this.nature === 'code_ai' && this.environment === 'lg') {
             subText = 'LangGraph Platform';
+        } else if (this.nature === 'code_ai' && this.environment === 'gcp') {
+            subText = 'GCP Cloud Run';
         } else if (this.nature === 'code' && this.environment === 'vercel') {
             subText = 'Vercel';
         } else if (this.nature === 'code' && this.environment === 'gcp') {
@@ -290,7 +306,7 @@ export class Node extends GraphElement {
 
         if (subText) {
             context.font = '11px Arial';
-            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 15);
+            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 12);
         }
     }
 

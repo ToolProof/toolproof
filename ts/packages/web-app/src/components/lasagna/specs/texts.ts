@@ -13,7 +13,7 @@ export const nodeDescriptions: Record<NodeNameType, string> = {
     InnerOutputGlue: 'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage',
     OuterOutput: 'Actionable academic OuterOutput that document the AI\'s reasoning behind crafting the Candidate, the Tools process, and the InnerOutput, offering suggestions for further action or future research (e.g. lab experiments).',
     OuterOutputGlue: 'Glue, as indicated by the small squares, means that LangGraph Platform needs an intermediate layer (for example GCP Cloud Run services) to talk to GCP Cloud Storage',
-    Checkpoints: 'Checkpoints record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
+    Meta: 'Meta record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
 };
 
 

@@ -6,7 +6,10 @@ export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeName
         AI: new Node(new Cell(2, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, nodeDescriptions['AI']),
         Humans: new Node(new Cell(2, 8, cellWidth, cellHeight), 'vercel', 'code', true, nodeDescriptions['Humans']),
         Tools: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
+        Standin: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code_ai', true, nodeDescriptions['Tools']),
         Data: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Tools']),
+        Meta: new Node(new Cell(1, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, nodeDescriptions['Tools']),
+        MetaInternal: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data_meta', true, nodeDescriptions['Tools']),
     } as const;
 }
 
@@ -140,6 +143,94 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             config: {
                 controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
                 reverse: 'Data_Humans',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Meta_AI'
+            }
+        },
+        Meta_AI: {
+            edge: new Edge(['Meta', 'center'], ['AI', 'left'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'AI_Data',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'AI_Meta'
+            }
+        },
+        AI_Meta: {
+            edge: new Edge(['AI', 'left'], ['Meta', 'center'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'Data_AI',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'AI_Standin'
+            }
+        },
+        AI_Standin: {
+            edge: new Edge(['AI', 'top'], ['Standin', 'bottom'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'Standin_AI',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Standin_AI'
+            }
+        },
+        Standin_AI: {
+            edge: new Edge(['Standin', 'bottom'], ['AI', 'top'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'AI_Standin',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Standin_Humans'
+            }
+        },
+        Standin_Humans: {
+            edge: new Edge(['Standin', 'right'], ['Humans', 'right'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
+                reverse: 'Humans_Standin',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Humans_Standin'
+            }
+        },
+        Humans_Standin: {
+            edge: new Edge(['Humans', 'right'], ['Standin', 'right'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
+                reverse: 'Standin_Humans',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Data_Standin'
+            }
+        },
+        Data_Standin: {
+            edge: new Edge(['Data', 'top'], ['Standin', 'left'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
+                reverse: 'Standin_Data',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Standin_Data'
+            }
+        },
+        Standin_Data: {
+            edge: new Edge(['Standin', 'left'], ['Data', 'top'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
+                reverse: 'Data_Standin',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
