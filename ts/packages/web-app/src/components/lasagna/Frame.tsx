@@ -1,7 +1,7 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
 import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
-import { pathOfDrugDiscovery, validTransitions } from '@/components/lasagna/specs/alpha/specs';
+import { path, validTransitions } from '@/components/lasagna/specs/alpha/specs';
 import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 
 interface FrameProps {
@@ -18,11 +18,11 @@ export default function Frame({ setPathDescription }: FrameProps) {
 
 
   useEffect(() => {
-    setPathDescription(pathOfDrugDiscovery[counter]?.[1] || '');
+    setPathDescription(path[counter]?.[1] || '');
   }, [counter, setPathDescription]);
 
   const isElementActive = (key: GraphElementNameType) => {
-    return pathOfDrugDiscovery[counter]?.[0]?.includes(key) || false;
+    return path[counter]?.[0]?.includes(key) || false;
     // return key === activeElement;
   };
 
@@ -31,13 +31,13 @@ export default function Frame({ setPathDescription }: FrameProps) {
     if (counter > 0) {
       setCounter(counter - 1);
     } else {
-      setCounter(pathOfDrugDiscovery.length - 1);
+      setCounter(path.length - 1);
     }
   };
 
   const handleClickNext = () => {
     if (isPlaying) return;
-    if (counter < pathOfDrugDiscovery.length - 1) {
+    if (counter < path.length - 1) {
       setCounter(counter + 1);
     } else {
       setCounter(0);
@@ -45,7 +45,7 @@ export default function Frame({ setPathDescription }: FrameProps) {
   };
 
   const playNext = () => {
-    setCounter((prevCounter) => (prevCounter < pathOfDrugDiscovery.length - 1 ? prevCounter + 1 : 0));
+    setCounter((prevCounter) => (prevCounter < path.length - 1 ? prevCounter + 1 : 0));
     timeoutRef.current = setTimeout(() => {
       if (timeoutRef.current) {
         playNext();

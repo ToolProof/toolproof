@@ -1,7 +1,7 @@
 'use client';
 import NodeSVG from './NodeSVG';
 import { Point, Node, Edge, GraphElementNameType, NodeNameType, EdgeNameType, EdgeWithConfig } from './classes';
-import { getNodes, getEdgesWithConfig, pathOfGenesis } from './specs/alpha/specs';
+import { getNodes, getEdgesWithConfig, path } from './specs/alpha/specs';
 import { useState, useRef, useEffect, useMemo } from 'react';
 
 interface PaintingProps {
@@ -60,7 +60,6 @@ export default function Painting({ isElementActive, counter, showAssistant }: Pa
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
     }, [gridSize]);
-
 
     useEffect(() => {
         const nodes = getNodes(cellWidth, cellHeight);

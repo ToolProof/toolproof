@@ -1,7 +1,6 @@
 import { nodeDescriptions, pathDescriptions } from '../texts';
 import { Cell, NodeNameType, EdgeNameType, Node, Edge, GraphElementNameType, EdgeWithConfig } from '@/components/lasagna/classes';
 
-
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
         AI: new Node(new Cell(2, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, nodeDescriptions['AI']),
@@ -11,7 +10,7 @@ export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeName
     } as const;
 }
 
-
+// ATTENTION: invoke/invoke edges and read/write edges
 export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Record<EdgeNameType, EdgeWithConfig> => {
     const nodes = getNodes(cellWidth, cellHeight);
     return {
@@ -169,43 +168,8 @@ export const validTransitions: Record<GraphElementNameType, GraphElementNameType
     Data_Humans: ['Humans'],
 };
 
-export const pathOfGenesis: Array<[GraphElementNameType[], string]> = [
-    [['Humans'],
-        'In the beginning, there were only Humans.'
-    ],
-    [['Humans'],
-        'Humans could replicate to create other Humans.'
-    ],
-    [['Humans', 'Humans_Tools', 'Tools'],
-        'Then Humans made Tools.'
-    ],
-    [['Humans', 'Tools_Humans', 'Tools'],
-        'Humans were using the Tools. They could create more Humans.'
-    ],
-    [['Humans', 'Humans_Tools', 'Tools'],
-        'Then Humans made more advanced Tools.'
-    ],
-    [['Humans', 'Tools_Humans', 'Tools'],
-        'Then Humans were using these more advanced Tools. They could create even more Humans.'
-    ],
-    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data'],
-        'Then Humans made Tools that could store Data. We entered the Historical Period. We had books, later usepapers'
-    ],
-    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data', 'Data_Humans'],
-        'Humans were consuming the Data that either themselves or other Humans had generated.'
-    ],
-    [['Humans', 'Humans_Tools', 'Tools', 'Data_Humans', 'Data', 'Tools_Data'],
-        'Humans used Tools to create a special type of Data, called instructions. Human then put these Data into Tools. We had computers.'
-    ],
-    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
-        'We now replace Tools and Humans with computers.'
-    ],
-    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools', 'AI'],
-        'Now we have AI.'
-    ],
-];
 
-export const pathOfDrugDiscovery: Array<[GraphElementNameType[], string]> = [
+export const path: Array<[GraphElementNameType[], string]> = [
     [['Humans'],
         'In the beginning, there were only Humans.'
     ],
