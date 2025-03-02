@@ -273,10 +273,10 @@ export class Node extends GraphElement {
 
         context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
 
-        return;
+        // return;
 
         let subText = '';
-        if (this.nature === 'code' && this.environment === 'lg') {
+        if (this.nature === 'code_ai' && this.environment === 'lg') {
             subText = 'LangGraph Platform';
         } else if (this.nature === 'code' && this.environment === 'vercel') {
             subText = 'Vercel';
@@ -289,8 +289,8 @@ export class Node extends GraphElement {
         }
 
         if (subText) {
-            context.font = '10px Arial';
-            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 20);
+            context.font = '11px Arial';
+            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 15);
         }
     }
 
