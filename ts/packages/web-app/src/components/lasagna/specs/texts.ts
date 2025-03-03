@@ -2,7 +2,7 @@ import { NodeNameType } from '../classes';
 
 
 export const nodeDescriptions: Record<NodeNameType, string> = {
-    AI: 'Built around a powerful, reflective GPT-style LLM, such as OpenAI\'s o3, the AI is pre-configured to use its parametric capabilities to collaborate with Humans and tools for drug discovery focused on a specified disease. By leveraging OpenAI\'s structured-outputs feature, the AI can directly generate Candidates in the formats required by respective Tools tools.',
+    AI: 'Built around a powerful, reflective GPT-style LLM, such as OpenAI\'s o3, the AI is pre-configured to use its parametric capabilities to collaborate with Humans and Tools for drug discovery focused on a specified disease. By leveraging OpenAI\'s structured-outputs feature, the AI can directly generate Candidates in the formats required by respective Tools.',
     Humans: 'Humans interact with the process via a web interface. A Humans in the loop will typically be an expert on the target disease.',
     Tools: 'Tools involve specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.',
     Data: 'Data is a file-pool that is shared between Humans, Tools, and the AI.',
