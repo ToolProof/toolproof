@@ -254,9 +254,9 @@ export class Node extends GraphElement {
 
     drawText(context: CanvasRenderingContext2D, key: string, showStandin: boolean) {
         if (!context) return;
-        if (key === 'MetaInternal') {
+        /* if (key === 'MetaInternal') {
             return null;
-        }
+        } */
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
@@ -282,6 +282,7 @@ export class Node extends GraphElement {
             context.fillText(displayText, x + this.cell.width / 4, y + this.cell.height / 2);
         } else if (key === 'MetaInternal') {
             context.font = '12px Arial';
+            context.fillStyle = 'rgba(0, 0, 0, 0.3)';
             context.fillText(displayText, x + this.cell.width / 1.3, y + this.cell.height / 2);
         } else {
             context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2 - 4);
@@ -343,7 +344,8 @@ export class Edge extends GraphElement {
         input: [NodeNameType, EdgePointType] | [Cell, EdgePointType],
         nodes: Record<NodeNameType, Node>
     ): Point {
-        // Helper to adjust diamond points for node-based inputs.
+        let result: Point = { x: 0, y: 0 }; // Default placeholder value
+
         function resolveDiamondPoint(node: Node, diamondKey: DiamondPointType): Point {
             const point = node.cell.getOuterDiamond()[diamondKey];
             if (node.nature === 'data') {
@@ -378,69 +380,75 @@ export class Edge extends GraphElement {
         }
 
         const key = input[1];
+        const isCorner = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].includes(key);
+        const isDiamondCorner = ['topLeftD', 'topRightD', 'bottomLeftD', 'bottomRightD'].includes(key);
 
-        // New branch: if the key is 'center', return the cell's center.
         if (key === 'center') {
             if (typeof input[0] === 'string') {
                 const node = nodes[input[0]];
                 if (!node) throw new Error(`Node ${input[0]} not found.`);
-                return node.cell.getCenter();
+                result = node.cell.getCenter();
             } else {
-                return input[0].getCenter();
+                result = input[0].getCenter();
             }
-        }
-
-        const isCorner = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].includes(key);
-        const isDiamondCorner = ['topLeftD', 'topRightD', 'bottomLeftD', 'bottomRightD'].includes(key);
-
-        if (typeof input[0] === 'string') {
+        } else if (typeof input[0] === 'string') {
             const node = nodes[input[0]];
             if (!node) throw new Error(`Node ${input[0]} not found.`);
 
             if (isCorner) {
-                return node.cell.getCorners()[key as CornerPointType];
+                result = node.cell.getCorners()[key as CornerPointType];
             } else if (isDiamondCorner) {
-                // For diamond-corner types, compute the average of two adjusted diamond points.
                 const topPoint = resolveDiamondPoint(node, 'top');
                 const bottomPoint = resolveDiamondPoint(node, 'bottom');
                 const leftPoint = resolveDiamondPoint(node, 'left');
                 const rightPoint = resolveDiamondPoint(node, 'right');
                 switch (key) {
                     case 'topLeftD':
-                        return { x: (topPoint.x + leftPoint.x) / 2, y: (topPoint.y + leftPoint.y) / 2 };
+                        result = { x: (topPoint.x + leftPoint.x) / 2, y: (topPoint.y + leftPoint.y) / 2 };
+                        break;
                     case 'topRightD':
-                        return { x: (topPoint.x + rightPoint.x) / 2, y: (topPoint.y + rightPoint.y) / 2 };
+                        result = { x: (topPoint.x + rightPoint.x) / 2, y: (topPoint.y + rightPoint.y) / 2 };
+                        break;
                     case 'bottomLeftD':
-                        return { x: (bottomPoint.x + leftPoint.x) / 2, y: (bottomPoint.y + leftPoint.y) / 2 };
+                        result = { x: (bottomPoint.x + leftPoint.x) / 2, y: (bottomPoint.y + leftPoint.y) / 2 };
+                        break;
                     case 'bottomRightD':
-                        return { x: (bottomPoint.x + rightPoint.x) / 2, y: (bottomPoint.y + rightPoint.y) / 2 };
+                        result = { x: (bottomPoint.x + rightPoint.x) / 2, y: (bottomPoint.y + rightPoint.y) / 2 };
+                        break;
                 }
             } else {
-                // Diamond point type
-                return resolveDiamondPoint(node, key as DiamondPointType);
+                result = resolveDiamondPoint(node, key as DiamondPointType);
             }
         } else {
-            // Cell-based input: no adjustments are applied.
             if (isCorner) {
-                return input[0].getCorners()[key as CornerPointType];
+                result = input[0].getCorners()[key as CornerPointType];
             } else if (isDiamondCorner) {
                 const diamond = input[0].getOuterDiamond();
                 switch (key) {
                     case 'topLeftD':
-                        return { x: (diamond.top.x + diamond.left.x) / 2, y: (diamond.top.y + diamond.left.y) / 2 };
+                        result = { x: (diamond.top.x + diamond.left.x) / 2, y: (diamond.top.y + diamond.left.y) / 2 };
+                        break;
                     case 'topRightD':
-                        return { x: (diamond.top.x + diamond.right.x) / 2, y: (diamond.top.y + diamond.right.y) / 2 };
+                        result = { x: (diamond.top.x + diamond.right.x) / 2, y: (diamond.top.y + diamond.right.y) / 2 };
+                        break;
                     case 'bottomLeftD':
-                        return { x: (diamond.bottom.x + diamond.left.x) / 2, y: (diamond.bottom.y + diamond.left.y) / 2 };
+                        result = { x: (diamond.bottom.x + diamond.left.x) / 2, y: (diamond.bottom.y + diamond.left.y) / 2 };
+                        break;
                     case 'bottomRightD':
-                        return { x: (diamond.bottom.x + diamond.right.x) / 2, y: (diamond.bottom.y + diamond.right.y) / 2 };
+                        result = { x: (diamond.bottom.x + diamond.right.x) / 2, y: (diamond.bottom.y + diamond.right.y) / 2 };
+                        break;
                 }
             } else {
-                return input[0].getOuterDiamond()[key as DiamondPointType];
+                result = input[0].getOuterDiamond()[key as DiamondPointType];
             }
         }
-        return { x: 0, y: 0 }; // ATTENTION: hack to satisfy TypeScript
+
+        return {
+            x: result.x,
+            y: result.y
+        }
     }
+
 
     draw(context: CanvasRenderingContext2D, color: string) {
         if (!context) return;

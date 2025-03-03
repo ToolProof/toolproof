@@ -188,36 +188,56 @@ export default function Painting({ isElementActive, counter, showStandin }: Pain
                 className="w-full h-full bg-transparent overflow-hidden pointer-events-none"
             />
             {/* Draw NodeSVGs */}
-            {nodes && <svg width={svgSize.width} height={svgSize.height} className="absolute top-0 left-0 bg-transparent">
-                {Object.entries(nodes).map(([key, node]) => {
-                    const color = 'transparent'; //node.getFillColor(); // ATTENTION
-                    return <NodeSVG key={key} nodeName={key as NodeNameType} node={node} color={color} handleNodeClickHelper={(nodeName) => handleNodeClick(nodeName as NodeNameType, node.cell.col * cellWidth, node.cell.row * cellHeight)} showStandin={showStandin} />;
-                })}
-            </svg>}
-            {/*(nodeName) && (
-                <div style={{
-                    position: 'absolute',
-                    top: boxPosition.top,
-                    left: boxPosition.left,
-                    backgroundColor: 'pink',
-                    padding: '10px',
-                    border: '1px solid black',
-                    zIndex: 10,
-                    borderRadius: '5px',
-                    width: '350px',
-                    height: nodeName === 'Humans' ? '100px' : '250px',
-                    overflowY: 'auto'
-                }}>
-                    <button onClick={() => setNodeName(null)} style={{
-                        float: 'right',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '16px',
-                        cursor: 'pointer'
-                    }}>✖</button>
+            {nodes && (
+                <svg width={svgSize.width} height={svgSize.height} className="absolute top-0 left-0 bg-transparent">
+                    {Object.entries(nodes).map(([key, node]) => {
+                        const color = 'transparent'; // node.getFillColor(); // ATTENTION
+                        return (
+                            <NodeSVG
+                                key={key}
+                                nodeName={key as NodeNameType}
+                                node={node}
+                                color={color}
+                                handleNodeClickHelper={(nodeName) =>
+                                    handleNodeClick(nodeName as NodeNameType, node.cell.col * cellWidth, node.cell.row * cellHeight)
+                                }
+                                showStandin={showStandin}
+                            />
+                        );
+                    })}
+                </svg>
+            )}
+            {nodes && nodeName && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: boxPosition.top,
+                        left: boxPosition.left,
+                        backgroundColor: 'pink',
+                        padding: '10px',
+                        border: '1px solid black',
+                        zIndex: 10,
+                        borderRadius: '5px',
+                        width: '350px',
+                        height: nodeName === 'Humans' ? '100px' : '250px',
+                        overflowY: 'auto',
+                    }}
+                >
+                    <button
+                        onClick={() => setNodeName(null)}
+                        style={{
+                            float: 'right',
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '16px',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        ✖
+                    </button>
                     <p>{nodes[nodeName].description}</p>
                 </div>
-            )*/}
+            )}
         </div>
     );
 }

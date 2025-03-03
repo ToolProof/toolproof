@@ -14,10 +14,10 @@ export default function Problem() {
     }
 
     return (
-        <div className='flex flex-col'>
+        <div className='flex flex-col items-center bg-red-400'>
             <h1>{problem.name}</h1>
             <Resources problemId={problem.id} />
-            <Tools problemId={problem.id} />
+            {/* <Tools problemId={problem.id} /> */}
         </div>
     )
 

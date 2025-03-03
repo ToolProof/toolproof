@@ -7,9 +7,9 @@ export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeName
         Humans: new Node(new Cell(2, 8, cellWidth, cellHeight), 'vercel', 'code', true, nodeDescriptions['Humans']),
         Tools: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
         Standin: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code_ai', true, nodeDescriptions['Tools']),
-        Data: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Tools']),
-        Meta: new Node(new Cell(1, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, nodeDescriptions['Tools']),
-        MetaInternal: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data_meta', true, nodeDescriptions['Tools']),
+        Data: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Data']),
+        Meta: new Node(new Cell(1, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, nodeDescriptions['Meta']),
+        MetaInternal: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data_meta', true, nodeDescriptions['MetaInternal']),
     } as const;
 }
 
@@ -21,7 +21,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             edge: new Edge(['AI', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Tools_AI',
+                reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -32,7 +32,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             edge: new Edge(['Tools', 'bottom'], ['AI', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'AI_Tools',
+                reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -43,7 +43,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             edge: new Edge(['Humans', 'top'], ['AI', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'AI_Humans',
+                reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -54,7 +54,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             edge: new Edge(['AI', 'bottom'], ['Humans', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Humans_AI',
+                reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -261,39 +261,35 @@ export const validTransitions: Record<GraphElementNameType, GraphElementNameType
 
 
 export const path: Array<[GraphElementNameType[], string]> = [
-    [['Humans'],
-        'In the beginning, there were only Humans.'
+    [[],
+        'Use the buttons below to navigate through a typical process iteration.'
     ],
-    [['Humans'],
-        'Humans could replicate to create other Humans.'
+    [['Humans', 'Humans_Data', 'Data'],
+        'A Human uploads an Anchor and a Target.'
     ],
-    [['Humans', 'Humans_Tools', 'Tools'],
-        'Then Humans made Tools.'
+    [['Data', 'Data_AI', 'AI'],
+        'The AI retrieves the Anchor and the Target.'
     ],
-    [['Humans', 'Tools_Humans', 'Tools'],
-        'Humans were using the Tools. They could create more Humans.'
+    [['AI', 'AI_Data', 'Data'],
+        'The AI constructs a Candidate.'
     ],
-    [['Humans', 'Humans_Tools', 'Tools'],
-        'Then Humans made more advanced Tools.'
+    [['Data', 'Data_Tools', 'Tools'],
+        'AutoDock Vina retrieves the Candidate and the Target.'
     ],
-    [['Humans', 'Tools_Humans', 'Tools'],
-        'Then Humans were using these more advanced Tools. They could create even more Humans.'
+    [['Tools', 'Tools_Data', 'Data'],
+        'AutoDock Vina simulates the interactions between the Candidate and the Target.'
     ],
-    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data'],
-        'Then Humans made Tools that could store Data. We entered the Historical Period. We had books, later usepapers'
+    [['Data', 'Data_AI', 'AI'],
+        'The AI retrieves the SimulationResult.'
     ],
-    [['Humans', 'Humans_Tools', 'Tools', 'Tools_Data', 'Data', 'Data_Humans'],
-        'Humans were consuming the Data that either themselves or other Humans had generated.'
+    [['AI', 'AI_Data', 'Data'],
+        'The AI writes a Paper.'
     ],
-    [['Humans', 'Humans_Tools', 'Tools', 'Data_Humans', 'Data', 'Tools_Data'],
-        'Humans used Tools to create a special type of Data, called instructions. Human then put these Data into Tools. We had computers.'
+    [['Data', 'Data_Humans', 'Humans'],
+        'The Human reads the Paper.'
     ],
-    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools'],
-        'We now replace Tools and Humans with computers.'
-    ],
-    [['Humans', 'Humans_Data', 'Data', 'Data_Tools', 'Tools', 'AI'],
-        'Now we have AI.'
-    ],
+    [['Humans', 'Humans_AI', 'AI', 'AI_Humans'],
+        'The Human discusses the Paper with the AI.']
 ];
 
 
