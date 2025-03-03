@@ -12,7 +12,6 @@ import Image from 'next/image';
 export default function SideBar() {
     const { data: session } = useSession();
     const userEmail = session?.user?.email || '';
-    const { files } = useResources();
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
@@ -37,13 +36,6 @@ export default function SideBar() {
                         <option value={'Alzheimer'}>Alzheimer</option>
                         <option value={'DLB'}>DLB</option>
                     </select>
-                </div>
-                <div className='flex flex-col py-4 space-y-2'>
-                    {files.map(file => (
-                        true && (
-                            <FileRow key={file.id} fileName={file.id} selectedOption={selectedOption} />
-                        )
-                    ))}
                 </div>
             </div>
             {session && (
