@@ -267,23 +267,23 @@ export const path: Array<[GraphElementNameType[], string]> = [
     [['Humans', 'Humans_Data', 'Data'],
         'A Human uploads an Anchor and a Target.'
     ],
-    [['Data', 'Data_AI', 'AI'],
+    [['Data', 'Data_AI', 'AI', 'Meta_AI'],
         'The AI retrieves the Anchor and the Target.'
     ],
-    [['AI', 'AI_Data', 'Data'],
+    [['AI', 'AI_Data', 'Data', 'AI_Meta'],
         'The AI constructs a Candidate.'
     ],
-    [['Data', 'Data_Tools', 'Tools'],
+    [['Data', 'Data_Tools', 'Tools', 'Data_Standin', 'Standin'],
         'AutoDock Vina retrieves the Candidate and the Target.'
     ],
-    [['Tools', 'Tools_Data', 'Data'],
+    [['Tools', 'Tools_Data', 'Data', 'Standin_Data', 'Standin'],
         'AutoDock Vina simulates the interactions between the Candidate and the Target.'
     ],
-    [['Data', 'Data_AI', 'AI'],
-        'The AI retrieves the SimulationResult.'
+    [['Data', 'Data_AI', 'AI', 'Meta_AI'],
+        'The AI retrieves the SimulationResults.'
     ],
-    [['AI', 'AI_Data', 'Data'],
-        'The AI writes a Paper.'
+    [['AI', 'AI_Data', 'Data', 'AI_Meta'],
+        'If the results are promising, the AI writes a Paper.'
     ],
     [['Data', 'Data_Humans', 'Humans'],
         'The Human reads the Paper.'
