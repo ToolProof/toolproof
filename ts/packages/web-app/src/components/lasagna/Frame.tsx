@@ -1,7 +1,7 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
 import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
-import { path, validTransitions } from '@/components/lasagna/specs/alpha/specs';
+import { path } from '@/components/lasagna/specs/alpha/specs';
 import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 
 interface FrameProps {

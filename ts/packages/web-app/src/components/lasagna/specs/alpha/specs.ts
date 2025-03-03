@@ -240,7 +240,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
     }
 }
 
-export const validTransitions: Record<GraphElementNameType, GraphElementNameType[]> = {
+/* export const validTransitions: Record<GraphElementNameType, GraphElementNameType[]> = {
     AI: ['AI_Tools', 'AI_Humans', 'AI_Data'],
     Tools: ['Tools_AI', 'Tools_Humans', 'Tools_Data'],
     Humans: ['Humans_AI', 'Humans_Tools', 'Humans_Data'],
@@ -257,7 +257,7 @@ export const validTransitions: Record<GraphElementNameType, GraphElementNameType
     Data_AI: ['AI'],
     Humans_Data: ['Data'],
     Data_Humans: ['Humans'],
-};
+}; */
 
 
 export const path: Array<[GraphElementNameType[], string]> = [

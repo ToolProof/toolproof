@@ -8,6 +8,7 @@ export const nodeDescriptions: Record<NodeNameType, string> = {
     Data: 'Data are the raw materials that the AI uses to generate InnerInput. Data are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.',
     Meta: 'Meta record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
     MetaInternal: 'Meta record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
+    Standin: '',
 };
 
 
