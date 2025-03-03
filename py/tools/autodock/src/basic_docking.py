@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from google.cloud import storage
 from google.auth import default
+import shutil
 
 
 # Set credentials
@@ -17,6 +18,19 @@ else:
 
 # Initialize storage client
 storage_client = storage.Client()
+
+
+def clear_tmp():
+    tmp_dir = "/tmp"
+    for filename in os.listdir(tmp_dir):
+        file_path = os.path.join(tmp_dir, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f"Failed to delete {file_path}: {e}")
 
 
 def run_command(command, check=True, env=None):
@@ -205,6 +219,8 @@ def retrieve_gcs_files(**kwargs):
 
 def run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path):
     try:
+        clear_tmp()  # Clear temp files before running
+        
         # Download necessary files from Cloud Storage
         local_files = retrieve_gcs_files(
             lig_smiles_path=lig_smiles_path, 
