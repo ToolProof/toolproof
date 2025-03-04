@@ -1,10 +1,17 @@
 from flask import Flask, jsonify, request
 from tools.autodock import basic_docking
+from ai import ai
 
 app = Flask(__name__)
 
+@app.route("/ai", methods=["GET", "POST"])
+def handle_request_ai():
+    ai.hello_world()
+    return jsonify({"message": "AI is working!"})
+    
+
 @app.route("/adv", methods=["GET", "POST"])
-def handle_request():
+def handle_request_adv():
     if request.method == "POST":
         data = request.json
         if not data:
