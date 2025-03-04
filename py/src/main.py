@@ -6,8 +6,8 @@ app = Flask(__name__)
 
 @app.route("/ai", methods=["GET", "POST"])
 def handle_request_ai():
-    ai.hello_world()
-    return jsonify({"message": "AI is working!"})
+    result = ai.test()
+    return jsonify({"message": "AI is working!", "result": result})
     
 
 @app.route("/adv", methods=["GET", "POST"])

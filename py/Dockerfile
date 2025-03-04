@@ -36,6 +36,9 @@ RUN micromamba run -n bd_env pip install prody
 # Install google-cloud-storage within the micromamba environment
 RUN micromamba run -n bd_env pip install google-cloud-storage
 
+# Install langchain and langchain-openai within the micromamba environment
+RUN micromamba run -n bd_env pip install langchain langchain-openai
+
 # Expose ports
 EXPOSE 8080
 

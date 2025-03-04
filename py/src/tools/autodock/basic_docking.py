@@ -4,6 +4,7 @@ from datetime import datetime
 from google.cloud import storage
 from google.auth import default
 import shutil
+from utils.gcs_utils import download_from_gcs, upload_to_gcs
 
 
 # Set credentials
@@ -165,42 +166,6 @@ def export_pose(lig_docking):
     run_command(f"micromamba run -n bd_env mk_export.py {lig_docking} -s {output_path}")
     return output_path
 
-
-def upload_to_gcs(local_path, bucket_name, destination_blob_name):
-    """Uploads a file to Google Cloud Storage."""
-    try:
-        print(f"Uploading {local_path} to GCS bucket {bucket_name} as {destination_blob_name}...")
-        bucket = storage_client.bucket(bucket_name)
-        blob = bucket.blob(destination_blob_name)
-        blob.upload_from_filename(local_path)
-        print(f"File {local_path} uploaded to {bucket_name}/{destination_blob_name}.")
-        return True
-    except Exception as e:
-        print(f"Failed to upload {local_path} to GCS: {e}")
-        return False
-    
-    
-def download_from_gcs(gcs_path):
-    """Downloads a file from Google Cloud Storage to /tmp and returns the local path."""
-    try:
-        # Extract the bucket name and blob name from the GCS path
-        if gcs_path.startswith("gs://"):
-            gcs_path = gcs_path[len("gs://"):]
-        bucket_name, blob_name = gcs_path.split("/", 1)
-        
-        # Define the local file path
-        local_path = f"/tmp/{os.path.basename(blob_name)}"
-
-        # Download the file
-        bucket = storage_client.bucket(bucket_name)
-        blob = bucket.blob(blob_name)
-        blob.download_to_filename(local_path)
-
-        print(f"Downloaded {gcs_path} to {local_path}")
-        return local_path
-    except Exception as e:
-        print(f"Failed to download {gcs_path}: {e}")
-        raise
 
 def retrieve_gcs_files(**kwargs):
     """
