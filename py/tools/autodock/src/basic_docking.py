@@ -235,8 +235,6 @@ def run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig
         
         lig_prepared = prepare_ligand(lig_smiles)
         
-        print(f"Prepared ligand: {lig_prepared}")
-        
         rec_prepared = prepare_receptor(rec_no_lig, lig_box)
         
         lig_docking = run_docking(lig_prepared, rec_prepared)
@@ -252,8 +250,8 @@ def run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig
         os.makedirs(date_time_str, exist_ok=True)
         
         files_to_upload = [
-            (lig_docking, f"{date_time_str}{lig_docking[4:]}"),
-            (lig_pose, f"{date_time_str}{lig_pose[4:]}")
+            (lig_docking, f"adv/{date_time_str}{lig_docking[4:]}"),
+            (lig_pose, f"adv/{date_time_str}{lig_pose[4:]}")
         ]
         
         success_files = []

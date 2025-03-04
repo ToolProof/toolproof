@@ -36,7 +36,7 @@ RUN micromamba run -n bd_env pip install prody
 # Install google-cloud-storage within the micromamba environment
 RUN micromamba run -n bd_env pip install google-cloud-storage
 
-# Expose ports if needed (optional)
+# Expose ports
 EXPOSE 8080
 
 # Set the command to run your Python script when the container starts
