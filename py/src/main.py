@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request
-import basic_docking
+from tools.autodock import basic_docking
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/adv", methods=["GET", "POST"])
 def handle_request():
     if request.method == "POST":
         data = request.json
@@ -19,7 +19,7 @@ def handle_request():
             rec_no_lig_path = data.get("rec_no_lig_path")
 
             # Call the workflow from basic_docking
-            result = basic_docking.run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path)
+            result = basic_docking.run_simulation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path)
             return jsonify({"message": "Automation completed successfully", "result": result}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500

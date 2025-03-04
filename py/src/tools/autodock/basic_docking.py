@@ -217,7 +217,7 @@ def retrieve_gcs_files(**kwargs):
     return local_files
 
 
-def run_automation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path):
+def run_simulation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path):
     try:
         clear_tmp()  # Clear temp files before running
         
