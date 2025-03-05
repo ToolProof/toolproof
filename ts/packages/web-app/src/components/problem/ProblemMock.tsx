@@ -8,7 +8,7 @@ interface ProblemMockProps {
 }
 
 export default function ProblemMock({ counter, isNor }: ProblemMockProps) {
-    const [displayText, setDisplayText] = useState('');
+    const [displayText, setDisplayText] = useState(''); // Display text for resource descriptions
     const prevCounterRef = useRef(counter); // Using useRef to persist previous counter value
 
     useEffect(() => {

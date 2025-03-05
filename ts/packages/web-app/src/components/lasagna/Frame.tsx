@@ -128,9 +128,14 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
       <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
         {headline}
       </div>
-      <div className="fixed top-6 left-0 w-full text-center p-4 font-bold text-xs bg-transparent">
+      <div className="fixed top-6 left-0 w-full text-center p-4 text-xs bg-transparent">
         {subHeadline}
       </div>
+      {isNor && (
+        <div className="fixed top-12 left-0 w-full bg-transparent p-4 text-xs text-center">
+          NB: Fremstillingen er opprinnelig ment for tekniske samarbeidspartnere og kan derfor være noe avansert for allmennheten.
+        </div>)
+      }
       <Painting
         isElementActive={isElementActive}
         counter={counter}
