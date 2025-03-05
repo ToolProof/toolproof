@@ -1,16 +1,18 @@
 'use client';
 import NodeSVG from './NodeSVG';
 import { Point, Node, Edge, GraphElementNameType, NodeNameType, EdgeNameType, EdgeWithConfig } from './classes';
-import { getNodes, getEdgesWithConfig } from './specs/alpha/specs';
+import { getNodes, getEdgesWithConfig } from './specs';
+import { getNodes as getNodesNor, getEdgesWithConfig as getEdgesWithConfigNor } from './specsNor';
 import { useState, useRef, useEffect, useMemo } from 'react';
 
 interface PaintingProps {
     isElementActive: (key: GraphElementNameType) => boolean;
     counter: number;
     showStandin: boolean;
+    isNor: boolean;
 }
 
-export default function Painting({ isElementActive, counter, showStandin }: PaintingProps) {
+export default function Painting({ isElementActive, counter, showStandin, isNor }: PaintingProps) {
     const parentRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [nodeName, setNodeName] = useState<NodeNameType | null>(null);
@@ -66,11 +68,16 @@ export default function Painting({ isElementActive, counter, showStandin }: Pain
     }, [gridSize]);
 
     useEffect(() => {
-        const nodes = getNodes(cellWidth, cellHeight);
-        setNodes(nodes);
-        const edgesWithConfig = getEdgesWithConfig(cellWidth, cellHeight);
-        setEdgesWithConfig(edgesWithConfig);
-    }, [cellHeight, cellWidth]);
+        if (isNor) {
+            setNodes(getNodesNor(cellWidth, cellHeight));
+            setEdgesWithConfig(getEdgesWithConfigNor(cellWidth, cellHeight));
+        } else {
+            const nodes = getNodes(cellWidth, cellHeight);
+            setNodes(nodes);
+            const edgesWithConfig = getEdgesWithConfig(cellWidth, cellHeight);
+            setEdgesWithConfig(edgesWithConfig);
+        }
+    }, [cellHeight, cellWidth, isNor]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -97,7 +104,7 @@ export default function Painting({ isElementActive, counter, showStandin }: Pain
             if (!showStandin && key === 'Standin') return;
             if (showStandin && key === 'Tools') return;
             if (!showStandin && key === 'Meta') return;
-            if (showStandin && key === 'MetaInternal') return;
+            if ((showStandin || isNor) && key === 'MetaInternal') return;
             const color = isActive ? 'yellow' : 'black';
             node.draw(context, color, key as NodeNameType, showStandin);
         });

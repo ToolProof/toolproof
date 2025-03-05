@@ -1,5 +1,5 @@
 import Wall from '@/components/lasagna/Wall';
 
 export default function Home() {
-  return <Wall isNor={false} />;
+  return <Wall isNor={true} />;
 }

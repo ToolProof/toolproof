@@ -269,7 +269,8 @@ export class Node extends GraphElement {
         if (key === 'Standin') {
             displayText = 'Tools';
         } else if (key === 'MetaInternal') {
-            displayText = 'Meta';
+            // displayText = 'Meta';
+            displayText = '';
         }
         /* if (displayText === 'AI') {
             displayText = 'OpenAI o3';

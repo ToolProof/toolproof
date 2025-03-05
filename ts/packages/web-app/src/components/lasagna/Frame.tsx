@@ -1,17 +1,19 @@
 'use client'
 import Painting from '@/components/lasagna/Painting';
-import { GraphElementNameType, Node, EdgeWithConfig } from '@/components/lasagna/classes';
-import { path } from '@/components/lasagna/specs/alpha/specs';
-import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
+import { GraphElementNameType } from '@/components/lasagna/classes';
+import { path } from '@/components/lasagna/specs';
+import { path as pathNor } from '@/components/lasagna/specsNor';
+import { useState, useRef, useEffect, Dispatch, SetStateAction } from 'react';
 
 interface FrameProps {
   counter: number;
   setCounter: Dispatch<SetStateAction<number>>;
   pathDescription: string;
   setPathDescription: Dispatch<SetStateAction<string>>;
+  isNor: boolean;
 }
 
-export default function Frame({ counter, setCounter, pathDescription, setPathDescription }: FrameProps) {
+export default function Frame({ counter, setCounter, pathDescription, setPathDescription, isNor }: FrameProps) {
   const [showStandin, setshowStandin] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeElement, setActiveElement] = useState<GraphElementNameType | null>(null);
@@ -20,8 +22,12 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
 
 
   useEffect(() => {
-    setPathDescription(path[counter]?.[1] || '');
-  }, [counter, setPathDescription]);
+    if (isNor) {
+      setPathDescription(pathNor[counter]?.[1] || '');
+    } else {
+      setPathDescription(path[counter]?.[1] || '');
+    }
+  }, [counter, isNor, setPathDescription]);
 
   const isElementActive = (key: GraphElementNameType) => {
     return path[counter]?.[0]?.includes(key) || false;
@@ -103,40 +109,54 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
     };
   }, [playNext]); */
 
-  const headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showStandin ? ' - Version 2' : ' - Version 1');
-  const subHeadline = 'Rectangles indicate code | Diamonds indicate code that runs AI | Ellipses indicate data storage | Color indicates where the code/data runs/resides';
+  let headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showStandin ? ' - Version 2' : ' - Version 1');
+  let subHeadline = 'Rectangles indicate code | Diamonds indicate code that runs AI | Ellipses indicate data storage | Color indicates where the code/data runs/resides';
+
+  let buttonPrevious = 'Previous';
+  let buttonNext = 'Next';
+
+  if (isNor) {
+    headline = 'Velkommen til en visualisering av ToolProof Drug Discovery (alle elementer kan klikkes på for informasjon)';
+    subHeadline = 'Rektangler indikerer kode | Diamanter indikerer KI (engelsk: AI) | Ellipser indikerer datalagring | Farge indikerer hvor koden/datalagringen kjører/oppholder seg';
+    buttonPrevious = 'Forrige';
+    buttonNext = 'Neste';
+  }
+
 
   return (
     <div className='bg-transparent w-full h-full'>
       <div className="fixed top-0 left-0 w-full text-center p-2 font-bold text-lg bg-white">
         {headline}
       </div>
-      <div className="fixed top-6 left-0 w-full text-center p-4 font-bold text-sm bg-transparent">
+      <div className="fixed top-6 left-0 w-full text-center p-4 font-bold text-xs bg-transparent">
         {subHeadline}
       </div>
       <Painting
         isElementActive={isElementActive}
         counter={counter}
         showStandin={showStandin}
+        isNor={isNor}
       />
       !isPlaying && (
-        <div className="fixed bottom-14 right-0 w-[600px] bg-transparent p-4 text-center">
-          <p>{pathDescription}</p>
-        </div>
+      <div className="fixed bottom-14 right-0 w-[600px] bg-transparent p-4 text-center">
+        <p>{pathDescription}</p>
+      </div>
       )
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent">
         <div className="flex-grow flex justify-center">
-          <button
-            className="fixed right-2 w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            onClick={() => setshowStandin((prev) => !prev)}
-          >
-            {showStandin ? 'Show V.1' : 'Show V.2'}
-          </button>
+          {!isNor && (
+            <button
+              className="fixed right-2 w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              onClick={() => setshowStandin((prev) => !prev)}
+            >
+              {showStandin ? 'Show V.1' : 'Show V.2'}
+            </button>
+          )}
           <button
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickPrevious}
           >
-            Previous
+            {buttonPrevious}
           </button>
           {/* <button className="w-32 mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>
             {isPlaying ? 'Stop' : 'Play'}
@@ -145,7 +165,7 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
             className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickNext}
           >
-            Next
+            {buttonNext}
           </button>
         </div>
       </div>

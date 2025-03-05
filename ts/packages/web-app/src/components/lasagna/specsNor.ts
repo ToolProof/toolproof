@@ -1,4 +1,4 @@
-import { nodeDescriptions, pathDescriptions } from '../texts';
+import { nodeDescriptions, pathDescriptions } from './texts/textsNor';
 import { Cell, NodeNameType, EdgeNameType, Node, Edge, GraphElementNameType, EdgeWithConfig } from '@/components/lasagna/classes';
 
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
@@ -9,7 +9,7 @@ export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeName
         Standin: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code_ai', true, nodeDescriptions['Tools']),
         Data: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Data']),
         Meta: new Node(new Cell(1, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, nodeDescriptions['Meta']),
-        MetaInternal: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data_meta', true, nodeDescriptions['MetaInternal']),
+        MetaInternal: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data_meta', true, nodeDescriptions['Data']),
     } as const;
 }
 
@@ -261,35 +261,16 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
 
 
 export const path: Array<[GraphElementNameType[], string]> = [
-    [[],
-        'Use the buttons below to navigate through a typical process iteration.'
-    ],
-    [['Humans', 'Humans_Data', 'Data'],
-        'A Human uploads an Anchor and a Target.'
-    ],
-    [['Data', 'Data_AI', 'AI', 'Meta_AI'],
-        'The AI retrieves the Anchor and the Target.'
-    ],
-    [['AI', 'AI_Data', 'Data', 'AI_Meta'],
-        'The AI constructs a Candidate.'
-    ],
-    [['Data', 'Data_Tools', 'Tools', 'Data_Standin', 'Standin'],
-        'AutoDock Vina retrieves the Candidate and the Target.'
-    ],
-    [['Tools', 'Tools_Data', 'Data', 'Standin_Data', 'Standin'],
-        'AutoDock Vina simulates the interactions between the Candidate and the Target.'
-    ],
-    [['Data', 'Data_AI', 'AI', 'Meta_AI'],
-        'The AI retrieves the SimulationResults.'
-    ],
-    [['AI', 'AI_Data', 'Data', 'AI_Meta'],
-        'If the results are promising, the AI writes a Paper.'
-    ],
-    [['Data', 'Data_Humans', 'Humans'],
-        'The Human reads the Paper.'
-    ],
-    [['Humans', 'Humans_AI', 'AI', 'AI_Humans'],
-        'The Human discusses the Paper with the AI.']
+    [[], pathDescriptions[0]],
+    [['Humans', 'Humans_Data', 'Data'], pathDescriptions[1]],
+    [['Data', 'Data_AI', 'AI', 'Meta_AI'], pathDescriptions[2]],
+    [['AI', 'AI_Data', 'Data', 'AI_Meta'], pathDescriptions[3]],
+    [['Data', 'Data_Tools', 'Tools', 'Data_Standin', 'Standin'], pathDescriptions[4]],
+    [['Tools', 'Tools_Data', 'Data', 'Standin_Data', 'Standin'], pathDescriptions[5]],
+    [['Data', 'Data_AI', 'AI', 'Meta_AI'], pathDescriptions[6]],
+    [['AI', 'AI_Data', 'Data', 'AI_Meta'], pathDescriptions[7]],
+    [['Data', 'Data_Humans', 'Humans'], pathDescriptions[8]],
+    [['Humans', 'Humans_AI', 'AI', 'AI_Humans'], pathDescriptions[9]],
 ];
 
 
