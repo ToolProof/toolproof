@@ -252,7 +252,7 @@ export class Node extends GraphElement {
         context.stroke();
     }
 
-    drawText(context: CanvasRenderingContext2D, key: string, showStandin: boolean) {
+    drawText(context: CanvasRenderingContext2D, key: string, showStandin: boolean, isNor: boolean) {
         if (!context) return;
         /* if (key === 'MetaInternal') {
             return null;
@@ -269,8 +269,11 @@ export class Node extends GraphElement {
         if (key === 'Standin') {
             displayText = 'Tools';
         } else if (key === 'MetaInternal') {
-            // displayText = 'Meta';
-            displayText = '';
+            if (isNor) {
+                displayText = '';
+            } else {
+                displayText = 'Meta';
+            }
         }
         /* if (displayText === 'AI') {
             displayText = 'OpenAI o3';

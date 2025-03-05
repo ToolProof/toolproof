@@ -12,9 +12,14 @@ export default function ProblemMock({ counter, isNor }: ProblemMockProps) {
     const prevCounterRef = useRef(counter); // Using useRef to persist previous counter value
 
     useEffect(() => {
-        setDisplayText('');
+        if (isNor && counter !== 0) {
+            setDisplayText('Også elementene ovenfor kan klikkes for informasjon.');
+        }
+        else {
+            setDisplayText('');
+        }
         prevCounterRef.current = counter; // Update previous counter after render
-    }, [counter]);
+    }, [counter, isNor]);
 
     const handleClick = (resource: string) => {
         if (isNor) {
@@ -71,7 +76,7 @@ export default function ProblemMock({ counter, isNor }: ProblemMockProps) {
                     </li>
                 ))}
             </ul>
-            <p className='mt-24'>{displayText}</p>
+            <p className='mt-12'>{displayText}</p>
         </div>
     );
 }

@@ -117,7 +117,7 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
 
   if (isNor) {
     headline = 'Velkommen til en visualisering av ToolProof Drug Discovery (alle elementer kan klikkes på for informasjon)';
-    subHeadline = 'Rektangler indikerer kode | Diamanter indikerer KI (engelsk: AI) | Ellipser indikerer datalagring | Farge indikerer hvor koden/datalagringen kjører/oppholder seg';
+    subHeadline = 'Rektangler = kode | Diamanter = KI (AI) | Ellipser = datalagring | Farge indikerer hvor koden/datalagringen kjører/oppholder seg | NB: Fremstillingen er noe teknisk';
     buttonPrevious = 'Forrige';
     buttonNext = 'Neste';
   }
@@ -131,11 +131,6 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
       <div className="fixed top-6 left-0 w-full text-center p-4 text-xs bg-transparent">
         {subHeadline}
       </div>
-      {isNor && (
-        <div className="fixed top-12 left-0 w-full bg-transparent p-4 text-xs text-center">
-          NB: Fremstillingen er opprinnelig ment for tekniske samarbeidspartnere og kan derfor være noe avansert for allmennheten.
-        </div>)
-      }
       <Painting
         isElementActive={isElementActive}
         counter={counter}
@@ -147,27 +142,24 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
         <p>{pathDescription}</p>
       </div>
       )
-      <div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent">
-        <div className="flex-grow flex justify-center">
+      <div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent justify-center">
+        <div className="flex w-1/2 justify-end">
           {!isNor && (
             <button
-              className="fixed right-2 w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
               onClick={() => setshowStandin((prev) => !prev)}
             >
               {showStandin ? 'Show V.1' : 'Show V.2'}
             </button>
           )}
           <button
-            className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
+            className={`w-32 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''} mr-2`}
             onClick={handleClickPrevious}
           >
             {buttonPrevious}
           </button>
-          {/* <button className="w-32 mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={handleClickPlay}>
-            {isPlaying ? 'Stop' : 'Play'}
-          </button> */}
           <button
-            className={`w-32 mx-2 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
+            className={`w-32 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''}`}
             onClick={handleClickNext}
           >
             {buttonNext}

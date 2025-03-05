@@ -114,7 +114,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             if (showStandin && key === 'Tools') return;
             if (!showStandin && key === 'Meta') return;
             if (showStandin && key === 'MetaInternal') return;
-            node.drawText(context, key, showStandin);
+            node.drawText(context, key, showStandin, isNor);
         });
 
 
@@ -185,7 +185,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             }
         });
 
-    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showStandin]);
+    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showStandin, isNor]);
 
 
     return (
