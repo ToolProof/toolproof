@@ -29,5 +29,5 @@ export const pathDescriptions: Record<number, string> = {
     6: 'AI-en henter simuleringsresultatene.',
     7: 'Hvis resultatene er lovende, skriver AI-en en artikkel.',
     8: 'Mennesket leser artikkelen.',
-    9: 'Mennesket diskuterer artikkelen med AI-en og vurderer laboratorietester.',
+    9: 'Mennesket diskuterer artikkelen med AI-en og vurderer laboratorietester eller nye runder med simulering.',
 };
