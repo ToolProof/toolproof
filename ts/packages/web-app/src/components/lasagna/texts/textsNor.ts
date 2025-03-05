@@ -8,7 +8,7 @@ export const nodeDescriptions: Record<NodeNameType, string> = {
     Data: 'Data er en filmappe som deles mellom mennesker, verktøy og AI-en. Det er her ankre, mål, kandidater mv. lagres og hentes.',
     Meta: 'Meta registrerer AI-ens interne tilstand og fungerer som en detaljert logg over hvert steg den tar, slik at den kan reflektere over sin egen atferd.',
     MetaInternal: 'Meta registrerer AI-ens interne tilstand og fungerer som en detaljert logg over hvert steg den tar, slik at den kan reflektere over sin egen atferd.',
-    Standin: '',
+    Standin: 'Foo',
 };
 
 export const resourceDescriptions: Record<string, string> = {
