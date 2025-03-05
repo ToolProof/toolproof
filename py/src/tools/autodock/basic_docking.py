@@ -1,24 +1,9 @@
 import subprocess
 import os
 from datetime import datetime
-from google.cloud import storage
 from google.auth import default
 import shutil
 from utils.gcs_utils import download_from_gcs, upload_to_gcs
-
-
-# Set credentials
-if os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
-    # Use explicit credentials if provided
-    print(f"Using credentials from GOOGLE_APPLICATION_CREDENTIALS: {os.getenv('GOOGLE_APPLICATION_CREDENTIALS')}")
-elif os.getenv("K_SERVICE"):
-    # Running in a Cloud Run environment, ADC is used automatically
-    print("Using Application Default Credentials (ADC).")
-else:
-    raise RuntimeError("No Google Cloud credentials found. Set GOOGLE_APPLICATION_CREDENTIALS.")
-
-# Initialize storage client
-storage_client = storage.Client()
 
 
 def clear_tmp():

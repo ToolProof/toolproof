@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/ai", methods=["GET", "POST"])
 def handle_request_ai():
-    result = ai.test()
+    result = ai.start()
     return jsonify({"message": "AI is working!", "result": result})
     
 
@@ -36,4 +36,4 @@ def handle_request_adv():
 
 if __name__ == "__main__":
     # Expose the app on port 8080
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=True)
