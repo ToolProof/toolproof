@@ -116,7 +116,7 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
   let buttonNext = 'Next';
 
   if (isNor) {
-    headline = 'Velkommen til en visualisering av ToolProof Drug Discovery (alle elementer kan klikkes på for informasjon)';
+    headline = 'Velkommen til en visualisering av ToolProof Drug Discovery (alle elementer kan klikkes for informasjon)';
     subHeadline = 'Rektangler = kode | Diamanter = KI (AI) | Ellipser = datalagring | Farge indikerer hvor koden/datalagringen kjører/oppholder seg | NB: Fremstillingen er noe teknisk';
     buttonPrevious = 'Forrige';
     buttonNext = 'Neste';
