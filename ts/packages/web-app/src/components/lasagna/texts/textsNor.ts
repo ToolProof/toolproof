@@ -12,10 +12,10 @@ export const nodeDescriptions: Record<NodeNameType, string> = {
 };
 
 export const resourceDescriptions: Record<string, string> = {
-    'anchor.pdb': 'En anker fungerer som et utgangspunkt for legemiddelutviklingsprosessen. Et anker er vanligvis et eksisterende, men suboptimalt legemiddel (også kjent som et ligand) for den aktuelle sykdommen. Ankrene er representert som .pdb (Protein Data Bank)-filer eller SMILES-strenger, begge brukt til å beskrive molekylstrukturer. Ankre som vil bli forsøkt med tanke på Lewy Body Demens er tyrosinhydroksylasehemmere som Imatinib og Nilotinib. Sistnevnte har gitt lovende testresultater mot denne sykdommen, men virkestoffet trenger i for liten grad inn i hjernen. Kanskje er det en forandring i designet på dette legemiddelet som skal til? (Tips: google Georgetown University + Lewy Body + Nilotinib for mer informasjon).',
-    'target.pdb': 'Målet er et protein som er kjent for å spille en rolle i sykdommen. AI-en bruker ankeret til å generere en kandidat som er antatt å binde seg til målet.',
+    'anchor.pdb': 'En anker fungerer som et utgangspunkt for legemiddelutviklingsprosessen. Et anker er vanligvis et eksisterende, men suboptimalt legemiddel (også kjent som et ligand) for den aktuelle sykdommen. Ankrene er representert som .pdb (Protein Data Bank)-filer eller SMILES-strenger, begge brukt til å beskrive molekylstrukturer. Ankre som vil bli forsøkt med tanke på Lewy Body Demens er tyrosinhydroksylasehemmere som Imatinib og Nilotinib. Sistnevnte har gitt lovende testresultater mot denne sykdommen, men virkestoffet trenger i for liten grad inn i hjernen. Kanskje er det en forandring i designet på dette legemiddelet som skal til? (google "Georgetown University + Lewy Body + Nilotinib" for mer informasjon).',
+    'target.pdb': 'Målet er et protein som er kjent for å spille en rolle i sykdommen. AI-en bruker ankeret til å generere en kandidat som er antatt å binde seg til målet. Med tanke på Lewy Body demens er det proteinet c-Abl som er det naturlige målet. Dette fordi det fosforylerer (kjemisk prosess) det sykdomsfremkallende alfa-synuklein proteinet, hvilket får sistnevnte til å klumpe seg sammen i hjernen i såkalte Lewy legemer.',
     'candidate.pdb': 'Kandidaten er et molekyl som genereres av AI-en basert på ankeret og målet. Kandidaten er antatt å binde seg til målet og har potensial til å utvikles til et legemiddel mot sykdommen.',
-    'simulationResults.xyz': 'Dette er resultatet av en simulering som tester kandidatens evne til å binde seg til målet. .xyz indikerer at resultatene består av filer i forskjellige filformater. Med tanke på Lewy Body demens er det proteinet c-Abl som er det naturlige målet. Dette fordi det fosforylerer (kjemisk prosess) det sykdomsfremkallende alfa-synuklein proteinet, hvilket får sistnevnte til å klumpe seg sammen i hjernen i såkalte Lewy legemer.',
+    'simulationResults.xyz': 'Dette er resultatet av en simulering som tester kandidatens evne til å binde seg til målet. .xyz indikerer at resultatene består av filer i forskjellige filformater.',
     'paper.txt': 'En akademisk artikkel som dokumenterer agentens resonnement, simuleringsprosessen og resultater, samt gir forslag til videre handling eller fremtidig forskning.',
 };
 
@@ -29,5 +29,5 @@ export const pathDescriptions: Record<number, string> = {
     6: 'AI-en henter simuleringsresultatene.',
     7: 'Hvis resultatene er lovende, skriver AI-en en artikkel.',
     8: 'Mennesket leser artikkelen.',
-    9: 'Mennesket diskuterer artikkelen med AI-en.',
+    9: 'Mennesket diskuterer artikkelen med AI-en og vurderer laboratorietester.',
 };
