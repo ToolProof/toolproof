@@ -21,7 +21,7 @@ export async function testHelper() {
         const thread = await client.threads.create();
 
         // Invoke the graph with the thread config
-        // const config = { configurable: { thread_id: "a3be082e-59c5-4070-85af-c30093f71ce4" } };
+        // const config = { configurable: { thread_id: "bb4fef5c-0d5b-45df-aa40-837a11662d44" } };
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {

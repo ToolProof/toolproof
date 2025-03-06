@@ -35,7 +35,7 @@ export default function SideBar() {
     return (
         <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
             <div className='flex-1'>
-                {false && (
+                {true && (
                     <button
                         onClick={handleAddChat}
                         className='bg-blue-500 text-white px-0 py-2 w-full rounded-md hover:bg-blue-600'

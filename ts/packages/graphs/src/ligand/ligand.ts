@@ -13,7 +13,7 @@ const State = Annotation.Root({
     ...MessagesAnnotation.spec,
     goal: Annotation<string>({
         reducer: (prev, next) => next, // Simple reducer that replaces the value
-        default: () => "Curing Dementia with Lewy Bodies", // Initial default value
+        default: () => "Curing cancer", // Initial default value
     }),
 
 });
