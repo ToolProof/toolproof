@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google-cloud/storage": "^7.15.2",
     "@langchain/langgraph": "^0.2.36",
     "@langchain/langgraph-checkpoint-postgres": "^0.0.2",
     "@langchain/langgraph-sdk": "^0.0.32",
@@ -19,6 +20,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@langchain/langgraph-cli": "^0.0.13",
     "@types/pg": "^8.11.10"
   }
 }

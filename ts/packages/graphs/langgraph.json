@@ -1,9 +1,13 @@
 {
     "node_version": "20",
     "dockerfile_lines": [],
-    "dependencies": ["."],
+    "dependencies": [
+        ".",
+        "./gcp-key.json"
+    ],
     "graphs": {
-      "graph": "./src/tests/baz.ts:graph"
+      "graph": "./src/tests/baz.ts:graph",
+      "storage_graph": "./src/tests/bazWithStorage.ts:graph"
     },
     "env": ".env"
-  }
+}
