@@ -5,8 +5,8 @@ import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
 
 const urlLocal = `http://localhost:8123`;
-const urlRemote = ``
-const url = urlLocal; //process.env.URL || urlLocal;
+const urlRemote = `https://baztest-490f0752e1d2559197a721cafbd3a375.us.langgraph.app`;
+const url = urlRemote; //process.env.URL || urlLocal;
 const graphName = 'graph';
 const client = new Client({
     apiUrl: url,
@@ -21,11 +21,11 @@ export async function testHelper() {
         const thread = await client.threads.create();
 
         // Invoke the graph with the thread config
-        // const config = { configurable: { thread_id: "bb4fef5c-0d5b-45df-aa40-837a11662d44" } };
+        // const config = { configurable: { thread_id: "5426f0ae-0abf-41ac-865b-6b1c7abf9056" } };
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('What is the capital of Sweden?')],
+                messages: [new HumanMessage('Who is the prime minister of Sweden?')],
             },
             config,
         );

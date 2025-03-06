@@ -5,6 +5,8 @@ import { useChat } from '@/lib/firebaseWebHelpers';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '@/redux/hooks';
+import { setShowSideBar } from '@/redux/features/configSlice';
 
 type Props = {
     params: {
@@ -17,6 +19,11 @@ export default function Chat({ params: { id } }: Props) {
     const userEmail = session?.user?.email || '';
     const router = useRouter();
     const { chat } = useChat(id);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(setShowSideBar(true));
+    }, [dispatch]);
 
     useEffect(() => {
         if (!userEmail) {

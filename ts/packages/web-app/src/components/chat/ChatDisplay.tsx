@@ -10,9 +10,14 @@ import { ChatRead } from 'shared/src/typings';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 
 
-const url = `http://localhost:8123`;
-const ligandGraph = new RemoteGraph({ graphId: 'graph', url });
-const config = { configurable: { thread_id: 'bb4fef5c-0d5b-45df-aa40-837a11662d44' } };
+const url = `https://baztest-490f0752e1d2559197a721cafbd3a375.us.langgraph.app`;
+const apiKey = process.env.NEXT_PUBLIC_LANGCHAIN_API_KEY;
+const ligandGraph = new RemoteGraph({ 
+    graphId: 'graph', 
+    url,
+    apiKey
+});
+const config = { configurable: { thread_id: '5426f0ae-0abf-41ac-865b-6b1c7abf9056' } };
 // ***
 
 type Props = {

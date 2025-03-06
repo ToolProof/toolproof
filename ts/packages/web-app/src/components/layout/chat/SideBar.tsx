@@ -17,6 +17,7 @@ export default function SideBar() {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const isApproved = useAppSelector(state => state.config.isApproved);
+    const showSideBar = useAppSelector(state => state.config.showSideBar);
 
     useEffect(() => {
         dispatch(setUserEmail(userEmail));
@@ -30,7 +31,9 @@ export default function SideBar() {
         }
     }
 
-    if (!isApproved) return <div />
+    if (!isApproved) return null;
+
+    if (!showSideBar) return null;
 
     return (
         <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
