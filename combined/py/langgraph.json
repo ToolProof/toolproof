@@ -1,0 +1,10 @@
+{
+    "dependencies": [
+        ".",
+        "./gcp-key.json"
+    ],
+    "graphs": {
+        "py_processor": "./processor.py:graph"
+    },
+    "env": ".env"
+}
