@@ -103,7 +103,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             const isActive = isElementActive(key as NodeNameType);
             if (!showStandin && key === 'Standin') return;
             if (showStandin && key === 'Tools') return;
-            if (!showStandin && key === 'Meta') return;
+            if (!showStandin && key === 'MetaInternal') return;
             if ((showStandin || isNor) && key === 'MetaInternal') return;
             const color = isActive ? 'yellow' : 'black';
             node.draw(context, color, key as NodeNameType, showStandin);
@@ -112,7 +112,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
         Object.entries(nodes).forEach(([key, node]) => {
             if (!showStandin && key === 'Standin') return;
             if (showStandin && key === 'Tools') return;
-            if (!showStandin && key === 'Meta') return;
+            if (!showStandin && key === 'MetaInternal') return;
             if (showStandin && key === 'MetaInternal') return;
             node.drawText(context, key, showStandin, isNor);
         });
@@ -137,10 +137,10 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             if (showStandin && key.includes('Tools')) {
                 shouldDraw = false;
             }
-            if (!showStandin && key.includes('Meta')) {
+            if (!showStandin && key.includes('MetaInternal')) {
                 shouldDraw = false;
             }
-            if (showStandin && (key === 'AI_Data' || key === 'Data_AI')) {
+            if (!showStandin && (key === 'AI_Data' || key === 'Data_AI')) {
                 shouldDraw = false;
             }
 

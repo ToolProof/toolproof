@@ -109,7 +109,7 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
     };
   }, [playNext]); */
 
-  let headline = 'Welcome to a visualization of ToolProof Drug Discovery' + (showStandin ? ' - Version 2' : ' - Version 1');
+  let headline = 'Welcome to a visualization of ToolProof Drug Discovery';
   let subHeadline = 'Rectangles indicate code | Diamonds indicate code that runs AI | Ellipses indicate data storage | Color indicates where the code/data runs/resides';
 
   let buttonPrevious = 'Previous';
@@ -144,14 +144,6 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
       )
       <div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent justify-center">
         <div className="flex w-1/2 justify-end">
-          {!isNor && (
-            <button
-              className="w-32 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
-              onClick={() => setshowStandin((prev) => !prev)}
-            >
-              {showStandin ? 'Show V.1' : 'Show V.2'}
-            </button>
-          )}
           <button
             className={`w-32 px-4 py-2 bg-gray-300 rounded ${!isPlaying ? 'hover:bg-gray-400' : ''} mr-2`}
             onClick={handleClickPrevious}

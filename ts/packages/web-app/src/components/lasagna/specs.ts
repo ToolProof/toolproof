@@ -153,7 +153,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             edge: new Edge(['Meta', 'center'], ['AI', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'AI_Data',
+                reverse: 'AI_Meta',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -164,7 +164,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
             edge: new Edge(['AI', 'left'], ['Meta', 'center'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Data_AI',
+                reverse: 'Meta_AI',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -263,12 +263,12 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
 export const path: Array<[GraphElementNameType[], string]> = [
     [[], pathDescriptions[0]],
     [['Humans', 'Humans_Data', 'Data'], pathDescriptions[1]],
-    [['Data', 'Data_AI', 'AI', 'Meta_AI'], pathDescriptions[2]],
-    [['AI', 'AI_Data', 'Data', 'AI_Meta'], pathDescriptions[3]],
+    [['Data', 'Meta', 'AI', 'Meta_AI'], pathDescriptions[2]],
+    [['AI', 'Meta', 'Data', 'AI_Meta'], pathDescriptions[3]],
     [['Data', 'Data_Tools', 'Tools', 'Data_Standin', 'Standin'], pathDescriptions[4]],
     [['Tools', 'Tools_Data', 'Data', 'Standin_Data', 'Standin'], pathDescriptions[5]],
-    [['Data', 'Data_AI', 'AI', 'Meta_AI'], pathDescriptions[6]],
-    [['AI', 'AI_Data', 'Data', 'AI_Meta'], pathDescriptions[7]],
+    [['Data', 'Meta', 'AI', 'Meta_AI'], pathDescriptions[6]],
+    [['AI', 'Meta', 'Data', 'AI_Meta'], pathDescriptions[7]],
     [['Data', 'Data_Humans', 'Humans'], pathDescriptions[8]],
     [['Humans', 'Humans_AI', 'AI', 'AI_Humans'], pathDescriptions[9]],
 ];
