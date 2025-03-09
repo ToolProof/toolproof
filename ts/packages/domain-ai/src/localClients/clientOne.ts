@@ -14,7 +14,7 @@ const client = new Client({
 const remoteGraph = new RemoteGraph({ graphId: graphName, url });
 
 
-export async function testHelper() {
+export async function runRemoteGraph() {
 
     try {
         // Create a thread (or use an existing thread instead)
@@ -25,7 +25,7 @@ export async function testHelper() {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('Who is the prime minister of Sweden?')],
+                messages: [new HumanMessage('Who is the prime minister of Denmark?')],
             },
             config,
         );
