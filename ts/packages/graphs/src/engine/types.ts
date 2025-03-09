@@ -1,4 +1,5 @@
-import { primeGoal, TOOL_METADATA, RESOURCE_METADATA } from './toolproof';
+import { TOOL_METADATA, RESOURCE_METADATA, primeGoal } from './constants.js';
+
 
 // Extract types from metadata keys
 export type ToolType = keyof typeof TOOL_METADATA;
@@ -35,33 +36,24 @@ export type Direction = {
 export type Actionable = string; // must semantically satisfy certain conditions
 
 
-/**
- * Represents a Worker within ToolProof.
- * 
- * A Worker is an entity that operates toward a specified subgoal, defined by a direction object. This object includes:
- *  - A subgoal to pursue
- *  - A description of the direction
- *  - A suggested set of tools (though Workers may also utilize additional tools)
- * 
- * Workers generate an array of actionables—tasks that can be executed by Humans, and potentially in the future by Tools or other Workers, to achieve the specified subgoal.
- * 
- * Behavior:
- *  - If no direction is provided, a Worker defaults to pursuing the prime goal.
- *  - When multiple Workers are created with the same or similar subgoals (including the prime goal), ToolProof consolidates them into a single Worker to maximize efficiency.
- */
-export class Worker { // implements Runnable
-    direction: Direction;
+// Factory function to create a resource with its predefined description
+export const createResource = <T extends ResourceType>(
+    name: T,
+    path: string
+): { name: T; path: string; description: string } => ({
+    name,
+    description: RESOURCE_METADATA[name].description,
+    path
+});
 
-    constructor(direction: Direction = { subGoal: primeGoal, description: '', tools: [] }) {
-        this.direction = direction;
-    }
-
-    /**
-     * Returns an array of actionables—tasks that contribute to achieving the subgoal.
-     */
-    getActionables(): Actionable[] {
-        // const actionables: Actionable[] = someImplementation(this.direction);
-        // return actionables;
-        return []; // Returning an empty array to satisfy TypeScript
-    }
-}
+// Factory function to create a tool with its predefined description and required resources
+export const createTool = <T extends ToolType>(
+    name: T,
+    resources: RequiredResourcesObject<T>
+): Tool<T> & { description: string } => {
+    return {
+        name,
+        description: TOOL_METADATA[name].description,
+        resources
+    };
+};

@@ -6,7 +6,7 @@ import { HumanMessage } from '@langchain/core/messages';
 
 const urlLocal = `http://localhost:8123`;
 const urlRemote = `https://baztest-490f0752e1d2559197a721cafbd3a375.us.langgraph.app`;
-const url = urlRemote; //process.env.URL || urlLocal;
+const url = urlLocal; //process.env.URL || urlLocal;
 const graphName = 'graph';
 const client = new Client({
     apiUrl: url,

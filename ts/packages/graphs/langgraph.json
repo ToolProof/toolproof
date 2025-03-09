@@ -7,10 +7,7 @@
         "../../../py"
     ],
     "graphs": {
-        "py_processor": "../../../py/src/graphs/processor.py:graph",
-        "combined_graph": "./src/tests/combinedGraph.ts:graph",
-        "graph": "./src/tests/baz.ts:graph",
-        "storage_graph": "./src/tests/bazWithStorage.ts:graph"
+        "graph": "./src/tests/workerTest.ts:graph"
     },
     "env": ".env"
 }
