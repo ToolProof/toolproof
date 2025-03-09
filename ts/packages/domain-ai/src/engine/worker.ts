@@ -1,5 +1,5 @@
 import { primeGoal } from './constants.js';
-import { Direction, Actionable } from './types.js';
+import { Direction, Actionable, SubGoal } from './types.js';
 import { AIMessage } from '@langchain/core/messages';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { OpenAI } from "@langchain/openai";
@@ -18,11 +18,11 @@ import { OpenAI } from "@langchain/openai";
  *  - If no direction is provided, a Worker defaults to pursuing the prime goal.
  *  - When multiple Workers are created with the same or similar subgoals (including the prime goal), ToolProof consolidates them into a single Worker to maximize efficiency.
  */
-export class Worker<T> extends Runnable{
+export class Worker<T> extends Runnable {
 
     direction: Direction;
 
-    constructor(direction: Direction = { subGoal: primeGoal, description: '', tools: [] }) {
+    constructor(direction: Direction = { subGoal: new SubGoal(primeGoal), description: '', tools: [] }) {
         super();
         this.direction = direction;
     }

@@ -1,4 +1,4 @@
-import { TOOL_METADATA, RESOURCE_METADATA, primeGoal } from './constants.js';
+import { TOOL_METADATA, RESOURCE_METADATA } from './constants.js';
 
 
 // Extract types from metadata keys
@@ -14,20 +14,60 @@ export type RequiredResourcesObject<T extends ToolType> = {
 };
 
 // Define the structure of a Tool
-export type Tool<T extends ToolType = ToolType> = {
+export interface Tool<T extends ToolType = ToolType> {
     name: T;
     resources: RequiredResourcesObject<T>;
 };
 
 // Define the structure of a Resource
-export type Resource = {
+export interface Resource {
     name: ResourceType;
     path: string;
 };
 
+export class SubGoal {
+    description: string;
+
+    constructor(description: string) {
+        this.description = description;
+    }
+}
+
+export class Remove extends SubGoal {
+    type: 'remove';
+
+    constructor(description: string) {
+        super(description);
+        this.type = 'remove';
+    }
+}
+
+export class Promote extends SubGoal {
+    type: 'promote';
+
+    constructor(description: string) {
+        super(description);
+        this.type = 'promote';
+    }
+}
+
+export interface ICD_11_Entry {
+    code: string;
+    name: string;
+}
+
+export class Disease extends Remove {
+    icd_11_entry: ICD_11_Entry;
+
+    constructor(icd_11_entry: ICD_11_Entry) {
+        super(`Cure ${icd_11_entry.name}`);
+        this.icd_11_entry = icd_11_entry;
+    }
+}
+
 // Define the structure of a Direction
-export type Direction = {
-    subGoal: string; // must semantically satisfy certain conditions
+export interface Direction {
+    subGoal: SubGoal;
     description: string;
     tools: Tool[];
 };

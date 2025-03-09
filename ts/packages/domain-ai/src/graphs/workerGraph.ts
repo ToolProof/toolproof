@@ -1,5 +1,5 @@
 import { Worker } from "../engine/worker.js";
-import { createResource, createTool } from "../engine/types.js";
+import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { OpenAI } from "@langchain/openai";
@@ -18,8 +18,8 @@ let worker = new Worker<typeof State.State>();
 
 const initNode = async (state: typeof State.State) => {
     worker = new Worker<typeof State.State>({
-        subGoal: 'Cure Dementia with Lewy Bodies',
-        description: 'Develop AI-driven workflows for drug discovery',
+        subGoal: new Disease({ code: '8A22', name: 'Lewy Body Disease' }),
+        description: '',
         tools: [
             createTool('autodock', {
                 anchor: createResource('anchor', 'tp-data/resources/imatinib.txt'),
