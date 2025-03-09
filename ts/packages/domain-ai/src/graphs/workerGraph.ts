@@ -28,7 +28,7 @@ const initNode = async (state: typeof State.State) => {
             })
         ]
     });
-    return { messages: [new AIMessage('Mutus')] };
+    return { messages: [new AIMessage('One')] };
 };
 
 

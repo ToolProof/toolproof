@@ -30,7 +30,7 @@ export class Worker<T> extends Runnable{
     lc_namespace = []; // ATTENTION: empty array for now
 
     async invoke(state: T, options?: Partial<RunnableConfig<Record<string, any>>>) {
-        return { messages: [new AIMessage('Nomen Detit Kokis')] };
+        return { messages: [new AIMessage('Two')] };
     }
 
     /**

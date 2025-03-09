@@ -25,7 +25,7 @@ export async function runRemoteGraph() {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('Who is the prime minister of Denmark?')],
+                messages: [new HumanMessage('Zero')],
             },
             config,
         );
