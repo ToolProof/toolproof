@@ -16,6 +16,7 @@ import { OpenAI } from "@langchain/openai";
  * 
  * Behavior:
  *  - If no direction is provided, a Worker defaults to pursuing the prime goal.
+ * To be implemented:
  *  - When multiple Workers are created with the same or similar subgoals (including the prime goal), ToolProof consolidates them into a single Worker to maximize efficiency.
  */
 export class Worker<T> extends Runnable {
@@ -30,7 +31,7 @@ export class Worker<T> extends Runnable {
     lc_namespace = []; // ATTENTION: empty array for now
 
     async invoke(state: T, options?: Partial<RunnableConfig<Record<string, any>>>) {
-        return { messages: [new AIMessage('Two')] };
+        return { messages: [new AIMessage('Worker is invoked')] };
     }
 
     /**
@@ -42,17 +43,3 @@ export class Worker<T> extends Runnable {
         return []; // Returning an empty array to satisfy TypeScript
     }
 }
-
-
-// // Example usage
-/* const worker = new Worker<typeof State.State>({
-    subGoal: 'Cure Dementia with Lewy Bodies',
-    description: 'Develop AI-driven workflows for drug discovery',
-    tools: [
-        createTool('autodock', {
-            anchor: createResource('anchor', 'tp-data/resources/imatinib.txt'),
-            target: createResource('target', 'tp-data/resources/1iep_no_lig.pdb'),
-            box: createResource('box', 'tp-data/resources/xray-imatinib.pdb'),
-        })
-    ]
-}); */

@@ -4,6 +4,7 @@
     "dependencies": [
         ".",
         "./gcp-key.json",
+        "../shared",
         "../../../py"
     ],
     "graphs": {

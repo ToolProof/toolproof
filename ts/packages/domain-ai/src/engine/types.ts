@@ -1,16 +1,16 @@
-import { TOOL_METADATA, RESOURCE_METADATA } from './constants.js';
+import { TOOL_METADATA, RESOURCE_ROLE_METADATA } from './constants.js';
 
 
 // Extract types from metadata keys
 export type ToolType = keyof typeof TOOL_METADATA;
-export type ResourceType = keyof typeof RESOURCE_METADATA;
+export type ResourceRoleType = keyof typeof RESOURCE_ROLE_METADATA;
 
 // Extract required resources for a specific tool
 export type RequiredResourcesFor<T extends ToolType> = (typeof TOOL_METADATA)[T]['requiredResources'][number];
 
 // Strictly enforce required resources as an object
 export type RequiredResourcesObject<T extends ToolType> = {
-    [K in RequiredResourcesFor<T>]: { name: K; path: string };
+    [K in RequiredResourcesFor<T>]: { role: K; path: string };
 };
 
 // Define the structure of a Tool
@@ -21,7 +21,7 @@ export interface Tool<T extends ToolType = ToolType> {
 
 // Define the structure of a Resource
 export interface Resource {
-    name: ResourceType;
+    role: ResourceRoleType;
     path: string;
 };
 
@@ -51,6 +51,7 @@ export class Promote extends SubGoal {
     }
 }
 
+// ICD is the International Classification of Diseases
 export interface ICD_11_Entry {
     code: string;
     name: string;
@@ -77,12 +78,12 @@ export type Actionable = string; // must semantically satisfy certain conditions
 
 
 // Factory function to create a resource with its predefined description
-export const createResource = <T extends ResourceType>(
-    name: T,
+export const createResource = <T extends ResourceRoleType>(
+    role: T,
     path: string
-): { name: T; path: string; description: string } => ({
-    name,
-    description: RESOURCE_METADATA[name].description,
+): { role: T; path: string; description: string } => ({
+    role,
+    description: RESOURCE_ROLE_METADATA[role].description,
     path
 });
 
