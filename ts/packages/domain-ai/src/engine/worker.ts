@@ -2,7 +2,6 @@ import { primeGoal } from './constants.js';
 import { Direction, Actionable, SubGoal } from './types.js';
 import { AIMessage } from '@langchain/core/messages';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { OpenAI } from "@langchain/openai";
 
 /**
  * Represents a Worker within ToolProof.
@@ -26,10 +25,28 @@ export class Worker<T> extends Runnable {
         this.direction = direction;
     }
 
-    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface
+    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
+    /**
+     * Invokes the Worker. This is the method that is run during graph execution.
+     * 
+     * @param state The current state of the Worker
+     * @param options Optional configuration for the Worker
+     */
     async invoke(state: T, options?: Partial<RunnableConfig<Record<string, any>>>) {
         return { messages: [new AIMessage('Worker is invoked')] };
+    }
+
+    alpha() {
+        console.log('alpha');
+    }
+
+    beta() {
+        console.log('beta');
+    }
+
+    gamma() {
+        console.log('gamma');
     }
 
     /**
