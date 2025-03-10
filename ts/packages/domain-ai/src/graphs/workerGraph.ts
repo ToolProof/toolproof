@@ -2,8 +2,8 @@ import { Worker } from "../engine/worker.js";
 import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
-// import dbAdmin from "shared/src/firebaseAdminInit"; // ATTENTION: should use this import instead of the next one
-import dbAdmin from "../../firebaseAdminInit"; // ATTENTION: temporary hack since "shared" is not recognized--this file should be deleted once the above import works
+// import dbAdmin from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK: We should use this import instead of the next one, but for some reason "shared" is not recognized, despite I've included it in both langgraph.json and package.json. Can you fix this? Going forward, several modules will need to be shared across different packages, so it's important to keep the codebase DRY.
+import dbAdmin from "../../firebaseAdminInit";
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -12,9 +12,10 @@ const State = Annotation.Root({
 let worker = new Worker<typeof State.State>();
 
 const nodeLoadWorker = async (state: typeof State.State) => {
-    /* worker = new Worker<typeof State.State>({
+    // ATTENTION_RONAK: We'll rely on this hardcoded Worker for now. I'll reconsider the Firestore schema before we switch to dynamic loading. 
+    worker = new Worker<typeof State.State>({
         subGoal: new Disease({ code: '8A22', name: 'Lewy Body Disease' }),
-        description: 'dummy_description',
+        description: 'Try to find a candidate ligand that binds to the Target better than the Anchor.',
         tools: [
             createTool('autodock', {
                 anchor: createResource('anchor', 'tp-data/resources/imatinib.txt'),
@@ -22,9 +23,12 @@ const nodeLoadWorker = async (state: typeof State.State) => {
                 box: createResource('box', 'tp-data/resources/xray-imatinib.pdb'),
             })
         ]
-    }); */
+    });
 
-    try {
+    return { messages: [new AIMessage("Worker loaded")] };
+
+    // Load Worker from Firestore
+    /* try {
         // Step 1: Fetch the Direction document
         const directionRef = dbAdmin.collection("directions").doc("drvYNXsHPYV8fm1yURtQ"); // Replace with dynamic ID if needed
         const directionSnap = await directionRef.get();
@@ -109,7 +113,7 @@ const nodeLoadWorker = async (state: typeof State.State) => {
     } catch (error) {
         console.error("Error loading Worker:", error);
         return { messages: [new AIMessage("Error loading Worker")] };
-    }
+    } */
 };
 
 
