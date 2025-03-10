@@ -116,10 +116,10 @@ const nodeLoadDirection = async (state: typeof State.State) => {
             tools: tools.filter(Boolean) // Remove nulls if any tool fetch fails
         };
 
-        return { messages: [new AIMessage("Direction loaded")] };
+        return { direction: direction, messages: [new AIMessage("Direction loaded")] };
     } catch (error) {
         console.error("Error loading Direction:", error);
-        return { messages: [new AIMessage("Error loading Direction")] };
+        return { direction: direction, messages: [new AIMessage("Error loading Direction")] };
     }
 };
 
