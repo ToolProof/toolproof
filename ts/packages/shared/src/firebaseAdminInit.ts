@@ -1,6 +1,5 @@
-//import "dotenv/config";
-import admin from "firebase-admin";
-import { getApps } from "firebase-admin/app";
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 const serviceAccount = { // ATTENTION: hardcoded
   projectId: "toolproof-563fe",
@@ -8,14 +7,13 @@ const serviceAccount = { // ATTENTION: hardcoded
   clientEmail: "firebase-adminsdk-gl5nu@toolproof-563fe.iam.gserviceaccount.com"
 };
 
-//const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string);
+const app = getApps().length === 0 
+    ? initializeApp({
+        credential: cert(serviceAccount),
+    })
+    : getApps()[0];
 
-if (!getApps().length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-    });
-}
+const db = getFirestore(app);
 
-const dbAdmin = admin.firestore();
+export { db };
 
-export default dbAdmin;

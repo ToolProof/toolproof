@@ -2,8 +2,8 @@ import { Direction } from "../engine/types.js";
 import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
-// import dbAdmin from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK: We should use this import instead of the next one, but for some reason "shared" is not recognized, despite I've included it in both langgraph.json and package.json. Can you fix this? Going forward, several modules will need to be shared across different packages, so it's important to keep the codebase DRY.
-import dbAdmin from "../../firebaseAdminInit";
+import { db } from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK: We should use this import instead of the next one, but for some reason "shared" is not recognized, despite I've included it in both langgraph.json and package.json. Can you fix this? Going forward, several modules will need to be shared across different packages, so it's important to keep the codebase DRY.
+// import dbAdmin from "../../firebaseAdminInit";
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -37,7 +37,7 @@ const nodeLoadDirection = async (state: typeof State.State) => {
     // Load Direction from Firestore
     try {
         // Step 1: Fetch the Direction document
-        const directionRef = dbAdmin.collection("directions").doc("drvYNXsHPYV8fm1yURtQ"); // Replace with dynamic ID if needed
+        const directionRef = db.collection("directions").doc("drvYNXsHPYV8fm1yURtQ"); // Replace with dynamic ID if needed
         const directionSnap = await directionRef.get();
 
         if (!directionSnap.exists) {
@@ -50,51 +50,35 @@ const nodeLoadDirection = async (state: typeof State.State) => {
             throw new Error("Direction document is empty");
         }
 
-        // Step 2: Fetch the subGoal document
-        const subGoalRef = dbAdmin.doc(directionData.subGoal);
-        const subGoalSnap = await subGoalRef.get();
-
-        if (!subGoalSnap.exists) {
-            throw new Error("SubGoal document not found");
+        if (!directionData?.subGoal) {
+            throw new Error("Missing subGoal reference");
         }
 
+        // Step 2: Fetch the subGoal document - using the reference directly
+        const subGoalSnap = await directionData.subGoal.get();
         const subGoalData = subGoalSnap.data();
 
-        if (!subGoalData) {
-            throw new Error("SubGoal document is empty");
+        if (!subGoalData?.code || !subGoalData?.name) {
+            throw new Error("Invalid subGoal data structure");
         }
 
         const subGoal = new Disease({ code: subGoalData.code, name: subGoalData.name });
 
-        // Step 3: Fetch the tools
+        // Step 3: Fetch the tools - using the references directly
         const tools = await Promise.all(
-            directionData.tools.map(async (toolPath: string) => {
-                const toolRef = dbAdmin.doc(toolPath);
+            directionData.tools.map(async (toolRef: any) => {
                 const toolSnap = await toolRef.get();
-
-                if (!toolSnap.exists) return null;
-
                 const toolData = toolSnap.data();
 
-                if (!toolData) return null;
+                if (!toolData?.name) return null;
 
-                // Step 4: Fetch resources for the tool
+                // Step 4: Fetch resources for the tool - using references directly
                 const resources = await Promise.all(
-                    Object.entries(directionData.resources).map(async ([role, resourcePath]) => {
-                        // Ensure resourcePath is a string before passing it to doc()
-                        if (typeof resourcePath !== "string") {
-                            console.error(`Invalid resource path for role ${role}:`, resourcePath);
-                            return null;
-                        }
-
-                        const resourceRef = dbAdmin.doc(resourcePath);
-                        const resourceSnap = await resourceRef.get();
-
-                        if (!resourceSnap.exists) return null;
-
+                    Object.entries(directionData.resources).map(async ([role, resourceRef]) => {
+                        const resourceSnap = await (resourceRef as FirebaseFirestore.DocumentReference).get();
                         const resourceData = resourceSnap.data();
 
-                        if (!resourceData) return null;
+                        if (!resourceData?.path) return null;
 
                         return createResource(role as any, resourceData.path);
                     })
