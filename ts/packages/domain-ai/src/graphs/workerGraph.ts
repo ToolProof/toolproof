@@ -2,7 +2,7 @@ import { Direction } from "../engine/types.js";
 import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
-import { db } from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK: We should use this import instead of the next one, but for some reason "shared" is not recognized, despite I've included it in both langgraph.json and package.json. Can you fix this? Going forward, several modules will need to be shared across different packages, so it's important to keep the codebase DRY.
+import { db } from "shared/src/firebaseAdminInit";
 // import dbAdmin from "../../firebaseAdminInit";
 
 const State = Annotation.Root({
@@ -31,8 +31,6 @@ const nodeLoadDirection = async (state: typeof State.State) => {
     };
 
     // return { direction: direction, messages: [new AIMessage("Direction loaded")] };
-
-    // ATTENTION_RONAK: Can you see if you can get the loading of Direction from Firestore to work so that we can replace the hardcoded object above? Currently, it fails with the error "Error loading Direction".
 
     // Load Direction from Firestore
     try {
@@ -123,7 +121,7 @@ const nodeGenerateCandidate = async (state: typeof State.State) => {
 };
 
 const nodeInvokeDocking = async (state: typeof State.State) => {
-    // ATTTENTION_RONAK: We should invoke Autodock Vina here...
+    // ATTENTION_RONAK: We should invoke Autodock Vina here...
 };
 
 
@@ -133,8 +131,8 @@ const stateGraph = new StateGraph(State)
     .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
     .addNode("nodeInvokeDocking", nodeInvokeDocking)
     .addEdge(START, "nodeLoadDirection")
-    .addEdge("nodeLoadDirection", "nodeLoadResources") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
-    .addEdge("nodeLoadResources", "nodeInvokeDocking")
+    .addEdge("nodeLoadDirection", "nodeLoadResources")
+    .addEdge("nodeLoadResources", "nodeInvokeDocking") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
     .addEdge("nodeInvokeDocking", END);
 
 

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from google.auth import default
 import shutil
-from utils.gcs_utils import download_from_gcs, upload_to_gcs
+from shared.gcs_utils import download_from_gcs, upload_to_gcs
 
 
 def clear_tmp():
