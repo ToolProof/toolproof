@@ -124,7 +124,7 @@ const nodeLoadDirection = async (state: typeof State.State) => {
 };
 
 
-export const nodeLoadResources = async (state: typeof State.State) => {
+const nodeLoadResources = async (state: typeof State.State) => {
     // ATTENTION_RONAK: Can you see if you can load the resources files from Cloud Storage and store their contents in the resources state object? Python has better tooling for chunking up the pdb files, though... Would it be possible to to do the chunking in a Python node and get the results back here (as JSON)?
 
     // Uncomment the line below to see the direction object in messages
@@ -134,12 +134,24 @@ export const nodeLoadResources = async (state: typeof State.State) => {
 };
 
 
+const nodeGenerateCandidate = async (state: typeof State.State) => {
+
+};
+
+const nodeInvokeDocking = async (state: typeof State.State) => {
+    // ATTTENTION_RONAK: We should invoke Autodock Vina here...
+};
+
+
 const stateGraph = new StateGraph(State)
     .addNode("nodeLoadDirection", nodeLoadDirection)
     .addNode("nodeLoadResources", nodeLoadResources)
+    .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
+    .addNode("nodeInvokeDocking", nodeInvokeDocking)
     .addEdge(START, "nodeLoadDirection")
-    .addEdge("nodeLoadDirection", "nodeLoadResources")
-    .addEdge("nodeLoadResources", END);
+    .addEdge("nodeLoadDirection", "nodeLoadResources") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
+    .addEdge("nodeLoadResources", "nodeInvokeDocking")
+    .addEdge("nodeInvokeDocking", END);
 
 
 export const graph = stateGraph.compile();
