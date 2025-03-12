@@ -25,7 +25,7 @@ export async function runRemoteGraph() {
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
-                messages: [new HumanMessage('Graph is invoked')],
+                messages: [new HumanMessage('Graph is invoked')]
             },
             config,
         );

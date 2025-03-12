@@ -2,8 +2,8 @@ import { Direction } from "../engine/types.js";
 import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
-import { db } from "shared/src/firebaseAdminInit";
-// import dbAdmin from "../../firebaseAdminInit";
+// import { db } from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK: this still doesn't work when running the graph in D
+import db from "../../firebaseAdminInit.js";
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -16,9 +16,11 @@ const State = Annotation.Root({
 });
 
 
-const nodeLoadDirection = async (state: typeof State.State) => {
+const nodeLoadDirection = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
 
-    let direction = {
+    let direction;
+
+    /* direction = {
         subGoal: new Disease({ code: '8A22', name: 'Lewy Body Disease' }),
         description: 'Try to find a candidate ligand that binds to the Target better than the Anchor.',
         tools: [
@@ -30,7 +32,7 @@ const nodeLoadDirection = async (state: typeof State.State) => {
         ]
     };
 
-    // return { direction: direction, messages: [new AIMessage("Direction loaded")] };
+    return { direction: direction, messages: [new AIMessage("Direction loaded")] }; */
 
     // Load Direction from Firestore
     try {
@@ -56,7 +58,7 @@ const nodeLoadDirection = async (state: typeof State.State) => {
         const subGoalSnap = await directionData.subGoal.get();
         const subGoalData = subGoalSnap.data();
 
-        if (!subGoalData?.code || !subGoalData?.name) {
+        if (!subGoalData?.code || !subGoalData?.name) { // ATTENTION: subGoal might not be a Disease
             throw new Error("Invalid subGoal data structure");
         }
 
@@ -92,7 +94,7 @@ const nodeLoadDirection = async (state: typeof State.State) => {
             })
         );
 
-        direction = {
+        direction ={
             subGoal,
             description: directionData.description,
             tools: tools.filter(Boolean) // Remove nulls if any tool fetch fails
@@ -101,7 +103,7 @@ const nodeLoadDirection = async (state: typeof State.State) => {
         return { direction: direction, messages: [new AIMessage("Direction loaded")] };
     } catch (error) {
         console.error("Error loading Direction:", error);
-        return { direction: direction, messages: [new AIMessage("Error loading Direction")] };
+        return { messages: [new AIMessage("Error loading Direction")] };
     }
 };
 
@@ -127,13 +129,13 @@ const nodeInvokeDocking = async (state: typeof State.State) => {
 
 const stateGraph = new StateGraph(State)
     .addNode("nodeLoadDirection", nodeLoadDirection)
-    .addNode("nodeLoadResources", nodeLoadResources)
-    .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
-    .addNode("nodeInvokeDocking", nodeInvokeDocking)
+    // .addNode("nodeLoadResources", nodeLoadResources)
+    // .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
+    // .addNode("nodeInvokeDocking", nodeInvokeDocking)
     .addEdge(START, "nodeLoadDirection")
-    .addEdge("nodeLoadDirection", "nodeLoadResources")
-    .addEdge("nodeLoadResources", "nodeInvokeDocking") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
-    .addEdge("nodeInvokeDocking", END);
+    // .addEdge("nodeLoadDirection", "nodeLoadResources")
+    // .addEdge("nodeLoadResources", "nodeInvokeDocking") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
+    .addEdge("nodeLoadDirection", END);
 
 
 export const graph = stateGraph.compile();
