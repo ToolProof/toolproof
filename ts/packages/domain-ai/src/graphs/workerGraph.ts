@@ -2,7 +2,8 @@ import { Direction } from "../engine/types.js";
 import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
-import { db } from "shared/src/firebaseAdminInit";
+// import { db } from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK
+import db from "../../firebaseAdminInit";
 import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
 
@@ -88,13 +89,15 @@ const nodeLoadDirection = async (state: typeof State.State): Promise<Partial<typ
                     })
                 );
 
+                // ATTENTION: every resource doesn't neccearily belong to a tool
+
                 // Convert resource list into the required object structure
                 const resourcesObject = resources.reduce((acc, resource) => {
                     if (resource) acc[resource.role] = resource;
                     return acc;
                 }, {} as Record<string, { role: string; path: string; description: string }>);
 
-                return createTool(toolData.name, resourcesObject);
+                return createTool(toolData.name, resourcesObject); // ATTENTION: how can resourcesObject be accepted?
             })
         );
 
@@ -238,13 +241,13 @@ const nodeInvokeDocking = async (state: typeof State.State) => {
 
 const stateGraph = new StateGraph(State)
     .addNode("nodeLoadDirection", nodeLoadDirection)
-    // .addNode("nodeLoadResources", nodeLoadResources)
-    // .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
-    // .addNode("nodeInvokeDocking", nodeInvokeDocking)
+    .addNode("nodeLoadResources", nodeLoadResources)
+    .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
+    .addNode("nodeInvokeDocking", nodeInvokeDocking)
     .addEdge(START, "nodeLoadDirection")
     .addEdge("nodeLoadDirection", "nodeLoadResources")
     .addEdge("nodeLoadResources", "nodeGenerateCandidate")
-    .addEdge("nodeGenerateCandidate", "nodeInvokeDocking") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
+    .addEdge("nodeGenerateCandidate", "nodeInvokeDocking")
     .addEdge("nodeInvokeDocking", END);
 
 
