@@ -2,8 +2,9 @@ import { Direction } from "../engine/types.js";
 import { Disease, createResource, createTool } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
-// import { db } from "shared/src/firebaseAdminInit"; // ATTENTION_RONAK: this still doesn't work when running the graph in D
-import db from "../../firebaseAdminInit.js";
+import { db } from "shared/src/firebaseAdminInit";
+import { Storage } from '@google-cloud/storage';
+import * as path from 'path';
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -11,6 +12,9 @@ const State = Annotation.Root({
         reducer: (prev, next) => next
     }),
     resources: Annotation<Map<string, Map<string, string>>>({
+        reducer: (prev, next) => next
+    }),
+    docking: Annotation<any>({  // You can make this more specific based on the result type
         reducer: (prev, next) => next
     })
 });
@@ -25,9 +29,9 @@ const nodeLoadDirection = async (state: typeof State.State): Promise<Partial<typ
         description: 'Try to find a candidate ligand that binds to the Target better than the Anchor.',
         tools: [
             createTool('autodock', {
-                anchor: createResource('anchor', 'tp-data/resources/imatinib.txt'),
-                target: createResource('target', 'tp-data/resources/1iep_no_lig.pdb'),
-                box: createResource('box', 'tp-data/resources/xray-imatinib.pdb'),
+                anchor: createResource('anchor', 'tp_data/resources/imatinib.txt'),
+                target: createResource('target', 'tp_data/resources/1iep_no_lig.pdb'),
+                box: createResource('box', 'tp_data/resources/xray-imatinib.pdb'),
             })
         ]
     };
@@ -108,22 +112,127 @@ const nodeLoadDirection = async (state: typeof State.State): Promise<Partial<typ
 };
 
 
+const storage = new Storage({
+    keyFilename: path.join(process.cwd(), 'gcp-key.json'),
+});
+
+
 const nodeLoadResources = async (state: typeof State.State) => {
-    // ATTENTION_RONAK: Can you see if you can load the resources files from Cloud Storage and store their contents in the resources state object? Python has better tooling for chunking up the pdb files, though... Would it be possible to to do the chunking in a Python node and get the results back here (as JSON)?
+    try {
+        const resourcesMap = new Map<string, Map<string, string>>();
 
-    // Uncomment the line below to see the direction object in messages
-    // return { messages: [new AIMessage(JSON.stringify(state.direction))] };
+        for (const tool of state.direction.tools) {
+            
+            if (!tool.resources) {
+                console.warn(`No resources found for tool ${tool.name}`);
+                continue;
+            }
 
-    return { messages: [new AIMessage("Resources loaded")] };
+            const toolResources = new Map<string, string>();
+
+            for (const [role, resource] of Object.entries(tool.resources)) {
+                try {
+                    
+                    const path = resource.path;
+                    const bucketName = 'tp_data';
+                    // Try both tp_data and tp-data formats
+                    const blobName = path
+                        .replace('tp_data/', '')
+                        .replace('tp-data/', '');
+                    
+                    console.log(`Attempting download from ${bucketName}/${blobName}`);
+                    
+                    const [content] = await storage
+                        .bucket(bucketName)
+                        .file(blobName)
+                        .download();
+                    
+                    toolResources.set(role, content.toString());
+                    console.log(`Successfully downloaded ${role} resource`);
+                } catch (downloadError: any) {
+                    console.error(`Download error for ${role}:`, downloadError);
+                    toolResources.set(role, `Error downloading: ${downloadError.message}`);
+                }
+            }
+            
+            resourcesMap.set(tool.name, toolResources);
+        }
+
+        // Convert Map to plain object for better visibility in results
+        const resourcesObject = Object.fromEntries(
+            Array.from(resourcesMap.entries()).map(([toolName, resources]) => [
+                toolName,
+                Object.fromEntries(resources)
+            ])
+        );
+
+        return { 
+            resources: resourcesObject,
+            messages: [new AIMessage("Resources loaded successfully")]
+        };
+    } catch (error: any) {
+        console.error("Error in nodeLoadResources:", error);
+        return {
+            resources: {},
+            messages: [new AIMessage(`Error loading resources: ${error.message}`)]
+        };
+    }
 };
 
 
 const nodeGenerateCandidate = async (state: typeof State.State) => {
-
+    return { messages: [new AIMessage("Candidate loaded")] };
 };
 
 const nodeInvokeDocking = async (state: typeof State.State) => {
-    // ATTENTION_RONAK: We should invoke Autodock Vina here...
+    try {
+        // Get the first autodock tool and its resources
+        const autodockTool = state.direction.tools[0];
+        if (!autodockTool || autodockTool.name !== 'autodock') {
+            throw new Error("No autodock tool found in direction");
+        }
+
+        const ligSmilesPath = autodockTool.resources.anchor.path.replace('tp-data/', 'tp_data/');
+        const ligBoxPath = autodockTool.resources.box.path.replace('tp-data/', 'tp_data/');
+        const recNoLigPath = autodockTool.resources.target.path.replace('tp-data/', 'tp_data/');
+
+        // Extract paths from the resources
+        const payload = {
+            lig_name: "imatinib", // Static for now
+            lig_smiles_path: ligSmilesPath,
+            lig_box_path: ligBoxPath,
+            rec_name: "1iep", // Static for now
+            rec_no_lig_path: recNoLigPath
+        };
+
+        console.log("Sending payload to /adv:", payload);
+
+        // Call the Python /adv endpoint
+        const response = await fetch('https://service-tp-tools-384484325421.europe-west2.run.app/adv', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log('response :', response);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return { 
+            messages: [new AIMessage("Docking completed successfully")],
+            docking: result.result
+        };
+
+    } catch (error: any) {
+        console.error("Error in nodeInvokeDocking:", error);
+        return {
+            messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
+        };
+    }
 };
 
 
@@ -133,9 +242,10 @@ const stateGraph = new StateGraph(State)
     // .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
     // .addNode("nodeInvokeDocking", nodeInvokeDocking)
     .addEdge(START, "nodeLoadDirection")
-    // .addEdge("nodeLoadDirection", "nodeLoadResources")
-    // .addEdge("nodeLoadResources", "nodeInvokeDocking") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
-    .addEdge("nodeLoadDirection", END);
+    .addEdge("nodeLoadDirection", "nodeLoadResources")
+    .addEdge("nodeLoadResources", "nodeGenerateCandidate")
+    .addEdge("nodeGenerateCandidate", "nodeInvokeDocking") // ATTENTION_RONAK: We're skipping nodeGenerateCandidate for now--we'll just use the Anchor as Candidate for now
+    .addEdge("nodeInvokeDocking", END);
 
 
 export const graph = stateGraph.compile();
