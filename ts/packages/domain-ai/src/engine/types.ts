@@ -1,28 +1,93 @@
-import { TOOL_METADATA, RESOURCE_ROLE_METADATA } from './constants.js';
+import { tools, resourceRoles, ToolType, ResourceRoleType } from './constants.js';
 
 
-// Extract types from metadata keys
-export type ToolType = keyof typeof TOOL_METADATA;
-export type ResourceRoleType = keyof typeof RESOURCE_ROLE_METADATA;
+// Extract specific literal values from a readonly Set
+type ExtractSetValues<T> = T extends ReadonlySet<infer U> ? U : never;
 
-// Extract required resources for a specific tool
-export type RequiredResourcesFor<T extends ToolType> = (typeof TOOL_METADATA)[T]['requiredResources'][number];
+// Extract required inputs and outputs for a specific tool
+export type RequiredToolInputs<T extends ToolType> = ExtractSetValues<(typeof tools)[T]['inputs']>;
+export type RequiredToolOutputs<T extends ToolType> = ExtractSetValues<(typeof tools)[T]['outputs']>;
 
-// Strictly enforce required resources as an object
-export type RequiredResourcesObject<T extends ToolType> = {
-    [K in RequiredResourcesFor<T>]: { role: K; path: string };
+
+// Testing required inputs and outputs for the autodock tool
+const requiredToolInputs_1: RequiredToolInputs<'autodock'> = 'ligand_smiles'; // ✅ Works
+const requiredToolInputs_2: RequiredToolInputs<'autodock'> = 'receptor_pdb';  // ✅ Works
+const requiredToolInputs_3: RequiredToolInputs<'autodock'> = 'box_pdb';  // ✅ Works
+// @ts-expect-error
+const requiredToolInputs_4: RequiredToolInputs<'autodock'> = 'invalid_input_xyz'; // ❌ Correctly errors
+
+const requiredToolOutputs_1: RequiredToolOutputs<'autodock'> = 'docking_result_pdb'; // ✅ Works
+const requiredToolOutputs_2: RequiredToolOutputs<'autodock'> = 'docking_pose_sdf';   // ✅ Works
+// @ts-expect-error
+const requiredToolOutputs_3: RequiredToolOutputs<'autodock'> = 'invalid_output_xyz';  // ❌ Correctly errors
+
+
+// Strictly enforce required inputs and outputs as an object
+export type RequiredToolInputsObject<T extends ToolType> = {
+    [K in RequiredToolInputs<T>]: { role: K; path: string };
+};
+
+export type RequiredToolOutputsObject<T extends ToolType> = {
+    [K in RequiredToolOutputs<T>]: { role: K; path: string };
 };
 
 // Define the structure of a Tool
 export interface Tool<T extends ToolType = ToolType> {
     name: T;
-    resources: RequiredResourcesObject<T>;
+    inputs: RequiredToolInputsObject<T>;
+    outputs: RequiredToolOutputsObject<T>;
+};
+
+// Factory function to create a tool with its predefined description and required inputs and outputs
+export const createTool = <T extends ToolType>(
+    name: T,
+    inputs: RequiredToolInputsObject<T>,
+    outputs: RequiredToolOutputsObject<T>
+): Tool<T> & { description: string } => {
+    return {
+        name,
+        description: tools[name].description,
+        inputs,
+        outputs
+    };
 };
 
 // Define the structure of a Resource
 export interface Resource {
     role: ResourceRoleType;
     path: string;
+};
+
+// Factory function to create a resource with its predefined description
+export const createResource = <T extends ResourceRoleType>(
+    role: T,
+    path: string
+): { role: T; path: string; description: string } => ({
+    role,
+    description: resourceRoles[role].description,
+    path
+});
+
+// Extract the union of all input resource roles from a list of tools
+type UnionOfToolInputs<T extends Tool[]> = T extends (infer U)[]
+    ? U extends Tool
+    ? keyof U["inputs"]
+    : never
+    : never;
+
+// Extract the union of all output resource roles from a list of tools
+type UnionOfToolOutputs<T extends Tool[]> = T extends (infer U)[]
+    ? U extends Tool
+    ? keyof U["outputs"]
+    : never
+    : never;
+
+// Compute Required Resources = Inputs - Outputs
+type ExtractRequiredResources<T extends Tool[]> = Exclude<UnionOfToolInputs<T>, UnionOfToolOutputs<T>>;
+
+// Compute Required Resources as an object
+export type RequiredResourcesObject<T extends Tool[]> = {
+    [K in ExtractRequiredResources<T>]: { role: K; path: string };
 };
 
 export class SubGoal {
@@ -66,35 +131,35 @@ export class Disease extends Remove {
     }
 }
 
-// Define the structure of a Direction
-export interface Direction {
-    subGoal: SubGoal;
+// Define the structure of a Strategy
+export type Strategy<T extends readonly ToolType[]> = {
+    subGoals: SubGoal[];
     description: string;
-    tools: Tool[];
+    tools: [...{ [K in keyof T]: Tool<T[K]> }]; // ✅ Enforce tuple structure
+    resources: RequiredResourcesObject<Tool<T[number]>[]>;
 };
 
 // Actionable type
 export type Actionable = string; // must semantically satisfy certain conditions
 
 
-// Factory function to create a resource with its predefined description
-export const createResource = <T extends ResourceRoleType>(
-    role: T,
-    path: string
-): { role: T; path: string; description: string } => ({
-    role,
-    description: RESOURCE_ROLE_METADATA[role].description,
-    path
-});
+// Example usage
 
-// Factory function to create a tool with its predefined description and required resources
-export const createTool = <T extends ToolType>(
-    name: T,
-    resources: RequiredResourcesObject<T>
-): Tool<T> & { description: string } => {
-    return {
-        name,
-        description: TOOL_METADATA[name].description,
-        resources
-    };
+const autodock = createTool("autodock",
+    { ligand_smiles: { role: "ligand_smiles", path: "/path/ligand_smiles" }, receptor_pdb: { role: "receptor_pdb", path: "/path/receptor_pdb" }, box_pdb: { role: "box_pdb", path: "/path/box_pdb" } },
+    { docking_result_pdb: { role: "docking_result_pdb", path: "/path/docking_result_pdb" }, docking_pose_sdf: { role: "docking_pose_sdf", path: "/path/docking_pose_sdf" } }
+);
+
+
+
+// Testing valid strategy
+const validStrategy: Strategy<["autodock"]> = {
+    subGoals: [],
+    description: "Example strategy using autodock",
+    tools: [autodock] as [typeof autodock], // ✅ Explicitly define tuple
+    resources: {
+        ligand_smiles: { role: "ligand_smiles", path: "/path/ligand_smiles" },
+        receptor_pdb: { role: "receptor_pdb", path: "/path/receptor_pdb" },
+        box_pdb: { role: "box_pdb", path: "/path/box_pdb" }
+    }
 };
