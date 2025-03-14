@@ -1,4 +1,5 @@
 
+// resourceRoles defines various types of files that serve as inputs and outputs for tools
 export const resourceRoles = {
     ligand_smiles: { description: 'SMILES string representing the molecular structure of the ligand' },
     receptor_pdb: { description: 'Protein Data Bank (PDB) file representing the molecular structure of the receptor' },
@@ -8,8 +9,3 @@ export const resourceRoles = {
 } as const;
 
 export type ResourceRoleType = keyof typeof resourceRoles;
-
-
-/* anchor: { description: 'An Anchor serves as a starting point for the drug discovery process. An Anchor is usually an existing, though suboptimal, drug (also known as a ligand) for the target disease. Anchors are represented as .pdb (Protein Data Bank) files or SMILES strings, both used to depict molecular structures.' },
-    target: { description: 'The Target is a protein that is known to play a role in the target disease. The goal of the drug discovery process is to find a candidate ligand that binds to the Target.' },
-    box: { description: 'A Box refers to the search space where the docking simulation occurs. This box defines the region of interest within the target macromolecule (such as a protein or DNA) where potential ligand binding sites are explored. The docking algorithm only searches for ligand binding poses within the specified box. If the box is too small, it may miss relevant binding sites; if too large, it increases computational cost.' } */

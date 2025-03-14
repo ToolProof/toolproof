@@ -1,9 +1,9 @@
 import { ResourceRoleType } from './resourceRoles';
 
-//
+// tools defines AI-invokable functionalities, each specifying the resourceRoles it accepts as inputs and produces as outputs
 export const tools = {
     autodock: {
-        description: '',
+        description: 'Dock a ligand into a receptor using AutoDock, an open-source tool for molecular docking.',
         inputs: (() => {
             const values = ['ligand_smiles', 'receptor_pdb', 'box_pdb'] as const satisfies ResourceRoleType[];
             return new Set(values);

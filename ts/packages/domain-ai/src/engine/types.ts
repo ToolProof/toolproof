@@ -8,7 +8,6 @@ type ExtractSetValues<T> = T extends ReadonlySet<infer U> ? U : never;
 export type RequiredToolInputs<T extends ToolType> = ExtractSetValues<(typeof tools)[T]['inputs']>;
 export type RequiredToolOutputs<T extends ToolType> = ExtractSetValues<(typeof tools)[T]['outputs']>;
 
-
 // Testing required inputs and outputs for the autodock tool
 const requiredToolInputs_1: RequiredToolInputs<'autodock'> = 'ligand_smiles'; // ✅ Works
 const requiredToolInputs_2: RequiredToolInputs<'autodock'> = 'receptor_pdb';  // ✅ Works
@@ -21,7 +20,6 @@ const requiredToolOutputs_2: RequiredToolOutputs<'autodock'> = 'docking_pose_sdf
 // @ts-expect-error
 const requiredToolOutputs_3: RequiredToolOutputs<'autodock'> = 'invalid_output_xyz';  // ❌ Correctly errors
 
-
 // Strictly enforce required inputs and outputs as an object
 export type RequiredToolInputsObject<T extends ToolType> = {
     [K in RequiredToolInputs<T>]: { role: K; path: string };
@@ -31,7 +29,7 @@ export type RequiredToolOutputsObject<T extends ToolType> = {
     [K in RequiredToolOutputs<T>]: { role: K; path: string };
 };
 
-// Helper interface to define a flattened object
+// Helper interface to define a flattened Tool object
 export interface Tool<T extends ToolType = ToolType> {
     name: T;
     description: (typeof tools)[T]['description'];
@@ -61,6 +59,8 @@ export type RequiredResourcesObject<T extends Tool[]> = {
     [K in ExtractRequiredResources<T>]: { role: K; path: string };
 };
 
+
+// Define the structure of a SubGoal
 export class SubGoal {
     description: string;
 
@@ -93,6 +93,7 @@ export interface ICD_11_Entry {
     name: string;
 }
 
+// Define the structure of a Disease
 export class Disease extends Remove {
     icd_11_entry: ICD_11_Entry;
 
@@ -106,8 +107,11 @@ export class Disease extends Remove {
 export type Actionable = string; // must semantically satisfy certain conditions
 
 // Define the structure of a Strategy
-export type Strategy<T extends readonly ToolType[]> = {
+// ATTENTION: A strategy is implemented as a graph--so why do we need a separate Strategy interface?
+// A strategy requires all the resources that its tools require as inputs, net of the resources that its tools produce as outputs
+export interface Strategy<T extends readonly ToolType[]> {
     subGoals: SubGoal[];
     description: string;
+    tools: T;
     resources: RequiredResourcesObject<Tool<T[number]>[]>;
 };
