@@ -1,4 +1,4 @@
-import { primeGoal } from './constants.js';
+import { primeGoal } from './goals.js';
 import { Direction, Actionable, SubGoal } from './types.js';
 import { AIMessage } from '@langchain/core/messages';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';

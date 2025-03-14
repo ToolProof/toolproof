@@ -1,4 +1,4 @@
-import { tools, resourceRoles, ToolType, ResourceRoleType } from './constants.js';
+import { tools, ToolType } from './tools.js';
 
 
 // Extract specific literal values from a readonly Set
@@ -31,51 +31,13 @@ export type RequiredToolOutputsObject<T extends ToolType> = {
     [K in RequiredToolOutputs<T>]: { role: K; path: string };
 };
 
-// Define the structure of a Tool
+// Helper interface to define a flattened object
 export interface Tool<T extends ToolType = ToolType> {
     name: T;
     description: (typeof tools)[T]['description'];
-    // inputs: RequiredToolInputs<T>;
-    // outputs: RequiredToolOutputs<T>;
     inputs: RequiredToolInputsObject<T>;
     outputs: RequiredToolOutputsObject<T>;
 };
-
-// Factory function to create a tool with its predefined description and required inputs and outputs
-export const createTool = <T extends ToolType>(
-    name: T,
-    inputs: RequiredToolInputsObject<T>,
-    outputs: RequiredToolOutputsObject<T>
-): Tool<T> => {
-    return {
-        name,
-        description: tools[name].description,
-        inputs,
-        outputs
-    };
-};
-
-// Testing the creation of the autodock tool
-const autodock = createTool("autodock",
-    { ligand_smiles: { role: "ligand_smiles", path: "imatinib.txt" }, receptor_pdb: { role: "receptor_pdb", path: "1iep_no_lig.pdb" }, box_pdb: { role: "box_pdb", path: "xray-imatinib.pdb" } },
-    { docking_result_pdb: { role: "docking_result_pdb", path: "docking_result.pdb" }, docking_pose_sdf: { role: "docking_pose_sdf", path: "docking_pose.sdf" } }
-);
-
-// Define the structure of a Resource
-export interface Resource {
-    role: ResourceRoleType;
-    path: string;
-};
-
-// Factory function to create a resource with its predefined description
-export const createResource = <T extends ResourceRoleType>(
-    role: T,
-    path: string
-): { role: T; path: string; description: string } => ({
-    role,
-    description: resourceRoles[role].description,
-    path
-});
 
 // Extract the union of all input resource roles from a list of tools
 type UnionOfToolInputs<T extends Tool[]> = T extends (infer U)[]
@@ -147,19 +109,5 @@ export type Actionable = string; // must semantically satisfy certain conditions
 export type Strategy<T extends readonly ToolType[]> = {
     subGoals: SubGoal[];
     description: string;
-    // tools: [...{ [K in keyof T]: Tool<T[K]> }]; // ✅ Enforce tuple structure
-    tools: Set<ToolType>;
     resources: RequiredResourcesObject<Tool<T[number]>[]>;
-};
-
-// Testing valid strategy
-const validStrategy: Strategy<["autodock"]> = {
-    subGoals: [],
-    description: "Example strategy using autodock",
-    tools: new Set<ToolType>(["autodock"]),
-    resources: {
-        ligand_smiles: { role: "ligand_smiles", path: "/path/ligand_smiles" },
-        receptor_pdb: { role: "receptor_pdb", path: "/path/receptor_pdb" },
-        box_pdb: { role: "box_pdb", path: "/path/box_pdb" }
-    }
 };
