@@ -34,6 +34,9 @@ export type RequiredToolOutputsObject<T extends ToolType> = {
 // Define the structure of a Tool
 export interface Tool<T extends ToolType = ToolType> {
     name: T;
+    description: (typeof tools)[T]['description'];
+    // inputs: RequiredToolInputs<T>;
+    // outputs: RequiredToolOutputs<T>;
     inputs: RequiredToolInputsObject<T>;
     outputs: RequiredToolOutputsObject<T>;
 };
@@ -43,7 +46,7 @@ export const createTool = <T extends ToolType>(
     name: T,
     inputs: RequiredToolInputsObject<T>,
     outputs: RequiredToolOutputsObject<T>
-): Tool<T> & { description: string } => {
+): Tool<T> => {
     return {
         name,
         description: tools[name].description,
@@ -51,6 +54,12 @@ export const createTool = <T extends ToolType>(
         outputs
     };
 };
+
+// Testing the creation of the autodock tool
+const autodock = createTool("autodock",
+    { ligand_smiles: { role: "ligand_smiles", path: "imatinib.txt" }, receptor_pdb: { role: "receptor_pdb", path: "1iep_no_lig.pdb" }, box_pdb: { role: "box_pdb", path: "xray-imatinib.pdb" } },
+    { docking_result_pdb: { role: "docking_result_pdb", path: "docking_result.pdb" }, docking_pose_sdf: { role: "docking_pose_sdf", path: "docking_pose.sdf" } }
+);
 
 // Define the structure of a Resource
 export interface Resource {
@@ -131,32 +140,23 @@ export class Disease extends Remove {
     }
 }
 
+// Actionable type
+export type Actionable = string; // must semantically satisfy certain conditions
+
 // Define the structure of a Strategy
 export type Strategy<T extends readonly ToolType[]> = {
     subGoals: SubGoal[];
     description: string;
-    tools: [...{ [K in keyof T]: Tool<T[K]> }]; // ✅ Enforce tuple structure
+    // tools: [...{ [K in keyof T]: Tool<T[K]> }]; // ✅ Enforce tuple structure
+    tools: Set<ToolType>;
     resources: RequiredResourcesObject<Tool<T[number]>[]>;
 };
-
-// Actionable type
-export type Actionable = string; // must semantically satisfy certain conditions
-
-
-// Example usage
-
-const autodock = createTool("autodock",
-    { ligand_smiles: { role: "ligand_smiles", path: "/path/ligand_smiles" }, receptor_pdb: { role: "receptor_pdb", path: "/path/receptor_pdb" }, box_pdb: { role: "box_pdb", path: "/path/box_pdb" } },
-    { docking_result_pdb: { role: "docking_result_pdb", path: "/path/docking_result_pdb" }, docking_pose_sdf: { role: "docking_pose_sdf", path: "/path/docking_pose_sdf" } }
-);
-
-
 
 // Testing valid strategy
 const validStrategy: Strategy<["autodock"]> = {
     subGoals: [],
     description: "Example strategy using autodock",
-    tools: [autodock] as [typeof autodock], // ✅ Explicitly define tuple
+    tools: new Set<ToolType>(["autodock"]),
     resources: {
         ligand_smiles: { role: "ligand_smiles", path: "/path/ligand_smiles" },
         receptor_pdb: { role: "receptor_pdb", path: "/path/receptor_pdb" },
