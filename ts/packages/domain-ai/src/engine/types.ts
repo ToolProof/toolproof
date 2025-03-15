@@ -52,11 +52,11 @@ type UnionOfToolOutputs<T extends Tool[]> = T extends (infer U)[]
     : never;
 
 // Compute Required Resources = Inputs - Outputs
-type ExtractRequiredResources<T extends Tool[]> = Exclude<UnionOfToolInputs<T>, UnionOfToolOutputs<T>>;
+type ExtractRequiredRecipeInputs<T extends Tool[]> = Exclude<UnionOfToolInputs<T>, UnionOfToolOutputs<T>>;
 
 // Compute Required Resources as an object
-export type RequiredResourcesObject<T extends Tool[]> = {
-    [K in ExtractRequiredResources<T>]: { role: K; path: string };
+export type RequiredRecipeInputsObject<T extends Tool[]> = {
+    [K in ExtractRequiredRecipeInputs<T>]: { role: K; path: string };
 };
 
 
@@ -106,12 +106,19 @@ export class Disease extends Remove {
 // Actionable type
 export type Actionable = string; // must semantically satisfy certain conditions
 
-// Define the structure of a Strategy
-// ATTENTION: A strategy is implemented as a graph--so why do we need a separate Strategy interface?
-// A strategy requires all the resources that its tools require as inputs, net of the resources that its tools produce as outputs
-export interface Strategy<T extends readonly ToolType[]> {
-    subGoals: SubGoal[];
-    description: string;
+// Define the structure of a RecipeSpec
+// A RecipeSpec requires all the inputs that the tools of its associated Recipe require, net of those that the tools of its associated Recipe output
+export interface RecipeSpec<T extends readonly ToolType[]> {
     tools: T;
-    resources: RequiredResourcesObject<Tool<T[number]>[]>;
+    inputs: RequiredRecipeInputsObject<Tool<T[number]>[]>;
+};
+
+export interface Foo {
+    description: string;
+    recipeSpecs: Record<string, RecipeSpec<ToolType[]>>;
+}
+
+// Define ToolMethods where each method is a generic function
+export type ToolMethods<Tools extends readonly string[]> = {
+    [K in Tools[number]]: <T>(t: T) => Partial<T>;
 };
