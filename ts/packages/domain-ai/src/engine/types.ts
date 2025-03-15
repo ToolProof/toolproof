@@ -113,9 +113,10 @@ export interface RecipeSpec<T extends readonly ToolType[]> {
     inputs: RequiredRecipeInputsObject<Tool<T[number]>[]>;
 };
 
-export interface Foo {
+// Define the structure of a Recipe
+export interface Recipe<T extends ToolType[]> {
     description: string;
-    recipeSpecs: Record<string, RecipeSpec<ToolType[]>>;
+    recipeSpecs: Record<string, RecipeSpec<T>>;
 }
 
 // Define ToolMethods where each method is a generic function

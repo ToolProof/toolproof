@@ -1,8 +1,6 @@
-import { Foo } from "./types.js";
+import { Recipe } from "./types.js";
 
-// ATTENTION: how is "autodock" being inferred here?
-
-export const alpha: Foo = {
+export const alpha: Recipe<["autodock"]> = {
     description: "Alpha",
     recipeSpecs: {
         subGoal_1: {
@@ -14,7 +12,17 @@ export const alpha: Foo = {
             }
         },
         subGoal_2: {
-            tools: ["autodock"],
+            // @ts-expect-error
+            tools: [],
+            inputs: {
+                ligand_smiles: { role: "ligand_smiles", path: "imatinib.txt" },
+                receptor_pdb: { role: "receptor_pdb", path: "1iep_no_lig.pdb" },
+                box_pdb: { role: "box_pdb", path: "xray-imatinib.pdb" },
+            }
+        },
+        subGoal_3: {
+            // @ts-expect-error
+            tools: ["autodock", "invalid_tool"],
             inputs: {
                 ligand_smiles: { role: "ligand_smiles", path: "imatinib.txt" },
                 receptor_pdb: { role: "receptor_pdb", path: "1iep_no_lig.pdb" },
