@@ -6,6 +6,9 @@ import { AIMessage } from "@langchain/core/messages";
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
+    subGoal: Annotation<string>({
+        reducer: (prev, next) => next
+    }),
     recipe: Annotation<Recipe>({
         reducer: (prev, next) => next
     }),
@@ -13,7 +16,7 @@ const State = Annotation.Root({
 
 
 const edgeShouldContinue = (state: typeof State.State) => {
-    if (false) {
+    if (true) {
         return 'nodeInvokeSubgraph';
     } else {
         return END;
