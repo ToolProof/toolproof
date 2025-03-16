@@ -114,12 +114,13 @@ export interface RecipeSpec<T extends readonly ToolType[]> {
 };
 
 // Define the structure of a Recipe
-export interface Recipe<T extends ToolType[]> {
+export interface Recipe<T extends ToolType[] = ToolType[]> {
+    name: string;
     description: string;
     recipeSpecs: Record<string, RecipeSpec<T>>;
 }
 
 // Define ToolMethods where each method is a generic function
 export type ToolMethods<Tools extends readonly string[]> = {
-    [K in Tools[number]]: <T>(t: T) => Partial<T>;
+    [K in Tools[number]]: <S>(state: S) => Promise<Partial<S>>;
 };

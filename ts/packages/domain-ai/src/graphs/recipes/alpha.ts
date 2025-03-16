@@ -1,7 +1,85 @@
+import { alpha } from "../../engine/recipeSpecs.js";
+import { ToolMethods } from "../../engine/types.js";
+import { AIMessage } from '@langchain/core/messages';
+import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
-import { AIMessage } from "@langchain/core/messages";
 import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
+
+
+// Define the AlphaInterface
+interface AlphaInterface extends ToolMethods<typeof alpha["recipeSpecs"][string]["tools"]> { }
+
+// Implement the interface in a class
+export class AlphaClass<T> extends Runnable implements AlphaInterface {
+
+    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
+
+    async invoke(state: T, options?: Partial<RunnableConfig<Record<string, any>>>) {
+
+        const foo = state.
+
+        const result = this.autodock<T>(state);
+        return { messages: [new AIMessage('AlphaClass is invoked')] };
+    }
+
+    async autodock<S>(state: S): Promise<Partial<S>> {
+        try {
+
+            const recipeSpeck = state.recipe.recipeSpecs;
+
+            // Get the first autodock tool and its resources
+            const autodockTool = state.direction.tools[0];
+            if (!autodockTool || autodockTool.name !== 'autodock') {
+                throw new Error("No autodock tool found in direction");
+            }
+
+            const ligSmilesPath = autodockTool.resources.anchor.path.replace('tp-data/', 'tp_data/');
+            const ligBoxPath = autodockTool.resources.box.path.replace('tp-data/', 'tp_data/');
+            const recNoLigPath = autodockTool.resources.target.path.replace('tp-data/', 'tp_data/');
+
+            // Extract paths from the resources
+            const payload = {
+                lig_name: "imatinib", // Static for now
+                lig_smiles_path: ligSmilesPath,
+                lig_box_path: ligBoxPath,
+                rec_name: "1iep", // Static for now
+                rec_no_lig_path: recNoLigPath
+            };
+
+            console.log("Sending payload to /adv:", payload);
+
+            // Call the Python /adv endpoint
+            const response = await fetch('https://service-tp-tools-384484325421.europe-west2.run.app/adv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            console.log('response :', response);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // ATTENTION_RONAK: Here we must store the results filepath (or folderpath) in the results state property.
+            return {
+                messages: [new AIMessage("Docking completed successfully")],
+                docking: result.result
+            };
+
+        } catch (error: any) {
+            console.error("Error in nodeInvokeDocking:", error);
+            return {
+                messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
+            };
+        }
+    };
+
+}
 
 
 const State = Annotation.Root({
@@ -10,13 +88,13 @@ const State = Annotation.Root({
     anchor: Annotation<Map<string, string>>({ // The value parameter should be a string, or preferably a stricter type that represents a subset of strings. Ideally, it should be a type that represents SMILES strings (if that's possible).
         reducer: (prev, next) => next
     }),
-    target: Annotation<Map<string, Map<string, PDBRowType>>>({ // The value parameter of the outer map should be a map that can hold PDB data. The key of this inner map should be a string (holding a "row_identifier") and the value should be a custom data type that represents a PDB row.
+    target: Annotation<Map<string, Map<string, any>>>({ // The value parameter of the outer map should be a map that can hold PDB data. The key of this inner map should be a string (holding a "row_identifier") and the value should be a custom data type that represents a PDB row.
         reducer: (prev, next) => next
     }),
-    box: Annotation<Map<string, Map<string, PDBRowType>>>({ // Same as target
+    box: Annotation<Map<string, Map<string, any>>>({ // Same as target
         reducer: (prev, next) => next
     }),
-    results: Annotation<Map<string, Map<string, ResultType>>>({  // The value parameter of the outer map should be a map that can hold results data. The key of this inner map should be a string (holding a "result_identifier") and the value should be a custom data type (probably a union type!) that represents a result.
+    results: Annotation<Map<string, Map<string, any>>>({  // The value parameter of the outer map should be a map that can hold results data. The key of this inner map should be a string (holding a "result_identifier") and the value should be a custom data type (probably a union type!) that represents a result.
         reducer: (prev, next) => next
     }),
     shouldRetry: Annotation<boolean>({
@@ -24,6 +102,8 @@ const State = Annotation.Root({
     })
 });
 
+
+const alphaClass = new AlphaClass<typeof State.State>();
 
 const storage = new Storage({
     keyFilename: path.join(process.cwd(), 'gcp-key.json'),
@@ -98,60 +178,6 @@ const nodeGenerateCandidate = async (state: typeof State.State) => {
 };
 
 
-const nodeInvokeDocking = async (state: typeof State.State) => {
-    try {
-        // Get the first autodock tool and its resources
-        const autodockTool = state.direction.tools[0];
-        if (!autodockTool || autodockTool.name !== 'autodock') {
-            throw new Error("No autodock tool found in direction");
-        }
-
-        const ligSmilesPath = autodockTool.resources.anchor.path.replace('tp-data/', 'tp_data/');
-        const ligBoxPath = autodockTool.resources.box.path.replace('tp-data/', 'tp_data/');
-        const recNoLigPath = autodockTool.resources.target.path.replace('tp-data/', 'tp_data/');
-
-        // Extract paths from the resources
-        const payload = {
-            lig_name: "imatinib", // Static for now
-            lig_smiles_path: ligSmilesPath,
-            lig_box_path: ligBoxPath,
-            rec_name: "1iep", // Static for now
-            rec_no_lig_path: recNoLigPath
-        };
-
-        console.log("Sending payload to /adv:", payload);
-
-        // Call the Python /adv endpoint
-        const response = await fetch('https://service-tp-tools-384484325421.europe-west2.run.app/adv', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-        });
-
-        console.log('response :', response);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        // ATTENTION_RONAK: Here we must store the results filepath (or folderpath) in the results state property.
-        return {
-            messages: [new AIMessage("Docking completed successfully")],
-            docking: result.result
-        };
-
-    } catch (error: any) {
-        console.error("Error in nodeInvokeDocking:", error);
-        return {
-            messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
-        };
-    }
-};
-
-
 const nodeLoadResults = async (state: typeof State.State) => {
     // ATTENTION_RONAK: Here we're we'll load the results.
 
@@ -178,7 +204,7 @@ const edgeShouldRetry = (state: typeof State.State) => {
 const stateGraph = new StateGraph(State)
     .addNode("nodeLoadResources", nodeLoadResources)
     .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
-    .addNode("nodeInvokeDocking", nodeInvokeDocking)
+    .addNode("nodeInvokeDocking", alphaClass)
     .addNode("nodeLoadResults", nodeLoadResults)
     .addNode("nodeEvaluateResults", nodeEvaluateResults)
     .addEdge(START, "nodeLoadResources")
@@ -189,4 +215,6 @@ const stateGraph = new StateGraph(State)
     .addConditionalEdges("nodeEvaluateResults", edgeShouldRetry);
 
 
-export const autodockGraph = stateGraph.compile();
+export const alphaGraph = stateGraph.compile();
+
+

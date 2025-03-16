@@ -1,7 +1,8 @@
 import { Recipe } from "./types.js";
 
 export const alpha: Recipe<["autodock"]> = {
-    description: "Alpha",
+    // name: "Alpha", // ATTENTION: typesscript doesn't flag if these are missing
+    // description: "Alpha",
     recipeSpecs: {
         subGoal_1: {
             tools: ["autodock"],
@@ -30,7 +31,7 @@ export const alpha: Recipe<["autodock"]> = {
             }
         }
     }
-}
+};
 
 
 
