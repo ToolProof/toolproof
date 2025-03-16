@@ -1,4 +1,4 @@
-import { alpha } from "../../engine/recipeSpecs.js";
+import { alpha } from "../../engine/recipes.js";
 import { ToolMethods } from "../../engine/types.js";
 import { AIMessage } from '@langchain/core/messages';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';

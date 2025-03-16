@@ -8,7 +8,7 @@
         "../../../py"
     ],
     "graphs": {
-        "graph": "./src/graphs/workerGraph.ts:graph"
+        "graph": "./src/graphs/superGraph.ts:graph"
     },
     "env": ".env"
 }
