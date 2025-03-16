@@ -16,7 +16,7 @@ const State = Annotation.Root({
 
 
 const edgeShouldContinue = (state: typeof State.State) => {
-    if (true) {
+    if (false) {
         return 'nodeInvokeSubgraph';
     } else {
         return END;
@@ -25,10 +25,9 @@ const edgeShouldContinue = (state: typeof State.State) => {
 
 
 const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
-    // ATTENTION_RONAK: Here we must transfer the state.direction.resources to the subgraph and invoke it.
 
     try {
-        // Extract paths from resources
+        // Extract paths from recipe
         const { ligand_smiles, receptor_pdb, box_pdb, } = state.recipe.recipeSpecs[state.subGoal].inputs;
         if (!ligand_smiles || !receptor_pdb || !box_pdb) {
             throw new Error("Missing required resource paths");
@@ -71,7 +70,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
     } catch (error: any) {
         console.error("Error in nodeInvokeSubgraph:", error);
         return {
-            messages: [new AIMessage(`Error invoking autodock subgraph: ${error.message}`)]
+            messages: [new AIMessage(`Error invoking subGraph: ${error.message}`)]
         };
     }
 };
@@ -80,7 +79,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
 const stateGraph = new StateGraph(State)
     .addNode("nodeInvokeSubgraph", nodeInvokeSubgraph)
     .addEdge(START, "nodeInvokeSubgraph")
-    .addConditionalEdges("nodeInvokeSubgraph", edgeShouldContinue);
+    .addConditionalEdges("nodeInvokeSubgraph", edgeShouldContinue)
 
 
 export const graph = stateGraph.compile();

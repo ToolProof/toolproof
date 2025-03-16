@@ -27,7 +27,7 @@ export class AlphaClass extends Runnable implements AlphaInterface {
     async autodock(state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> {
         try {
 
-            // Extract paths from the resources
+            /* // Extract paths from the resources
             const payload = {
                 lig_name: "imatinib", // Static for now
                 lig_smiles_path: state.ligandCandidate.path,
@@ -52,7 +52,7 @@ export class AlphaClass extends Runnable implements AlphaInterface {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
+            const result = await response.json(); */
 
             // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
             // We'll use dummy values for the maps.
@@ -104,10 +104,10 @@ const alphaClass = new AlphaClass();
 const nodeLoadInputs = async (state: typeof GraphState.State) => {
     try {
 
-        // ATTENTION_RONAK: Here we'll load the resources from the bucket and into GraphState.
+        // ATTENTION_RONAK: Here we'll load the inputs from the bucket and into GraphState.
 
         return {
-            messages: [new AIMessage("Resources loaded successfully")],
+            messages: [new AIMessage("Inputs loaded successfully")],
             ligandAnchor: { path: "", value: "" },
             receptor: { path: "", value: new Map() },
             box: { path: "", value: new Map() }
@@ -150,7 +150,10 @@ const nodeEvaluateResults = async (state: typeof GraphState.State) => {
 
     // ATTENTION_RONAK: Here we'll evaluate the results and decide whether to retry or not.
 
-    return { shouldRetry: false };
+    return {
+        messages: [new AIMessage("Results evaluated")],
+        shouldRetry: false
+    };
 };
 
 
