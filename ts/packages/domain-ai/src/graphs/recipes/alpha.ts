@@ -1,5 +1,5 @@
 import { alpha } from "../../engine/recipeSpecs.js";
-import { ToolMethods } from "../../engine/types.js";
+import { Recipe, ToolMethods } from "../../engine/types.js";
 import { AIMessage } from '@langchain/core/messages';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
@@ -7,44 +7,33 @@ import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
 
 
+const storage = new Storage({
+    keyFilename: path.join(process.cwd(), 'gcp-key.json'),
+});
+const bucketName = 'tp_data';
+
 // Define the AlphaInterface
-interface AlphaInterface extends ToolMethods<typeof alpha["recipeSpecs"][string]["tools"]> { }
+interface AlphaInterface extends ToolMethods<typeof alpha["recipeSpecs"][string]["tools"], typeof GraphState.State> { }
 
 // Implement the interface in a class
-export class AlphaClass<T> extends Runnable implements AlphaInterface {
+export class AlphaClass extends Runnable implements AlphaInterface {
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: T, options?: Partial<RunnableConfig<Record<string, any>>>) {
-
-        const foo = state.
-
-        const result = this.autodock<T>(state);
-        return { messages: [new AIMessage('AlphaClass is invoked')] };
+    async invoke(state: typeof GraphState.State, options?: Partial<RunnableConfig<Record<string, any>>>) {
+        return this.autodock(state);
     }
 
-    async autodock<S>(state: S): Promise<Partial<S>> {
+    async autodock(state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> {
         try {
-
-            const recipeSpeck = state.recipe.recipeSpecs;
-
-            // Get the first autodock tool and its resources
-            const autodockTool = state.direction.tools[0];
-            if (!autodockTool || autodockTool.name !== 'autodock') {
-                throw new Error("No autodock tool found in direction");
-            }
-
-            const ligSmilesPath = autodockTool.resources.anchor.path.replace('tp-data/', 'tp_data/');
-            const ligBoxPath = autodockTool.resources.box.path.replace('tp-data/', 'tp_data/');
-            const recNoLigPath = autodockTool.resources.target.path.replace('tp-data/', 'tp_data/');
 
             // Extract paths from the resources
             const payload = {
                 lig_name: "imatinib", // Static for now
-                lig_smiles_path: ligSmilesPath,
-                lig_box_path: ligBoxPath,
+                lig_smiles_path: state.ligandCandidate.path,
+                lig_box_path: state.box.path,
                 rec_name: "1iep", // Static for now
-                rec_no_lig_path: recNoLigPath
+                rec_no_lig_path: state.receptor.path,
             };
 
             console.log("Sending payload to /adv:", payload);
@@ -65,10 +54,12 @@ export class AlphaClass<T> extends Runnable implements AlphaInterface {
 
             const result = await response.json();
 
-            // ATTENTION_RONAK: Here we must store the results filepath (or folderpath) in the results state property.
+            // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
+            // We'll use dummy values for the maps.
             return {
                 messages: [new AIMessage("Docking completed successfully")],
-                docking: result.result
+                ligandDocking: { path: "", value: new Map() },
+                ligandPose: { path: "", value: new Map() }
             };
 
         } catch (error: any) {
@@ -78,23 +69,27 @@ export class AlphaClass<T> extends Runnable implements AlphaInterface {
             };
         }
     };
-
 }
 
 
-const State = Annotation.Root({
+const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec,
-    // ATTENTION_RONAK: Since the autodock workflow now has its own graph, we can have custom state properties instead of just "resources". The key of all outer maps will always be a string holding the respective filepath (possibly a folderpath for results).
-    anchor: Annotation<Map<string, string>>({ // The value parameter should be a string, or preferably a stricter type that represents a subset of strings. Ideally, it should be a type that represents SMILES strings (if that's possible).
+    ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
-    target: Annotation<Map<string, Map<string, any>>>({ // The value parameter of the outer map should be a map that can hold PDB data. The key of this inner map should be a string (holding a "row_identifier") and the value should be a custom data type that represents a PDB row.
+    ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
-    box: Annotation<Map<string, Map<string, any>>>({ // Same as target
+    receptor: Annotation<{ path: string, value: Map<string, any> }>({ // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDB row.
         reducer: (prev, next) => next
     }),
-    results: Annotation<Map<string, Map<string, any>>>({  // The value parameter of the outer map should be a map that can hold results data. The key of this inner map should be a string (holding a "result_identifier") and the value should be a custom data type (probably a union type!) that represents a result.
+    box: Annotation<{ path: string, value: Map<string, any> }>({ // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDB row.
+        reducer: (prev, next) => next
+    }),
+    ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
+        reducer: (prev, next) => next
+    }),
+    ligandPose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
         reducer: (prev, next) => next
     }),
     shouldRetry: Annotation<boolean>({
@@ -103,96 +98,63 @@ const State = Annotation.Root({
 });
 
 
-const alphaClass = new AlphaClass<typeof State.State>();
-
-const storage = new Storage({
-    keyFilename: path.join(process.cwd(), 'gcp-key.json'),
-});
+const alphaClass = new AlphaClass();
 
 
-const nodeLoadResources = async (state: typeof State.State) => {
+const nodeLoadInputs = async (state: typeof GraphState.State) => {
     try {
-        const resourcesMap = new Map<string, Map<string, string>>();
 
-        for (const tool of state.direction.tools) {
-
-            if (!tool.resources) {
-                console.warn(`No resources found for tool ${tool.name}`);
-                continue;
-            }
-
-            const toolResources = new Map<string, string>();
-
-            for (const [role, resource] of Object.entries(tool.resources)) {
-                try {
-
-                    const path = resource.path;
-                    const bucketName = 'tp_data';
-                    // Try both tp_data and tp-data formats
-                    const blobName = path
-                        .replace('tp_data/', '')
-                        .replace('tp-data/', '');
-
-                    console.log(`Attempting download from ${bucketName}/${blobName}`);
-
-                    const [content] = await storage
-                        .bucket(bucketName)
-                        .file(blobName)
-                        .download();
-
-                    toolResources.set(role, content.toString());
-                    console.log(`Successfully downloaded ${role} resource`);
-                } catch (downloadError: any) {
-                    console.error(`Download error for ${role}:`, downloadError);
-                    toolResources.set(role, `Error downloading: ${downloadError.message}`);
-                }
-            }
-
-            resourcesMap.set(tool.name, toolResources);
-        }
-
-        // Convert Map to plain object for better visibility in results
-        const resourcesObject = Object.fromEntries(
-            Array.from(resourcesMap.entries()).map(([toolName, resources]) => [
-                toolName,
-                Object.fromEntries(resources)
-            ])
-        );
+        // ATTENTION_RONAK: Here we'll load the resources from the bucket and into GraphState.
 
         return {
-            resources: resourcesObject,
-            messages: [new AIMessage("Resources loaded successfully")]
+            messages: [new AIMessage("Resources loaded successfully")],
+            ligandAnchor: { path: "", value: "" },
+            receptor: { path: "", value: new Map() },
+            box: { path: "", value: new Map() }
         };
+
     } catch (error: any) {
-        console.error("Error in nodeLoadResources:", error);
+        console.error("Error in nodeLoadInputs:", error);
         return {
-            resources: {},
-            messages: [new AIMessage(`Error loading resources: ${error.message}`)]
+            messages: [new AIMessage(`Error loading inputs: ${error.message}`)]
         };
     }
 };
 
 
-const nodeGenerateCandidate = async (state: typeof State.State) => {
-    return { messages: [new AIMessage("Candidate loaded")] };
+const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
+
+    // ATTENTION_RONAK: Here we'll generate the candidate and store it in GraphState.
+
+    return {
+        messages: [new AIMessage("Candidate loaded")],
+        ligandCandidate: { path: "", value: "" }
+    };
 };
 
 
-const nodeLoadResults = async (state: typeof State.State) => {
-    // ATTENTION_RONAK: Here we're we'll load the results.
+const nodeLoadResults = async (state: typeof GraphState.State) => {
 
-    return { results: {} }
+    // ATTENTION_RONAK: Here we'll load the docking results from the bucket and into GraphState.
+
+    return {
+        messages: [new AIMessage("Results loaded")],
+        ligandDocking: { ...state.ligandDocking, value: new Map() },
+        ligandPose: { ...state.ligandPose, value: new Map() }
+    };
+
 };
 
 
-const nodeEvaluateResults = async (state: typeof State.State) => {
+const nodeEvaluateResults = async (state: typeof GraphState.State) => {
+    
     // ATTENTION_RONAK: Here we'll evaluate the results and decide whether to retry or not.
 
     return { shouldRetry: false };
 };
 
 
-const edgeShouldRetry = (state: typeof State.State) => {
+const edgeShouldRetry = (state: typeof GraphState.State) => {
     if (state.shouldRetry) {
         return 'nodeGenerateCandidate';
     } else {
@@ -201,14 +163,14 @@ const edgeShouldRetry = (state: typeof State.State) => {
 };
 
 
-const stateGraph = new StateGraph(State)
-    .addNode("nodeLoadResources", nodeLoadResources)
+const stateGraph = new StateGraph(GraphState)
+    .addNode("nodeLoadInputs", nodeLoadInputs)
     .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
     .addNode("nodeInvokeDocking", alphaClass)
     .addNode("nodeLoadResults", nodeLoadResults)
     .addNode("nodeEvaluateResults", nodeEvaluateResults)
-    .addEdge(START, "nodeLoadResources")
-    .addEdge("nodeLoadResources", "nodeGenerateCandidate")
+    .addEdge(START, "nodeLoadInputs")
+    .addEdge("nodeLoadInputs", "nodeGenerateCandidate")
     .addEdge("nodeGenerateCandidate", "nodeInvokeDocking")
     .addEdge("nodeInvokeDocking", "nodeLoadResults")
     .addEdge("nodeLoadResults", "nodeEvaluateResults")

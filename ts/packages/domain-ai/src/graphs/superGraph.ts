@@ -12,7 +12,7 @@ const State = Annotation.Root({
 });
 
 
-const shouldContinue = (state: typeof State.State) => {
+const edgeShouldContinue = (state: typeof State.State) => {
     if (false) {
         return 'nodeInvokeSubgraph';
     } else {
@@ -40,7 +40,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
 const stateGraph = new StateGraph(State)
     .addNode("nodeInvokeSubgraph", nodeInvokeSubgraph)
     .addEdge(START, "nodeInvokeSubgraph")
-    .addConditionalEdges("nodeInvokeSubgraph", shouldContinue);
+    .addConditionalEdges("nodeInvokeSubgraph", edgeShouldContinue);
 
 
 export const graph = stateGraph.compile();

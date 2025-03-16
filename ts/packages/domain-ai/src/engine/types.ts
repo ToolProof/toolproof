@@ -121,6 +121,6 @@ export interface Recipe<T extends ToolType[] = ToolType[]> {
 }
 
 // Define ToolMethods where each method is a generic function
-export type ToolMethods<Tools extends readonly string[]> = {
-    [K in Tools[number]]: <S>(state: S) => Promise<Partial<S>>;
+export type ToolMethods<Tools extends readonly string[], S> = {
+    [K in Tools[number]]: (state: S) => Promise<Partial<S>>;
 };
