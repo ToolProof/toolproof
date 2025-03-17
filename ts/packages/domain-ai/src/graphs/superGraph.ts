@@ -64,7 +64,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         }
 
         return {
-            messages: [new AIMessage("SubGraph invoked successfully")],
+            messages: [...result.messages, new AIMessage("SubGraph invoked ")],
         };
 
     } catch (error: any) {
