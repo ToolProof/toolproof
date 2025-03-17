@@ -7,9 +7,9 @@ export const alpha: Recipe<["autodock"]> = {
         subGoal_1: {
             tools: ["autodock"],
             inputs: {
-                ligand_smiles: { role: "ligand_smiles", path: "imatinib.txt" },
-                receptor_pdb: { role: "receptor_pdb", path: "1iep_no_lig.pdb" },
-                box_pdb: { role: "box_pdb", path: "xray-imatinib.pdb" },
+                ligand_smiles: { role: "ligand_smiles", path: "resources/imatinib.txt" },
+                receptor_pdb: { role: "receptor_pdb", path: "resources/1iep_no_lig.pdb" },
+                box_pdb: { role: "box_pdb", path: "resources/xray-imatinib.pdb" },
             }
         },
         subGoal_2: {

@@ -23,18 +23,43 @@ export async function runRemoteGraph() {
 
         // Invoke the graph with the thread config
         // const config = { configurable: { thread_id: "5426f0ae-0abf-41ac-865b-6b1c7abf9056" } };
-        const config = { configurable: { thread_id: thread.thread_id } };
-        const result = await remoteGraph.invoke(
-            {
+        // const config = { configurable: { thread_id: thread.thread_id } };
+        // const result = await remoteGraph.invoke(
+        //     {
+        //         messages: [new HumanMessage('Graph is invoked')],
+        //         subGoal: "subGoal_1",
+        //         recipe: alpha,
+        //     },
+        //     config,
+        // );
+
+        // console.log('threadId:', thread.thread_id);
+        // console.log('result:', JSON.stringify(result, null, 2));
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 1800000); // 30 minutes
+
+        try {
+            console.log("Invoking the graph")
+            const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 subGoal: "subGoal_1",
                 recipe: alpha,
-            },
-            config,
-        );
+            }, {
+                configurable: { thread_id: thread.thread_id },
+                signal: controller.signal,
+            });
 
-        console.log('threadId:', thread.thread_id);
-        console.log('result:', JSON.stringify(result, null, 2));
+            console.log('threadId:', thread.thread_id);
+            console.log('result:', JSON.stringify(result, null, 2));
+            return result;
+
+        } finally {
+            clearTimeout(timeout);
+            if (!controller.signal.aborted) {
+                controller.abort();
+            }
+        }
 
     } catch (error) {
         console.error('Error invoking graph:', error);

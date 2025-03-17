@@ -4,8 +4,7 @@
     "dependencies": [
         ".",
         "./gcp-key.json",
-        "../shared",
-        "../../../py"
+        "../shared"
     ],
     "graphs": {
         "graph": "./src/graphs/superGraph.ts:graph"
