@@ -127,7 +127,7 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
     // ATTENTION_RONAK: Here we'll generate the candidate and store it in GraphState.
 
     return {
-        messages: [new AIMessage("Candidate loaded")],
+        messages: [new AIMessage("Candidate generated")],
         ligandCandidate: { path: "", value: "" }
     };
 };
