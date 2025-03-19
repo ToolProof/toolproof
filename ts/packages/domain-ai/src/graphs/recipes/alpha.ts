@@ -7,9 +7,10 @@ import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
 import axios from 'axios';
 import { OpenAI } from 'openai';
+import { z } from "zod";
+import { zodResponseFormat } from "openai/helpers/zod";
 
 const openai = new OpenAI();
-
 
 const storage = new Storage({
     keyFilename: path.join(process.cwd(), 'gcp-key.json'),
@@ -126,10 +127,13 @@ const GraphState = Annotation.Root({
     ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
-    receptor: Annotation<{ path: string, value: Map<string, any> }>({ // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDB row.
+    receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
-    box: Annotation<{ path: string, value: Map<string, any> }>({ // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDB row.
+    box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
+        reducer: (prev, next) => next
+    }),
+    ligandBox: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
     ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
@@ -178,10 +182,22 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
                     .file(blobName)
                     .download();
                 
-                results[key] = {
-                    path,
-                    value: content.toString()
-                };
+                if (key === 'receptor' || key === 'box') {
+                    // Pre-process PDB content into chunks
+                    const pdbContent = content.toString();
+                    const chunks = chunkPDBContent(pdbContent);
+                    results[key] = {
+                        path,
+                        value: chunks
+                    };
+                } else {
+                    // For other resources, keep as string
+                    results[key] = {
+                        path,
+                        value: content.toString()
+                    };
+                }
+                
                 console.log(`Successfully downloaded ${key} resource`);
             } catch (downloadError: any) {
                 console.error(`Download error for ${key}:`, downloadError);
@@ -192,6 +208,7 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
             }
         }
 
+        console.log('results.box :', results.box);
         return { 
             messages: [new AIMessage("Inputs loaded successfully")],
             ligandAnchor: results.ligandAnchor,
@@ -270,18 +287,17 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
     // ATTENTION_RONAK: Here we'll generate the candidate and store it in GraphState.
     try {
         const anchorContent: string = state.ligandAnchor.value;
-        const targetContent: any = state.receptor.value;
+        const targetChunks: ChunkInfo[] = state.receptor.value;
 
         console.log('anchorContent:', anchorContent);
 
-        if (!anchorContent || !targetContent) {
+        if (!anchorContent || !targetChunks || targetChunks.length === 0) {
             throw new Error("Missing required resources");
         }
-        const chunks = chunkPDBContent(targetContent);
         
         // Analyze chunks sequentially to maintain context
         let analysisContext = '';
-        for (const chunk of chunks) {
+        for (const chunk of targetChunks) {
             const response = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
                 messages: [
@@ -386,6 +402,145 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
     }
 };
 
+const nodeGenerateBox = async (state: typeof GraphState.State) => {
+    try {
+        const candidateSmiles: string = state.ligandCandidate.value;
+        const targetChunks: ChunkInfo[] = state.receptor.value;
+        
+        if (!candidateSmiles || !targetChunks || targetChunks.length === 0) {
+            throw new Error("Missing candidate SMILES or receptor data");
+        }
+        
+        // Prepare target information for the prompt
+        const targetSummary = targetChunks.map(chunk => 
+            `Chain ${chunk.chainId}: Residues ${chunk.startResidue}-${chunk.endResidue}`
+        ).join('\n');
+        
+        // Use zod for response formatting
+        const BoxSchema = z.object({
+            boxCoordinates: z.object({
+                center_x: z.number(),
+                center_y: z.number(),
+                center_z: z.number(),
+                size_x: z.number(),
+                size_y: z.number(),
+                size_z: z.number()
+            }),
+            bindingSiteResidues: z.array(z.object({
+                chainId: z.string(),
+                residueNumber: z.number(),
+                residueName: z.string()
+            }))
+        });
+        
+        const response = await openai.beta.chat.completions.parse({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: "Generate a docking box for the candidate molecule and target protein. The box should encompass the binding site."
+                },
+                {
+                    role: "user",
+                    content: `
+                        Candidate SMILES: ${candidateSmiles}
+                        
+                        Target protein information:
+                        ${targetSummary}
+                        
+                        Based on the protein structure and candidate molecule, define:
+                        1. A docking box with center coordinates (x,y,z) and dimensions
+                        2. Key binding site residues that should be included in the box
+                    `
+                }
+            ],
+            response_format: zodResponseFormat(BoxSchema, "box_generator")
+        });
+        
+        const parsedResponse = response.choices[0].message.parsed;
+        
+        if (!parsedResponse) {
+            throw new Error("Failed to parse box generation response");
+        }
+        
+        // Generate PDB-format box representation
+        const boxPDB = generateBoxPDB(parsedResponse.boxCoordinates);
+        
+        // Save box to GCS
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const boxFileName = `boxes/box_${timestamp}.pdb`;
+        
+        await storage
+            .bucket(bucketName)
+            .file(boxFileName)
+            .save(boxPDB, {
+                contentType: 'text/plain',
+                metadata: {
+                    createdAt: timestamp,
+                    type: 'box',
+                    candidateSource: state.ligandCandidate.path
+                }
+            });
+            
+        console.log(`Box saved to gs://tp_data/${boxFileName}`);
+        
+        return {
+            messages: [new AIMessage("Docking box generated")],
+            ligandBox: {
+                path: boxFileName,
+                value: boxPDB
+            }
+        };
+        
+    } catch (error: any) {
+        console.error("Error in nodeGenerateBox:", error);
+        return {
+            messages: [new AIMessage(`Error generating box: ${error.message}`)]
+        };
+    }
+};
+
+// Helper function to generate PDB format for the box
+const generateBoxPDB = (boxCoords: any): string => {
+    const { center_x, center_y, center_z, size_x, size_y, size_z } = boxCoords;
+    
+    // Calculate corner points
+    const halfX = size_x / 2;
+    const halfY = size_y / 2;
+    const halfZ = size_z / 2;
+    
+    // Generate PDB format with 8 corner points and connecting lines
+    let pdbContent = "HEADER    DOCKING BOX\n";
+    
+    // Add 8 corner points as atoms
+    const corners = [
+        [center_x - halfX, center_y - halfY, center_z - halfZ],
+        [center_x + halfX, center_y - halfY, center_z - halfZ],
+        [center_x + halfX, center_y + halfY, center_z - halfZ],
+        [center_x - halfX, center_y + halfY, center_z - halfZ],
+        [center_x - halfX, center_y - halfY, center_z + halfZ],
+        [center_x + halfX, center_y - halfY, center_z + halfZ],
+        [center_x + halfX, center_y + halfY, center_z + halfZ],
+        [center_x - halfX, center_y + halfY, center_z + halfZ]
+    ];
+    
+    corners.forEach((corner, i) => {
+        pdbContent += `ATOM  ${(i+1).toString().padStart(5)} ${' C  '.padEnd(4)}BOX A${(i+1).toString().padStart(4)}    ${corner[0].toFixed(3).padStart(8)}${corner[1].toFixed(3).padStart(8)}${corner[2].toFixed(3).padStart(8)}  1.00  0.00           C\n`;
+    });
+    
+    // Add connecting lines as CONECT records
+    pdbContent += "CONECT    1    2    4    5\n";
+    pdbContent += "CONECT    2    1    3    6\n";
+    pdbContent += "CONECT    3    2    4    7\n";
+    pdbContent += "CONECT    4    1    3    8\n";
+    pdbContent += "CONECT    5    1    6    8\n";
+    pdbContent += "CONECT    6    2    5    7\n";
+    pdbContent += "CONECT    7    3    6    8\n";
+    pdbContent += "CONECT    8    4    5    7\n";
+    pdbContent += "END\n";
+    
+    return pdbContent;
+};
 
 const nodeLoadResults = async (state: typeof GraphState.State) => {
     // ATTENTION_RONAK: Here we'll load the docking results from the bucket and into GraphState.
@@ -544,12 +699,14 @@ const edgeShouldRetry = (state: typeof GraphState.State) => {
 const stateGraph = new StateGraph(GraphState)
     .addNode("nodeLoadInputs", nodeLoadInputs)
     .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
+    .addNode("nodeGenerateBox", nodeGenerateBox)
     .addNode("nodeInvokeDocking", alphaClass)
     .addNode("nodeLoadResults", nodeLoadResults)
     .addNode("nodeEvaluateResults", nodeEvaluateResults)
     .addEdge(START, "nodeLoadInputs")
     .addEdge("nodeLoadInputs", "nodeGenerateCandidate")
-    .addEdge("nodeGenerateCandidate", "nodeInvokeDocking")
+    .addEdge("nodeGenerateCandidate", "nodeGenerateBox")
+    .addEdge("nodeGenerateBox", "nodeInvokeDocking")
     .addEdge("nodeInvokeDocking", "nodeLoadResults")
     .addEdge("nodeLoadResults", "nodeEvaluateResults")
     .addConditionalEdges("nodeEvaluateResults", edgeShouldRetry);
