@@ -2,7 +2,7 @@ import { Recipe } from "./types.js";
 
 export const alpha: Recipe<["autodock"]> = {
     name: "alpha", // ATTENTION: typesscript doesn't flag if this is missing
-    description: "", // ATTENTION: typesscript doesn't flag if this is missing
+    description: "Start by fetching an anchor-ligand (a starting point for the docking process), a receptor, and a box from Storage. Then generate a candidate-ligand with the aim to increase the binding affinity with respect to the receptor. Then invoke the autodock tool to perform docking. Then fetch the results from storage and evaluate them. If they are promising, end the process. If not, go back to generating a new candidate-ligand and continue the process from there.", // ATTENTION: typesscript doesn't flag if this is missing
     recipeSpecs: {
         subGoal_1: {
             tools: ["autodock"],
