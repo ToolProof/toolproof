@@ -7,7 +7,8 @@
         "../shared"
     ],
     "graphs": {
-        "graph": "./src/graphs/superGraph.ts:graph"
+        "graph": "./src/graphs/superGraph.ts:graph",
+        "repo_analyzer_graph": "./src/graphs/tests/repoAnalyzer.ts:repoAnalyzerGraph"
     },
     "env": ".env"
 }
