@@ -2,6 +2,11 @@ from typing import Dict, Sequence
 from langchain_core.messages import BaseMessage, AIMessage, HumanMessage
 from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv, dotenv_values
+
+# Load environment variables at the top of the file
+load_dotenv()
+config = dotenv_values()  # loads values into a dictionary
 
 # Define the state type
 class MessagesState(Dict):
@@ -26,7 +31,7 @@ def process_chemical(state: MessagesState) -> MessagesState:
 
         chatOpenAI = ChatOpenAI(
             model="o1",
-            api_key="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"
+            api_key=config["OPENAI_API_KEY"]
         )
         messages = [
             (

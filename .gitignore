@@ -13,3 +13,4 @@ venv
 __pycache__
 temp
 .langgraph_api
+gcp-key.json

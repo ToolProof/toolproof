@@ -1,6 +1,10 @@
 from utils.gcs_utils import download_from_gcs
-from tools.autodock import basic_docking
 from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv, dotenv_values
+
+# Load environment variables at the top of the file
+load_dotenv()
+config = dotenv_values()  # loads values into a dictionary
 
 # Step 1: Download these files from gcp:
     # A: tp_data/resources/imatinib.txt
@@ -39,7 +43,7 @@ def test(local_paths):
     
     chatOpenAI = ChatOpenAI(
         model="o1",
-        api_key="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"
+        api_key=config["OPENAI_API_KEY"]
     )
     messages = [
         (
