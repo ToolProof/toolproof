@@ -24,11 +24,11 @@ const State = Annotation.Root({
     }),
     repoUsername: Annotation<string>({
         reducer: (prev, next) => next,
-        default: () => "",
+        default: () => "", // Default empty string makes it optional
     }),
     repoPassword: Annotation<string>({
         reducer: (prev, next) => next,
-        default: () => "",
+        default: () => "", // Default empty string makes it optional
     }),
     clonePath: Annotation<string>({
         reducer: (prev, next) => next,
@@ -62,7 +62,7 @@ const cloneRepoNode = async (state: typeof State.State) => {
         }
         fs.mkdirSync(tempDir, { recursive: true });
 
-        // Format URL with credentials if provided
+        // Format URL with credentials only if both username and password are provided
         let cloneUrl = repoUrl;
         if (repoUsername && repoPassword) {
             // Extract protocol and the rest of the URL
@@ -74,7 +74,7 @@ const cloneRepoNode = async (state: typeof State.State) => {
 
         console.log(`Cloning repository from ${repoUrl} to ${tempDir}...`);
         
-        // Clone the repository
+        // Clone the repository (works for public repos without credentials)
         await execAsync(`git clone ${cloneUrl} ${tempDir}`);
         
         // Focus on the ts/packages/domain-ai directory
@@ -240,7 +240,7 @@ const analyzeCodeNode = async (state: typeof State.State) => {
 const readStateVariable = async (state: typeof State.State) => {
     console.log("state: ", state);
     return {
-        messages: [new AIMessage("State Fetched")],
+        messages: [new AIMessage(state.analysis)],
     };
 }
 
