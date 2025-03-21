@@ -22,10 +22,10 @@ RUN apt-get update && apt-get install -y git
 COPY src/ /app/src/
 
 # Clone additional repositories and install using pip
-RUN micromamba run -n bd_env git clone --single-branch --branch develop https://github.com/forlilab/scrubber.git && \
-    micromamba run -n bd_env pip install --use-pep517 -e scrubber
+RUN micromamba run -n bd_env git clone --single-branch --branch develop https://github.com/ToolProof/molscrub.git && \
+    micromamba run -n bd_env pip install --use-pep517 -e molscrub
 
-RUN git clone https://github.com/phenix-project/geostd.git
+RUN git clone https://github.com/ToolProof/geostd.git
 
 # RUN git clone --branch docwork --depth=1 --filter=tree:0 https://github.com/rwxayheee/Meeko.git && \
     # cd Meeko && git sparse-checkout set --no-cone example && git checkout
