@@ -21,17 +21,15 @@ async function main() {
 
         // Replace with your actual GitHub repository details
         const repoUrl = "https://github.com/ToolProof/toolproof.git";
-        const repoUsername = "userName";  // Optional: for private repos
-        const repoPassword = "GitToken";     // Optional: for private repos (use a token)
-
+        // No need to provide username or password for public repos
+        
         // Invoke the graph
         const config = { configurable: { thread_id: thread.thread_id } };
         const result = await remoteGraph.invoke(
             {
                 messages: [new HumanMessage('Analyze the repository code')],
-                repoUrl: repoUrl,
-                repoUsername: repoUsername,
-                repoPassword: repoPassword
+                repoUrl: repoUrl
+                // Username and password are completely optional and can be omitted
             },
             config
         );
