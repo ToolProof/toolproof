@@ -5,8 +5,8 @@ import os
 app = Flask(__name__)
     
 
-@app.route("/adv", methods=["GET", "POST"])
-def handle_request_adv():
+@app.route("/autodock_basic_docking", methods=["GET", "POST"])
+def autodock_basic_docking():
     if request.method == "POST":
         data = request.json
         if not data:
@@ -26,10 +26,11 @@ def handle_request_adv():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    return jsonify({"message": "Welcome to my Flask app running on Cloud Run!"})
+    return jsonify({"message": "Basic docking endpoint"})
 
-@app.route('/reactive', methods=['POST'])
-def reactive():
+
+@app.route('/autodock_reactive_docking', methods=["GET", "POST"])
+def autodock_reactive_docking():
     if request.method == "POST":
         data = request.json
         if not data:
@@ -61,7 +62,7 @@ def reactive():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         
-    return jsonify({"message": "Welcome to my Flask app running on Cloud Run!"})
+    return jsonify({"message": "Reactive docking endpoint"})
 
 if __name__ == "__main__":
     # Expose the app on port 8080

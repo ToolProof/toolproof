@@ -35,7 +35,7 @@ def prepare_ligand(lig_smiles):
     print("Preparing ligand...")
     output_path = "/tmp/lig_protomers"
     lig_with_protomers = add_protomers(lig_smiles)
-    run_command(f"micromamba run -n bd_env mk_prepare_ligand.py -i {lig_with_protomers} --multimol_outdir {output_path}")
+    run_command(f"micromamba run -n ad_env mk_prepare_ligand.py -i {lig_with_protomers} --multimol_outdir {output_path}")
     return f"{output_path}/_i0.pdbqt" # ATTENTION: hack since output_path is a directory
 
 
@@ -50,7 +50,7 @@ def add_protomers(lig_smiles):
         raise RuntimeError(f"Failed to read SMILES file {lig_smiles}: {e}")
 
     # Run the command with the SMILES string
-    run_command(f'micromamba run -n bd_env scrub.py "{smiles_string}" -o {output_path} --skip_tautomers --ph_low 5 --ph_high 9')
+    run_command(f'micromamba run -n ad_env scrub.py "{smiles_string}" -o {output_path} --skip_tautomers --ph_low 5 --ph_high 9')
     
     return output_path
 
@@ -72,14 +72,14 @@ def prepare_receptor(rec_no_lig, lig_box):
     print(f"Hydrogens added and optimized: saved to {rec_cryst1FH}")
 
     # Step 4: Prepare receptor for docking
-    run_command(f"micromamba run -n bd_env mk_prepare_receptor.py --read_pdb {rec_cryst1FH} -o {intermediate_path} -p -v --box_enveloping {lig_box} --padding 5")
+    run_command(f"micromamba run -n ad_env mk_prepare_receptor.py --read_pdb {rec_cryst1FH} -o {intermediate_path} -p -v --box_enveloping {lig_box} --padding 5")
     print("Receptor preparation complete.")
     return output_path
 
 
 def extract_receptor_atoms(rec_no_lig):
     output_path = "/tmp/rec_atoms.pdb"
-    run_command(f"""micromamba run -n bd_env python3 - <<EOF
+    run_command(f"""micromamba run -n ad_env python3 - <<EOF
 from prody import parsePDB, writePDB
 pdb_token = '{rec_no_lig}'
 atoms_from_pdb = parsePDB(pdb_token)
@@ -107,8 +107,8 @@ def extract_and_combine_cryst1(rec_no_lig, rec_atoms):
 def add_hydrogens_and_optimize(rec_cryst1):
     print("Adding hydrogens and optimizing with reduce2.py...")
     output_path = "/tmp/rec_cryst1FH.pdb" # ATTENTION
-    # Find the path to the reduce2.py script within the micromamba environment (bd_env)
-    micromamba_path = "/opt/conda/envs/bd_env/lib/python3.9/site-packages"
+    # Find the path to the reduce2.py script within the micromamba environment (ad_env)
+    micromamba_path = "/opt/conda/envs/ad_env/lib/python3.9/site-packages"
     reduce2_path = os.path.join(micromamba_path, "mmtbx", "command_line", "reduce2.py")
     reduce_opts = "approach=add add_flip_movers=True"
 
@@ -125,7 +125,7 @@ def add_hydrogens_and_optimize(rec_cryst1):
 
     # Run reduce2.py within the micromamba environment
     run_command(
-        f"micromamba run -n bd_env python3 {reduce2_path} {rec_cryst1} {reduce_opts}", 
+        f"micromamba run -n ad_env python3 {reduce2_path} {rec_cryst1} {reduce_opts}", 
         env=env
     )
     
@@ -141,14 +141,14 @@ def run_docking(lig_prepared, rec_prepared):
     print("Running docking...")
     output_path = "/tmp/lig_docking.pdbqt"
     config_txt = "/tmp/rec_prepared.box.txt" # ATTENTION
-    run_command(f"micromamba run -n bd_env vina --ligand {lig_prepared} --receptor {rec_prepared} --config {config_txt} --out {output_path}")
+    run_command(f"micromamba run -n ad_env vina --ligand {lig_prepared} --receptor {rec_prepared} --config {config_txt} --out {output_path}")
     return output_path
 
 
 def export_pose(lig_docking):
     print("Exporting docked pose...")
     output_path = "/tmp/lig_pose.sdf"
-    run_command(f"micromamba run -n bd_env mk_export.py {lig_docking} -s {output_path}")
+    run_command(f"micromamba run -n ad_env mk_export.py {lig_docking} -s {output_path}")
     return output_path
 
 
