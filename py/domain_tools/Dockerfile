@@ -14,9 +14,9 @@ RUN micromamba run -n bd_env pip install --upgrade pip
 # Install Flask using pip within the micromamba environment
 RUN micromamba run -n bd_env pip install flask
 
-# Install git as root
+# Install git and build tools as root
 USER root
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git build-essential
 
 # Copy the src folder into the container
 COPY src/ /app/src/
@@ -26,6 +26,9 @@ RUN micromamba run -n bd_env git clone --single-branch --branch develop https://
     micromamba run -n bd_env pip install --use-pep517 -e molscrub
 
 RUN git clone https://github.com/ToolProof/geostd.git
+
+# Install latest version of Meeko for reactive docking support
+RUN micromamba run -n bd_env pip install git+https://github.com/forlilab/Meeko.git
 
 # RUN git clone --branch docwork --depth=1 --filter=tree:0 https://github.com/rwxayheee/Meeko.git && \
     # cd Meeko && git sparse-checkout set --no-cone example && git checkout
