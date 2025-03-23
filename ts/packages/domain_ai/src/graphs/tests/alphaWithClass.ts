@@ -1,4 +1,7 @@
+import { alpha } from "../../engine/recipes.js";
+import { ToolMethods } from "../../engine/types.js";
 import { AIMessage } from '@langchain/core/messages';
+import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
@@ -13,6 +16,107 @@ const storage = new Storage({
     keyFilename: path.join(process.cwd(), 'gcp-key.json'),
 });
 const bucketName = 'tp_data';
+
+// Define the AlphaInterface
+interface AlphaInterface extends ToolMethods<typeof alpha["recipeSpecs"][string]["tools"], typeof GraphState.State> { }
+
+// Implement the interface in a class
+export class AlphaClass extends Runnable implements AlphaInterface {
+
+    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
+
+    async invoke(state: typeof GraphState.State, options?: Partial<RunnableConfig<Record<string, any>>>) {
+        return this.autodock(state);
+    }
+
+    async autodock(state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> {
+        try {
+            // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
+
+            // Ensure paths have the tp_data/ prefix
+            const addPrefix = (path: string) => {
+                if (path.startsWith('tp_data/')) return path;
+                if (path.startsWith('tp-data/')) return path.replace('tp-data/', 'tp_data/');
+                return `tp_data/${path}`;
+            };
+            
+            const ligSmilesPath = addPrefix(state.ligandCandidate.path);
+            const ligBoxPath = addPrefix(state.box.path);
+            const recNoLigPath = addPrefix(state.receptor.path);
+
+            // Extract paths from the resources
+            const payload = {
+                lig_name: "imatinib", // Static for now
+                lig_smiles_path: ligSmilesPath,
+                lig_box_path: ligBoxPath,
+                rec_name: "1iep", // Static for now
+                rec_no_lig_path: recNoLigPath
+            };
+
+            console.log("Sending payload to /adv:", payload);
+
+            // Create a new Map to store the results
+
+            const response = await axios.post(
+                'https://service-tp-tools-384484325421.europe-west2.run.app/adv',
+                payload,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 30 * 60 * 1000, // 30 minutes in milliseconds
+                }
+            );
+            
+            const result = response.data;
+            console.log('result:', result);
+
+            // Process actual results if available
+            if (result?.result?.uploaded_files) {
+                let ligandDockingPath = '';
+                let ligandPosePath = '';
+                
+                // Process each uploaded file
+                result.result.uploaded_files.forEach((filePath: string) => {
+                    const fileName = path.basename(filePath);
+                    
+                    // Determine file type based on extension
+                    if (fileName.endsWith('.pdbqt') || fileName.endsWith('.pdb')) {
+                        // This is the docking result file
+                        ligandDockingPath = filePath;
+                    } else if (fileName.endsWith('.sdf')) {
+                        // This is the pose file
+                        ligandPosePath = filePath;
+                    }
+                });
+                
+                if (!ligandDockingPath || !ligandPosePath) {
+                    console.warn("Missing expected file types in response:", result.result.uploaded_files);
+                }
+                
+                return {
+                    messages: [new AIMessage("Docking completed successfully")],
+                    ligandDocking: { 
+                        path: ligandDockingPath, 
+                        value: new Map()
+                    },
+                    ligandPose: { 
+                        path: ligandPosePath, 
+                        value: new Map()
+                    }
+                };
+            } else {
+                throw new Error("No uploaded files in response");
+            }
+
+        } catch (error: any) {
+            console.error("Error in nodeInvokeDocking:", error);
+            return {
+                messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
+            };
+        }
+    };
+}
 
 
 const GraphState = Annotation.Root({
@@ -47,6 +151,9 @@ const GraphState = Annotation.Root({
 });
 
 
+const alphaClass = new AlphaClass();
+
+
 const nodeLoadInputs = async (state: typeof GraphState.State) => {
     try {
 
@@ -67,14 +174,14 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
                 const blobName = path
                     .replace('tp_data/', '')
                     .replace('tp-data/', '');
-
+                
                 console.log(`Attempting download from ${bucketName}/${blobName}`);
-
+                
                 const [content] = await storage
                     .bucket(bucketName)
                     .file(blobName)
                     .download();
-
+                
                 if (key === 'receptor' || key === 'box') {
                     // Pre-process PDB content into chunks
                     const pdbContent = content.toString();
@@ -90,7 +197,7 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
                         value: content.toString()
                     };
                 }
-
+                
                 console.log(`Successfully downloaded ${key} resource`);
             } catch (downloadError: any) {
                 console.error(`Download error for ${key}:`, downloadError);
@@ -102,7 +209,7 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
         }
 
         console.log('results.box :', results.box);
-        return {
+        return { 
             messages: [new AIMessage("Inputs loaded successfully")],
             ligandAnchor: results.ligandAnchor,
             receptor: results.receptor,
@@ -131,16 +238,16 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
     let currentChainId = '';
     let startResidue = -1;
     let currentResidue = -1;
-
+    
     for (const line of lines) {
         if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
             const chainId = line.substring(21, 22).trim();
             const residueNumber = parseInt(line.substring(22, 26).trim());
 
             // Start new chunk if conditions met
-            if (currentChunk.length >= chunkSize ||
+            if (currentChunk.length >= chunkSize || 
                 (currentChainId && chainId !== currentChainId)) {
-
+                
                 if (currentChunk.length > 0) {
                     chunks.push({
                         chainId: currentChainId,
@@ -187,7 +294,7 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
         if (!anchorContent || !targetChunks || targetChunks.length === 0) {
             throw new Error("Missing required resources");
         }
-
+        
         // Analyze chunks sequentially to maintain context
         let analysisContext = '';
         for (const chunk of targetChunks) {
@@ -258,7 +365,7 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
         // Save candidate to GCS
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const candidateFileName = `candidates/candidate_${timestamp}.txt`;
-
+        
         try {
             await storage
                 .bucket(bucketName)
@@ -274,7 +381,7 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
 
             console.log(`Candidate saved to gs://tp_data/${candidateFileName}`);
 
-            return {
+            return { 
                 messages: [new AIMessage("Candidate generated")],
                 ligandCandidate: {
                     path: candidateFileName,
@@ -299,16 +406,16 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
     try {
         const candidateSmiles: string = state.ligandCandidate.value;
         const targetChunks: ChunkInfo[] = state.receptor.value;
-
+        
         if (!candidateSmiles || !targetChunks || targetChunks.length === 0) {
             throw new Error("Missing candidate SMILES or receptor data");
         }
-
+        
         // Prepare target information for the prompt
-        const targetSummary = targetChunks.map(chunk =>
+        const targetSummary = targetChunks.map(chunk => 
             `Chain ${chunk.chainId}: Residues ${chunk.startResidue}-${chunk.endResidue}`
         ).join('\n');
-
+        
         // Use zod for response formatting
         const BoxSchema = z.object({
             boxCoordinates: z.object({
@@ -325,7 +432,7 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
                 residueName: z.string()
             }))
         });
-
+        
         const response = await openai.beta.chat.completions.parse({
             model: "gpt-4o-mini",
             messages: [
@@ -349,20 +456,20 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
             ],
             response_format: zodResponseFormat(BoxSchema, "box_generator")
         });
-
+        
         const parsedResponse = response.choices[0].message.parsed;
-
+        
         if (!parsedResponse) {
             throw new Error("Failed to parse box generation response");
         }
-
+        
         // Generate PDB-format box representation
         const boxPDB = generateBoxPDB(parsedResponse.boxCoordinates);
-
+        
         // Save box to GCS
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const boxFileName = `boxes/box_${timestamp}.pdb`;
-
+        
         await storage
             .bucket(bucketName)
             .file(boxFileName)
@@ -374,9 +481,9 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
                     candidateSource: state.ligandCandidate.path
                 }
             });
-
+            
         console.log(`Box saved to gs://tp_data/${boxFileName}`);
-
+        
         return {
             messages: [new AIMessage("Docking box generated")],
             ligandBox: {
@@ -384,7 +491,7 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
                 value: boxPDB
             }
         };
-
+        
     } catch (error: any) {
         console.error("Error in nodeGenerateBox:", error);
         return {
@@ -396,15 +503,15 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
 // Helper function to generate PDB format for the box
 const generateBoxPDB = (boxCoords: any): string => {
     const { center_x, center_y, center_z, size_x, size_y, size_z } = boxCoords;
-
+    
     // Calculate corner points
     const halfX = size_x / 2;
     const halfY = size_y / 2;
     const halfZ = size_z / 2;
-
+    
     // Generate PDB format with 8 corner points and connecting lines
     let pdbContent = "HEADER    DOCKING BOX\n";
-
+    
     // Add 8 corner points as atoms
     const corners = [
         [center_x - halfX, center_y - halfY, center_z - halfZ],
@@ -416,11 +523,11 @@ const generateBoxPDB = (boxCoords: any): string => {
         [center_x + halfX, center_y + halfY, center_z + halfZ],
         [center_x - halfX, center_y + halfY, center_z + halfZ]
     ];
-
+    
     corners.forEach((corner, i) => {
-        pdbContent += `ATOM  ${(i + 1).toString().padStart(5)} ${' C  '.padEnd(4)}BOX A${(i + 1).toString().padStart(4)}    ${corner[0].toFixed(3).padStart(8)}${corner[1].toFixed(3).padStart(8)}${corner[2].toFixed(3).padStart(8)}  1.00  0.00           C\n`;
+        pdbContent += `ATOM  ${(i+1).toString().padStart(5)} ${' C  '.padEnd(4)}BOX A${(i+1).toString().padStart(4)}    ${corner[0].toFixed(3).padStart(8)}${corner[1].toFixed(3).padStart(8)}${corner[2].toFixed(3).padStart(8)}  1.00  0.00           C\n`;
     });
-
+    
     // Add connecting lines as CONECT records
     pdbContent += "CONECT    1    2    4    5\n";
     pdbContent += "CONECT    2    1    3    6\n";
@@ -431,102 +538,13 @@ const generateBoxPDB = (boxCoords: any): string => {
     pdbContent += "CONECT    7    3    6    8\n";
     pdbContent += "CONECT    8    4    5    7\n";
     pdbContent += "END\n";
-
+    
     return pdbContent;
-};
-
-
-const nodeInvokeDocking = async (state: typeof GraphState.State) => {
-    try {
-        // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
-
-        // Ensure paths have the tp_data/ prefix
-        const addPrefix = (path: string) => {
-            if (path.startsWith('tp_data/')) return path;
-            if (path.startsWith('tp-data/')) return path.replace('tp-data/', 'tp_data/');
-            return `tp_data/${path}`;
-        };
-
-        const ligSmilesPath = addPrefix(state.ligandCandidate.path);
-        const ligBoxPath = addPrefix(state.box.path);
-        const recNoLigPath = addPrefix(state.receptor.path);
-
-        // Extract paths from the resources
-        const payload = {
-            lig_name: "imatinib", // Static for now
-            lig_smiles_path: ligSmilesPath,
-            lig_box_path: ligBoxPath,
-            rec_name: "1iep", // Static for now
-            rec_no_lig_path: recNoLigPath
-        };
-
-        console.log("Sending payload to /adv:", payload);
-
-        // Create a new Map to store the results
-
-        const response = await axios.post(
-            'https://service-tp-tools-384484325421.europe-west2.run.app/adv',
-            payload,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                timeout: 30 * 60 * 1000, // 30 minutes in milliseconds
-            }
-        );
-
-        const result = response.data;
-        console.log('result:', result);
-
-        // Process actual results if available
-        if (result?.result?.uploaded_files) {
-            let ligandDockingPath = '';
-            let ligandPosePath = '';
-
-            // Process each uploaded file
-            result.result.uploaded_files.forEach((filePath: string) => {
-                const fileName = path.basename(filePath);
-
-                // Determine file type based on extension
-                if (fileName.endsWith('.pdbqt') || fileName.endsWith('.pdb')) {
-                    // This is the docking result file
-                    ligandDockingPath = filePath;
-                } else if (fileName.endsWith('.sdf')) {
-                    // This is the pose file
-                    ligandPosePath = filePath;
-                }
-            });
-
-            if (!ligandDockingPath || !ligandPosePath) {
-                console.warn("Missing expected file types in response:", result.result.uploaded_files);
-            }
-
-            return {
-                messages: [new AIMessage("Docking completed successfully")],
-                ligandDocking: {
-                    path: ligandDockingPath,
-                    value: new Map()
-                },
-                ligandPose: {
-                    path: ligandPosePath,
-                    value: new Map()
-                }
-            };
-        } else {
-            throw new Error("No uploaded files in response");
-        }
-
-    } catch (error: any) {
-        console.error("Error in nodeInvokeDocking:", error);
-        return {
-            messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
-        };
-    }
 };
 
 const nodeLoadResults = async (state: typeof GraphState.State) => {
     // ATTENTION_RONAK: Here we'll load the docking results from the bucket and into GraphState.
-
+    
     try {
         if (!state.ligandDocking?.path || !state.ligandPose?.path) {
             throw new Error("Missing ligandDocking or ligandPose paths");
@@ -545,24 +563,24 @@ const nodeLoadResults = async (state: typeof GraphState.State) => {
                 const blobName = path
                     .replace('tp_data/', '')
                     .replace('tp-data/', '');
-
+                
                 console.log(`Attempting to download ${bucketName}/${blobName}`);
-
+                
                 const [content] = await storage
                     .bucket(bucketName)
                     .file(blobName)
                     .download();
-
+                
                 // Create value map with content
                 const valueMap = new Map<string, any>();
                 valueMap.set('path', path);
                 valueMap.set('content', content.toString());
-
+                
                 results[key] = {
                     path,
                     value: valueMap
                 };
-
+                
                 console.log(`Successfully loaded ${key}`);
             } catch (downloadError: any) {
                 console.error(`Download error for ${key}:`, downloadError);
@@ -574,7 +592,7 @@ const nodeLoadResults = async (state: typeof GraphState.State) => {
             }
         }
 
-        return {
+        return { 
             messages: [new AIMessage("Results loaded")],
             ligandDocking: results.ligandDocking,
             ligandPose: results.ligandPose
@@ -597,14 +615,14 @@ const nodeEvaluateResults = async (state: typeof GraphState.State) => {
 
         // Prepare the results content for OpenAI evaluation
         let resultsContent = "";
-
+        
         const dockingContent = state.ligandDocking.value.get('content');
         const poseContent = state.ligandPose.value.get('content');
-
+        
         if (dockingContent) {
             resultsContent += `Docking Result:\n${dockingContent}\n\n`;
         }
-
+        
         if (poseContent) {
             resultsContent += `Pose Result:\n${poseContent}\n\n`;
         }
@@ -634,7 +652,7 @@ const nodeEvaluateResults = async (state: typeof GraphState.State) => {
         // Save evaluation to GCS
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const evaluationFileName = `evaluations/evaluation_${timestamp}.txt`;
-
+        
         await storage
             .bucket(bucketName)
             .file(evaluationFileName)
@@ -682,7 +700,7 @@ const stateGraph = new StateGraph(GraphState)
     .addNode("nodeLoadInputs", nodeLoadInputs)
     .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
     .addNode("nodeGenerateBox", nodeGenerateBox)
-    .addNode("nodeInvokeDocking", nodeInvokeDocking)
+    .addNode("nodeInvokeDocking", alphaClass)
     .addNode("nodeLoadResults", nodeLoadResults)
     .addNode("nodeEvaluateResults", nodeEvaluateResults)
     .addEdge(START, "nodeLoadInputs")
@@ -695,3 +713,8 @@ const stateGraph = new StateGraph(GraphState)
 
 
 export const alphaGraph = stateGraph.compile();
+
+
+
+
+
