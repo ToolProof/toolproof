@@ -39,6 +39,9 @@ RUN micromamba run -n ad_env pip install prody
 # Install google-cloud-storage within the micromamba environment
 RUN micromamba run -n ad_env pip install google-cloud-storage
 
+# Install google-cloud-firestore within the micromamba environment
+RUN micromamba run -n ad_env pip install google-cloud-firestore
+
 # Install langchain and langchain-openai within the micromamba environment
 RUN micromamba run -n ad_env pip install langchain langchain-openai
 

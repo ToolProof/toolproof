@@ -4,6 +4,7 @@ from datetime import datetime
 from google.auth import default
 import shutil
 from shared.gcs_utils import download_from_gcs, upload_to_gcs
+from google.cloud import firestore
 
 
 def clear_tmp():
@@ -31,23 +32,23 @@ def run_command(command, check=True, env=None):
         raise
 
 
-def prepare_ligand(lig_smiles):
+def prepare_ligand(ligand):
     print("Preparing ligand...")
-    output_path = "/tmp/lig_protomers"
-    lig_with_protomers = add_protomers(lig_smiles)
-    run_command(f"micromamba run -n ad_env mk_prepare_ligand.py -i {lig_with_protomers} --multimol_outdir {output_path}")
+    output_path = "/tmp/ligand_protomers"
+    ligand_with_protomers = add_protomers(ligand)
+    run_command(f"micromamba run -n ad_env mk_prepare_ligand.py -i {ligand_with_protomers} --multimol_outdir {output_path}")
     return f"{output_path}/_i0.pdbqt" # ATTENTION: hack since output_path is a directory
 
 
-def add_protomers(lig_smiles):
-    output_path = "/tmp/lig_with_protomers.sdf"
+def add_protomers(ligand):
+    output_path = "/tmp/ligand_with_protomers.sdf"
     
     # Read the SMILES string from the file
     try:
-        with open(lig_smiles, "r", encoding="utf-8") as file:
+        with open(ligand, "r", encoding="utf-8") as file:
             smiles_string = file.read().strip()
     except Exception as e:
-        raise RuntimeError(f"Failed to read SMILES file {lig_smiles}: {e}")
+        raise RuntimeError(f"Failed to read SMILES file {ligand}: {e}")
 
     # Run the command with the SMILES string
     run_command(f'micromamba run -n ad_env scrub.py "{smiles_string}" -o {output_path} --skip_tautomers --ph_low 5 --ph_high 9')
@@ -55,33 +56,33 @@ def add_protomers(lig_smiles):
     return output_path
 
 
-def prepare_receptor(rec_no_lig, lig_box):
+def prepare_receptor(receptor, box):
     print("Preparing receptor...")
-    intermediate_path = "/tmp/rec_prepared"
+    intermediate_path = "/tmp/receptor_prepared"
     output_path = f"{intermediate_path}.pdbqt" # ATTENTION
 
     # Step 1: Extract receptor atoms
-    rec_atoms = extract_receptor_atoms(rec_no_lig)
+    receptor_atoms = extract_receptor_atoms(receptor)
     
     # Step 2: Combine CRYST1 and receptor atoms
-    rec_cryst1 = extract_and_combine_cryst1(rec_no_lig, rec_atoms)
-    print(f"CRYST1 combined: saved to {rec_cryst1}")
+    receptor_cryst1 = extract_and_combine_cryst1(receptor, receptor_atoms)
+    print(f"CRYST1 combined: saved to {receptor_cryst1}")
 
     # Step 3: Add hydrogens and optimize
-    rec_cryst1FH = add_hydrogens_and_optimize(rec_cryst1)
-    print(f"Hydrogens added and optimized: saved to {rec_cryst1FH}")
+    receptor_cryst1FH = add_hydrogens_and_optimize(receptor_cryst1)
+    print(f"Hydrogens added and optimized: saved to {receptor_cryst1FH}")
 
     # Step 4: Prepare receptor for docking
-    run_command(f"micromamba run -n ad_env mk_prepare_receptor.py --read_pdb {rec_cryst1FH} -o {intermediate_path} -p -v --box_enveloping {lig_box} --padding 5")
+    run_command(f"micromamba run -n ad_env mk_prepare_receptor.py --read_pdb {receptor_cryst1FH} -o {intermediate_path} -p -v --box_enveloping {box} --padding 5")
     print("Receptor preparation complete.")
     return output_path
 
 
-def extract_receptor_atoms(rec_no_lig):
-    output_path = "/tmp/rec_atoms.pdb"
+def extract_receptor_atoms(receptor):
+    output_path = "/tmp/receptor_atoms.pdb"
     run_command(f"""micromamba run -n ad_env python3 - <<EOF
 from prody import parsePDB, writePDB
-pdb_token = '{rec_no_lig}'
+pdb_token = '{receptor}'
 atoms_from_pdb = parsePDB(pdb_token)
 receptor_selection = "chain A and not water and not hetero"
 receptor_atoms = atoms_from_pdb.select(receptor_selection)
@@ -92,11 +93,11 @@ EOF
     return output_path
     
 
-def extract_and_combine_cryst1(rec_no_lig, rec_atoms):
+def extract_and_combine_cryst1(receptor, receptor_atoms):
     print("Extracting CRYST1 and combining with receptor atoms...")
-    output_path = "/tmp/rec_cryst1.pdb"
-    cryst1_line = run_command(f"grep 'CRYST1' {rec_no_lig}", check=False).stdout.strip()
-    with open(rec_atoms, "r", encoding="utf-8") as receptor_f, open(output_path, "w", encoding="utf-8") as combined_f:
+    output_path = "/tmp/receptor_cryst1.pdb"
+    cryst1_line = run_command(f"grep 'CRYST1' {receptor}", check=False).stdout.strip()
+    with open(receptor_atoms, "r", encoding="utf-8") as receptor_f, open(output_path, "w", encoding="utf-8") as combined_f:
         if cryst1_line:
             combined_f.write(cryst1_line + "\n")
         combined_f.writelines(receptor_f.readlines())
@@ -104,9 +105,9 @@ def extract_and_combine_cryst1(rec_no_lig, rec_atoms):
     return output_path
 
 
-def add_hydrogens_and_optimize(rec_cryst1):
+def add_hydrogens_and_optimize(receptor_cryst1):
     print("Adding hydrogens and optimizing with reduce2.py...")
-    output_path = "/tmp/rec_cryst1FH.pdb" # ATTENTION
+    output_path = "/tmp/receptor_cryst1FH.pdb" # ATTENTION
     # Find the path to the reduce2.py script within the micromamba environment (ad_env)
     micromamba_path = "/opt/conda/envs/ad_env/lib/python3.9/site-packages"
     reduce2_path = os.path.join(micromamba_path, "mmtbx", "command_line", "reduce2.py")
@@ -125,7 +126,7 @@ def add_hydrogens_and_optimize(rec_cryst1):
 
     # Run reduce2.py within the micromamba environment
     run_command(
-        f"micromamba run -n ad_env python3 {reduce2_path} {rec_cryst1} {reduce_opts}", 
+        f"micromamba run -n ad_env python3 {reduce2_path} {receptor_cryst1} {reduce_opts}", 
         env=env
     )
     
@@ -137,77 +138,95 @@ def add_hydrogens_and_optimize(rec_cryst1):
     return output_path
 
 
-def run_docking(lig_prepared, rec_prepared):
+def run_docking(ligand_prepared, receptor_prepared):
     print("Running docking...")
-    output_path = "/tmp/lig_docking.pdbqt"
-    config_txt = "/tmp/rec_prepared.box.txt" # ATTENTION
-    run_command(f"micromamba run -n ad_env vina --ligand {lig_prepared} --receptor {rec_prepared} --config {config_txt} --out {output_path}")
+    output_path = "/tmp/docking.pdbqt"
+    config_txt = "/tmp/receptor_prepared.box.txt" # ATTENTION
+    run_command(f"micromamba run -n ad_env vina --ligand {ligand_prepared} --receptor {receptor_prepared} --config {config_txt} --out {output_path}")
     return output_path
 
 
-def export_pose(lig_docking):
+def export_pose(docking):
     print("Exporting docked pose...")
-    output_path = "/tmp/lig_pose.sdf"
-    run_command(f"micromamba run -n ad_env mk_export.py {lig_docking} -s {output_path}")
+    output_path = "/tmp/pose.sdf"
+    run_command(f"micromamba run -n ad_env mk_export.py {docking} -s {output_path}")
     return output_path
 
 
 def retrieve_gcs_files(**kwargs):
     """
-    Retrieves files from Cloud Storage for arguments ending in '_path' and stores them in /tmp.
-    Returns a dictionary with keys without '_path' and their corresponding local file paths.
+    Retrieves files from Cloud Storage and stores them in /tmp.
+    Returns a dictionary with keys and their corresponding local file paths.
     """
     local_files = {}
     
     for key, gcs_path in kwargs.items():
-        if key.endswith("_path"):
-            new_key = key[:-5]  # Remove "_path" suffix
-            local_files[new_key] = download_from_gcs(gcs_path)
+        local_files[key] = download_from_gcs(gcs_path)
+            
     
     return local_files
 
 
-def run_simulation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig_path):
+def run_simulation(ligand, receptor, box):
     try:
         clear_tmp()  # Clear temp files before running
         
         # Download necessary files from Cloud Storage
         local_files = retrieve_gcs_files(
-            lig_smiles_path=lig_smiles_path, 
-            lig_box_path=lig_box_path, 
-            rec_no_lig_path=rec_no_lig_path
+            ligand=ligand,
+            receptor=receptor,
+            box=box
         )
 
         # Extract local paths for function calls
-        lig_smiles = local_files["lig_smiles"]
-        lig_box = local_files["lig_box"]
-        rec_no_lig = local_files["rec_no_lig"]
+        ligand = local_files["ligand"]
+        box = local_files["box"]
+        receptor = local_files["receptor"]
         
-        lig_prepared = prepare_ligand(lig_smiles)
+        ligand_prepared = prepare_ligand(ligand)
         
-        rec_prepared = prepare_receptor(rec_no_lig, lig_box)
+        receptor_prepared = prepare_receptor(receptor, box)
         
-        lig_docking = run_docking(lig_prepared, rec_prepared)
+        docking = run_docking(ligand_prepared, receptor_prepared)
         
-        lig_pose = export_pose(lig_docking) 
+        pose = export_pose(docking) 
         
         # Get the current date and time
         now = datetime.now()
         # Format the date and time as a string
         date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
         
-        # Ensure the directory exists
-        os.makedirs(date_time_str, exist_ok=True)
+        
+        # Initialize Firestore client
+        db = firestore.Client()
+
+        # Create Firestore documents for "docking" and "pose" in the resources collection
+        resources_ref = db.collection("resources")
+        
+        docking_doc = resources_ref.document()
+        docking_doc.set({
+            "name": "docking",
+            "timestamp": date_time_str,
+            "path": f"tp_resources/{docking_doc.id}.pdbqt"
+        })
+        
+        pose_doc = resources_ref.document()
+        pose_doc.set({
+            "name": "pose",
+            "timestamp": date_time_str,
+            "path": f"tp_resources/{pose_doc.id}.sdf"
+        })
+        
         
         files_to_upload = [
-            (lig_docking, f"adv/{date_time_str}{lig_docking[4:]}"),
-            (lig_pose, f"adv/{date_time_str}{lig_pose[4:]}")
+            (docking, f"{docking_doc.id}.pdbqt"),
+            (pose, f"{pose_doc.id}.sdf")
         ]
         
         success_files = []
         failed_files = []
 
-        bucket_name = "tp_data"
+        bucket_name = "tp_resources"
 
         # Upload files to GCS
         for local_path, blob_name in files_to_upload:

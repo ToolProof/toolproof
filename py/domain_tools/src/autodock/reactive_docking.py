@@ -82,7 +82,7 @@ def run_simulation(lig_name, lig_smiles_path, lig_box_path, rec_name, rec_no_lig
         # Upload files to GCS
         success_files = []
         failed_files = []
-        bucket_name = "tp_data"
+        bucket_name = "tp_resources"
 
         # Upload files to GCS
         for local_path, blob_name in files_to_upload:
