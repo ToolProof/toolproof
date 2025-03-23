@@ -191,32 +191,37 @@ def run_simulation(ligand, receptor, box):
         
         pose = export_pose(docking) 
         
-        # Get the current date and time
-        now = datetime.now()
-        # Format the date and time as a string
-        date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
-        
+        # Extract the document ID from the ligand path
+        ligand_doc_id = os.path.basename(ligand).split('.')[0]
         
         # Initialize Firestore client
         db = firestore.Client()
-
+        
+        # Retrieve the ligand document
+        ligand_doc = db.collection("resources").document(ligand_doc_id).get()
+        if not ligand_doc.exists:
+            raise RuntimeError(f"Ligand document {ligand_doc_id} does not exist.")
+        
+        ligand_name = ligand_doc.to_dict().get("name", "unknown")
+        
         # Create Firestore documents for "docking" and "pose" in the resources collection
         resources_ref = db.collection("resources")
         
         docking_doc = resources_ref.document()
         docking_doc.set({
-            "name": "docking",
-            "timestamp": date_time_str,
+            "name": f"{ligand_name}_docking",
+            "description": "dummy",
+            "timestamp": firestore.SERVER_TIMESTAMP,
             "path": f"tp_resources/{docking_doc.id}.pdbqt"
         })
-        
+
         pose_doc = resources_ref.document()
         pose_doc.set({
-            "name": "pose",
-            "timestamp": date_time_str,
+            "name": f"{ligand_name}_pose",
+            "description": "dummy",
+            "timestamp": firestore.SERVER_TIMESTAMP,
             "path": f"tp_resources/{pose_doc.id}.sdf"
         })
-        
         
         files_to_upload = [
             (docking, f"{docking_doc.id}.pdbqt"),

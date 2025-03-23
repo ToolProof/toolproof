@@ -5,8 +5,8 @@ import os
 app = Flask(__name__)
     
 
-@app.route("/autodock_basic_docking", methods=["GET", "POST"])
-def autodock_basic_docking():
+@app.route("/autodock_basic", methods=["GET", "POST"])
+def autodock_basic():
     if request.method == "POST":
         data = request.json
         if not data:
@@ -27,8 +27,8 @@ def autodock_basic_docking():
     return jsonify({"message": "Basic docking endpoint"})
 
 
-@app.route('/autodock_reactive_docking', methods=["GET", "POST"])
-def autodock_reactive_docking():
+@app.route('/autodock_reactive', methods=["GET", "POST"])
+def autodock_reactive():
     if request.method == "POST":
         data = request.json
         if not data:
