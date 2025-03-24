@@ -177,7 +177,7 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 };
 
 const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
-    // ATTENTION_RONAK: Here we'll generate the candidate and store it in GraphState.
+    
     try {
         const anchorContent: string = state.ligandAnchor.value;
         const targetChunks: ChunkInfo[] = state.receptor.value;
@@ -254,6 +254,10 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
         if (!candidateSmiles) {
             throw new Error("Failed to generate candidate SMILES string");
         }
+
+        // ATTENTION_RONAK: Here we must generate a metadata document for the candidate and store it in Firestore.
+
+         
 
         // Save candidate to GCS
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');

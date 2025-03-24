@@ -211,16 +211,24 @@ def run_simulation(ligand, receptor, box):
         docking_doc.set({
             "name": f"{ligand_name}_docking",
             "description": "dummy",
+            "filetype": "pdbqt",
+            "generator": "autodock_basic",
+            "metamap": {
+                "type": "docking"
+            },
             "timestamp": firestore.SERVER_TIMESTAMP,
-            "path": f"tp_resources/{docking_doc.id}.pdbqt"
         })
 
         pose_doc = resources_ref.document()
         pose_doc.set({
             "name": f"{ligand_name}_pose",
             "description": "dummy",
+            "filetype": "sdf",
+            "generator": "autodock_basic",
+            "metamap": {
+                "type": "pose"
+            },
             "timestamp": firestore.SERVER_TIMESTAMP,
-            "path": f"tp_resources/{pose_doc.id}.sdf"
         })
         
         files_to_upload = [

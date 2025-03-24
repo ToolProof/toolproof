@@ -27,23 +27,19 @@ const edgeShouldContinue = (state: typeof State.State) => {
 const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
 
     try {
-        // Extract paths from recipe
-        const { ligand_smiles, receptor_pdb, box_pdb, } = state.recipe.recipeSpecs[state.subGoal].inputs;
-        if (!ligand_smiles || !receptor_pdb || !box_pdb) {
-            throw new Error("Missing required resource paths");
-        }
 
         // Create initial state for autodock graph with paths
+        // ATTENTION_RONAK: These paths are hardcoded for now, but they should be fetched Firestore
         const subGraphState = {
             messages: state.messages,
             ligandAnchor: {
-                path: ligand_smiles.path
+                path: "tp_resources/E4K9TgYvQ4cG9Gl64ALw.txt"
             },
             receptor: {
-                path: receptor_pdb.path
+                path: "tp_resources/PeeAt29vtih4HTyu2IFC.pdb"
             },
             box: {
-                path: box_pdb.path
+                path: "tp_resources/oK9g0fukcrfsHrmRklPB.pdb"
             },
             shouldRetry: false
         };
@@ -55,9 +51,10 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         let result;
         try {
             // Invoke the subGraph with abort signal
-            result = await subGraphs[state.recipe.name].invoke(subGraphState, {
+            // ATTENTION_RONAK: Invoke Python subGraph instead
+            /* result = await subGraphs[state.recipe.name].invoke(subGraphState, {
                 signal: controller.signal
-            });
+            }); */
         } finally {
             clearTimeout(timeout);
             controller.abort(); // Cleanup the controller
