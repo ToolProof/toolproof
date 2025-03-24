@@ -43,7 +43,7 @@ RUN micromamba run -n ad_env pip install google-cloud-storage
 RUN micromamba run -n ad_env pip install google-cloud-firestore
 
 # Install langchain and langchain-openai within the micromamba environment
-RUN micromamba run -n ad_env pip install langchain langchain-openai
+RUN micromamba run -n ad_env pip install langchain langchain_openai
 
 # Expose ports
 EXPOSE 8080
