@@ -6,6 +6,8 @@ import axios from 'axios';
 import { OpenAI } from 'openai';
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
+import { FieldValue } from 'firebase-admin/firestore';
+import { db } from "../../../firebaseAdminInit.js";
 
 const openai = new OpenAI();
 
@@ -16,7 +18,7 @@ const storage = new Storage({
         project_id: process.env.GCP_PROJECT_ID,
     }
 });
-const bucketName = 'tp_data';
+const bucketName = 'tp_resources';
 
 
 const GraphState = Annotation.Root({
@@ -56,7 +58,6 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
 
         // ATTENTION_RONAK: Here we'll load the inputs from the bucket and into GraphState.
 
-        console.log('state :', state);
         const resources = [
             { key: 'ligandAnchor', path: state.ligandAnchor.path },
             { key: 'receptor', path: state.receptor.path },
@@ -67,10 +68,9 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
 
         for (const { key, path } of resources) {
             try {
-                // Try both tp_data and tp-data formats
+                // Try both tp_resources and tp-data formats
                 const blobName = path
-                    .replace('tp_data/', '')
-                    .replace('tp-data/', '');
+                    .replace('tp_resources/', '');
 
                 console.log(`Attempting download from ${bucketName}/${blobName}`);
 
@@ -105,7 +105,6 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
             }
         }
 
-        console.log('results.box :', results.box);
         return {
             messages: [new AIMessage("Inputs loaded successfully")],
             ligandAnchor: results.ligandAnchor,
@@ -260,14 +259,32 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
         }
 
         // ATTENTION_RONAK: Here we must generate a metadata document for the candidate and store it in Firestore.
-
-         
-
-        // Save candidate to GCS
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const candidateFileName = `candidates/candidate_${timestamp}.txt`;
+        // Create Firestore document for the candidate in resources collection
+        const timestamp = new Date().toISOString();
 
         try {
+            // First create the document in Firestore
+            const resourcesRef = db.collection("resources");
+            const candidateDoc = resourcesRef.doc(); // Auto-generate document ID
+            
+            await candidateDoc.set({
+                "name": "imatinib",
+                "description": "Generated candidate molecule",
+                "filetype": "txt",
+                "generator": "alpha",
+                "metamap": {
+                    "role": "candidate",
+                    "type": "ligand",
+                },
+                "timestamp": FieldValue.serverTimestamp(),
+            });
+            
+            // Get the document ID
+            const docId = candidateDoc.id;
+            
+            // Save candidate to GCS using the document ID
+            const candidateFileName = `${docId}.txt`;
+            
             await storage
                 .bucket(bucketName)
                 .file(candidateFileName)
@@ -276,11 +293,12 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
                     metadata: {
                         createdAt: timestamp,
                         type: 'candidate',
-                        sourceAnchor: state.ligandAnchor.path
+                        sourceAnchor: state.ligandAnchor.path,
+                        firestoreDocId: docId
                     }
                 });
 
-            console.log(`Candidate saved to gs://tp_data/${candidateFileName}`);
+            console.log(`Candidate saved to gs://tp_resources/${candidateFileName} with Firestore ID: ${docId}`);
 
             return {
                 messages: [new AIMessage("Candidate generated")],
@@ -290,9 +308,9 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
                 }
             };
 
-        } catch (storageError: any) {
-            console.error('Error saving candidate to storage:', storageError);
-            throw new Error(`Failed to save candidate: ${storageError.message}`);
+        } catch (error: any) {
+            console.error('Error saving candidate:', error);
+            throw new Error(`Failed to save candidate: ${error.message}`);
         }
 
     } catch (error: any) {
@@ -371,19 +389,19 @@ const nodeGenerateBox = async (state: typeof GraphState.State) => {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const boxFileName = `boxes/box_${timestamp}.pdb`;
 
-        await storage
-            .bucket(bucketName)
-            .file(boxFileName)
-            .save(boxPDB, {
-                contentType: 'text/plain',
-                metadata: {
-                    createdAt: timestamp,
-                    type: 'box',
-                    candidateSource: state.ligandCandidate.path
-                }
-            });
+        // await storage
+        //     .bucket(bucketNameData)
+        //     .file(boxFileName)
+        //     .save(boxPDB, {
+        //         contentType: 'text/plain',
+        //         metadata: {
+        //             createdAt: timestamp,
+        //             type: 'box',
+        //             candidateSource: state.ligandCandidate.path
+        //         }
+        //     });
 
-        console.log(`Box saved to gs://tp_data/${boxFileName}`);
+        // console.log(`Box saved to gs://tp_data/${boxFileName}`);
 
         return {
             messages: [new AIMessage("Docking box generated")],
@@ -448,24 +466,23 @@ const nodeInvokeDocking = async (state: typeof GraphState.State) => {
     try {
         // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
 
-        // Ensure paths have the tp_data/ prefix
+        // Ensure paths have the tp_resources/ prefix
         const addPrefix = (path: string) => {
-            if (path.startsWith('tp_data/')) return path;
-            if (path.startsWith('tp-data/')) return path.replace('tp-data/', 'tp_data/');
-            return `tp_data/${path}`;
+            if (path.startsWith('tp_resources/')) return path;
+            return `tp_resources/${path}`;
         };
 
-        const ligSmilesPath = addPrefix(state.ligandCandidate.path);
-        const ligBoxPath = addPrefix(state.box.path);
-        const recNoLigPath = addPrefix(state.receptor.path);
+        const ligandPath = addPrefix(state.ligandCandidate.path);
+        const boxPath = addPrefix(state.box.path);
+        const receptorPath = addPrefix(state.receptor.path);
 
         // Extract paths from the resources
         const payload = {
             lig_name: "imatinib", // Static for now
-            lig_smiles_path: ligSmilesPath,
-            lig_box_path: ligBoxPath,
+            ligand: ligandPath,
+            box: boxPath,
             rec_name: "1iep", // Static for now
-            rec_no_lig_path: recNoLigPath
+            receptor: receptorPath
         };
 
         console.log("Sending payload to /adv:", payload);
@@ -473,7 +490,7 @@ const nodeInvokeDocking = async (state: typeof GraphState.State) => {
         // Create a new Map to store the results
 
         const response = await axios.post(
-            'https://service-tp-tools-384484325421.europe-west2.run.app/adv',
+            'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
             payload,
             {
                 headers: {
@@ -551,8 +568,7 @@ const nodeLoadResults = async (state: typeof GraphState.State) => {
             try {
                 // Remove any bucket prefix if present
                 const blobName = path
-                    .replace('tp_data/', '')
-                    .replace('tp-data/', '');
+                    .replace('tp_resources/', '');
 
                 console.log(`Attempting to download ${bucketName}/${blobName}`);
 
@@ -643,18 +659,18 @@ const nodeEvaluateResults = async (state: typeof GraphState.State) => {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const evaluationFileName = `evaluations/evaluation_${timestamp}.txt`;
 
-        await storage
-            .bucket(bucketName)
-            .file(evaluationFileName)
-            .save(evaluation, {
-                contentType: 'text/plain',
-                metadata: {
-                    createdAt: timestamp,
-                    type: 'evaluation'
-                }
-            });
+        // await storage
+        //     .bucket(bucketNameData)
+        //     .file(evaluationFileName)
+        //     .save(evaluation, {
+        //         contentType: 'text/plain',
+        //         metadata: {
+        //             createdAt: timestamp,
+        //             type: 'evaluation'
+        //         }
+        //     });
 
-        console.log(`Evaluation saved to gs://tp_data/${evaluationFileName}`);
+        // console.log(`Evaluation saved to gs://tp_data/${evaluationFileName}`);
 
 
         return {

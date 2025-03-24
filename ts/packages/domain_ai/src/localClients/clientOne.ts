@@ -45,6 +45,7 @@ export async function runRemoteGraph() {
                 messages: [new HumanMessage('Graph is invoked')],
                 subGoal: "subGoal_1",
                 recipe: alpha,
+                applicationId: "rbCb0zCl45hWHf9a8nmK",
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,
