@@ -1,16 +1,36 @@
 import os
 from google.cloud import storage
+from google.oauth2 import service_account
+from dotenv import load_dotenv
 
-# Set credentials
-if os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+# Load environment variables at the top of the file
+load_dotenv()
+
+# Check for environment variables first
+if os.getenv("GCP_CLIENT_EMAIL") and os.getenv("GCP_PRIVATE_KEY") and os.getenv("GCP_PROJECT_ID"):
+    print("Using GCP credentials from environment variables")
+    credentials_info = {
+        "type": "service_account",
+        "project_id": os.getenv("GCP_PROJECT_ID"),
+        "private_key": os.getenv("GCP_PRIVATE_KEY").replace("\\n", "\n"),
+        "client_email": os.getenv("GCP_CLIENT_EMAIL"),
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.getenv('GCP_CLIENT_EMAIL').replace('@', '%40')}",
+        "universe_domain": "googleapis.com"
+    }
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    storage_client = storage.Client(credentials=credentials)
+# Fall back to file-based credentials
+elif os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
     print(f"Using credentials from GOOGLE_APPLICATION_CREDENTIALS: {os.getenv('GOOGLE_APPLICATION_CREDENTIALS')}")
+    storage_client = storage.Client()
 elif os.getenv("K_SERVICE"):
     print("Using Application Default Credentials (ADC).")
+    storage_client = storage.Client()
 else:
-    raise RuntimeError("No Google Cloud credentials found. Set GOOGLE_APPLICATION_CREDENTIALS.")
-
-# Initialize the storage client
-storage_client = storage.Client()
+    raise RuntimeError("No Google Cloud credentials found. Set GCP_* environment variables or GOOGLE_APPLICATION_CREDENTIALS.")
 
 
 def download_from_gcs(gcs_path):

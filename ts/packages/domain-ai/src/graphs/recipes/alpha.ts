@@ -13,7 +13,11 @@ import { zodResponseFormat } from "openai/helpers/zod";
 const openai = new OpenAI();
 
 const storage = new Storage({
-    keyFilename: path.join(process.cwd(), 'gcp-key.json'),
+    credentials: {
+        client_email: process.env.GCP_CLIENT_EMAIL,
+        private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        project_id: process.env.GCP_PROJECT_ID,
+    }
 });
 const bucketName = 'tp_data';
 
