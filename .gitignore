@@ -14,3 +14,4 @@ __pycache__
 temp
 .langgraph_api
 gcp-key.json
+.DS_Store
