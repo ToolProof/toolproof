@@ -21,12 +21,39 @@ export interface Strategy extends Base {
     tools: Tool[];
 }
 
+export type Foo = {
+    alpha: AlphaValue;
+    beta: BetaValue;
+    gamma: GammaValue;
+};
+
+export type AlphaValue = "alpha1" | "alpha2" | "alpha3";
+export type BetaValue = "beta1" | "beta2" | "beta3";
+export type GammaValue = "gamma1" | "gamma2" | "gamma3";
+
 export interface Resource extends Base {
     filetype: string;
     generator: string;
     timestamp: string;
-    tags: { [key: string]: string };
+    tags?: Partial<Foo>; // ✅ each key has the correct value type, and all keys are optional
 }
+
+// Testing the Resource interface
+const resource: Resource = {
+    id: "res1",
+    name: "some resource",
+    description: "just testing",
+    filetype: "json",
+    generator: "system-x",
+    timestamp: "2025-03-25T12:00:00Z",
+    tags: {
+        alpha: "alpha2",     // ✅ valid
+        beta: "beta1",       // ✅ valid
+        // @ts-expect-error;
+        gamma: "oops",       // ❌ TypeScript complains!
+    }
+};
+
 
 export interface Employment {
     subGoal: SubGoal;
