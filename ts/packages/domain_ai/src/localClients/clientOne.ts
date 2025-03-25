@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { alpha } from "../engine/recipes.js"
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
@@ -43,9 +42,10 @@ export async function runRemoteGraph() {
             console.log("Invoking the graph")
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                subGoal: "subGoal_1",
-                recipe: alpha,
-                applicationId: "rbCb0zCl45hWHf9a8nmK",
+                application: {
+                    id: "rbCb0zCl45hWHf9a8nmK",
+                    data: {},
+                },
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

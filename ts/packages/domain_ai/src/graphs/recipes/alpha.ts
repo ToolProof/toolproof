@@ -8,6 +8,7 @@ import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from "../../../firebaseAdminInit.js";
+import { ApplicationData } from "../../engine/types2.js";
 
 const openai = new OpenAI();
 
@@ -23,6 +24,9 @@ const bucketName = 'tp_resources';
 
 const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec,
+    application: Annotation<{ id: string, data: ApplicationData }>({
+            reducer: (prev, next) => next
+        }),
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),

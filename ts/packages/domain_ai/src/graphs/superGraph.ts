@@ -1,146 +1,44 @@
 import { subGraphs } from "./subGraphs.js";
-import { Recipe } from "../engine/types.js";
+import { ApplicationData } from "../engine/types2.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
 import { db } from "../../firebaseAdminInit.js";
 
-const bucketName = 'tp_resources';
-
-// Define interface for application data
-interface ApplicationData {
-    id: string;
-    name?: string;
-    description?: string;
-    inputs: {
-        ligand: any;
-        receptor: any;
-        box: any;
-        [key: string]: any;
-    };
-    status?: string;
-    timestamp?: any;
-    metadata?: Record<string, any>;
-}
-
-// Interface for resource data structure
-interface ResourceData {
-    description: string;
-    filetype: string;
-    generator: string;
-    metamap: {
-        role?: string;
-        type?: string;
-    };
-    name: string;
-    path?: string;
-    timestamp: any;
-}
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
-    subGoal: Annotation<string>({
+    application: Annotation<{ id: string, data: ApplicationData }>({
         reducer: (prev, next) => next
     }),
-    recipe: Annotation<Recipe>({
-        reducer: (prev, next) => next
-    }),
-    applicationId: Annotation<string>({
-        reducer: (prev, next) => next
-    }),
-    application: Annotation<ApplicationData>({
-        reducer: (prev, next) => next
-    }),
-    ligandPath: Annotation<string>({
-        reducer: (prev, next) => next
-    }),
-    receptorPath: Annotation<string>({
-        reducer: (prev, next) => next
-    }),
-    boxPath: Annotation<string>({
-        reducer: (prev, next) => next
-    })
 });
 
 const nodeFetchApplication = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
     try {
-        if (!state.applicationId) {
+        if (!state.application.id) {
             throw new Error("Application ID is missing");
         }
 
         // Get application document
-        const applicationRef = db.collection("applications").doc(state.applicationId);
+        const applicationRef = db.collection("applications").doc(state.application.id);
         const applicationSnap = await applicationRef.get();
 
         if (!applicationSnap.exists) {
-            throw new Error(`Application with ID ${state.applicationId} not found`);
+            throw new Error(`Application with ID ${state.application.id} not found`);
         }
-        
-        const applicationData = applicationSnap.data();
+
+        // ATTENTION_RONAK: Here we must ensure that this gets populated properly
+        const applicationData: ApplicationData = applicationSnap.data() as ApplicationData;
 
         if (!applicationData) {
             throw new Error("Application document is empty");
         }
-        
-        // Get input references
-        const inputs = applicationData.inputs || {};
 
-        // Handle nested structure - find the first key that contains the resources
-        let ligandRef, receptorRef, boxRef;
-
-        // Check if inputs has a nested structure
-        const firstKey = Object.keys(inputs)[0];
-        if (firstKey && typeof inputs[firstKey] === 'object' && inputs[firstKey].ligand) {
-            // Nested structure case
-            ligandRef = inputs[firstKey].ligand;
-            receptorRef = inputs[firstKey].receptor;
-            boxRef = inputs[firstKey].box;
-        } else {
-            // Direct structure case
-            ligandRef = inputs.ligand;
-            receptorRef = inputs.receptor;
-            boxRef = inputs.box;
-        }
-
-        if (!ligandRef || !receptorRef || !boxRef) {
-            throw new Error("Missing required resource references");
-        }
-        
-        // Fetch resources in parallel
-        const [ligandSnap, receptorSnap, boxSnap] = await Promise.all([
-            ligandRef.get(),
-            receptorRef.get(),
-            boxRef.get()
-        ]);
-        
-        // Extract resource data
-        const ligandData = ligandSnap.exists ? ligandSnap.data() as ResourceData : null;
-        const receptorData = receptorSnap.exists ? receptorSnap.data() as ResourceData : null;
-        const boxData = boxSnap.exists ? boxSnap.data() as ResourceData : null;
-        
-        if (!ligandData || !receptorData || !boxData) {
-            throw new Error("One or more required resources not found");
-        }
-        
-        console.log("Resource data:", {
-            ligand: ligandData,
-            receptor: receptorData,
-            box: boxData
-        });
-        
-        // Construct resource paths
-        // Format: resources/{resourceId}.{filetype}
-        const ligandPath = `${bucketName}/${ligandSnap.id}.${ligandData.filetype}`;
-        const receptorPath = `${bucketName}/${receptorSnap.id}.${receptorData.filetype}`;
-        const boxPath = `${bucketName}/${boxSnap.id}.${boxData.filetype}`;
-        
-        console.log("Resource paths:", { ligandPath, receptorPath, boxPath });
-        
         return {
             messages: [new AIMessage("Application data fetched successfully")],
-            application: applicationData as ApplicationData,
-            ligandPath,
-            receptorPath,
-            boxPath
+            application: {
+                ...state.application,
+                data: applicationData,
+            },
         };
     } catch (error: any) {
         console.error("Error in nodeFetchApplication:", error);
@@ -155,16 +53,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         // Use paths from state
         const subGraphState = {
             messages: state.messages,
-            ligandAnchor: {
-                path: state.ligandPath
-            },
-            receptor: {
-                path: state.receptorPath
-            },
-            box: {
-                path: state.boxPath
-            },
-            shouldRetry: false
+            application: state.application
         };
 
         // Create an AbortController with a timeout
@@ -175,9 +64,6 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         try {
             // Invoke the subGraph with abort signal
             // ATTENTION_RONAK: Invoke Python subGraph instead
-            /* result = await subGraphs[state.recipe.name].invoke(subGraphState, {
-                signal: controller.signal
-            }); */
 
             result = await subGraphs[state.recipe.name].invoke(subGraphState, {
                 signal: controller.signal
