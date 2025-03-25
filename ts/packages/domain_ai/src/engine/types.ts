@@ -1,5 +1,3 @@
-
-
 interface Base {
     id: string;
     name: string;
@@ -19,7 +17,7 @@ export interface Tool extends Base {
 }
 
 export interface Strategy extends Base {
-    subGoals: SubGoal[]; // Indicates the supported subgoals of the strategy.
+    subGoals: SubGoal[];
     tools: Tool[];
 }
 
@@ -27,16 +25,18 @@ export interface Resource extends Base {
     filetype: string;
     generator: string;
     timestamp: string;
-    tags: Map<string, string>;
+    tags: { [key: string]: string };
 }
 
 export interface Employment {
     subGoal: SubGoal;
     strategy: Strategy;
-    inputs: Map<string, Map<string, Resource>>;
-    // Maps each tool to its inputSpecs and their filepaths. 
-    // The keys of the outer map represent the tools of the strategy, 
-    // while the keys of the inner map represent the inputSpecs of that tool. 
-    // NB: only inputSpecs that are not produced as outputSpecs of other tools of the strategy are required.
+    inputs: {
+        [toolId: string]: {
+            [inputSpecId: string]: Resource;
+        };
+    };
+    // The keys of the outer object represent the tools in the strategy,
+    // and the keys of the inner objects represent the inputSpecs for each tool.
+    // NB: Only inputSpecs that are not produced as outputSpecs of other tools in the strategy are required.
 }
-
