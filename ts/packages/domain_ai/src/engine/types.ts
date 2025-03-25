@@ -8,13 +8,18 @@ interface Base {
 
 export interface SubGoal extends Base { }
 
+/*
+    * For diseases, Base entries (i.e. id, name, and description) are given by the ICD-11 standard.
+*/
+export interface Disease extends SubGoal { }
+
 export interface Tool extends Base {
     inputSpecs: string[];
     outputSpecs: string[];
 }
 
 export interface Strategy extends Base {
-    subGoals: SubGoal[];
+    subGoals: SubGoal[]; // Indicates the supported subgoals of the strategy.
     tools: Tool[];
 }
 
