@@ -8,7 +8,7 @@ import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from "../../../firebaseAdminInit.js";
-import { ApplicationData } from "../../engine/types2.js";
+import { ApplicationData } from "../../engine/types.js";
 
 const openai = new OpenAI();
 

@@ -1,5 +1,5 @@
 import { subGraphs } from "./subGraphs.js";
-import { ApplicationData } from "../engine/types2.js";
+import { ApplicationData } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
 import { db } from "../../firebaseAdminInit.js";
