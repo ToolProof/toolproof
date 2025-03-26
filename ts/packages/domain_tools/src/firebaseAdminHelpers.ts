@@ -1,16 +1,38 @@
-import { Storage, UploadResponse } from '@google-cloud/storage';
-import dbAdmin from './shared/firebaseAdminInit.js';
-
-export const uploadFileToStorage = (localFilePath: string, remoteFilePath: string): Promise<UploadResponse> => {
-
-    const storage = new Storage();
-
-    return storage.bucket('toolproof-yellowpapers').upload(localFilePath, { destination: remoteFilePath });
-};
+import { db, storage } from './firebaseAdminInit.js';
 
 
-export const uploadFileNameToFirestore = (fileName: string) => {
-    const fileRef = dbAdmin.collection('files').doc(fileName);
+export const retrieveDocumentsFromFirestore = async () => {
+    const snapshot = await db.collection('resources').get();
 
-    return fileRef.set({ fileName });
+    return snapshot.docs.map(doc => doc.data());
 }
+
+
+export const retriveFileNamesFromStorage = async () => {
+
+    const [files] = await storage.bucket('tp_resources').getFiles();
+
+    return files.map(file => file.name);
+}
+
+
+export const cleanUpNonManualResources = async () => {
+    const snapshot = await db.collection('resources').get();
+
+    for (const doc of snapshot.docs) {
+        const data = doc.data();
+        const documentId = doc.id;
+
+        // Check if the "generator" field is not "manual"
+        if (data.generator !== 'manual') {
+            // Delete the Firestore document
+            await db.collection('resources').doc(documentId).delete();
+
+            // Construct the file name
+            const fileName = `${documentId}.${data.filetype}`;
+
+            // Delete the corresponding file in the Cloud Storage bucket
+            await storage.bucket('tp_resources').file(fileName).delete();
+        }
+    }
+};
