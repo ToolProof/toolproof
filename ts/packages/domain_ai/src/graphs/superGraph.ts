@@ -3,8 +3,18 @@ import { Recipe } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
 import { db } from "../../firebaseAdminInit.js";
+import { HumanMessage } from '@langchain/core/messages';
 
 const bucketName = 'tp_resources';
+
+import { Client } from '@langchain/langgraph-sdk';
+
+const url = `http://localhost:2024`;
+const graphName = 'alpha';
+
+const client = new Client({
+    apiUrl: url,
+});
 
 // Define interface for application data
 interface ApplicationData {
@@ -154,7 +164,9 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
     try {
         // Use paths from state
         const subGraphState = {
-            messages: state.messages,
+            messages: [
+                { "role": "user", "content": "Alpha Graph is invoked"}
+            ],
             ligandAnchor: {
                 path: state.ligandPath
             },
@@ -171,6 +183,8 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 30 * 60 * 1000); // 30 mins timeout
 
+        const thread = await client.threads.create();
+
         let result: any;
         try {
             // Invoke the subGraph with abort signal
@@ -179,9 +193,26 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
                 signal: controller.signal
             }); */
 
-            result = await subGraphs[state.recipe.name].invoke(subGraphState, {
-                signal: controller.signal
-            });
+            // result = await subGraphs[state.recipe.name].invoke(subGraphState, {
+            //     signal: controller.signal
+            // });
+
+            const streamResponse = client.runs.stream(
+                thread.thread_id,
+                graphName,
+                {
+                    input: subGraphState,
+                    streamMode: "messages",
+                    signal: controller.signal
+                }
+            );
+            
+            console.log('streamResponse :', streamResponse);
+            for await (const chunk of streamResponse) {
+                console.log(`Receiving new event of type: ${chunk.event}...`);
+                console.log(JSON.stringify(chunk.data));
+                console.log("\n\n");
+            }
         } finally {
             clearTimeout(timeout);
             controller.abort(); // Cleanup the controller

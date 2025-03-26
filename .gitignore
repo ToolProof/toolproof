@@ -10,6 +10,7 @@ node_modules/
 toolproof-563fe-bb4d69a8730d.json
 
 venv
+.venv
 __pycache__
 temp
 .langgraph_api
