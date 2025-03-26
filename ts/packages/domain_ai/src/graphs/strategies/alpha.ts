@@ -276,9 +276,9 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
                 "description": "Generated candidate molecule",
                 "filetype": "txt",
                 "generator": "alpha",
-                "metamap": {
-                    "role": "candidate",
+                "tags": {
                     "type": "ligand",
+                    "role": "candidate",
                 },
                 "timestamp": FieldValue.serverTimestamp(),
             });
