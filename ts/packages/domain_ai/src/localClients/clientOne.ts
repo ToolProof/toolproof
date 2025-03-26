@@ -42,10 +42,7 @@ export async function runRemoteGraph() {
             console.log("Invoking the graph")
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                application: {
-                    id: "rbCb0zCl45hWHf9a8nmK",
-                    data: {},
-                },
+                employmentId: "Q2k7FtvG2eSClgI4er9w",
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

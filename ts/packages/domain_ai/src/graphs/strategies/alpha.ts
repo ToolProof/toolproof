@@ -8,7 +8,7 @@ import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from "../../../firebaseAdminInit.js";
-import { ApplicationData } from "../../engine/types.js";
+import { Employment } from "../../engine/types.js";
 
 const openai = new OpenAI();
 
@@ -24,9 +24,9 @@ const bucketName = 'tp_resources';
 
 const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec,
-    application: Annotation<{ id: string, data: ApplicationData }>({
-            reducer: (prev, next) => next
-        }),
+    application: Annotation<Employment>({
+        reducer: (prev, next) => next
+    }),
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -184,7 +184,7 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 };
 
 const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
-    
+
     try {
         const anchorContent: string = state.ligandAnchor.value;
         const targetChunks: ChunkInfo[] = state.receptor.value;
@@ -270,7 +270,7 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
             // First create the document in Firestore
             const resourcesRef = db.collection("resources");
             const candidateDoc = resourcesRef.doc(); // Auto-generate document ID
-            
+
             await candidateDoc.set({
                 "name": "imatinib",
                 "description": "Generated candidate molecule",
@@ -282,13 +282,13 @@ const nodeGenerateCandidate = async (state: typeof GraphState.State) => {
                 },
                 "timestamp": FieldValue.serverTimestamp(),
             });
-            
+
             // Get the document ID
             const docId = candidateDoc.id;
-            
+
             // Save candidate to GCS using the document ID
             const candidateFileName = `${docId}.txt`;
-            
+
             await storage
                 .bucket(bucketName)
                 .file(candidateFileName)

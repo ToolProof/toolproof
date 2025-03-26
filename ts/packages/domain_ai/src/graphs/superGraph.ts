@@ -1,5 +1,5 @@
 import { subGraphs } from "./subGraphs.js";
-import { ApplicationData } from "../engine/types.js";
+import { Employment } from "../engine/types.js";
 import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
 import { db } from "../../firebaseAdminInit.js";
@@ -7,43 +7,43 @@ import { db } from "../../firebaseAdminInit.js";
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
-    application: Annotation<{ id: string, data: ApplicationData }>({
+    employmentId: Annotation<string>({
+        reducer: (prev, next) => next
+    }),
+    employment: Annotation<Employment>({
         reducer: (prev, next) => next
     }),
 });
 
-const nodeFetchApplication = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
+const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
     try {
-        if (!state.application.id) {
-            throw new Error("Application ID is missing");
+        if (!state.employmentId) {
+            throw new Error("Employment ID is missing");
         }
 
-        // Get application document
-        const applicationRef = db.collection("applications").doc(state.application.id);
-        const applicationSnap = await applicationRef.get();
+        // Get employment document
+        const employmentRef = db.collection("employments").doc(state.employmentId);
+        const employmentSnap = await employmentRef.get();
 
-        if (!applicationSnap.exists) {
-            throw new Error(`Application with ID ${state.application.id} not found`);
+        if (!employmentSnap.exists) {
+            throw new Error(`Employment with ID ${state.employmentId} not found`);
         }
 
         // ATTENTION_RONAK: Here we must ensure that this gets populated properly
-        const applicationData: ApplicationData = applicationSnap.data() as ApplicationData;
+        const employment: Employment = employmentSnap.data() as Employment;
 
-        if (!applicationData) {
-            throw new Error("Application document is empty");
+        if (!employment) {
+            throw new Error("Employment document is empty");
         }
 
         return {
-            messages: [new AIMessage("Application data fetched successfully")],
-            application: {
-                ...state.application,
-                data: applicationData,
-            },
+            messages: [new AIMessage("Employment data fetched successfully")],
+            employment: employment
         };
     } catch (error: any) {
-        console.error("Error in nodeFetchApplication:", error);
+        console.error("Error in nodeFetchEmployment:", error);
         return {
-            messages: [new AIMessage(`Error fetching application: ${error.message}`)]
+            messages: [new AIMessage(`Error fetching employment: ${error.message}`)]
         };
     }
 };
@@ -53,7 +53,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         // Use paths from state
         const subGraphState = {
             messages: state.messages,
-            application: state.application
+            employment: state.employment
         };
 
         // Create an AbortController with a timeout
@@ -95,10 +95,10 @@ const edgeShouldContinue = (state: typeof State.State) => {
 }
 
 const stateGraph = new StateGraph(State)
-    .addNode("nodeFetchApplication", nodeFetchApplication)
+    .addNode("nodeFetchEmployment", nodeFetchEmployment)
     .addNode("nodeInvokeSubgraph", nodeInvokeSubgraph)
-    .addEdge(START, "nodeFetchApplication")
-    .addEdge("nodeFetchApplication", "nodeInvokeSubgraph")
+    .addEdge(START, "nodeFetchEmployment")
+    .addEdge("nodeFetchEmployment", "nodeInvokeSubgraph")
     .addConditionalEdges("nodeInvokeSubgraph", edgeShouldContinue)
 
 export const graph = stateGraph.compile();
