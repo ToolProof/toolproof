@@ -3,7 +3,7 @@
         "."
     ],
     "graphs": {
-        "py_processor": "./processor.py:graph"
+        "alpha": "./src/graph/alpha.py:alpha_graph"
     },
     "env": ".env"
 }

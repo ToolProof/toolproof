@@ -12,6 +12,7 @@ toolproof-563fe-484028d2bf27.json
 firebaseAdminInit.ts
 
 venv
+.venv
 __pycache__
 temp
 .langgraph_api

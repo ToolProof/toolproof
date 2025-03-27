@@ -4,6 +4,14 @@ import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langcha
 import { AIMessage } from "@langchain/core/messages";
 import { db } from "../../firebaseAdminInit.js";
 
+import { Client } from '@langchain/langgraph-sdk';
+
+const url = `http://localhost:2024`;
+const graphName = 'alpha';
+
+const client = new Client({
+    apiUrl: url,
+});
 
 const State = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -36,9 +44,19 @@ const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<t
             throw new Error("Employment document is empty");
         }
 
+        const subGoalRef: any = employment.subGoal;
+        const strategyRef: any = employment.strategy;
+
+        // Create a new object with resolved references
+        const resolvedEmployment: Employment = {
+            subGoal: await (await subGoalRef.get()).data(),
+            strategy: await (await strategyRef.get()).data(),
+            inputs: employment.inputs
+        };
+
         return {
             messages: [new AIMessage("Employment data fetched successfully")],
-            employment: employment
+            employment: resolvedEmployment
         };
     } catch (error: any) {
         console.error("Error in nodeFetchEmployment:", error);
@@ -52,7 +70,9 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
     try {
         // Use paths from state
         const subGraphState = {
-            messages: state.messages,
+            messages: [
+                { "role": "user", "content": "Alpha Graph is invoked"}
+            ],
             employment: state.employment
         };
 
@@ -60,21 +80,41 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 30 * 60 * 1000); // 30 mins timeout
 
+        const thread = await client.threads.create();
+
         let result: any;
         try {
             // Invoke the subGraph with abort signal
             // ATTENTION_RONAK: Invoke Python subGraph instead
+            
 
-            result = await subGraphs[state.recipe.name].invoke(subGraphState, {
-                signal: controller.signal
-            });
+            // result = await subGraphs.alpha.invoke(subGraphState, {
+            //     signal: controller.signal
+            // });
+
+            const streamResponse = client.runs.stream(
+                thread.thread_id,
+                graphName,
+                {
+                    input: subGraphState,
+                    streamMode: "messages",
+                    signal: controller.signal
+                }
+            );
+            
+            console.log('streamResponse :', streamResponse);
+            for await (const chunk of streamResponse) {
+                console.log(`Receiving new event of type: ${chunk.event}...`);
+                console.log(JSON.stringify(chunk.data));
+                console.log("\n\n");
+            }
         } finally {
             clearTimeout(timeout);
             controller.abort(); // Cleanup the controller
         }
 
         return {
-            messages: [...result.messages, new AIMessage("SubGraph completed ")],
+            messages: [new AIMessage("SubGraph completed ")],
         };
 
     } catch (error: any) {

@@ -21,10 +21,21 @@ const storage = new Storage({
 });
 const bucketName = 'tp_resources';
 
+interface ResourceData {
+    description: string;
+    filetype: string;
+    generator: string;
+    tags: {
+        role?: string;
+        type?: string;
+    };
+    name: string;
+    timestamp: any;
+}
 
 const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec,
-    application: Annotation<Employment>({
+    employment: Annotation<Employment>({
         reducer: (prev, next) => next
     }),
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
@@ -62,10 +73,56 @@ const nodeLoadInputs = async (state: typeof GraphState.State) => {
 
         // ATTENTION_RONAK: Here we'll load the inputs from the bucket and into GraphState.
 
+        // Get input references
+        const inputs = state.employment.inputs || {};
+
+        // Handle nested structure - find the first key that contains the resources
+        let ligandRef: any, receptorRef: any, boxRef: any;
+
+        // Check if inputs has a nested structure
+        const firstKey = Object.keys(inputs)[0];
+        if (firstKey && typeof inputs[firstKey] === 'object' && inputs[firstKey].ligand) {
+            // Nested structure case
+            ligandRef = inputs[firstKey].ligand;
+            receptorRef = inputs[firstKey].receptor;
+            boxRef = inputs[firstKey].box;
+        } else {
+            // Direct structure case
+            ligandRef = inputs.ligand;
+            receptorRef = inputs.receptor;
+            boxRef = inputs.box;
+        }
+
+        if (!ligandRef || !receptorRef || !boxRef) {
+            throw new Error("Missing required resource references");
+        }
+        
+        // Fetch resources in parallel
+        const [ligandSnap, receptorSnap, boxSnap] = await Promise.all([
+            ligandRef.get(),
+            receptorRef.get(),
+            boxRef.get()
+        ]);
+        
+        // Extract resource data
+        const ligandData = ligandSnap.exists ? ligandSnap.data() as ResourceData : null;
+        const receptorData = receptorSnap.exists ? receptorSnap.data() as ResourceData : null;
+        const boxData = boxSnap.exists ? boxSnap.data() as ResourceData : null;
+        
+        if (!ligandData || !receptorData || !boxData) {
+            throw new Error("One or more required resources not found");
+        }
+
+        const ligandPath = `${bucketName}/${ligandSnap.id}.${ligandData.filetype}`;
+        const receptorPath = `${bucketName}/${receptorSnap.id}.${receptorData.filetype}`;
+        const boxPath = `${bucketName}/${boxSnap.id}.${boxData.filetype}`;
+        
+        console.log("Resource paths:", { ligandPath, receptorPath, boxPath });
+
         const resources = [
-            { key: 'ligandAnchor', path: state.ligandAnchor.path },
-            { key: 'receptor', path: state.receptor.path },
-            { key: 'box', path: state.box.path }
+            { key: 'ligandAnchor', path: ligandPath },
+            { key: 'receptor', path: receptorPath },
+            { key: 'box', path: boxPath }
         ];
 
         const results: Record<string, any> = {};
