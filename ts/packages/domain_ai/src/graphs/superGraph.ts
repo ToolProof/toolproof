@@ -44,9 +44,19 @@ const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<t
             throw new Error("Employment document is empty");
         }
 
+        const subGoalRef: any = employment.subGoal;
+        const strategyRef: any = employment.strategy;
+
+        // Create a new object with resolved references
+        const resolvedEmployment: Employment = {
+            subGoal: await (await subGoalRef.get()).data(),
+            strategy: await (await strategyRef.get()).data(),
+            inputs: employment.inputs
+        };
+
         return {
             messages: [new AIMessage("Employment data fetched successfully")],
-            employment: employment
+            employment: resolvedEmployment
         };
     } catch (error: any) {
         console.error("Error in nodeFetchEmployment:", error);
@@ -78,7 +88,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
             // ATTENTION_RONAK: Invoke Python subGraph instead
             
 
-            // result = await subGraphs[state.recipe.name].invoke(subGraphState, {
+            // result = await subGraphs.alpha.invoke(subGraphState, {
             //     signal: controller.signal
             // });
 
@@ -104,7 +114,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         }
 
         return {
-            messages: [...result.messages, new AIMessage("SubGraph completed ")],
+            messages: [new AIMessage("SubGraph completed ")],
         };
 
     } catch (error: any) {

@@ -14,11 +14,23 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 import datetime
 import sys
+import os
+# Add the parent directory to sys.path to allow importing from outside src
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from firebase_admin_init import db
+
+# Define Employment type
+class Employment(TypedDict):
+    """Employment data structure."""
+    subGoal: dict
+    strategy: dict
+    inputs: Dict[str, Dict[str, Any]]  # Nested structure for inputs
 
 # Define state as a TypedDict with annotations
 class GraphState(TypedDict):
     """State for the alpha graph."""
     messages: Annotated[List[AIMessage], add_messages]
+    employment: Employment  # Add employment field
     ligandAnchor: Dict[str, Union[str, Any]]  # path and value (SMILES string)
     ligandCandidate: Dict[str, Union[str, Any]]  # path and value (SMILES string)
     receptor: Dict[str, Union[str, List["ChunkInfo"]]]  # path and value (chunks)
@@ -82,6 +94,16 @@ class BoxCoordinates:
     def __init__(self, center: Point3D, size: Size3D):
         self.center = center
         self.size = size
+
+# Define ResourceData equivalent to the TypeScript interface
+class ResourceData(TypedDict):
+    """Data structure for resources."""
+    description: str
+    filetype: str
+    generator: str
+    tags: dict[str, Optional[str]]  # For role and type fields
+    name: str
+    timestamp: Any
 
 # Helper functions
 def chunk_pdb_content(pdb_content: str, chunk_size: int = 1000) -> List[ChunkInfo]:
@@ -175,10 +197,65 @@ async def node_load_inputs(state):
     print('state: ', state)
     """Load input resources from storage bucket."""
     try:
+        inputs = state.get("employment", {}).get("inputs", {})
+
+        # Handle nested structure - find the first key that contains the resources
+        ligand_ref, receptor_ref, box_ref = None, None, None
+
+        # Check if inputs has a nested structure
+        first_key = next(iter(inputs), None)
+        if first_key and isinstance(inputs[first_key], dict) and "ligand" in inputs[first_key]:
+            # Nested structure case
+            ligand_ref = inputs[first_key]["ligand"]
+            receptor_ref = inputs[first_key]["receptor"]
+            box_ref = inputs[first_key]["box"]
+        else:
+            # Direct structure case
+            ligand_ref = inputs.get("ligand")
+            receptor_ref = inputs.get("receptor")
+            box_ref = inputs.get("box")
+
+        if not ligand_ref or not receptor_ref or not box_ref:
+            raise ValueError("Missing required resource references")
+
+        # Fetch resources from Firestore
+        ligand_collection = ligand_ref['_path']['segments'][0]
+        ligand_doc_id = ligand_ref['_path']['segments'][1]
+        
+        ligand_snap = db.collection(ligand_collection).document(ligand_doc_id).get()
+        receptor_collection = receptor_ref['_path']['segments'][0]
+        receptor_doc_id = receptor_ref['_path']['segments'][1]
+        
+        receptor_snap = db.collection(receptor_collection).document(receptor_doc_id).get()
+        
+        box_collection = box_ref['_path']['segments'][0]
+        box_doc_id = box_ref['_path']['segments'][1]
+        
+        box_snap = db.collection(box_collection).document(box_doc_id).get()
+
+        # Extract resource data
+        ligand_data = ligand_snap.to_dict() if ligand_snap.exists else None
+        receptor_data = receptor_snap.to_dict() if receptor_snap.exists else None
+        box_data = box_snap.to_dict() if box_snap.exists else None
+
+        # Type check or cast if needed
+        if ligand_data: ligand_data = ligand_data  # type: ResourceData
+        if receptor_data: receptor_data = receptor_data  # type: ResourceData
+        if box_data: box_data = box_data  # type: ResourceData
+
+        if not ligand_data or not receptor_data or not box_data:
+            raise ValueError("One or more required resources not found")
+
+        ligand_path = f"{bucket_name}/{ligand_snap.id}.{ligand_data['filetype']}"
+        receptor_path = f"{bucket_name}/{receptor_snap.id}.{receptor_data['filetype']}"
+        box_path = f"{bucket_name}/{box_snap.id}.{box_data['filetype']}"
+
+        print("Resource paths:", {"ligandPath": ligand_path, "receptorPath": receptor_path, "boxPath": box_path})
+
         resources = [
-            {"key": "ligandAnchor", "path": state["ligandAnchor"]["path"]},
-            {"key": "receptor", "path": state["receptor"]["path"]},
-            {"key": "box", "path": state["box"]["path"]}
+            {"key": "ligandAnchor", "path": ligand_path},
+            {"key": "receptor", "path": receptor_path},
+            {"key": "box", "path": box_path}
         ]
 
         results = {}
