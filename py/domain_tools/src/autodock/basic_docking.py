@@ -213,7 +213,7 @@ def run_simulation(ligand, receptor, box):
             "description": "dummy",
             "filetype": "pdbqt",
             "generator": "autodock_basic",
-            "metamap": {
+            "tags": {
                 "type": "docking"
             },
             "timestamp": firestore.SERVER_TIMESTAMP,
@@ -225,7 +225,7 @@ def run_simulation(ligand, receptor, box):
             "description": "dummy",
             "filetype": "sdf",
             "generator": "autodock_basic",
-            "metamap": {
+            "tags": {
                 "type": "pose"
             },
             "timestamp": firestore.SERVER_TIMESTAMP,
