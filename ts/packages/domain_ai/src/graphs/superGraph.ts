@@ -13,7 +13,7 @@ const client = new Client({
     apiUrl: url,
 });
 
-const State = Annotation.Root({
+const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec,
     employmentId: Annotation<string>({
         reducer: (prev, next) => next
@@ -23,7 +23,7 @@ const State = Annotation.Root({
     }),
 });
 
-const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
+const nodeFetchEmployment = async (state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> => {
     try {
         if (!state.employmentId) {
             throw new Error("Employment ID is missing");
@@ -66,7 +66,7 @@ const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<t
     }
 };
 
-const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
+const nodeInvokeSubgraph = async (state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> => {
     try {
         // Use paths from state
         const subGraphState = {
@@ -125,7 +125,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
     }
 };
 
-const edgeShouldContinue = (state: typeof State.State) => {
+const edgeShouldContinue = (state: typeof GraphState.State) => {
     console.log('state :', state);
     if (false) {
         return 'nodeInvokeSubgraph';
@@ -134,7 +134,7 @@ const edgeShouldContinue = (state: typeof State.State) => {
     }
 }
 
-const stateGraph = new StateGraph(State)
+const stateGraph = new StateGraph(GraphState)
     .addNode("nodeFetchEmployment", nodeFetchEmployment)
     .addNode("nodeInvokeSubgraph", nodeInvokeSubgraph)
     .addEdge(START, "nodeFetchEmployment")
