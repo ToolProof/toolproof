@@ -1,14 +1,13 @@
 import { AIMessage } from '@langchain/core/messages';
-import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langchain/langgraph";
+import { StateGraph, Annotation, START, END } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
-import axios from 'axios';
+// import axios from 'axios';
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from "../../../firebaseAdminInit.js";
-import { Employment } from "../../engine/types.js";
 import { NodeLoadInputs, NodeLoadInputsState } from '../nodes/nodeLoadInputs.js';
 import { BaseStateSpec } from '../nodes/nodeUtils.js';
 
@@ -23,19 +22,6 @@ const storage = new Storage({
     }
 });
 const bucketName = 'tp_resources';
-
-interface ResourceData {
-    description: string;
-    filetype: string;
-    generator: string;
-    tags: {
-        role?: string;
-        type?: string;
-    };
-    name: string;
-    timestamp: any;
-}
-
 
 const GraphState = Annotation.Root({
     ...BaseStateSpec,

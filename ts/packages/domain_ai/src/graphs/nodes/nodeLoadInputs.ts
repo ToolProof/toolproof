@@ -1,5 +1,5 @@
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
+import { Annotation } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
 import { registerNode, BaseStateSpec } from "./nodeUtils.js";

@@ -1,4 +1,3 @@
-// commonState.ts
 import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 import { Employment } from '../../engine/types';
 
@@ -26,11 +25,11 @@ export function registerNode<
     TState,
     T extends NodeSpecs<TState> & (new (...args: any[]) => any)
 >(cls: T): T {
-    const s = cls.specs;
+    /* const s = cls.specs;
 
     if (!Array.isArray(s.resources?.inputSpecs) || !Array.isArray(s.resources?.outputSpecs)) {
         throw new Error(`Node ${cls.name} is missing required resource specs`);
-    }
+    } */
 
     return cls;
 }
