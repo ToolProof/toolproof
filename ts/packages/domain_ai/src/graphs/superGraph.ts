@@ -71,7 +71,7 @@ const nodeInvokeSubgraph = async (state: typeof GraphState.State): Promise<Parti
         // Use paths from state
         const subGraphState = {
             messages: [
-                { "role": "user", "content": "Alpha Graph is invoked"}
+                { "role": "user", "content": "Alpha Graph is invoked" }
             ],
             employment: state.employment
         };
@@ -86,13 +86,13 @@ const nodeInvokeSubgraph = async (state: typeof GraphState.State): Promise<Parti
         try {
             // Invoke the subGraph with abort signal
             // ATTENTION_RONAK: Invoke Python subGraph instead
-            
 
-            // result = await subGraphs.alpha.invoke(subGraphState, {
-            //     signal: controller.signal
-            // });
 
-            const streamResponse = client.runs.stream(
+            result = await subGraphs.alpha.invoke(subGraphState, {
+                signal: controller.signal
+            });
+
+            /* const streamResponse = client.runs.stream(
                 thread.thread_id,
                 graphName,
                 {
@@ -101,13 +101,13 @@ const nodeInvokeSubgraph = async (state: typeof GraphState.State): Promise<Parti
                     signal: controller.signal
                 }
             );
-            
+
             console.log('streamResponse :', streamResponse);
             for await (const chunk of streamResponse) {
                 console.log(`Receiving new event of type: ${chunk.event}...`);
                 console.log(JSON.stringify(chunk.data));
                 console.log("\n\n");
-            }
+            } */
         } finally {
             clearTimeout(timeout);
             controller.abort(); // Cleanup the controller
