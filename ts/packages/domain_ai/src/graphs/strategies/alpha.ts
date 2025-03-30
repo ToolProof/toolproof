@@ -3,12 +3,13 @@ import { StateGraph, Annotation, MessagesAnnotation, START, END } from "@langcha
 import { Storage } from '@google-cloud/storage';
 import * as path from 'path';
 import axios from 'axios';
-import { OpenAI } from 'openai';
+import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from "../../../firebaseAdminInit.js";
 import { Employment } from "../../engine/types.js";
+import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 
 const openai = new OpenAI();
 
@@ -67,119 +68,152 @@ const GraphState = Annotation.Root({
     })
 });
 
+interface NodeSpecs {
+    foo: {
+        description: string;
+        inputSpecs: string[];
+        outputSpecs: string[];
+    }
+}
 
-const nodeLoadInputs = async (state: typeof GraphState.State) => {
-    try {
+function registerNode<T extends NodeSpecs & (new (...args: any[]) => any)>(cls: T): T {
+    // Runtime check (optional)
+    if (!Array.isArray(cls.foo.inputSpecs) || !Array.isArray(cls.foo.outputSpecs)) {
+        throw new Error(`Node ${cls.name} is missing static specs`);
+    }
 
-        // ATTENTION_RONAK: Here we'll load the inputs from the bucket and into GraphState.
+    return cls;
+}
 
-        // Get input references
-        const inputs = state.employment.inputs || {};
 
-        // Handle nested structure - find the first key that contains the resources
-        let ligandRef: any, receptorRef: any, boxRef: any;
+export class NodeLoadInputs extends Runnable {
 
-        // Check if inputs has a nested structure
-        const firstKey = Object.keys(inputs)[0];
-        if (firstKey && typeof inputs[firstKey] === 'object' && inputs[firstKey].ligand) {
-            // Nested structure case
-            ligandRef = inputs[firstKey].ligand;
-            receptorRef = inputs[firstKey].receptor;
-            boxRef = inputs[firstKey].box;
-        } else {
-            // Direct structure case
-            ligandRef = inputs.ligand;
-            receptorRef = inputs.receptor;
-            boxRef = inputs.box;
-        }
+    static foo = {
+        description: "Load inputs from the bucket",
+        inputSpecs: ["ligand", "receptor", "box"],
+        outputSpecs: [],
+    }
 
-        if (!ligandRef || !receptorRef || !boxRef) {
-            throw new Error("Missing required resource references");
-        }
-        
-        // Fetch resources in parallel
-        const [ligandSnap, receptorSnap, boxSnap] = await Promise.all([
-            ligandRef.get(),
-            receptorRef.get(),
-            boxRef.get()
-        ]);
-        
-        // Extract resource data
-        const ligandData = ligandSnap.exists ? ligandSnap.data() as ResourceData : null;
-        const receptorData = receptorSnap.exists ? receptorSnap.data() as ResourceData : null;
-        const boxData = boxSnap.exists ? boxSnap.data() as ResourceData : null;
-        
-        if (!ligandData || !receptorData || !boxData) {
-            throw new Error("One or more required resources not found");
-        }
+    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-        const ligandPath = `${bucketName}/${ligandSnap.id}.${ligandData.filetype}`;
-        const receptorPath = `${bucketName}/${receptorSnap.id}.${receptorData.filetype}`;
-        const boxPath = `${bucketName}/${boxSnap.id}.${boxData.filetype}`;
-        
-        console.log("Resource paths:", { ligandPath, receptorPath, boxPath });
+    async invoke(state: typeof GraphState.State, options?: Partial<RunnableConfig<Record<string, any>>>) {
+        try {
 
-        const resources = [
-            { key: 'ligandAnchor', path: ligandPath },
-            { key: 'receptor', path: receptorPath },
-            { key: 'box', path: boxPath }
-        ];
+            // ATTENTION_RONAK: Here we'll load the inputs from the bucket and into GraphState.
 
-        const results: Record<string, any> = {};
+            // Get input references
+            const inputs = state.employment.inputs || {};
 
-        for (const { key, path } of resources) {
-            try {
-                // Try both tp_resources and tp-data formats
-                const blobName = path
-                    .replace('tp_resources/', '');
+            // Handle nested structure - find the first key that contains the resources
+            let ligandRef: any, receptorRef: any, boxRef: any;
 
-                console.log(`Attempting download from ${bucketName}/${blobName}`);
+            // Check if inputs has a nested structure
+            const firstKey = Object.keys(inputs)[0];
+            if (firstKey && typeof inputs[firstKey] === 'object' && inputs[firstKey].ligand) {
+                // Nested structure case
+                ligandRef = inputs[firstKey].ligand;
+                receptorRef = inputs[firstKey].receptor;
+                boxRef = inputs[firstKey].box;
+            } else {
+                // Direct structure case
+                ligandRef = inputs.ligand;
+                receptorRef = inputs.receptor;
+                boxRef = inputs.box;
+            }
 
-                const [content] = await storage
-                    .bucket(bucketName)
-                    .file(blobName)
-                    .download();
+            if (!ligandRef || !receptorRef || !boxRef) {
+                throw new Error("Missing required resource references");
+            }
 
-                if (key === 'receptor' || key === 'box') {
-                    // Pre-process PDB content into chunks
-                    const pdbContent = content.toString();
-                    const chunks = chunkPDBContent(pdbContent);
+            // Fetch resources in parallel
+            const [ligandSnap, receptorSnap, boxSnap] = await Promise.all([
+                ligandRef.get(),
+                receptorRef.get(),
+                boxRef.get()
+            ]);
+
+            // Extract resource data
+            const ligandData = ligandSnap.exists ? ligandSnap.data() as ResourceData : null;
+            const receptorData = receptorSnap.exists ? receptorSnap.data() as ResourceData : null;
+            const boxData = boxSnap.exists ? boxSnap.data() as ResourceData : null;
+
+            if (!ligandData || !receptorData || !boxData) {
+                throw new Error("One or more required resources not found");
+            }
+
+            const ligandPath = `${bucketName}/${ligandSnap.id}.${ligandData.filetype}`;
+            const receptorPath = `${bucketName}/${receptorSnap.id}.${receptorData.filetype}`;
+            const boxPath = `${bucketName}/${boxSnap.id}.${boxData.filetype}`;
+
+            console.log("Resource paths:", { ligandPath, receptorPath, boxPath });
+
+            const resources = [
+                { key: 'ligandAnchor', path: ligandPath },
+                { key: 'receptor', path: receptorPath },
+                { key: 'box', path: boxPath }
+            ];
+
+            const results: Record<string, any> = {};
+
+            for (const { key, path } of resources) {
+                try {
+                    // Try both tp_resources and tp-data formats
+                    const blobName = path
+                        .replace('tp_resources/', '');
+
+                    console.log(`Attempting download from ${bucketName}/${blobName}`);
+
+                    const [content] = await storage
+                        .bucket(bucketName)
+                        .file(blobName)
+                        .download();
+
+                    if (key === 'receptor' || key === 'box') {
+                        // Pre-process PDB content into chunks
+                        const pdbContent = content.toString();
+                        const chunks = chunkPDBContent(pdbContent);
+                        results[key] = {
+                            path,
+                            value: chunks
+                        };
+                    } else {
+                        // For other resources, keep as string
+                        results[key] = {
+                            path,
+                            value: content.toString()
+                        };
+                    }
+
+                    console.log(`Successfully downloaded ${key} resource`);
+                } catch (downloadError: any) {
+                    console.error(`Download error for ${key}:`, downloadError);
                     results[key] = {
                         path,
-                        value: chunks
-                    };
-                } else {
-                    // For other resources, keep as string
-                    results[key] = {
-                        path,
-                        value: content.toString()
+                        value: `Error downloading: ${downloadError.message}`
                     };
                 }
-
-                console.log(`Successfully downloaded ${key} resource`);
-            } catch (downloadError: any) {
-                console.error(`Download error for ${key}:`, downloadError);
-                results[key] = {
-                    path,
-                    value: `Error downloading: ${downloadError.message}`
-                };
             }
+
+            return {
+                messages: [new AIMessage("Inputs loaded successfully")],
+                ligandAnchor: results.ligandAnchor,
+                receptor: results.receptor,
+                box: results.box,
+            };
+
+        } catch (error: any) {
+            console.error("Error in nodeLoadInputs:", error);
+            return {
+                messages: [new AIMessage(`Error loading inputs: ${error.message}`)]
+            };
         }
-
-        return {
-            messages: [new AIMessage("Inputs loaded successfully")],
-            ligandAnchor: results.ligandAnchor,
-            receptor: results.receptor,
-            box: results.box,
-        };
-
-    } catch (error: any) {
-        console.error("Error in nodeLoadInputs:", error);
-        return {
-            messages: [new AIMessage(`Error loading inputs: ${error.message}`)]
-        };
     }
-};
+
+}
+
+const RegistredNodeLoadInputs = registerNode(NodeLoadInputs);
+
+const registredNodeLoadInputs = new RegistredNodeLoadInputs();
 
 interface ChunkInfo {
     chainId: string;
@@ -764,7 +798,7 @@ const edgeShouldRetry = (state: typeof GraphState.State) => {
 
 
 const stateGraph = new StateGraph(GraphState)
-    .addNode("nodeLoadInputs", nodeLoadInputs)
+    .addNode("nodeLoadInputs", registredNodeLoadInputs)
     .addNode("nodeGenerateCandidate", nodeGenerateCandidate)
     .addNode("nodeGenerateBox", nodeGenerateBox)
     .addNode("nodeInvokeDocking", nodeInvokeDocking)
