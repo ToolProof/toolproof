@@ -7,7 +7,7 @@ node_modules/
 .env
 .env.local
 
-toolproof-563fe-484028d2bf27.json
+toolproof-563fe-*.json
 
 firebaseAdminInit.ts
 
