@@ -19,7 +19,7 @@ export const NodeEvaluateResultsState = Annotation.Root({
     shouldRetry: Annotation<boolean>({
         reducer: (prev, next) => next
     }),
-    // ATTENTION: No error if the state channels that we only write to are missing in the state.
+    // ATTENTION: No error if the state channels that we only write to are missing in the state. SOLVED!
 });
 
 type WithBaseState = typeof NodeEvaluateResultsState.State &
@@ -39,7 +39,7 @@ class _NodeEvaluateResults extends Runnable {
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>) {
+    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         // ATTENTION_RONAK: Here we'll evaluate the results and decide whether to retry or not.
         try {
             if (!state.ligandDocking?.value || !state.ligandPose?.value) {
