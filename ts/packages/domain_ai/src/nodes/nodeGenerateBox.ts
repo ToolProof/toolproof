@@ -111,7 +111,7 @@ class _NodeGenerateBox extends Runnable {
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>) {
+    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         try {
             const candidateSmiles: string = state.ligandCandidate.value;
             const targetChunks: ChunkInfo[] = state.receptor.value;

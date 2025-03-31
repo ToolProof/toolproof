@@ -19,7 +19,6 @@ export const NodeEvaluateResultsState = Annotation.Root({
     shouldRetry: Annotation<boolean>({
         reducer: (prev, next) => next
     }),
-    // ATTENTION: No error if the state channels that we only write to are missing in the state. SOLVED!
 });
 
 type WithBaseState = typeof NodeEvaluateResultsState.State &

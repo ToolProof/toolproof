@@ -43,7 +43,7 @@ class _NodeInvokeDocking extends Runnable {
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>) {
+    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         try {
             // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
 

@@ -114,7 +114,7 @@ class _NodeLoadInputs extends Runnable {
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>) {
+    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         try {
 
             // ATTENTION_RONAK: Here we'll load the inputs from the bucket and into GraphState.

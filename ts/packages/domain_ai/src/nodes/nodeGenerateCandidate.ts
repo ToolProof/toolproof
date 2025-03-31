@@ -5,7 +5,7 @@ import { AIMessage } from '@langchain/core/messages';
 import { registerNode, BaseStateSpec } from "./nodeUtils.js";
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import { FieldValue } from 'firebase-admin/firestore';
-import { db } from "../../../firebaseAdminInit.js";
+import { db } from "../../firebaseAdminInit.js";
 
 const storage = new Storage({
     credentials: {
@@ -54,7 +54,7 @@ class _NodeGenerateCandidate extends Runnable {
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>) {
+    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
         try {
             const anchorContent: string = state.ligandAnchor.value;

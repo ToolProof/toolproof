@@ -1,5 +1,5 @@
 import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
-import { Employment } from '../../engine/types';
+import { Employment } from '../engine/types';
 
 export const BaseStateSpec = {
   ...MessagesAnnotation.spec,
