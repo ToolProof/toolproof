@@ -1,6 +1,5 @@
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
-import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
 import { registerNode, BaseStateSpec } from "./nodeUtils.js";
 import * as path from 'path';
@@ -47,10 +46,10 @@ type WithBaseState = typeof NodeInvokeDockingState.State &
 class _NodeInvokeDocking extends Runnable {
 
     static meta = {
-        description: "Load inputs from the bucket",
+        description: "Node to invoke AutoDock Vina.",
         stateSpecs: {
-            inputs: NodeInvokeDockingState_I.spec,
-            outputs: NodeInvokeDockingState_O.spec,
+            inputs: NodeInvokeDockingState_I,
+            outputs: NodeInvokeDockingState_O,
         },
         resourceSpecs: {
             inputs: ["ligand", "receptor", "box"],
@@ -149,7 +148,7 @@ class _NodeInvokeDocking extends Runnable {
 
 }
 
-export const NodeInvokeDocking = registerNode<typeof NodeInvokeDockingState, typeof _NodeInvokeDocking>(_NodeInvokeDocking);
+export const NodeInvokeDocking = registerNode<typeof NodeInvokeDockingState_I | typeof NodeInvokeDockingState_O, typeof _NodeInvokeDocking>(_NodeInvokeDocking);
 
 
 

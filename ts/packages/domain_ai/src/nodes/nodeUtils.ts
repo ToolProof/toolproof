@@ -13,8 +13,8 @@ export interface NodeSpecs<TState> {
     meta: {
         description: string;
         stateSpecs: {
-            inputs: Partial<TState>;
-            outputs: Partial<TState>;
+            inputs: TState;
+            outputs: TState;
         };
         resourceSpecs: {
             inputs: string[];
