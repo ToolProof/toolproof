@@ -6,6 +6,7 @@ import { NodeGenerateBox, NodeGenerateBoxState } from '../../nodes/nodeGenerateB
 import { NodeInvokeDocking, NodeInvokeDockingState } from '../../nodes/nodeInvokeDocking.js';
 import { NodeLoadResults, NodeLoadResultsState } from '../../nodes/nodeLoadResults.js';
 import { NodeEvaluateResults, NodeEvaluateResultsState } from '../../nodes/nodeEvaluateResults.js';
+import { AIMessage } from "@langchain/core/messages";
 
 const GraphState = Annotation.Root({
     ...BaseStateSpec,
@@ -27,15 +28,24 @@ const edgeShouldRetry = (state: typeof GraphState.State) => {
     }
 };
 
+const nodeStart = (state: typeof GraphState.State) => {
+    console.log('state :', state);
+    return {
+        messages: [new AIMessage("SubGraph Started successfully")],
+    };
+};
+
 
 const stateGraph = new StateGraph(GraphState)
+    .addNode("nodeStart", nodeStart)
     .addNode("nodeLoadInputs", new NodeLoadInputs())
     .addNode("nodeGenerateCandidate", new NodeGenerateCandidate())
     .addNode("nodeGenerateBox", new NodeGenerateBox())
     .addNode("nodeInvokeDocking", new NodeInvokeDocking())
     .addNode("nodeLoadResults", new NodeLoadResults())
     .addNode("nodeEvaluateResults", new NodeEvaluateResults())
-    .addEdge(START, "nodeLoadInputs")
+    .addEdge(START, "nodeStart")
+    .addEdge("nodeStart", "nodeLoadInputs")
     .addEdge("nodeLoadInputs", "nodeGenerateCandidate")
     .addEdge("nodeGenerateCandidate", "nodeInvokeDocking")
     .addEdge("nodeInvokeDocking", "nodeLoadResults")

@@ -80,7 +80,7 @@ const nodeInvokeSubgraph = async (state: typeof GraphState.State): Promise<Parti
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 30 * 60 * 1000); // 30 mins timeout
 
-        const thread = await client.threads.create();
+        // const thread = await client.threads.create();
 
         let result: any;
         try {

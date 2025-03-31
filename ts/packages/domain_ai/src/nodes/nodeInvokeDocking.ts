@@ -39,10 +39,10 @@ type WithBaseState = typeof NodeInvokeDockingState.State &
 class _NodeInvokeDocking extends Runnable {
 
     static specs = {
-        description: "Load inputs from the bucket",
+        description: "Invoke Docking for Candidate Ligand",
         resources: {
             inputSpecs: ["ligand", "receptor", "box"],
-            outputSpecs: [],
+            outputSpecs: ["docking", "pose"],
         },
         state: NodeInvokeDockingState,
     }
