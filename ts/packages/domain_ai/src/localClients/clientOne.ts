@@ -39,7 +39,7 @@ export async function runRemoteGraph() {
         const timeout = setTimeout(() => controller.abort(), 1800000); // 30 minutes
 
         try {
-            console.log("Invoking the graph")
+            console.log("Invoking the graph.")
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 employmentId: "Q2k7FtvG2eSClgI4er9w",
