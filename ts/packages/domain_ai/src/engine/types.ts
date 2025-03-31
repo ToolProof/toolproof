@@ -1,3 +1,5 @@
+import { DocumentReference } from "firebase-admin/firestore";
+
 interface Base {
     id: string;
     name: string;
@@ -47,8 +49,8 @@ export type GammaValue = "gamma1" | "gamma2" | "gamma3"; */
 
 export interface Resource extends Base {
     filetype: string;
-    generator: string;
     timestamp: string;
+    generator: string;
     tags: {
         [key: string]: string; // We're using a simplified type for now
     }

@@ -13,7 +13,7 @@ const client = new Client({
     apiUrl: url,
 });
 
-const State = Annotation.Root({
+const GraphState = Annotation.Root({
     ...MessagesAnnotation.spec,
     employmentId: Annotation<string>({
         reducer: (prev, next) => next
@@ -23,7 +23,7 @@ const State = Annotation.Root({
     }),
 });
 
-const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
+const nodeFetchEmployment = async (state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> => {
     try {
         if (!state.employmentId) {
             throw new Error("Employment ID is missing");
@@ -66,12 +66,12 @@ const nodeFetchEmployment = async (state: typeof State.State): Promise<Partial<t
     }
 };
 
-const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<typeof State.State>> => {
+const nodeInvokeSubgraph = async (state: typeof GraphState.State): Promise<Partial<typeof GraphState.State>> => {
     try {
         // Use paths from state
         const subGraphState = {
             messages: [
-                { "role": "user", "content": "Alpha Graph is invoked"}
+                { "role": "user", "content": "Alpha Graph is invoked" }
             ],
             employment: state.employment
         };
@@ -80,19 +80,19 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 30 * 60 * 1000); // 30 mins timeout
 
-        const thread = await client.threads.create();
+        // const thread = await client.threads.create();
 
         let result: any;
         try {
             // Invoke the subGraph with abort signal
             // ATTENTION_RONAK: Invoke Python subGraph instead
-            
 
-            // result = await subGraphs.alpha.invoke(subGraphState, {
-            //     signal: controller.signal
-            // });
 
-            const streamResponse = client.runs.stream(
+            result = await subGraphs.alpha.invoke(subGraphState, {
+                signal: controller.signal
+            });
+
+            /* const streamResponse = client.runs.stream(
                 thread.thread_id,
                 graphName,
                 {
@@ -101,13 +101,13 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
                     signal: controller.signal
                 }
             );
-            
+
             console.log('streamResponse :', streamResponse);
             for await (const chunk of streamResponse) {
                 console.log(`Receiving new event of type: ${chunk.event}...`);
                 console.log(JSON.stringify(chunk.data));
                 console.log("\n\n");
-            }
+            } */
         } finally {
             clearTimeout(timeout);
             controller.abort(); // Cleanup the controller
@@ -125,7 +125,7 @@ const nodeInvokeSubgraph = async (state: typeof State.State): Promise<Partial<ty
     }
 };
 
-const edgeShouldContinue = (state: typeof State.State) => {
+const edgeShouldContinue = (state: typeof GraphState.State) => {
     console.log('state :', state);
     if (false) {
         return 'nodeInvokeSubgraph';
@@ -134,7 +134,7 @@ const edgeShouldContinue = (state: typeof State.State) => {
     }
 }
 
-const stateGraph = new StateGraph(State)
+const stateGraph = new StateGraph(GraphState)
     .addNode("nodeFetchEmployment", nodeFetchEmployment)
     .addNode("nodeInvokeSubgraph", nodeInvokeSubgraph)
     .addEdge(START, "nodeFetchEmployment")
