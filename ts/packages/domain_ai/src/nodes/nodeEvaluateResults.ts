@@ -39,7 +39,7 @@ class _NodeEvaluateResults extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
-        // ATTENTION_RONAK: Here we'll evaluate the results and decide whether to retry or not.
+        // Here we evaluate the results and decide whether to retry or not.
         try {
             if (!state.ligandDocking?.value || !state.ligandPose?.value) {
                 throw new Error("Missing ligandDocking or ligandPose data");

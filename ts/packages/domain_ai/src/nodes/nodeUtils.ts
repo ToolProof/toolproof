@@ -20,7 +20,7 @@ export interface NodeSpecs<TState> {
     };
 }
 
-
+// ATTENTION_RONAK: The purpose of this is to enforce the contract of specs in the node class
 export function registerNode<
     TState,
     T extends NodeSpecs<TState> & (new (...args: any[]) => any)

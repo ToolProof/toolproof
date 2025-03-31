@@ -133,7 +133,6 @@ class _NodeGenerateCandidate extends Runnable {
                 throw new Error("Failed to generate candidate SMILES string");
             }
 
-            // ATTENTION_RONAK: Here we must generate a metadata document for the candidate and store it in Firestore.
             // Create Firestore document for the candidate in resources collection
             const timestamp = new Date().toISOString();
 

@@ -41,7 +41,7 @@ class _NodeLoadResults extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
-        // ATTENTION_RONAK: Here we'll load the docking results from the bucket and into GraphState.
+        // Here we load the docking results from the bucket and into GraphState.
 
         try {
             if (!state.ligandDocking?.path || !state.ligandPose?.path) {

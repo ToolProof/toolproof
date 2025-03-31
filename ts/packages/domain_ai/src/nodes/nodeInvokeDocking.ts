@@ -24,6 +24,12 @@ export const NodeInvokeDockingState = Annotation.Root({
     box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
+    ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
+        reducer: (prev, next) => next
+    }),
+    ligandPose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
+        reducer: (prev, next) => next
+    }),
 });
 
 type WithBaseState = typeof NodeInvokeDockingState.State &
@@ -45,7 +51,7 @@ class _NodeInvokeDocking extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         try {
-            // ATTENTION_RONAK: Here we must store the paths of the results in ligandDocking and ligandPose.
+            // Invoke docking and store the paths of the results in ligandDocking and ligandPose.
 
             // Ensure paths have the tp_resources/ prefix
             const addPrefix = (path: string) => {
