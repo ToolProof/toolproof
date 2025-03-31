@@ -3,7 +3,7 @@ import { BaseStateSpec } from '../../nodes/nodeUtils.js';
 import { NodeLoadInputs, NodeLoadInputsState } from '../../nodes/nodeLoadInputs.js';
 import { NodeGenerateCandidate, NodeGenerateCandidateState } from '../../nodes/nodeGenerateCandidate.js';
 import { NodeGenerateBox, NodeGenerateBoxState } from '../../nodes/nodeGenerateBox.js';
-import { NodeInvokeDocking, NodeInvokeDockingState } from '../../nodes/nodeInvokeDocking.js';
+import { NodeInvokeDocking, NodeInvokeDockingState_I } from '../../nodes/nodeInvokeDocking.js';
 import { NodeLoadResults, NodeLoadResultsState } from '../../nodes/nodeLoadResults.js';
 import { NodeEvaluateResults, NodeEvaluateResultsState } from '../../nodes/nodeEvaluateResults.js';
 
@@ -12,7 +12,7 @@ const GraphState = Annotation.Root({
     ...NodeLoadInputsState.spec,
     ...NodeGenerateCandidateState.spec,
     ...NodeGenerateBoxState.spec,
-    ...NodeInvokeDockingState.spec,
+    ...NodeInvokeDockingState_I.spec,
     ...NodeLoadResultsState.spec,
     ...NodeEvaluateResultsState.spec,
 });

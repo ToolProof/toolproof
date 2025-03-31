@@ -2,21 +2,24 @@ import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 import { Employment } from '../engine/types';
 
 export const BaseStateSpec = {
-  ...MessagesAnnotation.spec,
-  employment: Annotation<Employment>({
-    reducer: (prev, next) => next,
-  }),
+    ...MessagesAnnotation.spec,
+    employment: Annotation<Employment>({
+        reducer: (prev, next) => next,
+    }),
 };
 
 
 export interface NodeSpecs<TState> {
-    specs: {
+    meta: {
         description: string;
-        resources: {
-            inputSpecs: string[];
-            outputSpecs: string[];
+        stateSpecs: {
+            inputs: Partial<TState>;
+            outputs: Partial<TState>;
         };
-        state: TState;
+        resourceSpecs: {
+            inputs: string[];
+            outputs: string[];
+        };
     };
 }
 

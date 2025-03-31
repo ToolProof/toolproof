@@ -14,7 +14,7 @@ interface ChunkInfo {
 }
 
 
-export const NodeInvokeDockingState = Annotation.Root({
+const NodeInvokeDockingState_I = Annotation.Root({
     ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -24,6 +24,9 @@ export const NodeInvokeDockingState = Annotation.Root({
     box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
+});
+
+const NodeInvokeDockingState_O = Annotation.Root({
     ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
         reducer: (prev, next) => next
     }),
@@ -32,19 +35,27 @@ export const NodeInvokeDockingState = Annotation.Root({
     }),
 });
 
+export const NodeInvokeDockingState = Annotation.Root({
+    ...NodeInvokeDockingState_I.spec,
+    ...NodeInvokeDockingState_O.spec,
+});
+
 type WithBaseState = typeof NodeInvokeDockingState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeInvokeDocking extends Runnable {
 
-    static specs = {
+    static meta = {
         description: "Load inputs from the bucket",
-        resources: {
-            inputSpecs: ["ligand", "receptor", "box"],
-            outputSpecs: [],
+        stateSpecs: {
+            inputs: NodeInvokeDockingState_I.spec,
+            outputs: NodeInvokeDockingState_O.spec,
         },
-        state: NodeInvokeDockingState,
+        resourceSpecs: {
+            inputs: ["ligand", "receptor", "box"],
+            outputs: [],
+        },
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
