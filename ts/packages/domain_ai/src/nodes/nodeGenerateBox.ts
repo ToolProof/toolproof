@@ -92,6 +92,9 @@ export const NodeGenerateBoxState = Annotation.Root({
     ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
+    ligandBox: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+        reducer: (prev, next) => next
+    }),
 });
 
 type WithBaseState = typeof NodeGenerateBoxState.State &
