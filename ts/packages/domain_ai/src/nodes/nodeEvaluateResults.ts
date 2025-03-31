@@ -6,13 +6,16 @@ import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper 
 
 const openai = new OpenAI();
 
-export const NodeEvaluateResultsState = Annotation.Root({
+export const NodeEvaluateResultsState_I = Annotation.Root({
     ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
         reducer: (prev, next) => next
     }),
     ligandPose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
         reducer: (prev, next) => next
     }),
+});
+
+export const NodeEvaluateResultsState_O = Annotation.Root({
     evaluation: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -21,19 +24,29 @@ export const NodeEvaluateResultsState = Annotation.Root({
     }),
 });
 
+
+
+export const NodeEvaluateResultsState = Annotation.Root({
+    ...NodeEvaluateResultsState_I.spec,
+    ...NodeEvaluateResultsState_O.spec,
+});
+
 type WithBaseState = typeof NodeEvaluateResultsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeEvaluateResults extends Runnable {
 
-    static specs = {
-        description: "Load inputs from the bucket",
-        resources: {
-            inputSpecs: ["ligand", "receptor", "box"],
-            outputSpecs: [],
+    static meta = {
+        description: "Node to invoke AutoDock Vina.",
+        stateSpecs: {
+            inputs: NodeEvaluateResultsState_I,
+            outputs: NodeEvaluateResultsState_O,
         },
-        state: NodeEvaluateResultsState,
+        resourceSpecs: {
+            inputs: ["ligand", "receptor", "box"],
+            outputs: ["evaluation"],
+        },
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -119,7 +132,7 @@ class _NodeEvaluateResults extends Runnable {
 
 }
 
-export const NodeEvaluateResults = registerNode<typeof NodeEvaluateResultsState, typeof _NodeEvaluateResults>(_NodeEvaluateResults);
+export const NodeEvaluateResults = registerNode<typeof NodeEvaluateResultsState_I | typeof NodeEvaluateResultsState_O, typeof _NodeEvaluateResults>(_NodeEvaluateResults);
 
 
 
