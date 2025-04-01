@@ -78,6 +78,9 @@ export class Cell {
 // ATTENTION: could be a more powerful type to allow for aliases
 export type NodeNameType =
     | 'Node'
+    | 'PreviousNode'
+    | 'NextNode'
+    | 'Tool'
     | 'GraphState'
     | 'FileStorage'
 
@@ -87,6 +90,10 @@ export type EdgeNameType =
     | 'GraphState_Node'
     | 'Node_FileStorage'
     | 'FileStorage_Node'
+    | 'FileStorage_Tool'
+    | 'Tool_FileStorage'
+    | 'PreviousNode_Node'
+    | 'Node_NextNode'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
@@ -127,7 +134,7 @@ export class Node extends GraphElement {
             color = '0, 0, 0'; // black
         }
 
-        const alpha = key === 'MetaInternal' ? 0.1 : 1.0;
+        const alpha = (key === 'PreviousNode' || key === 'NextNode') ? 0.3 : 1.0;
         return `rgba(${color}, ${alpha})`;
     }
 
@@ -234,9 +241,6 @@ export class Node extends GraphElement {
 
     drawText(context: CanvasRenderingContext2D, key: string, counter: number) {
         if (!context) return;
-        /* if (key === 'MetaInternal') {
-            return null;
-        } */
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
@@ -269,22 +273,20 @@ export class Node extends GraphElement {
         }
 
         // return;
+        // console.log('counter', counter);
 
-        const subText = pathDescriptions[counter].NodeText;
-        /* if (this.nature === 'code_ai' && this.environment === 'lg') {
-            subText = 'LangGraph Platform';
-        } else if (this.nature === 'code_ai' && this.environment === 'gcp') {
-            subText = 'GCP Cloud Run';
-        } else if (this.nature === 'code' && this.environment === 'vercel') {
-            subText = 'Vercel';
-        } else if (this.nature === 'code' && this.environment === 'gcp') {
-            subText = 'GCP Cloud Run';
-        } else if (this.nature === 'data' && this.environment === 'gcp') {
-            subText = 'GCP Cloud Storage';
-        } else if (this.nature === 'data' && this.environment === 'lg') {
-            subText = 'LangGraph Platform';
+        let subText = '';
+        const pathDescription = pathDescriptions[counter];
+        if (key === 'Node') {
+            subText = pathDescription.NodeText;
+        } else if (key === 'GraphState') {
+            subText = pathDescription.GraphStateText;
+        } else if (key === 'FileStorage') {
+            subText = pathDescription.FileStorageText;
+        } else if (key === 'Tool') {
+            subText = '';
         }
- */
+
         if (subText) {
             context.font = '11px Arial';
             context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 12);
@@ -330,9 +332,9 @@ export class Edge extends GraphElement {
             const point = node.cell.getOuterDiamond()[diamondKey];
             if (node.nature === 'data') {
                 if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y - (Edge.cellHeight / 8) }; // ATTENTION
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) }; // ATTENTION
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y + (Edge.cellHeight / 8) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
                 }
             } else if (node.nature === 'code_ai') {
                 if (diamondKey === 'left') {
@@ -480,9 +482,16 @@ export class Edge extends GraphElement {
 
     }
 
-    drawEdgehead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string) {
-        const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        this.drawEdgeheadAtAngle(context, end, angle, color);
+    drawEdgehead(context: CanvasRenderingContext2D, start: Point, end: Point, color: string, shiftUpwards: boolean) {
+        if (shiftUpwards) {
+            // Adjust the arrowhead position upwards based on the cell height
+            const adjustment = Edge.cellHeight / 1.5; // Dynamically adjust based on cell height
+            const angle = Math.atan2((end.y - adjustment) - (start.y - adjustment), end.x - start.x);
+            this.drawEdgeheadAtAngle(context, { x: end.x, y: end.y - adjustment }, angle, color);
+        } else {
+            const angle = Math.atan2(end.y - start.y, end.x - start.x);
+            this.drawEdgeheadAtAngle(context, end, angle, color);
+        }
     }
 
     drawCurvyEdgehead(context: CanvasRenderingContext2D, start: Point, control: Point, end: Point, color: string) {

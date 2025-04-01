@@ -3,9 +3,12 @@ import { Cell, NodeNameType, EdgeNameType, Node, Edge, GraphElementNameType, Edg
 
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
-        Node: new Node(new Cell(4, 2, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['Node']),
-        GraphState: new Node(new Cell(2, 2, cellWidth, cellHeight), 'lg', 'code', true, nodeDescriptions['GraphState']),
-        FileStorage: new Node(new Cell(0, 2, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['FileStorage']),
+        Node: new Node(new Cell(4, 4, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['Node']),
+        PreviousNode: new Node(new Cell(4, 1, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['PreviousNode']),
+        NextNode: new Node(new Cell(4, 7, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['NextNode']),
+        Tool: new Node(new Cell(6, 4, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['Tool']),
+        GraphState: new Node(new Cell(2, 4, cellWidth, cellHeight), 'lg', 'code', true, nodeDescriptions['GraphState']),
+        FileStorage: new Node(new Cell(0, 4, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['FileStorage']),
     } as const;
 }
 
@@ -16,7 +19,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Node_GraphState: {
             edge: new Edge(['Node', 'bottom'], ['GraphState', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'bottom'],
+                controlPoint: [new Cell(2, 5, cellWidth, cellHeight), 'bottom'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -27,7 +30,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         GraphState_Node: {
             edge: new Edge(['GraphState', 'top'], ['Node', 'top'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(2, 1, cellWidth, cellHeight), 'top'],
+                controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'top'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -38,7 +41,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         Node_FileStorage: {
             edge: new Edge(['Node', 'bottom'], ['FileStorage', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(2, 4, cellWidth, cellHeight), 'bottom'],
+                controlPoint: [new Cell(2, 6, cellWidth, cellHeight), 'bottom'],
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
@@ -49,7 +52,51 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
         FileStorage_Node: {
             edge: new Edge(['FileStorage', 'top'], ['Node', 'top'], nodes, cellWidth, cellHeight),
             config: {
+                controlPoint: [new Cell(2, 2, cellWidth, cellHeight), 'top'],
+                reverse: null,
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Tool_FileStorage'
+            }
+        },
+        Tool_FileStorage: {
+            edge: new Edge(['Tool', 'bottom'], ['FileStorage', 'bottom'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: [new Cell(2, 8, cellWidth, cellHeight), 'bottom'],
+                reverse: null,
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'FileStorage_Tool'
+            }
+        },
+        FileStorage_Tool: {
+            edge: new Edge(['FileStorage', 'top'], ['Tool', 'top'], nodes, cellWidth, cellHeight),
+            config: {
                 controlPoint: [new Cell(2, 0, cellWidth, cellHeight), 'top'],
+                reverse: null,
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'PreviousNode_Node'
+            }
+        },
+        PreviousNode_Node: {
+            edge: new Edge(['PreviousNode', 'bottom'], ['Node', 'top'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: null,
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Node_NextNode'
+            }
+        },
+        Node_NextNode: {
+            edge: new Edge(['Node', 'bottom'], ['NextNode', 'top'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
                 reverse: null,
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);

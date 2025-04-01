@@ -29,8 +29,8 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
     const [edgesWithConfig, setEdgesWithConfig] = useState<Record<EdgeNameType, EdgeWithConfig>>();
 
     const gridSize = useMemo(() => ({
-        col: 5,
-        row: 5,
+        col: 7,
+        row: 9,
     }), []);
 
     const handleNodeClick = (nodeName: NodeNameType, x: number, y: number) => {
@@ -111,7 +111,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
 
 
         // Draw edges
-        const edgeheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
+        const edgeheadQueue: { key: EdgeNameType, start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
         const bar = () => {
             return false;
@@ -123,7 +123,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             const color = isActive ? 'yellow' : 'black';
 
 
-            if (!isReverseActive) {
+            if (isActive || key === 'PreviousNode_Node' || key === 'Node_NextNode') {
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
                         context,
@@ -133,12 +133,14 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
                     );
                     if (isActive) {
                         const controlPoint = Edge.resolvePoint(edgeWithConfig.config.controlPoint, nodes);
-                        edgeheadQueue.push({ start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: true, control: controlPoint });
+                        edgeheadQueue.push({ key, start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: true, control: controlPoint });
                     }
                 } else {
-                    edgeWithConfig.edge.draw(context, color);
-                    if (isActive) {
-                        edgeheadQueue.push({ start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: false });
+                    if (key !== 'PreviousNode_Node' && key !== 'Node_NextNode') {
+                        edgeWithConfig.edge.draw(context, color);
+                    }
+                    if (isActive || key === 'PreviousNode_Node' || key === 'Node_NextNode') {
+                        edgeheadQueue.push({ key, start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: false });
                     }
                 }
             }
@@ -156,15 +158,15 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             genesisEdgeWithConfig.config.drawInOrder(foo, key, genesisEdgeWithConfig);
         }
 
-        edgeheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
+        edgeheadQueue.forEach(({ key, start, end, color, isCurvy, control }) => {
             if (isCurvy && control) {
                 Edge.prototype.drawCurvyEdgehead(context, start, control, end, color);
             } else {
-                Edge.prototype.drawEdgehead(context, start, end, color);
+                Edge.prototype.drawEdgehead(context, start, end, color, key === 'PreviousNode_Node' || key === 'Node_NextNode');
             }
         });
 
-    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showStandin, isNor]);
+    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showStandin, isNor, counter]);
 
 
     return (
