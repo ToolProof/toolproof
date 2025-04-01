@@ -4,6 +4,7 @@ import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
 import { registerNode, BaseStateSpec } from "./nodeUtils.js";
 
+// ATTENTION: factor out
 const storage = new Storage({
     credentials: {
         client_email: process.env.GCP_CLIENT_EMAIL,
@@ -11,8 +12,10 @@ const storage = new Storage({
         project_id: process.env.GCP_PROJECT_ID,
     }
 });
+// ATTENTION: factor out to shared/src/constants.ts
 const bucketName = 'tp_resources';
 
+// ATTENTION: factor out to types.ts
 interface ResourceData {
     description: string;
     filetype: string;
@@ -25,6 +28,7 @@ interface ResourceData {
     timestamp: any;
 }
 
+// ATTENTION: factor out to types.ts
 interface ChunkInfo {
     chainId: string;
     startResidue: number;
@@ -32,6 +36,7 @@ interface ChunkInfo {
     content: string;
 }
 
+// ATTENTION: factor out to utils.ts
 const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInfo[] => {
     const lines = pdbContent.split('\n');
     const chunks: ChunkInfo[] = [];

@@ -53,7 +53,7 @@ class _NodeInvokeDocking extends Runnable {
         },
         resourceSpecs: {
             inputs: ["ligand", "receptor", "box"],
-            outputs: [],
+            outputs: ["docking", "pose"],
         },
     }
 

@@ -1,7 +1,7 @@
 'use client';
 import Problem from '@/components/problem/Problem';
 import ProblemMock from '@/components/problem/ProblemMock';
-import Frame from '@/components/lasagna/Frame';
+import Frame from '@/components/lasagna2/Frame';
 import { useState } from 'react';
 
 interface WallProps {
@@ -14,9 +14,9 @@ export default function Wall({ isNor }: WallProps) {
 
   return (
     <div className='flex h-screen'>
-      {<div className='w-[1200px] flex flex-col justify-center items-center py-20 bg-transparent'>
+      {/* <div className='w-[1200px] flex flex-col justify-center items-center py-20 bg-transparent'>
         <ProblemMock counter={counter} isNor={isNor} />
-      </div>}
+      </div> */}
       <Frame counter={counter} setCounter={setCounter} pathDescription={pathDescription} setPathDescription={setPathDescription} isNor={isNor}/>
     </div>
   )
