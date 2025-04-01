@@ -79,14 +79,8 @@ const generateBoxPDB = (boxCoords: any): string => {
     return pdbContent;
 };
 
-export const NodeGenerateBoxState = Annotation.Root({
-    ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
+export const NodeGenerateBoxState_I = Annotation.Root({
     receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
-        reducer: (prev, next) => next
-    }),
-    box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
     ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
@@ -97,19 +91,33 @@ export const NodeGenerateBoxState = Annotation.Root({
     }),
 });
 
+export const NodeGenerateBoxState_O = Annotation.Root({
+    box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
+        reducer: (prev, next) => next
+    }),
+});
+
+export const NodeGenerateBoxState = Annotation.Root({
+    ...NodeGenerateBoxState_I.spec,
+    ...NodeGenerateBoxState_O.spec,
+});
+
 type WithBaseState = typeof NodeGenerateBoxState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeGenerateBox extends Runnable {
 
-    static specs = {
-        description: "Load inputs from the bucket",
-        resources: {
-            inputSpecs: ["ligand", "receptor", "box"],
-            outputSpecs: [],
+    static meta = {
+        description: "Generate the box.",
+        stateSpecs: {
+            inputs: NodeGenerateBoxState_I,
+            outputs: NodeGenerateBoxState_O,
         },
-        state: NodeGenerateBoxState,
+        resourceSpecs: {
+            inputs: [],
+            outputs: [],
+        },
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -214,7 +222,7 @@ class _NodeGenerateBox extends Runnable {
 
 }
 
-export const NodeGenerateBox = registerNode<typeof NodeGenerateBoxState, typeof _NodeGenerateBox>(_NodeGenerateBox);
+export const NodeGenerateBox = registerNode<typeof NodeGenerateBoxState_I | typeof NodeGenerateBoxState_O, typeof _NodeGenerateBox>(_NodeGenerateBox);
 
 
 

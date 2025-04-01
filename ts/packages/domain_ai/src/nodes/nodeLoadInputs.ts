@@ -85,7 +85,10 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 };
 
 
-export const NodeLoadInputsState = Annotation.Root({
+const NodeLoadInputsState_I = Annotation.Root({
+});
+
+const NodeLoadInputsState_O = Annotation.Root({
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -97,19 +100,28 @@ export const NodeLoadInputsState = Annotation.Root({
     }),
 });
 
+
+export const NodeLoadInputsState = Annotation.Root({
+    ...NodeLoadInputsState_I.spec,
+    ...NodeLoadInputsState_O.spec,
+});
+
 type WithBaseState = typeof NodeLoadInputsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeLoadInputs extends Runnable {
 
-    static specs = {
+    static meta = {
         description: "Load inputs from the bucket",
-        resources: {
-            inputSpecs: ["ligand", "receptor", "box"],
-            outputSpecs: [],
+        stateSpecs: {
+            inputs: NodeLoadInputsState_I,
+            outputs: NodeLoadInputsState_O,
         },
-        state: NodeLoadInputsState,
+        resourceSpecs: {
+            inputs: ["ligand", "receptor", "box"],
+            outputs: [],
+        },
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -229,7 +241,7 @@ class _NodeLoadInputs extends Runnable {
 
 }
 
-export const NodeLoadInputs = registerNode<typeof NodeLoadInputsState, typeof _NodeLoadInputs>(_NodeLoadInputs);
+export const NodeLoadInputs = registerNode<typeof NodeLoadInputsState_I | typeof NodeLoadInputsState_O, typeof _NodeLoadInputs>(_NodeLoadInputs);
 
 
 

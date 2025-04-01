@@ -25,16 +25,24 @@ interface ChunkInfo {
     content: string;
 }
 
-export const NodeGenerateCandidateState = Annotation.Root({
+export const NodeGenerateCandidateState_I = Annotation.Root({
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
     receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
+});
+
+export const NodeGenerateCandidateState_O = Annotation.Root({
     ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
+});
+
+export const NodeGenerateCandidateState = Annotation.Root({
+    ...NodeGenerateCandidateState_I.spec,
+    ...NodeGenerateCandidateState_O.spec,
 });
 
 type WithBaseState = typeof NodeGenerateCandidateState.State &
@@ -43,14 +51,18 @@ type WithBaseState = typeof NodeGenerateCandidateState.State &
 
 class _NodeGenerateCandidate extends Runnable {
 
-    static specs = {
+    static meta = {
         description: "Generate candidate ligand from a given ligand and receptor.",
-        resources: {
-            inputSpecs: [],
-            outputSpecs: ["candidate"],
+        stateSpecs: {
+            inputs: NodeGenerateCandidateState_I,
+            outputs: NodeGenerateCandidateState_O,
         },
-        state: NodeGenerateCandidateState,
+        resourceSpecs: {
+            inputs: ["ligand", "receptor", "box"],
+            outputs: ["candidate"],
+        },
     }
+
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
@@ -197,7 +209,7 @@ class _NodeGenerateCandidate extends Runnable {
 
 }
 
-export const NodeGenerateCandidate = registerNode<typeof NodeGenerateCandidateState, typeof _NodeGenerateCandidate>(_NodeGenerateCandidate);
+export const NodeGenerateCandidate = registerNode<typeof NodeGenerateCandidateState_I | typeof NodeGenerateCandidateState_O, typeof _NodeGenerateCandidate>(_NodeGenerateCandidate);
 
 
 

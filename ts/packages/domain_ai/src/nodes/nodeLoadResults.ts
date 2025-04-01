@@ -14,7 +14,10 @@ const storage = new Storage({
 const bucketName = 'tp_resources';
 
 
-export const NodeLoadResultsState = Annotation.Root({
+export const NodeLoadResultsState_I = Annotation.Root({
+});
+
+export const NodeLoadResultsState_O = Annotation.Root({
     ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
         reducer: (prev, next) => next
     }),
@@ -23,19 +26,27 @@ export const NodeLoadResultsState = Annotation.Root({
     }),
 });
 
+export const NodeLoadResultsState = Annotation.Root({
+    ...NodeLoadResultsState_I.spec,
+    ...NodeLoadResultsState_O.spec,
+});
+
 type WithBaseState = typeof NodeLoadResultsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeLoadResults extends Runnable {
 
-    static specs = {
-        description: "Load inputs from the bucket",
-        resources: {
-            inputSpecs: ["ligand", "receptor", "box"],
-            outputSpecs: [],
+    static meta = {
+        description: "Load docking results from the bucket.",
+        stateSpecs: {
+            inputs: NodeLoadResultsState_I,
+            outputs: NodeLoadResultsState_O,
         },
-        state: NodeLoadResultsState,
+        resourceSpecs: {
+            inputs: ["docking", "pose"],
+            outputs: [],
+        },
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -104,7 +115,7 @@ class _NodeLoadResults extends Runnable {
 
 }
 
-export const NodeLoadResults = registerNode<typeof NodeLoadResultsState, typeof _NodeLoadResults>(_NodeLoadResults);
+export const NodeLoadResults = registerNode<typeof NodeLoadResultsState_I | typeof NodeLoadResultsState_O, typeof _NodeLoadResults>(_NodeLoadResults);
 
 
 
