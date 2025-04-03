@@ -3,7 +3,8 @@
         "."
     ],
     "graphs": {
-        "alpha": "./src/graph/alpha.py:alpha_graph"
+        "alpha": "./src/graph/alpha.py:alpha_graph",
+        "alpha_strategies": "./src/graphs/strategies/alpha.py:alpha_graph"
     },
     "env": ".env"
 }
