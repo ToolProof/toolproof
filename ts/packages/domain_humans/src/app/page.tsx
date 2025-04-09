@@ -1,6 +1,6 @@
 'use client'
 // import Wall from '@/components/lasagna/Wall';
-import Wall from '@/components/lasagna2/Wall';
+import Wall from '@/components/lasagna3/Wall';
 import { useAppDispatch } from '@/redux/hooks';
 import { setShowSideBar } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
