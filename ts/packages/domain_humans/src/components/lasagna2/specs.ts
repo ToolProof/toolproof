@@ -3,10 +3,11 @@ import { Cell, NodeNameType, EdgeNameType, Node, Edge, GraphElementNameType, Edg
 
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
+        Graph: new Node(new Cell(4, 0, cellWidth, cellHeight), 'lg', 'dummy', true, nodeDescriptions['Graph']),
         Node: new Node(new Cell(4, 4, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['Node']),
         PreviousNode: new Node(new Cell(4, 1, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['PreviousNode']),
         NextNode: new Node(new Cell(4, 7, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['NextNode']),
-        Tool: new Node(new Cell(6, 4, cellWidth, cellHeight), 'lg', 'data', true, nodeDescriptions['Tool']),
+        Tool: new Node(new Cell(6, 4, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Tool']),
         GraphState: new Node(new Cell(2, 4, cellWidth, cellHeight), 'lg', 'code', true, nodeDescriptions['GraphState']),
         FileStorage: new Node(new Cell(0, 4, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['FileStorage']),
     } as const;
@@ -101,6 +102,39 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
+                next: (bar: () => boolean) => 'Node_Tool'
+            }
+        },
+        Node_Tool: {
+            edge: new Edge(['Node', 'right'], ['Tool', 'left'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'Tool_Node',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Tool_Node'
+            }
+        },
+        Tool_Node: {
+            edge: new Edge(['Tool', 'left'], ['Node', 'right'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'Node_Tool',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Tool_GraphState'
+            }
+        },
+        Tool_GraphState: {
+            edge: new Edge(['Tool', 'bottom'], ['GraphState', 'bottom'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: [new Cell(4, 7, cellWidth, cellHeight), 'bottom'],
+                reverse: null,
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
                 next: (bar: () => boolean) => null
             }
         },
@@ -129,7 +163,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
 
 export const path: Array<[GraphElementNameType[], string]> = [
     [[], pathDescriptions[0].Description],
-    [[], pathDescriptions[1].Description],
+    [['Tool_GraphState'], pathDescriptions[1].Description],
     [['FileStorage_Node'], pathDescriptions[2].Description],
     [['Node_GraphState'], pathDescriptions[3].Description],
     [['GraphState_Node'], pathDescriptions[4].Description],

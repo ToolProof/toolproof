@@ -83,6 +83,7 @@ export type NodeNameType =
     | 'Tool'
     | 'GraphState'
     | 'FileStorage'
+    | 'Graph'
 
 
 export type EdgeNameType =
@@ -94,6 +95,9 @@ export type EdgeNameType =
     | 'Tool_FileStorage'
     | 'PreviousNode_Node'
     | 'Node_NextNode'
+    | 'Node_Tool'
+    | 'Tool_Node'
+    | 'Tool_GraphState'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
@@ -244,33 +248,23 @@ export class Node extends GraphElement {
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
-        context.font = '14px Arial';
+        context.font = '12px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
         let displayText = key;
-        if (key === 'Standin') {
-            displayText = 'Tools';
-        } else if (key === 'MetaInternal') {
-            displayText = 'Meta';
-        }
-        /* if (displayText === 'AI') {
-            displayText = 'OpenAI o3';
-        } else if (displayText === 'Tools') {
-            displayText = false ? 'AutoDock' : 'Schrödinger';
-        } */
-
-        if (key === 'Meta') {
-            context.font = '12px Arial';
-            context.fillText(displayText, x + this.cell.width / 4, y + this.cell.height / 2);
-        } else if (key === 'MetaInternal') {
-            context.font = '12px Arial';
-            context.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            context.fillText(displayText, x + this.cell.width / 1.3, y + this.cell.height / 2);
+        if (key === 'Node') {
+            displayText = pathDescriptions[counter].NodeText;
+            context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
+        } else if (key === 'Graph') {
+            context.font = '14px Arial';
+            displayText = pathDescriptions[counter].GraphName;
+            context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2 - 14);
         } else {
-            context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2 - 4);
+            context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
         }
+
 
         // return;
         // console.log('counter', counter);
@@ -278,7 +272,7 @@ export class Node extends GraphElement {
         let subText = '';
         const pathDescription = pathDescriptions[counter];
         if (key === 'Node') {
-            subText = pathDescription.NodeText;
+            subText = '';
         } else if (key === 'GraphState') {
             subText = pathDescription.GraphStateText;
         } else if (key === 'FileStorage') {
@@ -289,7 +283,7 @@ export class Node extends GraphElement {
 
         if (subText) {
             context.font = '11px Arial';
-            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 12);
+            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 14);
         }
     }
 

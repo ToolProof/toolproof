@@ -123,7 +123,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             const color = isActive ? 'yellow' : 'black';
 
 
-            if (isActive || key === 'PreviousNode_Node' || key === 'Node_NextNode') {
+            if ((isActive && !isReverseActive) || key === 'PreviousNode_Node' || key === 'Node_NextNode') {
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
                         context,

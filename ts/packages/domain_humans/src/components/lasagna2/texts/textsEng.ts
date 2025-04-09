@@ -22,6 +22,7 @@ export const resourceDescriptions: Record<string, string> = {
 
 
 type Foo = {
+    GraphName: string;
     NodeText: string;
     GraphStateText: string;
     FileStorageText: string;
@@ -31,42 +32,49 @@ type Foo = {
 
 export const pathDescriptions: Record<number, Foo> = {
     0: {
-        NodeText: '',
+        GraphName: '',
+        NodeText: 'Node',
         GraphStateText: '',
         FileStorageText: '',
         Description: 'Use the buttons below to navigate through the graph.',
     },
     1: {
-        NodeText: '',
-        GraphStateText: '',
+        GraphName: 'RemoteGraph',
+        NodeText: 'Implicit Node',
+        GraphStateText: 'employmentId',
         FileStorageText: '',
-        Description: 'Client writes "employmentId" to FileStorage.',
+        Description: 'Client writes "employmentId" to GraphState.',
     },
     2: {
+        GraphName: 'SuperGraph',
         NodeText: 'NodeFetchEmployment',
         GraphStateText: '',
         FileStorageText: 'employment',
         Description: 'Node reads "employment" from FileStorage.',
     },
     3: {
+        GraphName: 'SuperGraph',
         NodeText: 'NodeFetchEmployment',
         GraphStateText: 'employment',
         FileStorageText: '',
         Description: 'Node writes "employment" to GraphState.',
     },
     4: {
+        GraphName: 'AlphaGraph',
         NodeText: 'NodeLoadInputs',
         GraphStateText: 'employment',
         FileStorageText: '',
         Description: 'Node reads "employment" from GraphState.',
     },
     5: {
+        GraphName: 'AlphaGraph',
         NodeText: 'NodeLoadInputs',
         GraphStateText: '',
         FileStorageText: 'ligandAnchor, receptor, box',
         Description: 'Node reads "ligandAnchor", "receptor", and "box" from FileStorage.',
     },
     6: {
+        GraphName: 'AlphaGraph',
         NodeText: 'NodeLoadInputs',
         GraphStateText: 'ligandAnchor, receptor, box',
         FileStorageText: '',
