@@ -275,6 +275,8 @@ export class Edge extends GraphElement {
     public endPoint: Point;
     public static cellWidth: number;
     public static cellHeight: number;
+    public controlPoint: Point | null;
+    public reverse: string | null;
 
     constructor(
         startPointSpec: [string, EdgePointType] | [Cell, EdgePointType],
@@ -283,7 +285,7 @@ export class Edge extends GraphElement {
         nodes: Node[],
         cellWidth: number,
         cellHeight: number,
-        controlPoint: [string, DiamondPointType] | [Cell, DiamondPointType] | null,
+        controlPointSpec: [string, DiamondPointType] | [Cell, DiamondPointType] | null,
         reverse: string | null,
     ) {
         super();
@@ -291,10 +293,12 @@ export class Edge extends GraphElement {
         Edge.cellHeight = cellHeight;
         this.startPoint = Edge.resolvePoint(startPointSpec, nodes);
         this.endPoint = Edge.resolvePoint(endPointSpec, nodes);
+        this.controlPoint = controlPointSpec ? Edge.resolvePoint(controlPointSpec, nodes) : null;
+        this.reverse = reverse;
     }
 
     static resolvePoint(
-        input: [string, EdgePointType] | [Cell, EdgePointType],
+        pointSpec: [string, EdgePointType] | [Cell, EdgePointType],
         // Update the type here as well
         nodes: Node[]
     ): Point {
@@ -333,24 +337,24 @@ export class Edge extends GraphElement {
             return point;
         }
 
-        const key = input[1];
+        const key = pointSpec[1];
         const isCorner = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].includes(key);
         const isDiamondCorner = ['topLeftD', 'topRightD', 'bottomLeftD', 'bottomRightD'].includes(key);
 
         // If the node is specified by an id string, find it in the nodes array.
         if (key === 'center') {
-            if (typeof input[0] === 'string') {
+            if (typeof pointSpec[0] === 'string') {
                 // Use Array.find() to locate the node by its id.
-                const node = nodes.find(n => n.name === input[0]);
-                if (!node) throw new Error(`Node ${input[0]} not found.`);
+                const node = nodes.find(n => n.name === pointSpec[0]);
+                if (!node) throw new Error(`Node ${pointSpec[0]} not found.`);
                 result = node.cell.getCenter();
             } else {
-                result = input[0].getCenter();
+                result = pointSpec[0].getCenter();
             }
-        } else if (typeof input[0] === 'string') {
+        } else if (typeof pointSpec[0] === 'string') {
             // Look up the node in the array.
-            const node = nodes.find(n => n.name === input[0]);
-            if (!node) throw new Error(`Node ${input[0]} not found.`);
+            const node = nodes.find(n => n.name === pointSpec[0]);
+            if (!node) throw new Error(`Node ${pointSpec[0]} not found.`);
 
             if (isCorner) {
                 result = node.cell.getCorners()[key as CornerPointType];
@@ -378,9 +382,9 @@ export class Edge extends GraphElement {
             }
         } else {
             if (isCorner) {
-                result = input[0].getCorners()[key as CornerPointType];
+                result = pointSpec[0].getCorners()[key as CornerPointType];
             } else if (isDiamondCorner) {
-                const diamond = input[0].getOuterDiamond();
+                const diamond = pointSpec[0].getOuterDiamond();
                 switch (key) {
                     case 'topLeftD':
                         result = { x: (diamond.top.x + diamond.left.x) / 2, y: (diamond.top.y + diamond.left.y) / 2 };
@@ -396,7 +400,10 @@ export class Edge extends GraphElement {
                         break;
                 }
             } else {
-                result = input[0].getOuterDiamond()[key as DiamondPointType];
+                console.log('pointSpec[0]', JSON.stringify(pointSpec[0]));
+                const foo = pointSpec[0];
+                foo.getOuterDiamond();
+                result = pointSpec[0].getOuterDiamond()[key as DiamondPointType];
             }
         }
 

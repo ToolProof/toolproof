@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { diamondPointTypes, Node, Edge, EdgePointType } from './classes';
+import { diamondPointTypes, Node, Edge, Cell, EdgePointType, DiamondPointType } from './classes';
 
 type AddEdgeProps = {
     nodes: Node[];
@@ -15,6 +15,7 @@ export default function AddEdge({ nodes, setEdges, gridSize }: AddEdgeProps) {
         endNodePoint: 'left',
         colControl: 0,
         rowControl: 0,
+        pointControl: 'top'
     });
 
 
@@ -29,7 +30,7 @@ export default function AddEdge({ nodes, setEdges, gridSize }: AddEdgeProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log('formData', formData);
-        setEdges((prev) => [...prev, new Edge([formData.startNode, formData.startNodePoint as EdgePointType], [formData.endNode, formData.endNodePoint as EdgePointType], nodes, 0, 0, null, null)]);
+        setEdges((prev) => [...prev, new Edge([formData.startNode, formData.startNodePoint as EdgePointType], [formData.endNode, formData.endNodePoint as EdgePointType], nodes, 0, 0, [new Cell(formData.colControl, formData.rowControl, 117, 90), formData.pointControl as DiamondPointType], null)]);
 
     };
 
@@ -115,12 +116,27 @@ export default function AddEdge({ nodes, setEdges, gridSize }: AddEdgeProps) {
                 <select
                     name="rowControl"
                     className="mx-4"
-                    value={formData.colControl}
+                    value={formData.rowControl}
                     onChange={handleChangeSelect}
                 >
                     {Array.from({ length: gridSize.col }, (_, i) => (
                         <option key={i} value={i}>
                             {i}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <label className="p-4">
+                Control Point:
+                <select
+                    name="pointControl"
+                    className="mx-4"
+                    value={formData.pointControl}
+                    onChange={handleChangeSelect}
+                >
+                    {diamondPointTypes.map((item, index) => (
+                        <option key={index} value={item}>
+                            {item}
                         </option>
                     ))}
                 </select>

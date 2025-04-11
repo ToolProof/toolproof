@@ -26,6 +26,8 @@ export default function Frame({ nodes, edges, gridSize }: FrameProps) {
                 const newCellWidth = Math.floor(clientWidth / gridSize.col);
                 const newCellHeight = Math.floor(clientHeight / gridSize.row);
 
+                console.log('newCellWidth', newCellWidth, 'newCellHeight', newCellHeight);
+
                 // Only update state if the new cell sizes are different
                 if (newCellWidth !== cellWidth || newCellHeight !== cellHeight) {
                     setCellWidth(newCellWidth);
@@ -66,7 +68,7 @@ export default function Frame({ nodes, edges, gridSize }: FrameProps) {
             }
         }
 
-
+        // ATTENTION: hack
         // Update each node's cell dimensions
         nodes.forEach(node => {
             node.cell.width = cellWidth;
@@ -80,12 +82,18 @@ export default function Frame({ nodes, edges, gridSize }: FrameProps) {
             node.draw(context, color, 'TestNode', true);
         });
 
-
+        // ATTENTION: hack
+        // Update each edge's cell dimensions
         Edge.cellWidth = cellWidth;
         Edge.cellHeight = cellHeight;
+
         // Draw the edges
         edges.forEach(edge => {
-            edge.draw(context, 'yellow');
+            if (edge.controlPoint === null) {
+                edge.draw(context, 'yellow')
+            } else {
+                edge.drawCurvy(context, edge.controlPoint, nodes, 'yellow')
+            }
         });
 
 
