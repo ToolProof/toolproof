@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { Node, Edge } from './classes';
 
-export default function Frame() {
+type FrameProps = {
+    nodes: Node[];
+    edges: Edge[];
+    gridSize: { col: number; row: number };
+}
+
+export default function Frame({ nodes, edges, gridSize }: FrameProps) {
     const parentRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-
-    // Grid size: 5 columns and 5 rows
-    const gridSize = useMemo(() => ({
-        col: 10,
-        row: 10,
-    }), []);
 
     // State to hold the cell width and height
     const [cellWidth, setCellWidth] = useState(0);
@@ -19,7 +20,7 @@ export default function Frame() {
             if (parentRef.current && canvasRef.current) {
                 const { clientWidth, clientHeight } = parentRef.current;
 
-                console.log('clientWidth', clientWidth, 'clientHeight', clientHeight);
+                // console.log('clientWidth', clientWidth, 'clientHeight', clientHeight);
 
                 // Calculate cell size based on parent container size and grid size
                 const newCellWidth = Math.floor(clientWidth / gridSize.col);
@@ -64,11 +65,36 @@ export default function Frame() {
                 context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
             }
         }
-    }, [cellWidth, cellHeight, gridSize]); // Re-run when the cell sizes change
+
+
+        // Update each node's cell dimensions
+        nodes.forEach(node => {
+            node.cell.width = cellWidth;
+            node.cell.height = cellHeight;
+        });
+
+        // Draw the nodes
+        nodes.forEach((node, index) => {
+            const isActive = true;
+            const color = isActive ? 'yellow' : 'black';
+            node.draw(context, color, 'TestNode', true);
+        });
+
+
+        Edge.cellWidth = cellWidth;
+        Edge.cellHeight = cellHeight;
+        // Draw the edges
+        edges.forEach(edge => {
+            edge.draw(context, 'yellow');
+        });
+
+
+
+    }, [cellWidth, cellHeight, gridSize, nodes, edges]); // Re-run when the cell sizes change
 
     return (
-        <div ref={parentRef} className='bg-black'>
-            <canvas ref={canvasRef} className='bg-green-200'/>
+        <div ref={parentRef} className='bg-black h-full'>
+            <canvas ref={canvasRef} className='bg-green-200' />
         </div>
     );
 }
