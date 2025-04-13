@@ -79,32 +79,32 @@ export class Cell {
 export type NodeNameType =
     | 'Tools'
     | 'ToolsPrivate'
-    | 'Strategies'
-    | 'StrategiesPrivate'
-    | 'Humans'
-    | 'HumansPrivate'
+    | 'Graphs'
+    | 'GraphsPrivate'
+    | 'Clients'
+    | 'ClientsPrivate'
     | 'Resources'
     | 'ResourcesLeft'
     | 'ResourcesRight'
 
 
 export type EdgeNameType =
-    | 'Tools_Strategies'
-    | 'Strategies_Tools'
-    | 'Strategies_Humans'
-    | 'Humans_Strategies'
+    | 'Tools_Graphs'
+    | 'Graphs_Tools'
+    | 'Graphs_Clients'
+    | 'Clients_Graphs'
     | 'Tools_ResourcesLeft'
     | 'ResourcesLeft_Tools'
-    | 'Strategies_Resources'
-    | 'Resources_Strategies'
-    | 'Humans_ResourcesRight'
-    | 'ResourcesRight_Humans'
+    | 'Graphs_Resources'
+    | 'Resources_Graphs'
+    | 'Clients_ResourcesRight'
+    | 'ResourcesRight_Clients'
     | 'Tools_ToolsPrivate'
     | 'ToolsPrivate_Tools'
-    | 'Strategies_StrategiesPrivate'
-    | 'StrategiesPrivate_Strategies'
-    | 'Humans_HumansPrivate'
-    | 'HumansPrivate_Humans'
+    | 'Graphs_GraphsPrivate'
+    | 'GraphsPrivate_Graphs'
+    | 'Clients_ClientsPrivate'
+    | 'ClientsPrivate_Clients'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
@@ -229,7 +229,7 @@ export class Node extends GraphElement {
         context.fillStyle = 'black';
 
         let displayText = key;
-        if (key === 'ToolsPrivate' || key === 'StrategiesPrivate' || key === 'HumansPrivate') {
+        if (key === 'ToolsPrivate' || key === 'GraphsPrivate' || key === 'ClientsPrivate') {
             displayText = 'Private';
         } else if (key === 'Resources') {
             displayText = 'Shared';
@@ -298,9 +298,9 @@ export class Edge extends GraphElement {
             const point = node.cell.getOuterDiamond()[diamondKey];
             if (node.nature === 'code') {
                 if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) }; // ATTENTION
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 8) }; // ATTENTION
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 8) };
                 }
             } else if (node.nature === 'data_Private') {
                 if (diamondKey === 'left') {

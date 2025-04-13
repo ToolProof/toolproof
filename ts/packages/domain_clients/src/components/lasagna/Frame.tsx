@@ -18,9 +18,9 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
   }, [counter, setPathDescription]);
 
   const isElementActive = (key: GraphElementNameType) => {
-    // return path[counter]?.[0]?.includes(key) || false;
+    return path[counter]?.[0]?.includes(key) || false;
     // return key === activeElement;
-    return false;
+    // return false;
   };
 
   const handleClickPrevious = () => {
@@ -46,7 +46,7 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
         isElementActive={isElementActive}
         counter={counter}
       />
-      <div className="fixed bottom-14 right-0 w-[600px] bg-transparent p-4 text-center">
+      <div className="fixed bottom-0 left-0 w-[600px] bg-transparent p-4 text-center">
         <p>{pathDescription}</p>
       </div>
       {<div className="fixed bottom-0 left-0 w-full flex p-4 bg-transparent justify-center">

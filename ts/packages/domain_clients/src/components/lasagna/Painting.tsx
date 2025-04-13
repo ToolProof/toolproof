@@ -85,7 +85,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
         // Draw the grid
         for (let col = 0; col < gridSize.col; col++) {
             for (let row = 0; row < gridSize.row; row++) {
-                context.strokeStyle = 'red';
+                context.strokeStyle = 'transparent';
                 context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
             }
         }
@@ -116,7 +116,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
             const color = isActive ? 'yellow' : 'black';
 
 
-            if ((isActive && !isReverseActive) || true) {
+            if (!isReverseActive) {
 
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
@@ -144,7 +144,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
             }
         };
 
-        const key = 'Tools_Strategies';
+        const key = 'Tools_Graphs';
         const genesisEdgeWithConfig = edgesWithConfig[key];
         if (genesisEdgeWithConfig && genesisEdgeWithConfig.config) {
             genesisEdgeWithConfig.config.drawInOrder(foo, key, genesisEdgeWithConfig);
@@ -198,7 +198,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
                         zIndex: 10,
                         borderRadius: '5px',
                         width: '350px',
-                        height: nodeName === 'Humans' ? '100px' : '250px',
+                        height: nodeName === 'Clients' ? '100px' : '250px',
                         overflowY: 'auto',
                     }}
                 >
