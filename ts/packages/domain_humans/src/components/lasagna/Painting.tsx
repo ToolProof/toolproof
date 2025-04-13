@@ -2,17 +2,14 @@
 import NodeSVG from './NodeSVG';
 import { Point, Node, Edge, GraphElementNameType, NodeNameType, EdgeNameType, EdgeWithConfig } from './classes';
 import { getNodes, getEdgesWithConfig } from './specs';
-import { getNodes as getNodesNor, getEdgesWithConfig as getEdgesWithConfigNor } from './specsNor';
 import { useState, useRef, useEffect, useMemo } from 'react';
 
 interface PaintingProps {
     isElementActive: (key: GraphElementNameType) => boolean;
     counter: number;
-    showStandin: boolean;
-    isNor: boolean;
 }
 
-export default function Painting({ isElementActive, counter, showStandin, isNor }: PaintingProps) {
+export default function Painting({ isElementActive, counter }: PaintingProps) {
     const parentRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [nodeName, setNodeName] = useState<NodeNameType | null>(null);
@@ -29,8 +26,8 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
     const [edgesWithConfig, setEdgesWithConfig] = useState<Record<EdgeNameType, EdgeWithConfig>>();
 
     const gridSize = useMemo(() => ({
-        col: 4,
-        row: 11
+        col: 7,
+        row: 7,
     }), []);
 
     const handleNodeClick = (nodeName: NodeNameType, x: number, y: number) => {
@@ -68,16 +65,11 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
     }, [gridSize]);
 
     useEffect(() => {
-        if (isNor) {
-            setNodes(getNodesNor(cellWidth, cellHeight));
-            setEdgesWithConfig(getEdgesWithConfigNor(cellWidth, cellHeight));
-        } else {
-            const nodes = getNodes(cellWidth, cellHeight);
-            setNodes(nodes);
-            const edgesWithConfig = getEdgesWithConfig(cellWidth, cellHeight);
-            setEdgesWithConfig(edgesWithConfig);
-        }
-    }, [cellHeight, cellWidth, isNor]);
+        const nodes = getNodes(cellWidth, cellHeight);
+        setNodes(nodes);
+        const edgesWithConfig = getEdgesWithConfig(cellWidth, cellHeight);
+        setEdgesWithConfig(edgesWithConfig);
+    }, [cellHeight, cellWidth]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -91,35 +83,28 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw the grid
-        /* for (let col = 0; col < gridSize.col; col++) {
+        for (let col = 0; col < gridSize.col; col++) {
             for (let row = 0; row < gridSize.row; row++) {
-                context.strokeStyle = 'black';
+                context.strokeStyle = 'red';
                 context.strokeRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
             }
-        } */
+        }
+        context.strokeStyle = 'black';
 
         // Draw nodes
         Object.entries(nodes).forEach(([key, node]) => {
             const isActive = isElementActive(key as NodeNameType);
-            if (!showStandin && key === 'Standin') return;
-            if (showStandin && key === 'Tools') return;
-            if (!showStandin && key === 'MetaInternal') return;
-            if ((showStandin || isNor) && key === 'MetaInternal') return;
             const color = isActive ? 'yellow' : 'black';
-            node.draw(context, color, key as NodeNameType, showStandin);
+            node.draw(context, color, key as NodeNameType);
         });
 
         Object.entries(nodes).forEach(([key, node]) => {
-            if (!showStandin && key === 'Standin') return;
-            if (showStandin && key === 'Tools') return;
-            if (!showStandin && key === 'MetaInternal') return;
-            if (showStandin && key === 'MetaInternal') return;
-            node.drawText(context, key, showStandin, isNor);
+            node.drawText(context, key, counter);
         });
 
 
         // Draw edges
-        const edgeheadQueue: { start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
+        const edgeheadQueue: { key: EdgeNameType, start: Point; end: Point; color: string; isCurvy: boolean; control?: Point }[] = [];
 
         const bar = () => {
             return false;
@@ -130,21 +115,9 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             const isActive = isElementActive(key);
             const color = isActive ? 'yellow' : 'black';
 
-            let shouldDraw = true;
-            if (!showStandin && key.includes('Standin')) {
-                shouldDraw = false;
-            }
-            if (showStandin && key.includes('Tools')) {
-                shouldDraw = false;
-            }
-            if (!showStandin && key.includes('MetaInternal')) {
-                shouldDraw = false;
-            }
-            if (!showStandin && (key === 'AI_Data' || key === 'Data_AI')) {
-                shouldDraw = false;
-            }
 
-            if (!isReverseActive && shouldDraw) {
+            if ((isActive && !isReverseActive) || true) {
+
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
                         context,
@@ -154,12 +127,12 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
                     );
                     if (isActive) {
                         const controlPoint = Edge.resolvePoint(edgeWithConfig.config.controlPoint, nodes);
-                        edgeheadQueue.push({ start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: true, control: controlPoint });
+                        edgeheadQueue.push({ key, start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: true, control: controlPoint });
                     }
                 } else {
                     edgeWithConfig.edge.draw(context, color);
                     if (isActive) {
-                        edgeheadQueue.push({ start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: false });
+                        edgeheadQueue.push({ key, start: edgeWithConfig.edge.startPoint, end: edgeWithConfig.edge.endPoint, color, isCurvy: false });
                     }
                 }
             }
@@ -171,13 +144,13 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             }
         };
 
-        const key = 'AI_Tools';
+        const key = 'Tools_Strategies';
         const genesisEdgeWithConfig = edgesWithConfig[key];
         if (genesisEdgeWithConfig && genesisEdgeWithConfig.config) {
             genesisEdgeWithConfig.config.drawInOrder(foo, key, genesisEdgeWithConfig);
         }
 
-        edgeheadQueue.forEach(({ start, end, color, isCurvy, control }) => {
+        edgeheadQueue.forEach(({ key, start, end, color, isCurvy, control }) => {
             if (isCurvy && control) {
                 Edge.prototype.drawCurvyEdgehead(context, start, control, end, color);
             } else {
@@ -185,7 +158,7 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
             }
         });
 
-    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, showStandin, isNor]);
+    }, [edgesWithConfig, cellHeight, cellWidth, gridSize, nodes, isElementActive, counter]);
 
 
     return (
@@ -208,7 +181,6 @@ export default function Painting({ isElementActive, counter, showStandin, isNor 
                                 handleNodeClickHelper={(nodeName) =>
                                     handleNodeClick(nodeName as NodeNameType, node.cell.col * cellWidth, node.cell.row * cellHeight)
                                 }
-                                showStandin={showStandin}
                             />
                         );
                     })}

@@ -2,12 +2,12 @@ import { NodeNameType } from '../classes';
 
 
 export const nodeDescriptions: Record<NodeNameType, string> = {
-    AI: 'Built around a powerful, reflective GPT-style LLM, such as OpenAI\'s o3, the AI is pre-configured to use its parametric capabilities to collaborate with Humans and Tools for drug discovery focused on a specified disease. By leveraging OpenAI\'s structured-outputs feature, the AI can directly generate Candidates in the formats required by respective Tools.',
+    AI: 'Built around a powerful, reflective GPT-style LLM, such as OpenAI\'s o3, the AI is pre-configured to use its parametric capabilities to collaborate with Humans and Webs for drug discovery focused on a specified disease. By leveraging OpenAI\'s structured-outputs feature, the AI can directly generate Candidates in the formats required by respective Webs.',
     Humans: 'Humans interact with the process via a web interface. A Humans in the loop will typically be an expert on the target disease.',
-    Tools: 'Tools involve specialized tools that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These tools, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.',
-    Data: 'Data is a file-pool that is shared between Humans, Tools, and the AI.',
-    Meta: 'Meta record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
-    MetaInternal: 'Meta record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
+    Webs: 'Webs involve specialized Webs that support the drug discovery process through molecular docking, molecular dynamics, quantum mechanical free energy calculations, and more. These Webs, often Python-based (e.g., AutoDock Vina, Schrödinger Suite), stress-test the Candidate’s ability to bind to target molecules, usually proteins.',
+    Data: 'Data is a file-pool that is shared between Humans, Webs, and the AI.',
+    Private: 'Private record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
+    PrivateInternal: 'Private record the AI\'s internal state and serves as a detailed log of every step it takes, allowing it to introspect its own behavior.',
     Standin: '',
 };
 
@@ -21,15 +21,63 @@ export const resourceDescriptions: Record<string, string> = {
 };
 
 
-export const pathDescriptions: Record<number, string> = {
-    0: 'Use the buttons below to navigate through a typical process iteration.',
-    1: 'A Human uploads an Anchor and a Target.',
-    2: 'The AI retrieves the Anchor and the Target.',
-    3: 'The AI constructs a Candidate.',
-    4: 'AutoDock Vina retrieves the Candidate and the Target.',
-    5: 'AutoDock Vina simulates the interactions between the Candidate and the Target.',
-    6: 'The AI retrieves the SimulationResults.',
-    7: 'If the results are promising, the AI writes a Paper.',
-    8: 'The Human reads the Paper.',
-    9: 'The Human discusses the Paper with the AI.',
+type Foo = {
+    GraphName: string;
+    NodeText: string;
+    ComputeEngineText: string;
+    CloudStorageText: string;
+    Description: string;
+}
+
+
+export const pathDescriptions: Record<number, Foo> = {
+    0: {
+        GraphName: '',
+        NodeText: 'Node',
+        ComputeEngineText: '',
+        CloudStorageText: '',
+        Description: 'Use the buttons below to navigate through the graph.',
+    },
+    1: {
+        GraphName: 'RemoteGraph',
+        NodeText: 'Implicit Node',
+        ComputeEngineText: 'employmentId',
+        CloudStorageText: '',
+        Description: 'Client writes "employmentId" to ComputeEngine.',
+    },
+    2: {
+        GraphName: 'SuperGraph',
+        NodeText: 'NodeFetchEmployment',
+        ComputeEngineText: '',
+        CloudStorageText: 'employment',
+        Description: 'Node reads "employment" from CloudStorage.',
+    },
+    3: {
+        GraphName: 'SuperGraph',
+        NodeText: 'NodeFetchEmployment',
+        ComputeEngineText: 'employment',
+        CloudStorageText: '',
+        Description: 'Node writes "employment" to ComputeEngine.',
+    },
+    4: {
+        GraphName: 'AlphaGraph',
+        NodeText: 'NodeLoadInputs',
+        ComputeEngineText: 'employment',
+        CloudStorageText: '',
+        Description: 'Node reads "employment" from ComputeEngine.',
+    },
+    5: {
+        GraphName: 'AlphaGraph',
+        NodeText: 'NodeLoadInputs',
+        ComputeEngineText: '',
+        CloudStorageText: 'ligandAnchor, receptor, box',
+        Description: 'Node reads "ligandAnchor", "receptor", and "box" from CloudStorage.',
+    },
+    6: {
+        GraphName: 'AlphaGraph',
+        NodeText: 'NodeLoadInputs',
+        ComputeEngineText: 'ligandAnchor, receptor, box',
+        CloudStorageText: '',
+        Description: 'Node writes "ligandAnchor", "receptor", and "box" to ComputeEngine.',
+    },
 };

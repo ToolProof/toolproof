@@ -1,15 +1,17 @@
-import { nodeDescriptions, pathDescriptions } from './texts/textsEng';
-import { Cell, NodeNameType, EdgeNameType, Node, Edge, GraphElementNameType, EdgeWithConfig } from '@/components/lasagna/classes';
+import { nodeDescriptions } from './texts/textsEng';
+import { Cell, NodeNameType, EdgeNameType, Node, Edge, EdgeWithConfig } from '@/components/lasagna/classes';
 
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
-        AI: new Node(new Cell(2, 5, cellWidth, cellHeight), 'lg', 'code_ai', true, nodeDescriptions['AI']),
-        Humans: new Node(new Cell(2, 8, cellWidth, cellHeight), 'vercel', 'code', true, nodeDescriptions['Humans']),
-        Tools: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code', true, nodeDescriptions['Tools']),
-        Standin: new Node(new Cell(2, 2, cellWidth, cellHeight), 'gcp', 'code_ai', true, nodeDescriptions['Tools']),
-        Data: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data', true, nodeDescriptions['Data']),
-        Meta: new Node(new Cell(1, 5, cellWidth, cellHeight), 'lg', 'data_meta', true, nodeDescriptions['Meta']),
-        MetaInternal: new Node(new Cell(0, 5, cellWidth, cellHeight), 'gcp', 'data_meta', true, nodeDescriptions['MetaInternal']),
+        Tools: new Node(new Cell(1, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Tools']),
+        Strategies: new Node(new Cell(3, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Strategies']),
+        Humans: new Node(new Cell(5, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Humans']),
+        ToolsPrivate: new Node(new Cell(1, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ToolsPrivate']),
+        StrategiesPrivate: new Node(new Cell(3, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['StrategiesPrivate']),
+        HumansPrivate: new Node(new Cell(5, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['HumansPrivate']),
+        Resources: new Node(new Cell(3, 5, cellWidth, cellHeight), 'agnostic', 'data', true, nodeDescriptions['Resources']),
+        ResourcesLeft: new Node(new Cell(1, 5, cellWidth, cellHeight), 'agnostic', 'dummy', true, nodeDescriptions['Resources']),
+        ResourcesRight: new Node(new Cell(5, 5, cellWidth, cellHeight), 'agnostic', 'dummy', true, nodeDescriptions['Resources']),
     } as const;
 }
 
@@ -17,220 +19,176 @@ export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeName
 export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Record<EdgeNameType, EdgeWithConfig> => {
     const nodes = getNodes(cellWidth, cellHeight);
     return {
-        AI_Tools: {
-            edge: new Edge(['AI', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
+        Tools_Strategies: {
+            edge: new Edge(['Tools', 'right'], ['Strategies', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'Strategies_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_AI'
+                next: (bar: () => boolean) => 'Strategies_Tools'
             }
         },
-        Tools_AI: {
-            edge: new Edge(['Tools', 'bottom'], ['AI', 'top'], nodes, cellWidth, cellHeight),
+        Strategies_Tools: {
+            edge: new Edge(['Strategies', 'left'], ['Tools', 'right'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'Tools_Strategies',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Humans_AI'
+                next: (bar: () => boolean) => 'Strategies_Humans'
             }
         },
-        Humans_AI: {
-            edge: new Edge(['Humans', 'top'], ['AI', 'bottom'], nodes, cellWidth, cellHeight),
+        Strategies_Humans: {
+            edge: new Edge(['Strategies', 'right'], ['Humans', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'Humans_Strategies',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'AI_Humans'
+                next: (bar: () => boolean) => 'Humans_Strategies'
             }
         },
-        AI_Humans: {
-            edge: new Edge(['AI', 'bottom'], ['Humans', 'top'], nodes, cellWidth, cellHeight),
+        Humans_Strategies: {
+            edge: new Edge(['Humans', 'left'], ['Strategies', 'right'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: null,
+                reverse: 'Strategies_Humans',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_Humans'
+                next: (bar: () => boolean) => 'Tools_ToolsPrivate'
             }
         },
-        Tools_Humans: {
-            edge: new Edge(['Tools', 'right'], ['Humans', 'right'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
-                reverse: 'Humans_Tools',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Humans_Tools'
-            }
-        },
-        Humans_Tools: {
-            edge: new Edge(['Humans', 'right'], ['Tools', 'right'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
-                reverse: 'Tools_Humans',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Data_AI'
-            }
-        },
-        Data_AI: {
-            edge: new Edge(['Data', 'right'], ['AI', 'left'], nodes, cellWidth, cellHeight),
+        Tools_ToolsPrivate: {
+            edge: new Edge(['Tools', 'bottom'], ['ToolsPrivate', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'AI_Data',
+                reverse: 'ToolsPrivate_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'AI_Data'
+                next: (bar: () => boolean) => 'ToolsPrivate_Tools'
             }
         },
-        AI_Data: {
-            edge: new Edge(['AI', 'left'], ['Data', 'right'], nodes, cellWidth, cellHeight),
+        ToolsPrivate_Tools: {
+            edge: new Edge(['ToolsPrivate', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Data_AI',
+                reverse: 'Tools_ToolsPrivate',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Data_Tools'
+                next: (bar: () => boolean) => 'Strategies_StrategiesPrivate'
             }
         },
-        Data_Tools: {
-            edge: new Edge(['Data', 'top'], ['Tools', 'left'], nodes, cellWidth, cellHeight),
+        Strategies_StrategiesPrivate: {
+            edge: new Edge(['Strategies', 'bottom'], ['StrategiesPrivate', 'top'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'StrategiesPrivate_Strategies',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'StrategiesPrivate_Strategies'
+            }
+        },
+        StrategiesPrivate_Strategies: {
+            edge: new Edge(['StrategiesPrivate', 'top'], ['Strategies', 'bottom'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'Strategies_StrategiesPrivate',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Humans_HumansPrivate'
+            }
+        },
+        Humans_HumansPrivate: {
+            edge: new Edge(['Humans', 'bottom'], ['HumansPrivate', 'top'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'HumansPrivate_Humans',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'HumansPrivate_Humans'
+            }
+        },
+        HumansPrivate_Humans: {
+            edge: new Edge(['HumansPrivate', 'top'], ['Humans', 'bottom'], nodes, cellWidth, cellHeight),
+            config: {
+                controlPoint: null,
+                reverse: 'Humans_HumansPrivate',
+                drawInOrder: (foo, key, edgeWithConfig) => {
+                    foo(key, edgeWithConfig);
+                },
+                next: (bar: () => boolean) => 'Tools_ResourcesLeft'
+            }
+        },
+        Tools_ResourcesLeft: {
+            edge: new Edge(['Tools', 'bottom'], ['ResourcesLeft', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Tools_Data',
+                reverse: 'ResourcesLeft_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_Data'
+                next: (bar: () => boolean) => 'ResourcesLeft_Tools' 
             }
         },
-        Tools_Data: {
-            edge: new Edge(['Tools', 'left'], ['Data', 'top'], nodes, cellWidth, cellHeight),
+        ResourcesLeft_Tools: {
+            edge: new Edge(['ResourcesLeft', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Data_Tools',
+                reverse: 'Tools_ResourcesLeft',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Data_Humans'
+                next: (bar: () => boolean) => 'Strategies_Resources'
             }
         },
-        Data_Humans: {
-            edge: new Edge(['Data', 'bottom'], ['Humans', 'left'], nodes, cellWidth, cellHeight),
+        Strategies_Resources: {
+            edge: new Edge(['Strategies', 'bottom'], ['Resources', 'top'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
-                reverse: 'Humans_Data',
+                controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'left'],
+                reverse: 'Resources_Strategies',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Humans_Data'
+                next: (bar: () => boolean) => 'Resources_Strategies'
             }
         },
-        Humans_Data: {
-            edge: new Edge(['Humans', 'left'], ['Data', 'bottom'], nodes, cellWidth, cellHeight),
+        Resources_Strategies: {
+            edge: new Edge(['Resources', 'top'], ['Strategies', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: [new Cell(0, 7, cellWidth, cellHeight), 'left'],
-                reverse: 'Data_Humans',
+                controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'left'],
+                reverse: 'Strategies_Resources',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Meta_AI'
+                next: (bar: () => boolean) => 'Humans_ResourcesRight'
             }
         },
-        Meta_AI: {
-            edge: new Edge(['Meta', 'center'], ['AI', 'left'], nodes, cellWidth, cellHeight),
+        Humans_ResourcesRight: {
+            edge: new Edge(['Humans', 'bottom'], ['ResourcesRight', 'top'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: null,
-                reverse: 'AI_Meta',
+                controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'left'],
+                reverse: 'ResourcesRight_Humans',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'AI_Meta'
+                next: (bar: () => boolean) => 'ResourcesRight_Humans'
             }
         },
-        AI_Meta: {
-            edge: new Edge(['AI', 'left'], ['Meta', 'center'], nodes, cellWidth, cellHeight),
+        ResourcesRight_Humans: {
+            edge: new Edge(['ResourcesRight', 'top'], ['Humans', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
-                controlPoint: null,
-                reverse: 'Meta_AI',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'AI_Standin'
-            }
-        },
-        AI_Standin: {
-            edge: new Edge(['AI', 'top'], ['Standin', 'bottom'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: null,
-                reverse: 'Standin_AI',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Standin_AI'
-            }
-        },
-        Standin_AI: {
-            edge: new Edge(['Standin', 'bottom'], ['AI', 'top'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: null,
-                reverse: 'AI_Standin',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Standin_Humans'
-            }
-        },
-        Standin_Humans: {
-            edge: new Edge(['Standin', 'right'], ['Humans', 'right'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
-                reverse: 'Humans_Standin',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Humans_Standin'
-            }
-        },
-        Humans_Standin: {
-            edge: new Edge(['Humans', 'right'], ['Standin', 'right'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: [new Cell(4, 5, cellWidth, cellHeight), 'left'],
-                reverse: 'Standin_Humans',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Data_Standin'
-            }
-        },
-        Data_Standin: {
-            edge: new Edge(['Data', 'top'], ['Standin', 'left'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Standin_Data',
-                drawInOrder: (foo, key, edgeWithConfig) => {
-                    foo(key, edgeWithConfig);
-                },
-                next: (bar: () => boolean) => 'Standin_Data'
-            }
-        },
-        Standin_Data: {
-            edge: new Edge(['Standin', 'left'], ['Data', 'top'], nodes, cellWidth, cellHeight),
-            config: {
-                controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Data_Standin',
+                controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'left'],
+                reverse: 'Humans_ResourcesRight',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -240,38 +198,8 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
     }
 }
 
-/* export const validTransitions: Record<GraphElementNameType, GraphElementNameType[]> = {
-    AI: ['AI_Tools', 'AI_Humans', 'AI_Data'],
-    Tools: ['Tools_AI', 'Tools_Humans', 'Tools_Data'],
-    Humans: ['Humans_AI', 'Humans_Tools', 'Humans_Data'],
-    Data: ['Data_AI', 'Data_Tools', 'Data_Humans'],
-    AI_Tools: ['Tools'],
-    Tools_AI: ['AI'],
-    AI_Humans: ['Humans'],
-    Humans_AI: ['AI'],
-    Tools_Humans: ['Humans'],
-    Humans_Tools: ['Tools'],
-    Tools_Data: ['Data'],
-    Data_Tools: ['Tools'],
-    AI_Data: ['Data'],
-    Data_AI: ['AI'],
-    Humans_Data: ['Data'],
-    Data_Humans: ['Humans'],
-}; */
 
-
-export const path: Array<[GraphElementNameType[], string]> = [
-    [[], pathDescriptions[0]],
-    [['Humans', 'Humans_Data', 'Data'], pathDescriptions[1]],
-    [['Data', 'Meta', 'AI', 'Meta_AI'], pathDescriptions[2]],
-    [['AI', 'Meta', 'Data', 'AI_Meta'], pathDescriptions[3]],
-    [['Data', 'Data_Tools', 'Tools', 'Data_Standin', 'Standin'], pathDescriptions[4]],
-    [['Tools', 'Tools_Data', 'Data', 'Standin_Data', 'Standin'], pathDescriptions[5]],
-    [['Data', 'Meta', 'AI', 'Meta_AI'], pathDescriptions[6]],
-    [['AI', 'Meta', 'Data', 'AI_Meta'], pathDescriptions[7]],
-    [['Data', 'Data_Humans', 'Humans'], pathDescriptions[8]],
-    [['Humans', 'Humans_AI', 'AI', 'AI_Humans'], pathDescriptions[9]],
-];
+export const path = [];
 
 
 

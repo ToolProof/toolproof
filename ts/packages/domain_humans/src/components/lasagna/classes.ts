@@ -1,4 +1,4 @@
-
+import { pathDescriptions } from './texts/textsEng';
 
 export class Point {
     constructor(public x: number, public y: number) { }
@@ -77,47 +77,45 @@ export class Cell {
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type NodeNameType =
-    | 'AI'
-    | 'Humans'
     | 'Tools'
-    | 'Standin'
-    | 'Data'
-    | 'Meta'
-    | 'MetaInternal'
+    | 'ToolsPrivate'
+    | 'Strategies'
+    | 'StrategiesPrivate'
+    | 'Humans'
+    | 'HumansPrivate'
+    | 'Resources'
+    | 'ResourcesLeft'
+    | 'ResourcesRight'
 
 
 export type EdgeNameType =
-    | 'AI_Tools'
-    | 'Tools_AI'
-    | 'AI_Standin'
-    | 'Standin_AI'
-    | 'AI_Humans'
-    | 'Humans_AI'
-    | 'Tools_Humans'
-    | 'Humans_Tools'
-    | 'Standin_Humans'
-    | 'Humans_Standin'
-    | 'Tools_Data'
-    | 'Data_Tools'
-    | 'Standin_Data'
-    | 'Data_Standin'
-    | 'AI_Data'
-    | 'Data_AI'
-    | 'Humans_Data'
-    | 'Data_Humans'
-    | 'Meta_AI'
-    | 'AI_Meta'
+    | 'Tools_Strategies'
+    | 'Strategies_Tools'
+    | 'Strategies_Humans'
+    | 'Humans_Strategies'
+    | 'Tools_ResourcesLeft'
+    | 'ResourcesLeft_Tools'
+    | 'Strategies_Resources'
+    | 'Resources_Strategies'
+    | 'Humans_ResourcesRight'
+    | 'ResourcesRight_Humans'
+    | 'Tools_ToolsPrivate'
+    | 'ToolsPrivate_Tools'
+    | 'Strategies_StrategiesPrivate'
+    | 'StrategiesPrivate_Strategies'
+    | 'Humans_HumansPrivate'
+    | 'HumansPrivate_Humans'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
 
 
-export type Environment = 'lg' | 'vercel' | 'gcp';
-export type Nature = 'code' | 'code_ai' | 'data' | 'data_meta' | 'dummy';
+export type Environment = 'agnostic' | 'lgp' | 'vercel' | 'gcp';
+export type Nature = 'code' | 'data' | 'data_Private' | 'dummy';
 
 
 export class GraphElement {
-    draw(context: CanvasRenderingContext2D, color: string, key?: GraphElementNameType, helperSwitch?: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, key?: GraphElementNameType) {
         // Placeholder method to be overridden by subclasses
         console.log('Drawing a graph element');
     }
@@ -137,21 +135,17 @@ export class Node extends GraphElement {
 
     getFillColor(key: GraphElementNameType): string {
         let color: string;
-        if (this.environment === 'lg') {
-            color = '255, 0, 0'; // red
-        } else if (this.environment === 'vercel') {
-            color = '144, 238, 144'; // lightgreen
-        } else if (this.environment === 'gcp') {
-            color = '173, 216, 230'; // lightblue
+        if (this.environment === 'agnostic') {
+            color = '0, 255, 0';
         } else {
             color = '0, 0, 0'; // black
         }
 
-        const alpha = key === 'MetaInternal' ? 0.1 : 1.0;
+        const alpha = false ? 0.3 : 1.0;
         return `rgba(${color}, ${alpha})`;
     }
 
-    fill(context: CanvasRenderingContext2D, key: NodeNameType, showStandin: boolean) {
+    fill(context: CanvasRenderingContext2D, key: NodeNameType) {
         if (!context) return;
 
         const x = this.cell.col * this.cell.width;
@@ -160,50 +154,35 @@ export class Node extends GraphElement {
 
         context.fillStyle = this.getFillColor(key);
 
-        if (this.nature === 'data') {
+        if (this.nature === 'code') {
             context.beginPath();
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
             context.fill();
-        } else if (this.nature === 'data_meta') {
-            if (key === 'Meta') {
-                // Smaller centered ellipse
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + smallerWidth / 2; // Left-aligned
-                const centeredY = y + this.cell.height / 2;
-                context.beginPath();
-                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
-                context.fill();
-            } else if (key === 'MetaInternal') {
-                // Smaller centered ellipse
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + this.cell.width - smallerWidth / 2; // Right-aligned
-                const centeredY = y + this.cell.height / 2;
-                context.beginPath();
-                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
-                context.fill();
-            }
-        } else if ((this.nature === 'code_ai')) {
-            context.beginPath();
-            context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
-            context.lineTo(x + this.cell.width + this.cell.width / 6, y + this.cell.height / 2);
-            context.lineTo(x + this.cell.width / 2, y + this.cell.height + this.cell.height / 6);
-            context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
-            context.closePath();
-            context.fill();
-        } else if (this.nature === 'code') {
-            context.fillRect(x, y, this.cell.width, this.cell.height);
+        } else if (this.nature === 'data_Private') {
+            // Larger centered rectangle
+            const scaleFactor = 1.5; // Increase size by 1.5x
+            const rectWidth = (this.cell.width / 3) * scaleFactor;
+            const rectHeight = (this.cell.height / 3) * scaleFactor;
+            const centeredX = x + (this.cell.width - rectWidth) / 2;
+            const centeredY = y + (this.cell.height - rectHeight) / 2;
+            context.fillRect(centeredX, centeredY, rectWidth, rectHeight);
+        } else if (this.nature === 'data') {
+            // Combine the current cell and the two preceding and succeeding cells into one large rectangle
+            const totalWidth = this.cell.width * 5; // Current cell + 2 preceding + 2 succeeding
+            const startX = x - 2 * this.cell.width; // Start from the leftmost preceding cell
+
+            // Fill one large rectangle
+            context.fillRect(startX, y, totalWidth, this.cell.height);
         }
     }
 
-    draw(context: CanvasRenderingContext2D, color: string, key: NodeNameType, showStandin: boolean) {
+    draw(context: CanvasRenderingContext2D, color: string, key: NodeNameType) {
         if (!context) return;
         /* if (key.includes('Dummy')) {
             return null;
         } */
 
-        this.fill(context, key, showStandin);
+        this.fill(context, key);
 
         const { col, row } = this.cell;
         const x = col * this.cell.width;
@@ -215,103 +194,68 @@ export class Node extends GraphElement {
 
         context.beginPath();
 
-        if (this.nature === 'data') {
+        if (this.nature === 'code') {
             // Ellipse stroke
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
-        } else if (this.nature === 'data_meta') {
-            if (key === 'Meta') {
-                // Smaller centered ellipse stroke
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + smallerWidth / 2; // Left-aligned
-                const centeredY = y + this.cell.height / 2;
-                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
-            } else if (key === 'MetaInternal') {
-                // Smaller centered ellipse stroke
-                const smallerWidth = this.cell.width / 2;
-                const smallerHeight = this.cell.height / 1.5;
-                const centeredX = x + this.cell.width - smallerWidth / 2; // Right-aligned
-                const centeredY = y + this.cell.height / 2;
-                context.ellipse(centeredX, centeredY, smallerWidth / 2, smallerHeight / 2, 0, 0, 2 * Math.PI);
+        } else if (this.nature === 'data_Private') {
+            // Larger centered rectangle stroke
+            const scaleFactor = 1.5; // Increase size by 1.5x
+            const rectWidth = (this.cell.width / 3) * scaleFactor;
+            const rectHeight = (this.cell.height / 3) * scaleFactor;
+            const centeredX = x + (this.cell.width - rectWidth) / 2;
+            const centeredY = y + (this.cell.height - rectHeight) / 2;
+            context.rect(centeredX, centeredY, rectWidth, rectHeight);
+        } else if (this.nature === 'data') {
+            // Combine the current cell and the two preceding and succeeding cells into one large rectangle
+            const totalWidth = this.cell.width * 5; // Current cell + 2 preceding + 2 succeeding
+            const startX = x - 2 * this.cell.width; // Start from the leftmost preceding cell
 
-                context.lineWidth = 1;
-                context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-            }
-        } else if ((this.nature === 'code_ai')) {
-            // Diamond stroke
-            context.moveTo(x + this.cell.width / 2, y - this.cell.height / 6);
-            context.lineTo(x + this.cell.width + this.cell.width / 6, y + this.cell.height / 2);
-            context.lineTo(x + this.cell.width / 2, y + this.cell.height + this.cell.height / 6);
-            context.lineTo(x - this.cell.width / 6, y + this.cell.height / 2);
-            context.closePath();
-        } else if (this.nature === 'code') {
-            // Full cell rectangle stroke
-            context.rect(x, y, this.cell.width, this.cell.height);
+            // Draw one large rectangle
+            context.rect(startX, y, totalWidth, this.cell.height);
         }
 
         context.stroke();
     }
 
-    drawText(context: CanvasRenderingContext2D, key: string, showStandin: boolean, isNor: boolean) {
+    drawText(context: CanvasRenderingContext2D, key: string, counter: number) {
         if (!context) return;
-        /* if (key === 'MetaInternal') {
-            return null;
-        } */
+        if (key === 'ResourcesLeft' || key === 'ResourcesRight') return;
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
-        context.font = '14px Arial';
+        context.font = '12px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
         let displayText = key;
-        if (key === 'Standin') {
-            displayText = 'Tools';
-        } else if (key === 'MetaInternal') {
-            if (isNor) {
-                displayText = '';
-            } else {
-                displayText = 'Meta';
-            }
+        if (key === 'ToolsPrivate' || key === 'StrategiesPrivate' || key === 'HumansPrivate') {
+            displayText = 'Private';
+        } else if (key === 'Resources') {
+            displayText = 'Shared';
         }
-        /* if (displayText === 'AI') {
-            displayText = 'OpenAI o3';
-        } else if (displayText === 'Tools') {
-            displayText = false ? 'AutoDock' : 'Schrödinger';
-        } */
 
-        if (key === 'Meta') {
-            context.font = '12px Arial';
-            context.fillText(displayText, x + this.cell.width / 4, y + this.cell.height / 2);
-        } else if (key === 'MetaInternal') {
-            context.font = '12px Arial';
-            context.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            context.fillText(displayText, x + this.cell.width / 1.3, y + this.cell.height / 2);
-        } else {
-            context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2 - 4);
-        }
+        context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
+
 
         // return;
+        // console.log('counter', counter);
 
         let subText = '';
-        if (this.nature === 'code_ai' && this.environment === 'lg') {
-            subText = 'LangGraph Platform';
-        } else if (this.nature === 'code_ai' && this.environment === 'gcp') {
-            subText = 'GCP Cloud Run';
-        } else if (this.nature === 'code' && this.environment === 'vercel') {
-            subText = 'Vercel';
-        } else if (this.nature === 'code' && this.environment === 'gcp') {
-            subText = 'GCP Cloud Run';
-        } else if (this.nature === 'data' && this.environment === 'gcp') {
-            subText = 'GCP Cloud Storage';
-        } else if (this.nature === 'data' && this.environment === 'lg') {
-            subText = 'LangGraph Platform';
+        const pathDescription = pathDescriptions[counter];
+        if (key === 'Node') {
+            subText = '';
+        } else if (key === 'ComputeEngine') {
+            subText = pathDescription.ComputeEngineText;
+        } else if (key === 'CloudStorage') {
+            subText = pathDescription.CloudStorageText;
+        } else if (key === 'Web') {
+            subText = '';
         }
 
         if (subText) {
-            context.font = '11px Arial';
-            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 12);
+            context.font = '9px Arial';
+            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 14);
         }
     }
 
@@ -352,32 +296,21 @@ export class Edge extends GraphElement {
 
         function resolveDiamondPoint(node: Node, diamondKey: DiamondPointType): Point {
             const point = node.cell.getOuterDiamond()[diamondKey];
-            if (node.nature === 'data') {
+            if (node.nature === 'code') {
                 if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) }; // ATTENTION
                 } else if (diamondKey === 'bottom') {
                     return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
                 }
-            } else if (node.nature === 'code_ai') {
+            } else if (node.nature === 'data_Private') {
                 if (diamondKey === 'left') {
-                    return { x: point.x - (Edge.cellWidth / 6), y: point.y };
+                    return { x: point.x + (Edge.cellWidth / 4), y: point.y };
                 } else if (diamondKey === 'right') {
-                    return { x: point.x + (Edge.cellWidth / 6), y: point.y };
+                    return { x: point.x - (Edge.cellWidth / 4), y: point.y };
                 } else if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 4) };
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
-                }
-            } else if (node.nature === 'dummy') {
-                const smallerWidth = Edge.cellWidth / 2;
-                if (diamondKey === 'left') {
-                    return { x: point.x + (smallerWidth / 2), y: point.y };
-                } else if (diamondKey === 'right') {
-                    return { x: point.x - (smallerWidth / 2), y: point.y };
-                } else if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
-                } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 4) };
                 }
             }
             return point;

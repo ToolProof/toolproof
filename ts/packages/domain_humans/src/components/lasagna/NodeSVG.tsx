@@ -5,108 +5,80 @@ interface NodeSVGProps {
     node: Node;
     color: string;
     handleNodeClickHelper: (nodeName: NodeNameType) => void;
-    showStandin: boolean;
 }
 
-const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClickHelper, showStandin }) => {
+const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClickHelper }) => {
     const { col, row, width, height } = node.cell;
     const x = col * width;
     const y = row * height;
 
-    // Calculate smaller size for 'dummy' nodes
-    const shouldBeSmall = node.nature === 'data_meta';
-    const smallWidth = width / 2;
-    const smallHeight = height / 1.5;
-    const smallX = x + (width - smallWidth) / 2;
-    const smallY = y + (height - smallHeight) / 2;
+    // Calculate smaller size for 'data_Private' nodes
+    const scaleFactor = 1.5; // Increase size by 1.5x
+    const smallWidth = (width / 3) * scaleFactor; // Corresponds to rectWidth
+    const smallHeight = (height / 3) * scaleFactor; // Corresponds to rectHeight
+    const smallX = x + (width - smallWidth) / 2; // Centered horizontally
+    const smallY = y + (height - smallHeight) / 2; // Centered vertically
 
     const handleClick = () => {
+        return;
         handleNodeClickHelper(nodeName);
     };
 
-    /* if (shouldBeSmall) {
-        return null;
-    } */
-
-    if (nodeName.includes('Dummy')) {
+    if (nodeName === 'ResourcesLeft' || nodeName === 'ResourcesRight') {
         return null;
     }
 
-    if (!showStandin && nodeName === 'Standin') return;
-    if (showStandin && nodeName === 'Tools') return;
-    if (!showStandin && nodeName === 'Meta') return;
-    if (showStandin && nodeName === 'MetaInternal') return;
+    const strokeColor = 'transparent'; // Default stroke color
 
     return (
         <>
-            {node.nature === 'data' ? (
+            {node.nature === 'code' ? (
                 <ellipse
                     cx={x + width / 2}
                     cy={y + height / 2}
                     rx={width / 2}
                     ry={height / 2 + 10}
                     fill={color}
-                    stroke="transparent"
+                    stroke={strokeColor}
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
-            ) : node.nature === 'data_meta' && nodeName === 'Meta' ? (
-                <ellipse
-                    cx={x + smallWidth / 2} // Left-aligned
-                    cy={y + height / 2}
-                    rx={smallWidth / 2}
-                    ry={smallHeight / 2}
+            ) : node.nature === 'data_Private' ? (
+                <rect
+                    x={smallX} // Centered horizontally
+                    y={smallY} // Centered vertically
+                    width={smallWidth} // Smaller width
+                    height={smallHeight} // Smaller height
                     fill={color}
-                    stroke="transparent"
-                    onClick={handleClick}
-                    pointerEvents="visible"
-                />
-            ) : node.nature === 'data_meta' && nodeName === 'MetaInternal' ? (
-                <ellipse
-                    cx={x + width - smallWidth / 2} // Right-aligned
-                    cy={y + height / 2}
-                    rx={smallWidth / 2}
-                    ry={smallHeight / 2}
-                    fill={color}
-                    stroke="transparent"
-                    onClick={handleClick}
-                    pointerEvents="visible"
-                />
-            ) : node.nature === 'code_ai' ? (
-                <polygon
-                    points={`${x + width / 2},${y - height / 6} ${x + width + width / 6},${y + height / 2} ${x + width / 2},${y + height + height / 6} ${x - width / 6},${y + height / 2}`}
-                    fill={color}
-                    stroke="transparent"
+                    stroke={strokeColor}
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
             ) : (
                 <rect
-                    x={shouldBeSmall ? smallX : x}
-                    y={shouldBeSmall ? smallY : y}
-                    width={shouldBeSmall ? smallWidth : width}
-                    height={shouldBeSmall ? smallHeight : height}
+                    x={x - 2 * width} // Start from the leftmost preceding cell
+                    y={y} // Keep the same vertical position
+                    width={width * 5} // Current cell + 2 preceding + 2 succeeding
+                    height={height} // Keep the same height
                     fill={color}
-                    stroke="transparent"
+                    stroke={strokeColor}
                     onClick={handleClick}
                     pointerEvents="visible"
                 />
             )}
 
             {/* Ensure text does not interfere with clickability */}
-            {!shouldBeSmall && (
-                <text
-                    x={x + width / 2}
-                    y={y + height / 2}
-                    fontSize="16px"
-                    textAnchor="middle"
-                    alignmentBaseline="middle"
-                    fill="black"
-                    pointerEvents="none" // Prevents text from intercepting clicks
-                >
-                    {/* {nodeName} */}
-                </text>
-            )}
+            <text
+                x={x + width / 2}
+                y={y + height / 2}
+                fontSize="16px"
+                textAnchor="middle"
+                alignmentBaseline="middle"
+                fill="black"
+                pointerEvents="none" // Prevents text from intercepting clicks
+            >
+                {/* {nodeName} */}
+            </text>
         </>
     );
 };
