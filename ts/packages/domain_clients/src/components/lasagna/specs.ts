@@ -1,194 +1,195 @@
 import { nodeDescriptions, pathDescriptions } from './texts/textsEng';
 import { Cell, NodeNameType, EdgeNameType, Node, Edge, EdgeWithConfig, GraphElementNameType } from '@/components/lasagna/classes';
 
+
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
-        Tools: new Node(new Cell(1, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Tools']),
-        Graphs: new Node(new Cell(3, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Graphs']),
-        Clients: new Node(new Cell(5, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Clients']),
-        ToolsPrivate: new Node(new Cell(1, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ToolsPrivate']),
-        GraphsPrivate: new Node(new Cell(3, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['GraphsPrivate']),
-        ClientsPrivate: new Node(new Cell(5, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ClientsPrivate']),
+        Tool: new Node(new Cell(1, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Tool']),
+        Graph: new Node(new Cell(3, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Graph']),
+        Client: new Node(new Cell(5, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Client']),
+        ToolPrivate: new Node(new Cell(1, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ToolPrivate']),
+        GraphPrivate: new Node(new Cell(3, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['GraphPrivate']),
+        ClientPrivate: new Node(new Cell(5, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ClientPrivate']),
         Resources: new Node(new Cell(3, 5, cellWidth, cellHeight), 'agnostic', 'data', true, nodeDescriptions['Resources']),
         ResourcesLeft: new Node(new Cell(1, 5, cellWidth, cellHeight), 'agnostic', 'dummy', true, nodeDescriptions['Resources']),
         ResourcesRight: new Node(new Cell(5, 5, cellWidth, cellHeight), 'agnostic', 'dummy', true, nodeDescriptions['Resources']),
     } as const;
 }
 
-// ATTENTION: invoke/invoke edges and read/write edges
+
 export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Record<EdgeNameType, EdgeWithConfig> => {
     const nodes = getNodes(cellWidth, cellHeight);
     return {
-        Tools_Graphs: {
-            edge: new Edge(['Tools', 'right'], ['Graphs', 'left'], nodes, cellWidth, cellHeight),
+        Tool_Graph: {
+            edge: new Edge(['Tool', 'right'], ['Graph', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Graphs_Tools',
+                reverse: 'Graph_Tool',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Graphs_Tools'
+                next: (bar: () => boolean) => 'Graph_Tool'
             }
         },
-        Graphs_Tools: {
-            edge: new Edge(['Graphs', 'left'], ['Tools', 'right'], nodes, cellWidth, cellHeight),
+        Graph_Tool: {
+            edge: new Edge(['Graph', 'left'], ['Tool', 'right'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Tools_Graphs',
+                reverse: 'Tool_Graph',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Graphs_Clients'
+                next: (bar: () => boolean) => 'Graph_Client'
             }
         },
-        Graphs_Clients: {
-            edge: new Edge(['Graphs', 'right'], ['Clients', 'left'], nodes, cellWidth, cellHeight),
+        Graph_Client: {
+            edge: new Edge(['Graph', 'right'], ['Client', 'left'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Clients_Graphs',
+                reverse: 'Client_Graph',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Clients_Graphs'
+                next: (bar: () => boolean) => 'Client_Graph'
             }
         },
-        Clients_Graphs: {
-            edge: new Edge(['Clients', 'left'], ['Graphs', 'right'], nodes, cellWidth, cellHeight),
+        Client_Graph: {
+            edge: new Edge(['Client', 'left'], ['Graph', 'right'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Graphs_Clients',
+                reverse: 'Graph_Client',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_ToolsPrivate'
+                next: (bar: () => boolean) => 'Tool_ToolPrivate'
             }
         },
-        Tools_ToolsPrivate: {
-            edge: new Edge(['Tools', 'bottom'], ['ToolsPrivate', 'top'], nodes, cellWidth, cellHeight),
+        Tool_ToolPrivate: {
+            edge: new Edge(['Tool', 'bottom'], ['ToolPrivate', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'ToolsPrivate_Tools',
+                reverse: 'ToolPrivate_Tool',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'ToolsPrivate_Tools'
+                next: (bar: () => boolean) => 'ToolPrivate_Tool'
             }
         },
-        ToolsPrivate_Tools: {
-            edge: new Edge(['ToolsPrivate', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
+        ToolPrivate_Tool: {
+            edge: new Edge(['ToolPrivate', 'top'], ['Tool', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Tools_ToolsPrivate',
+                reverse: 'Tool_ToolPrivate',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Graphs_GraphsPrivate'
+                next: (bar: () => boolean) => 'Graph_GraphPrivate'
             }
         },
-        Graphs_GraphsPrivate: {
-            edge: new Edge(['Graphs', 'bottom'], ['GraphsPrivate', 'top'], nodes, cellWidth, cellHeight),
+        Graph_GraphPrivate: {
+            edge: new Edge(['Graph', 'bottom'], ['GraphPrivate', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'GraphsPrivate_Graphs',
+                reverse: 'GraphPrivate_Graph',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'GraphsPrivate_Graphs'
+                next: (bar: () => boolean) => 'GraphPrivate_Graph'
             }
         },
-        GraphsPrivate_Graphs: {
-            edge: new Edge(['GraphsPrivate', 'top'], ['Graphs', 'bottom'], nodes, cellWidth, cellHeight),
+        GraphPrivate_Graph: {
+            edge: new Edge(['GraphPrivate', 'top'], ['Graph', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Graphs_GraphsPrivate',
+                reverse: 'Graph_GraphPrivate',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Clients_ClientsPrivate'
+                next: (bar: () => boolean) => 'Client_ClientPrivate'
             }
         },
-        Clients_ClientsPrivate: {
-            edge: new Edge(['Clients', 'bottom'], ['ClientsPrivate', 'top'], nodes, cellWidth, cellHeight),
+        Client_ClientPrivate: {
+            edge: new Edge(['Client', 'bottom'], ['ClientPrivate', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'ClientsPrivate_Clients',
+                reverse: 'ClientPrivate_Client',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'ClientsPrivate_Clients'
+                next: (bar: () => boolean) => 'ClientPrivate_Client'
             }
         },
-        ClientsPrivate_Clients: {
-            edge: new Edge(['ClientsPrivate', 'top'], ['Clients', 'bottom'], nodes, cellWidth, cellHeight),
+        ClientPrivate_Client: {
+            edge: new Edge(['ClientPrivate', 'top'], ['Client', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: null,
-                reverse: 'Clients_ClientsPrivate',
+                reverse: 'Client_ClientPrivate',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_ResourcesLeft'
+                next: (bar: () => boolean) => 'Tool_ResourcesLeft'
             }
         },
-        Tools_ResourcesLeft: {
-            edge: new Edge(['Tools', 'bottom'], ['ResourcesLeft', 'top'], nodes, cellWidth, cellHeight),
+        Tool_ResourcesLeft: {
+            edge: new Edge(['Tool', 'bottom'], ['ResourcesLeft', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'ResourcesLeft_Tools',
+                reverse: 'ResourcesLeft_Tool',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'ResourcesLeft_Tools'
+                next: (bar: () => boolean) => 'ResourcesLeft_Tool'
             }
         },
-        ResourcesLeft_Tools: {
-            edge: new Edge(['ResourcesLeft', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
+        ResourcesLeft_Tool: {
+            edge: new Edge(['ResourcesLeft', 'top'], ['Tool', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Tools_ResourcesLeft',
+                reverse: 'Tool_ResourcesLeft',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Graphs_Resources'
+                next: (bar: () => boolean) => 'Graph_Resources'
             }
         },
-        Graphs_Resources: {
-            edge: new Edge(['Graphs', 'bottom'], ['Resources', 'top'], nodes, cellWidth, cellHeight),
+        Graph_Resources: {
+            edge: new Edge(['Graph', 'bottom'], ['Resources', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Resources_Graphs',
+                reverse: 'Resources_Graph',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Resources_Graphs'
+                next: (bar: () => boolean) => 'Resources_Graph'
             }
         },
-        Resources_Graphs: {
-            edge: new Edge(['Resources', 'top'], ['Graphs', 'bottom'], nodes, cellWidth, cellHeight),
+        Resources_Graph: {
+            edge: new Edge(['Resources', 'top'], ['Graph', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(2, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Graphs_Resources',
+                reverse: 'Graph_Resources',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Clients_ResourcesRight'
+                next: (bar: () => boolean) => 'Client_ResourcesRight'
             }
         },
-        Clients_ResourcesRight: {
-            edge: new Edge(['Clients', 'bottom'], ['ResourcesRight', 'top'], nodes, cellWidth, cellHeight),
+        Client_ResourcesRight: {
+            edge: new Edge(['Client', 'bottom'], ['ResourcesRight', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'ResourcesRight_Clients',
+                reverse: 'ResourcesRight_Client',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'ResourcesRight_Clients'
+                next: (bar: () => boolean) => 'ResourcesRight_Client'
             }
         },
-        ResourcesRight_Clients: {
-            edge: new Edge(['ResourcesRight', 'top'], ['Clients', 'bottom'], nodes, cellWidth, cellHeight),
+        ResourcesRight_Client: {
+            edge: new Edge(['ResourcesRight', 'top'], ['Client', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Clients_ResourcesRight',
+                reverse: 'Client_ResourcesRight',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -201,7 +202,20 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
 
 export const path: Array<[GraphElementNameType[], string]> = [
     [[], pathDescriptions[0].Description],
-    [['Clients_ResourcesRight'], pathDescriptions[1].Description],
+    [['Client_ResourcesRight'], pathDescriptions[1].Description],
+    [['Client_Graph'], pathDescriptions[2].Description],
+    [['Graph_GraphPrivate'], pathDescriptions[3].Description],
+    [['GraphPrivate_Graph'], pathDescriptions[4].Description],
+    [['Resources_Graph'], pathDescriptions[5].Description],
+    [['Resources_Graph'], pathDescriptions[6].Description],
+    [['Graph_GraphPrivate'], pathDescriptions[7].Description],
+    [['GraphPrivate_Graph'], pathDescriptions[8].Description],
+    [['Graph_GraphPrivate'], pathDescriptions[9].Description],
+    [['Graph_Resources'], pathDescriptions[10].Description],
+    [['Graph_Tool'], pathDescriptions[11].Description],
+    [['ResourcesLeft_Tool'], pathDescriptions[12].Description],
+    [['Tool_ToolPrivate', 'ToolPrivate_Tool', 'Tool_Graph'], pathDescriptions[13].Description],
+    [['Tool_ResourcesLeft'], pathDescriptions[14].Description],
 ];
 
 

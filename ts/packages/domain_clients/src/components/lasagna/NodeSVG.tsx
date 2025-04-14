@@ -13,7 +13,7 @@ const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClic
     const y = row * height;
 
     // Calculate smaller size for 'data_Private' nodes
-    const scaleFactor = 1.5; // Increase size by 1.5x
+    const scaleFactor = 2;
     const smallWidth = (width / 3) * scaleFactor; // Corresponds to rectWidth
     const smallHeight = (height / 3) * scaleFactor; // Corresponds to rectHeight
     const smallX = x + (width - smallWidth) / 2; // Centered horizontally

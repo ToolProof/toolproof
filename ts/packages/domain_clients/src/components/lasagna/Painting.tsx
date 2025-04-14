@@ -116,7 +116,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
             const color = isActive ? 'yellow' : 'black';
 
 
-            if (!isReverseActive) {
+            if (!isReverseActive || key === 'Tool_ToolPrivate' || key === 'ToolPrivate_Tool') {
 
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
@@ -144,7 +144,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
             }
         };
 
-        const key = 'Tools_Graphs';
+        const key = 'Tool_Graph';
         const genesisEdgeWithConfig = edgesWithConfig[key];
         if (genesisEdgeWithConfig && genesisEdgeWithConfig.config) {
             genesisEdgeWithConfig.config.drawInOrder(foo, key, genesisEdgeWithConfig);
@@ -198,7 +198,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
                         zIndex: 10,
                         borderRadius: '5px',
                         width: '350px',
-                        height: nodeName === 'Clients' ? '100px' : '250px',
+                        height: nodeName === 'Client' ? '100px' : '250px',
                         overflowY: 'auto',
                     }}
                 >

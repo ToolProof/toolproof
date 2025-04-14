@@ -2,12 +2,12 @@ import { NodeNameType } from '../classes';
 
 
 export const nodeDescriptions: Record<NodeNameType, string> = {
-    Tools: '',
-    Graphs: '',
-    Clients: '',
-    ToolsPrivate: '.',
-    GraphsPrivate: '',
-    ClientsPrivate: '',
+    Tool: '',
+    Graph: '',
+    Client: '',
+    ToolPrivate: '.',
+    GraphPrivate: '',
+    ClientPrivate: '',
     Resources: '',
 };
 
@@ -22,62 +22,102 @@ export const resourceDescriptions: Record<string, string> = {
 
 
 type Foo = {
-    GraphName: string;
-    NodeText: string;
-    ComputeEngineText: string;
-    CloudStorageText: string;
+    ToolText: string;
+    GraphText: string;
+    ClientText: string;
     Description: string;
 }
 
 
 export const pathDescriptions: Record<number, Foo> = {
     0: {
-        GraphName: '',
-        NodeText: 'Node',
-        ComputeEngineText: '',
-        CloudStorageText: '',
-        Description: 'Use the buttons below to navigate through the graph.',
+        ToolText: '',
+        GraphText: '',
+        ClientText: '',
+        Description: 'Use the buttons to navigate.',
     },
     1: {
-        GraphName: 'RemoteGraph',
-        NodeText: 'Implicit Node',
-        ComputeEngineText: 'employmentId',
-        CloudStorageText: '',
-        Description: 'Client writes "employmentId" to ComputeEngine.',
+        ToolText: '',
+        GraphText: '',
+        ClientText: '',
+        Description: 'Client writes employment, anchor, and target to Shared Resourses.',
     },
     2: {
-        GraphName: 'SuperGraph',
-        NodeText: 'NodeFetchEmployment',
-        ComputeEngineText: '',
-        CloudStorageText: 'employment',
-        Description: 'Node reads "employment" from CloudStorage.',
+        ToolText: '',
+        GraphText: 'remoteGraph: nodeImplicit',
+        ClientText: '',
+        Description: 'Client invokes Graph and passes employmentId.',
     },
     3: {
-        GraphName: 'SuperGraph',
-        NodeText: 'NodeFetchEmployment',
-        ComputeEngineText: 'employment',
-        CloudStorageText: '',
-        Description: 'Node writes "employment" to ComputeEngine.',
+        ToolText: '',
+        GraphText: 'remoteGraph: nodeImplicit',
+        ClientText: '',
+        Description: 'Graph writes employmentId to its Private Resources',
     },
     4: {
-        GraphName: 'AlphaGraph',
-        NodeText: 'NodeLoadInputs',
-        ComputeEngineText: 'employment',
-        CloudStorageText: '',
-        Description: 'Node reads "employment" from ComputeEngine.',
+        ToolText: '',
+        GraphText: 'superGraph: nodeFetchEmployment',
+        ClientText: '',
+        Description: 'Graph reads employmentId from its Private Resources',
     },
     5: {
-        GraphName: 'AlphaGraph',
-        NodeText: 'NodeLoadInputs',
-        ComputeEngineText: '',
-        CloudStorageText: 'ligandAnchor, receptor, box',
-        Description: 'Node reads "ligandAnchor", "receptor", and "box" from CloudStorage.',
+        ToolText: '',
+        GraphText: 'superGraph: nodeFetchEmployment',
+        ClientText: '',
+        Description: 'Graph reads employment from Shared Resources.',
     },
     6: {
-        GraphName: 'AlphaGraph',
-        NodeText: 'NodeLoadInputs',
-        ComputeEngineText: 'ligandAnchor, receptor, box',
-        CloudStorageText: '',
-        Description: 'Node writes "ligandAnchor", "receptor", and "box" to ComputeEngine.',
+        ToolText: '',
+        GraphText: 'betaGraph: nodeLoadInputs',
+        ClientText: '',
+        Description: 'Graph reads anchor and target from Shared Resources.',
+    },
+    7: {
+        ToolText: '',
+        GraphText: 'betaGraph: nodeLoadInputs',
+        ClientText: '',
+        Description: 'Graph writes anchor and (chunked) target to its Private Resources.',
+    },
+    8: {
+        ToolText: '',
+        GraphText: 'betaGraph: nodeGenerateCandidate',
+        ClientText: '',
+        Description: 'Graph reads anchor and (chunked) target from its Private Resources.',
+    },
+    9: {
+        ToolText: '',
+        GraphText: 'betaGraph: nodeGenerateCandidate',
+        ClientText: '',
+        Description: 'Graph writes candidate to its Private Resources.',
+    },
+    10: {
+        ToolText: '',
+        GraphText: 'betaGraph: nodeGenerateCandidate',
+        ClientText: '',
+        Description: 'Graph writes candidate to Shared Resources.',
+    },
+    11: {
+        ToolText: 'schrodinger',
+        GraphText: 'betaGraph: nodeInvokeDocking',
+        ClientText: '',
+        Description: 'Graph invokes the Schrodinger Tool and passes candidate and target paths.',
+    },
+    12: {
+        ToolText: 'schrodinger',
+        GraphText: 'betaGraph: nodeInvokeDocking',
+        ClientText: '',
+        Description: 'Schrodinger reads candidate and target from Shared Resources.',
+    },
+    13: {
+        ToolText: 'schrodinger',
+        GraphText: 'betaGraph: nodeInvokeDocking',
+        ClientText: '',
+        Description: 'Schrodinger runs its workflow, using its Private Resources as scratch space and broadcasting its progress meanwhile.',
+    },
+    14: {
+        ToolText: 'schrodinger',
+        GraphText: 'betaGraph: nodeInvokeDocking',
+        ClientText: '',
+        Description: 'Schrodinger writes dockingResults (various files) to Shared Resources.',
     },
 };

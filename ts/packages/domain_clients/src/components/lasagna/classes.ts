@@ -77,34 +77,34 @@ export class Cell {
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type NodeNameType =
-    | 'Tools'
-    | 'ToolsPrivate'
-    | 'Graphs'
-    | 'GraphsPrivate'
-    | 'Clients'
-    | 'ClientsPrivate'
+    | 'Tool'
+    | 'ToolPrivate'
+    | 'Graph'
+    | 'GraphPrivate'
+    | 'Client'
+    | 'ClientPrivate'
     | 'Resources'
     | 'ResourcesLeft'
     | 'ResourcesRight'
 
 
 export type EdgeNameType =
-    | 'Tools_Graphs'
-    | 'Graphs_Tools'
-    | 'Graphs_Clients'
-    | 'Clients_Graphs'
-    | 'Tools_ResourcesLeft'
-    | 'ResourcesLeft_Tools'
-    | 'Graphs_Resources'
-    | 'Resources_Graphs'
-    | 'Clients_ResourcesRight'
-    | 'ResourcesRight_Clients'
-    | 'Tools_ToolsPrivate'
-    | 'ToolsPrivate_Tools'
-    | 'Graphs_GraphsPrivate'
-    | 'GraphsPrivate_Graphs'
-    | 'Clients_ClientsPrivate'
-    | 'ClientsPrivate_Clients'
+    | 'Tool_Graph'
+    | 'Graph_Tool'
+    | 'Graph_Client'
+    | 'Client_Graph'
+    | 'Tool_ResourcesLeft'
+    | 'ResourcesLeft_Tool'
+    | 'Graph_Resources'
+    | 'Resources_Graph'
+    | 'Client_ResourcesRight'
+    | 'ResourcesRight_Client'
+    | 'Tool_ToolPrivate'
+    | 'ToolPrivate_Tool'
+    | 'Graph_GraphPrivate'
+    | 'GraphPrivate_Graph'
+    | 'Client_ClientPrivate'
+    | 'ClientPrivate_Client'
 
 
 export type GraphElementNameType = NodeNameType | EdgeNameType;
@@ -135,14 +135,20 @@ export class Node extends GraphElement {
 
     getFillColor(key: GraphElementNameType): string {
         let color: string;
-        if (this.environment === 'agnostic') {
-            color = '0, 255, 0';
+        if (key.includes('Tool')) {
+            color = 'hsl(0, 100%, 50%)'; // Red
+        } else if (key.includes('Graph')) {
+            color = 'hsl(120, 100%, 50%)'; // Green
+        } else if (key.includes('Client')) {
+            color = 'hsl(240, 100%, 70%)'; // Blue
+        } else if (key.includes('Resources')) {
+            color = 'hsl(0, 0%, 83%)'; // Light gray
         } else {
-            color = '0, 0, 0'; // black
+            throw new Error(`Unknown key: ${key}`);
         }
 
         const alpha = false ? 0.3 : 1.0;
-        return `rgba(${color}, ${alpha})`;
+        return `hsla(${color.slice(4, -1)}, ${alpha})`;
     }
 
     fill(context: CanvasRenderingContext2D, key: NodeNameType) {
@@ -160,7 +166,7 @@ export class Node extends GraphElement {
             context.fill();
         } else if (this.nature === 'data_Private') {
             // Larger centered rectangle
-            const scaleFactor = 1.5; // Increase size by 1.5x
+            const scaleFactor = 2;
             const rectWidth = (this.cell.width / 3) * scaleFactor;
             const rectHeight = (this.cell.height / 3) * scaleFactor;
             const centeredX = x + (this.cell.width - rectWidth) / 2;
@@ -199,7 +205,7 @@ export class Node extends GraphElement {
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
         } else if (this.nature === 'data_Private') {
             // Larger centered rectangle stroke
-            const scaleFactor = 1.5; // Increase size by 1.5x
+            const scaleFactor = 2;
             const rectWidth = (this.cell.width / 3) * scaleFactor;
             const rectHeight = (this.cell.height / 3) * scaleFactor;
             const centeredX = x + (this.cell.width - rectWidth) / 2;
@@ -223,39 +229,33 @@ export class Node extends GraphElement {
 
         const x = this.cell.col * this.cell.width;
         const y = this.cell.row * this.cell.height;
-        context.font = '12px Arial';
+        context.font = '14px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillStyle = 'black';
 
         let displayText = key;
-        if (key === 'ToolsPrivate' || key === 'GraphsPrivate' || key === 'ClientsPrivate') {
-            displayText = 'Private';
+        if (key === 'ToolPrivate' || key === 'GraphPrivate' || key === 'ClientPrivate') {
+            displayText = 'Private Resources';
+            context.font = '12px Arial';
         } else if (key === 'Resources') {
-            displayText = 'Shared';
+            displayText = 'Shared Resources';
         }
 
         context.fillText(displayText, x + this.cell.width / 2, y + this.cell.height / 2);
-
 
         // return;
         // console.log('counter', counter);
 
         let subText = '';
         const pathDescription = pathDescriptions[counter];
-        if (key === 'Node') {
-            subText = '';
-        } else if (key === 'ComputeEngine') {
-            subText = pathDescription.ComputeEngineText;
-        } else if (key === 'CloudStorage') {
-            subText = pathDescription.CloudStorageText;
-        } else if (key === 'Web') {
-            subText = '';
+        if (key === 'Graph') {
+            subText = pathDescription.GraphText;
         }
 
         if (subText) {
             context.font = '9px Arial';
-            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 14);
+            context.fillText(subText, x + this.cell.width / 2, y + this.cell.height / 2 + 24);
         }
     }
 
@@ -304,13 +304,13 @@ export class Edge extends GraphElement {
                 }
             } else if (node.nature === 'data_Private') {
                 if (diamondKey === 'left') {
-                    return { x: point.x + (Edge.cellWidth / 4), y: point.y };
+                    return { x: point.x + (Edge.cellWidth / 6), y: point.y };
                 } else if (diamondKey === 'right') {
-                    return { x: point.x - (Edge.cellWidth / 4), y: point.y };
+                    return { x: point.x - (Edge.cellWidth / 6), y: point.y };
                 } else if (diamondKey === 'top') {
-                    return { x: point.x, y: point.y + (Edge.cellHeight / 4) };
+                    return { x: point.x, y: point.y + (Edge.cellHeight / 6) };
                 } else if (diamondKey === 'bottom') {
-                    return { x: point.x, y: point.y - (Edge.cellHeight / 4) };
+                    return { x: point.x, y: point.y - (Edge.cellHeight / 6) };
                 }
             }
             return point;
