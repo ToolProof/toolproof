@@ -34,7 +34,7 @@ export const pathDescriptions: Record<number, Foo> = {
         ToolText: '',
         GraphText: '',
         ClientText: '',
-        Description: 'Use the buttons to navigate.',
+        Description: 'Use the buttons to navigate. (Disregard the first few steps--we are cheating for now.)',
     },
     1: {
         ToolText: '',
