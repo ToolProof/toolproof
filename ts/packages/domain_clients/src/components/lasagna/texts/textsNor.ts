@@ -3,7 +3,7 @@ import { NodeNameType } from '../classes';
 
 export const nodeDescriptions: Record<NodeNameType, string> = {
     AI: 'Bygget rundt en kraftig, reflekterende GPT-lignende LLM, som OpenAIs o3, er AI-en forhåndskonfigurert til å bruke sine parametriske kapasiteter til å samarbeide med mennesker og verktøy for legemiddelutvikling rettet mot en spesifikk sykdom. Ved å utnytte OpenAIs strukturert-utdata-funksjon kan AI-en direkte generere kandidater i formatene som kreves av de respektive verktøyene.',
-    Client: 'Mennesker samhandler med prosessen via et nettgrensesnitt. Et menneske i loopen vil vanligvis være en ekspert på den aktuelle sykdommen.',
+    Clients: 'Mennesker samhandler med prosessen via et nettgrensesnitt. Et menneske i loopen vil vanligvis være en ekspert på den aktuelle sykdommen.',
     Webs: 'Verktøy innebærer spesialiserte verktøy som støtter legemiddelutviklingsprosessen gjennom molekylær docking, molekylær dynamikk, kvantemekaniske frie energiberegninger og mer. Disse verktøyene, ofte Python-baserte (f.eks. AutoDock Vina, Schrödinger Suite), tester kandidatens evne til å binde seg til målstrukturer, vanligvis proteiner.',
     Data: 'Data er en filmappe som deles mellom mennesker, verktøy og AI-en. Det er her ankre, mål, kandidater mv. lagres og hentes.',
     Private: 'Private registrerer AI-ens interne tilstand og fungerer som en detaljert logg over hvert steg den tar, slik at den kan reflektere over sin egen atferd.',

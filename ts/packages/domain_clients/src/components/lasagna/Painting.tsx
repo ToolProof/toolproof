@@ -1,11 +1,11 @@
-'use client';
+'use Clients';
 import NodeSVG from './NodeSVG';
-import { Point, Node, Edge, GraphElementNameType, NodeNameType, EdgeNameType, EdgeWithConfig } from './classes';
+import { Point, Node, Edge, GraphsElementNameType, NodeNameType, EdgeNameType, EdgeWithConfig } from './classes';
 import { getNodes, getEdgesWithConfig } from './specs';
 import { useState, useRef, useEffect, useMemo } from 'react';
 
 interface PaintingProps {
-    isElementActive: (key: GraphElementNameType) => boolean;
+    isElementActive: (key: GraphsElementNameType) => boolean;
     counter: number;
 }
 
@@ -39,9 +39,9 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
     useEffect(() => {
         const updateDimensions = () => {
             if (parentRef.current && canvasRef.current) {
-                const { clientWidth, clientHeight } = parentRef.current;
-                const newCellWidth = Math.floor(clientWidth / gridSize.col);
-                const newCellHeight = Math.floor(clientHeight / gridSize.row);
+                const { ClientsWidth, ClientsHeight } = parentRef.current;
+                const newCellWidth = Math.floor(ClientsWidth / gridSize.col);
+                const newCellHeight = Math.floor(ClientsHeight / gridSize.row);
 
                 if (newCellWidth !== cellWidthRef.current || newCellHeight !== cellHeightRef.current) {
                     cellWidthRef.current = newCellWidth;
@@ -50,11 +50,11 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
                     setCellHeight(newCellHeight);
 
                     const canvas = canvasRef.current;
-                    canvas.width = clientWidth;
-                    canvas.height = clientHeight;
+                    canvas.width = ClientsWidth;
+                    canvas.height = ClientsHeight;
 
                     // ✅ Update SVG dimensions dynamically
-                    setSvgSize({ width: clientWidth, height: clientHeight });
+                    setSvgSize({ width: ClientsWidth, height: ClientsHeight });
                 }
             }
         };
@@ -116,7 +116,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
             const color = isActive ? 'yellow' : 'black';
 
 
-            if (!isReverseActive || key === 'Tool_ToolPrivate' || key === 'ToolPrivate_Tool') {
+            if (!isReverseActive || key === 'Tools_ToolsPrivate' || key === 'ToolsPrivate_Tools') {
 
                 if (edgeWithConfig.config.controlPoint) {
                     edgeWithConfig.edge.drawCurvy(
@@ -144,7 +144,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
             }
         };
 
-        const key = 'Tool_Graph';
+        const key = 'Tools_Graphs';
         const genesisEdgeWithConfig = edgesWithConfig[key];
         if (genesisEdgeWithConfig && genesisEdgeWithConfig.config) {
             genesisEdgeWithConfig.config.drawInOrder(foo, key, genesisEdgeWithConfig);
@@ -198,7 +198,7 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
                         zIndex: 10,
                         borderRadius: '5px',
                         width: '350px',
-                        height: nodeName === 'Client' ? '100px' : '250px',
+                        height: nodeName === 'Clients' ? '100px' : '250px',
                         overflowY: 'auto',
                     }}
                 >

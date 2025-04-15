@@ -2,12 +2,12 @@ import { NodeNameType } from '../classes';
 
 
 export const nodeDescriptions: Record<NodeNameType, string> = {
-    Tool: '',
-    Graph: '',
-    Client: '',
-    ToolPrivate: '.',
-    GraphPrivate: '',
-    ClientPrivate: '',
+    Tools: '',
+    Graphs: '',
+    Clients: '',
+    ToolsPrivate: '.',
+    GraphsPrivate: '',
+    ClientsPrivate: '',
     Resources: '',
 };
 
@@ -22,102 +22,102 @@ export const resourceDescriptions: Record<string, string> = {
 
 
 type Foo = {
-    ToolText: string;
-    GraphText: string;
-    ClientText: string;
+    ToolsText: string;
+    GraphsText: string;
+    ClientsText: string;
     Description: string;
 }
 
 
 export const pathDescriptions: Record<number, Foo> = {
     0: {
-        ToolText: '',
-        GraphText: '',
-        ClientText: '',
+        ToolsText: '',
+        GraphsText: '',
+        ClientsText: '',
         Description: 'Use the buttons to navigate. (Disregard the first few steps--we are cheating for now.)',
     },
     1: {
-        ToolText: '',
-        GraphText: '',
-        ClientText: '',
-        Description: 'Client writes employment, anchor, and target to Shared Resourses.',
+        ToolsText: '',
+        GraphsText: '',
+        ClientsText: '',
+        Description: 'Clients writes employment, anchor, and target to Shared Resourses.',
     },
     2: {
-        ToolText: '',
-        GraphText: 'remoteGraph: nodeImplicit',
-        ClientText: '',
-        Description: 'Client invokes Graph and passes employmentId.',
+        ToolsText: '',
+        GraphsText: 'remoteGraphs: nodeImplicit',
+        ClientsText: '',
+        Description: 'Clients invokes Graphs and passes employmentId.',
     },
     3: {
-        ToolText: '',
-        GraphText: 'remoteGraph: nodeImplicit',
-        ClientText: '',
-        Description: 'Graph writes employmentId to its Private Resources',
+        ToolsText: '',
+        GraphsText: 'remoteGraphs: nodeImplicit',
+        ClientsText: '',
+        Description: 'Graphs writes employmentId to its Private Resources',
     },
     4: {
-        ToolText: '',
-        GraphText: 'superGraph: nodeFetchEmployment',
-        ClientText: '',
-        Description: 'Graph reads employmentId from its Private Resources',
+        ToolsText: '',
+        GraphsText: 'superGraphs: nodeFetchEmployment',
+        ClientsText: '',
+        Description: 'Graphs reads employmentId from its Private Resources',
     },
     5: {
-        ToolText: '',
-        GraphText: 'superGraph: nodeFetchEmployment',
-        ClientText: '',
-        Description: 'Graph reads employment from Shared Resources.',
+        ToolsText: '',
+        GraphsText: 'superGraphs: nodeFetchEmployment',
+        ClientsText: '',
+        Description: 'Graphs reads employment from Shared Resources.',
     },
     6: {
-        ToolText: '',
-        GraphText: 'betaGraph: nodeLoadInputs',
-        ClientText: '',
-        Description: 'Graph reads anchor and target from Shared Resources.',
+        ToolsText: '',
+        GraphsText: 'betaGraphs: nodeLoadInputs',
+        ClientsText: '',
+        Description: 'Graphs reads anchor and target from Shared Resources.',
     },
     7: {
-        ToolText: '',
-        GraphText: 'betaGraph: nodeLoadInputs',
-        ClientText: '',
-        Description: 'Graph writes anchor and (chunked) target to its Private Resources.',
+        ToolsText: '',
+        GraphsText: 'betaGraphs: nodeLoadInputs',
+        ClientsText: '',
+        Description: 'Graphs writes anchor and (chunked) target to its Private Resources.',
     },
     8: {
-        ToolText: '',
-        GraphText: 'betaGraph: nodeGenerateCandidate',
-        ClientText: '',
-        Description: 'Graph reads anchor and (chunked) target from its Private Resources.',
+        ToolsText: '',
+        GraphsText: 'betaGraphs: nodeGenerateCandidate',
+        ClientsText: '',
+        Description: 'Graphs reads anchor and (chunked) target from its Private Resources.',
     },
     9: {
-        ToolText: '',
-        GraphText: 'betaGraph: nodeGenerateCandidate',
-        ClientText: '',
-        Description: 'Graph writes candidate to its Private Resources.',
+        ToolsText: '',
+        GraphsText: 'betaGraphs: nodeGenerateCandidate',
+        ClientsText: '',
+        Description: 'Graphs writes candidate to its Private Resources.',
     },
     10: {
-        ToolText: '',
-        GraphText: 'betaGraph: nodeGenerateCandidate',
-        ClientText: '',
-        Description: 'Graph writes candidate to Shared Resources.',
+        ToolsText: '',
+        GraphsText: 'betaGraphs: nodeGenerateCandidate',
+        ClientsText: '',
+        Description: 'Graphs writes candidate to Shared Resources.',
     },
     11: {
-        ToolText: 'schrodinger',
-        GraphText: 'betaGraph: nodeInvokeDocking',
-        ClientText: '',
-        Description: 'Graph invokes the Schrodinger Tool and passes candidate and target paths.',
+        ToolsText: 'schrodinger',
+        GraphsText: 'betaGraphs: nodeInvokeDocking',
+        ClientsText: '',
+        Description: 'Graphs invokes the Schrodinger Tools and passes candidate and target paths.',
     },
     12: {
-        ToolText: 'schrodinger',
-        GraphText: 'betaGraph: nodeInvokeDocking',
-        ClientText: '',
+        ToolsText: 'schrodinger',
+        GraphsText: 'betaGraphs: nodeInvokeDocking',
+        ClientsText: '',
         Description: 'Schrodinger reads candidate and target from Shared Resources.',
     },
     13: {
-        ToolText: 'schrodinger',
-        GraphText: 'betaGraph: nodeInvokeDocking',
-        ClientText: '',
+        ToolsText: 'schrodinger',
+        GraphsText: 'betaGraphs: nodeInvokeDocking',
+        ClientsText: '',
         Description: 'Schrodinger runs its workflow, using its Private Resources as scratch space and broadcasting its progress meanwhile.',
     },
     14: {
-        ToolText: 'schrodinger',
-        GraphText: 'betaGraph: nodeInvokeDocking',
-        ClientText: '',
+        ToolsText: 'schrodinger',
+        GraphsText: 'betaGraphs: nodeInvokeDocking',
+        ClientsText: '',
         Description: 'Schrodinger writes dockingResults (various files) to Shared Resources.',
     },
 };

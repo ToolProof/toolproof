@@ -1,6 +1,6 @@
-'use client'
+'use Clients'
 import Painting from '@/components/lasagna/Painting';
-import { GraphElementNameType } from '@/components/lasagna/classes';
+import { GraphsElementNameType } from '@/components/lasagna/classes';
 import { path } from '@/components/lasagna/specs';
 import { useEffect, Dispatch, SetStateAction } from 'react';
 
@@ -17,7 +17,7 @@ export default function Frame({ counter, setCounter, pathDescription, setPathDes
     setPathDescription(path[counter]?.[1] || '');
   }, [counter, setPathDescription]);
 
-  const isElementActive = (key: GraphElementNameType) => {
+  const isElementActive = (key: GraphsElementNameType) => {
     return path[counter]?.[0]?.includes(key) || false;
     // return key === activeElement;
     // return false;

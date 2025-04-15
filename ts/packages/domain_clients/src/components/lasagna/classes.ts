@@ -77,52 +77,58 @@ export class Cell {
 
 // ATTENTION: could be a more powerful type to allow for aliases
 export type NodeNameType =
-    | 'Tool'
-    | 'ToolPrivate'
-    | 'Graph'
-    | 'GraphPrivate'
-    | 'Client'
-    | 'ClientPrivate'
+    | 'Tools'
+    | 'ToolsPrivate'
+    | 'Graphs'
+    | 'GraphsPrivate'
+    | 'Clients'
+    | 'ClientsPrivate'
     | 'Resources'
     | 'ResourcesLeft'
     | 'ResourcesRight'
 
 
-export type EdgeNameType =
-    | 'Tool_Graph'
-    | 'Graph_Tool'
-    | 'Graph_Client'
-    | 'Client_Graph'
-    | 'Tool_ResourcesLeft'
-    | 'ResourcesLeft_Tool'
-    | 'Graph_Resources'
-    | 'Resources_Graph'
-    | 'Client_ResourcesRight'
-    | 'ResourcesRight_Client'
-    | 'Tool_ToolPrivate'
-    | 'ToolPrivate_Tool'
-    | 'Graph_GraphPrivate'
-    | 'GraphPrivate_Graph'
-    | 'Client_ClientPrivate'
-    | 'ClientPrivate_Client'
+export type CodeCodeNameType =
+    | 'Tools_Graphs'
+    | 'Graphs_Tools'
+    | 'Graphs_Clients'
+    | 'Clients_Graphs'
+
+export type CodePrivateNameType =
+    | 'Tools_ToolsPrivate'
+    | 'ToolsPrivate_Tools'
+    | 'Graphs_GraphsPrivate'
+    | 'GraphsPrivate_Graphs'
+    | 'Clients_ClientsPrivate'
+    | 'ClientsPrivate_Clients'
+
+export type CodeSharedNameType =
+    | 'Tools_ResourcesLeft'
+    | 'ResourcesLeft_Tools'
+    | 'Graphs_Resources'
+    | 'Resources_Graphs'
+    | 'Clients_ResourcesRight'
+    | 'ResourcesRight_Clients'
 
 
-export type GraphElementNameType = NodeNameType | EdgeNameType;
+export type EdgeNameType = CodeCodeNameType | CodePrivateNameType | CodeSharedNameType;
+
+export type GraphsElementNameType = NodeNameType | EdgeNameType;
 
 
 export type Environment = 'agnostic' | 'lgp' | 'vercel' | 'gcp';
 export type Nature = 'code' | 'data' | 'data_Private' | 'dummy';
 
 
-export class GraphElement {
-    draw(context: CanvasRenderingContext2D, color: string, key?: GraphElementNameType) {
+export class GraphsElement {
+    draw(context: CanvasRenderingContext2D, color: string, key?: GraphsElementNameType) {
         // Placeholder method to be overridden by subclasses
-        console.log('Drawing a graph element');
+        console.log('Drawing a Graphs element');
     }
 }
 
 
-export class Node extends GraphElement {
+export class Node extends GraphsElement {
     constructor(
         public cell: Cell,
         public environment: Environment,
@@ -133,13 +139,13 @@ export class Node extends GraphElement {
         super();
     }
 
-    getFillColor(key: GraphElementNameType): string {
+    getFillColor(key: GraphsElementNameType): string {
         let color: string;
-        if (key.includes('Tool')) {
+        if (key.includes('Tools')) {
             color = 'hsl(0, 100%, 50%)'; // Red
-        } else if (key.includes('Graph')) {
+        } else if (key.includes('Graphs')) {
             color = 'hsl(120, 100%, 50%)'; // Green
-        } else if (key.includes('Client')) {
+        } else if (key.includes('Clients')) {
             color = 'hsl(240, 100%, 70%)'; // Blue
         } else if (key.includes('Resources')) {
             color = 'hsl(0, 0%, 83%)'; // Light gray
@@ -235,7 +241,7 @@ export class Node extends GraphElement {
         context.fillStyle = 'black';
 
         let displayText = key;
-        if (key === 'ToolPrivate' || key === 'GraphPrivate' || key === 'ClientPrivate') {
+        if (key === 'ToolsPrivate' || key === 'GraphsPrivate' || key === 'ClientsPrivate') {
             displayText = 'Private Resources';
             context.font = '12px Arial';
         } else if (key === 'Resources') {
@@ -249,8 +255,8 @@ export class Node extends GraphElement {
 
         let subText = '';
         const pathDescription = pathDescriptions[counter];
-        if (key === 'Graph') {
-            subText = pathDescription.GraphText;
+        if (key === 'Graphs') {
+            subText = pathDescription.GraphsText;
         }
 
         if (subText) {
@@ -268,7 +274,7 @@ export type DiamondCornerPointType = 'topLeftD' | 'topRightD' | 'bottomLeftD' | 
 export type EdgePointType = CenterPointType | CornerPointType | DiamondPointType | DiamondCornerPointType;
 
 
-export class Edge extends GraphElement {
+export class Edge extends GraphsElement {
     public startPoint: Point;
     public endPoint: Point;
     private static cellWidth: number;

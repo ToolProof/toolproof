@@ -1,4 +1,4 @@
-'use client';
+'use Clients';
 import Problem from '@/components/problem/Problem';
 import ProblemMock from '@/components/problem/ProblemMock';
 import Frame from '@/components/lasagna/Frame';
