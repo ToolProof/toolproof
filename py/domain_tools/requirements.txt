@@ -1,0 +1,23 @@
+# FastAPI and WebSocket support
+fastapi>=0.68.0
+websockets>=10.0
+uvicorn>=0.15.0
+
+# Google Cloud
+google-cloud-storage>=2.10.0
+google-cloud-firestore>=2.11.0
+
+# Async support
+asyncio>=3.4.3
+
+# Typing and validation
+pydantic>=2.0.0
+
+# Logging and utilities
+python-dotenv>=1.0.0
+
+# CORS middleware
+python-multipart>=0.0.5
+
+python-dotenv
+firebase_admin

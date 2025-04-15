@@ -5,11 +5,13 @@ from subprocess import Popen
 from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict, List
+from typing import Dict, List, Any
 import json
 import asyncio
 from uuid import uuid4
 import logging
+from src.fetch_resources import fetch_resources  # Updated import path
+import shutil
 
 # Enhanced logging setup
 logging.basicConfig(
@@ -124,10 +126,20 @@ def wait_for_file(file_path, timeout=900, check_interval=5):
         waited += check_interval
     return False
 
-async def run_commands_async(job_id: str):
+async def run_commands_async(job_id: str, state: Dict[str, Any]):
     try:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         logfile = LOG_DIR / f"workflow_{timestamp}.log"
+        
+        # Fetch resources first
+        try:
+            resources = fetch_resources(state)
+            logger.info(f"Resources fetched successfully for job {job_id}")
+            
+            # Copy the fetched files to current working directory
+        except Exception as e:
+            logger.error(f"Error fetching resources: {e}")
+            raise
         
         total_steps = len(COMMANDS)
         
@@ -139,10 +151,9 @@ async def run_commands_async(job_id: str):
                     "total_steps": total_steps,
                     "status": "running",
                     "message": f"Running: {cmd}",
-                    "progress_percentage": ((i + 1) / total_steps) * 100
+                    "progress_percentage": ((i) / total_steps) * 100
                 }
                 logger.debug(f"Broadcasting progress: {progress}")
-                # Use asyncio.create_task to avoid blocking
                 await asyncio.create_task(manager.broadcast_to_job(job_id, progress))
 
                 cwd = os.getcwd()
@@ -211,7 +222,7 @@ async def run_commands_async(job_id: str):
         }))
 
 @app.post("/run-docking/")
-async def run_docking(background_tasks: BackgroundTasks):
+async def run_docking(background_tasks: BackgroundTasks, state: Dict[str, Any]):
     job_id = str(uuid4())
     logger.info(f"Starting new docking job: {job_id}")
     
@@ -225,8 +236,8 @@ async def run_docking(background_tasks: BackgroundTasks):
         "progress_percentage": 0
     }
     
-    # Add the task to background_tasks instead of creating it directly
-    background_tasks.add_task(run_commands_async, job_id)
+    # Add the task to background_tasks with state parameter
+    background_tasks.add_task(run_commands_async, job_id, state)
     
     logger.info(f"Job {job_id} initialized and ready for WebSocket connections")
     return {
