@@ -32,7 +32,7 @@ const NodeSVG: React.FC<NodeSVGProps> = ({ nodeName, node, color, handleNodeClic
 
     return (
         <>
-            {node.nature === 'code' ? (
+            {node.nature === 'logic' ? (
                 <ellipse
                     cx={x + width / 2}
                     cy={y + height / 2}

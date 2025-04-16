@@ -4,13 +4,13 @@ import { Cell, NodeNameType, EdgeNameType, Node, Edge, EdgeWithConfig, GraphsEle
 
 export const getNodes = (cellWidth: number, cellHeight: number): Record<NodeNameType, Node> => {
     return {
-        Tools: new Node(new Cell(1, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Tools']),
-        Graphs: new Node(new Cell(3, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Graphs']),
-        Clients: new Node(new Cell(5, 1, cellWidth, cellHeight), 'agnostic', 'code', true, nodeDescriptions['Clients']),
+        Tools: new Node(new Cell(1, 1, cellWidth, cellHeight), 'agnostic', 'logic', true, nodeDescriptions['Tools']),
+        Graphs: new Node(new Cell(3, 1, cellWidth, cellHeight), 'agnostic', 'logic', true, nodeDescriptions['Graphs']),
+        Clients: new Node(new Cell(5, 1, cellWidth, cellHeight), 'agnostic', 'logic', true, nodeDescriptions['Clients']),
         ToolsPrivate: new Node(new Cell(1, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ToolsPrivate']),
         GraphsPrivate: new Node(new Cell(3, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['GraphsPrivate']),
         ClientsPrivate: new Node(new Cell(5, 3, cellWidth, cellHeight), 'agnostic', 'data_Private', true, nodeDescriptions['ClientsPrivate']),
-        Resources: new Node(new Cell(3, 5, cellWidth, cellHeight), 'agnostic', 'data', true, nodeDescriptions['Resources']),
+        Resources: new Node(new Cell(3, 5, cellWidth, cellHeight), 'agnostic', 'storage', true, nodeDescriptions['Resources']),
         ResourcesLeft: new Node(new Cell(1, 5, cellWidth, cellHeight), 'agnostic', 'dummy', true, nodeDescriptions['Resources']),
         ResourcesRight: new Node(new Cell(5, 5, cellWidth, cellHeight), 'agnostic', 'dummy', true, nodeDescriptions['Resources']),
     } as const;

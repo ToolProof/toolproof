@@ -88,13 +88,13 @@ export type NodeNameType =
     | 'ResourcesRight'
 
 
-export type CodeCodeNameType =
+export type LogicLogicNameType =
     | 'Tools_Graphs'
     | 'Graphs_Tools'
     | 'Graphs_Clients'
     | 'Clients_Graphs'
 
-export type CodePrivateNameType =
+export type LogicPrivateNameType =
     | 'Tools_ToolsPrivate'
     | 'ToolsPrivate_Tools'
     | 'Graphs_GraphsPrivate'
@@ -102,7 +102,7 @@ export type CodePrivateNameType =
     | 'Clients_ClientsPrivate'
     | 'ClientsPrivate_Clients'
 
-export type CodeSharedNameType =
+export type LogicSharedNameType =
     | 'Tools_ResourcesLeft'
     | 'ResourcesLeft_Tools'
     | 'Graphs_Resources'
@@ -111,13 +111,13 @@ export type CodeSharedNameType =
     | 'ResourcesRight_Clients'
 
 
-export type EdgeNameType = CodeCodeNameType | CodePrivateNameType | CodeSharedNameType;
+export type EdgeNameType = LogicLogicNameType | LogicPrivateNameType | LogicSharedNameType;
 
 export type GraphsElementNameType = NodeNameType | EdgeNameType;
 
 
 export type Environment = 'agnostic' | 'lgp' | 'vercel' | 'gcp';
-export type Nature = 'code' | 'data' | 'data_Private' | 'dummy';
+export type Nature = 'logic' | 'storage' | 'data_Private' | 'dummy';
 
 
 export class GraphsElement {
@@ -166,7 +166,7 @@ export class Node extends GraphsElement {
 
         context.fillStyle = this.getFillColor(key);
 
-        if (this.nature === 'code') {
+        if (this.nature === 'logic') {
             context.beginPath();
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
             context.fill();
@@ -178,7 +178,7 @@ export class Node extends GraphsElement {
             const centeredX = x + (this.cell.width - rectWidth) / 2;
             const centeredY = y + (this.cell.height - rectHeight) / 2;
             context.fillRect(centeredX, centeredY, rectWidth, rectHeight);
-        } else if (this.nature === 'data') {
+        } else if (this.nature === 'storage') {
             // Combine the current cell and the two preceding and succeeding cells into one large rectangle
             const totalWidth = this.cell.width * 5; // Current cell + 2 preceding + 2 succeeding
             const startX = x - 2 * this.cell.width; // Start from the leftmost preceding cell
@@ -206,7 +206,7 @@ export class Node extends GraphsElement {
 
         context.beginPath();
 
-        if (this.nature === 'code') {
+        if (this.nature === 'logic') {
             // Ellipse stroke
             context.ellipse(x + this.cell.width / 2, y + this.cell.height / 2, this.cell.width / 2, radius, 0, 0, 2 * Math.PI);
         } else if (this.nature === 'data_Private') {
@@ -217,7 +217,7 @@ export class Node extends GraphsElement {
             const centeredX = x + (this.cell.width - rectWidth) / 2;
             const centeredY = y + (this.cell.height - rectHeight) / 2;
             context.rect(centeredX, centeredY, rectWidth, rectHeight);
-        } else if (this.nature === 'data') {
+        } else if (this.nature === 'storage') {
             // Combine the current cell and the two preceding and succeeding cells into one large rectangle
             const totalWidth = this.cell.width * 5; // Current cell + 2 preceding + 2 succeeding
             const startX = x - 2 * this.cell.width; // Start from the leftmost preceding cell
@@ -302,7 +302,7 @@ export class Edge extends GraphsElement {
 
         function resolveDiamondPoint(node: Node, diamondKey: DiamondPointType): Point {
             const point = node.cell.getOuterDiamond()[diamondKey];
-            if (node.nature === 'code') {
+            if (node.nature === 'logic') {
                 if (diamondKey === 'top') {
                     return { x: point.x, y: point.y - (Edge.cellHeight / 8) }; // ATTENTION
                 } else if (diamondKey === 'bottom') {
