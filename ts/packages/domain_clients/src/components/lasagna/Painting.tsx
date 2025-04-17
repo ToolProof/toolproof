@@ -39,9 +39,9 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
     useEffect(() => {
         const updateDimensions = () => {
             if (parentRef.current && canvasRef.current) {
-                const { ClientsWidth, ClientsHeight } = parentRef.current;
-                const newCellWidth = Math.floor(ClientsWidth / gridSize.col);
-                const newCellHeight = Math.floor(ClientsHeight / gridSize.row);
+                const { clientWidth, clientHeight } = parentRef.current;
+                const newCellWidth = Math.floor(clientWidth / gridSize.col);
+                const newCellHeight = Math.floor(clientHeight / gridSize.row);
 
                 if (newCellWidth !== cellWidthRef.current || newCellHeight !== cellHeightRef.current) {
                     cellWidthRef.current = newCellWidth;
@@ -50,11 +50,11 @@ export default function Painting({ isElementActive, counter }: PaintingProps) {
                     setCellHeight(newCellHeight);
 
                     const canvas = canvasRef.current;
-                    canvas.width = ClientsWidth;
-                    canvas.height = ClientsHeight;
+                    canvas.width = clientWidth;
+                    canvas.height = clientHeight;
 
                     // ✅ Update SVG dimensions dynamically
-                    setSvgSize({ width: ClientsWidth, height: ClientsHeight });
+                    setSvgSize({ width: clientWidth, height: clientHeight });
                 }
             }
         };
