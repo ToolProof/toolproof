@@ -103,12 +103,12 @@ export type LogicPrivateNameType =
     | 'ClientsPrivate_Clients'
 
 export type LogicSharedNameType =
-    | 'Tools_ResourcesLeft'
-    | 'ResourcesLeft_Tools'
+    | 'Tools_Resources'
+    | 'Resources_Tools'
     | 'Graphs_Resources'
     | 'Resources_Graphs'
-    | 'Clients_ResourcesRight'
-    | 'ResourcesRight_Clients'
+    | 'Clients_Resources'
+    | 'Resources_Clients'
 
 
 export type EdgeNameType = LogicLogicNameType | LogicPrivateNameType | LogicSharedNameType;

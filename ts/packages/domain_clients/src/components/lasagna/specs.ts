@@ -127,25 +127,25 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Tools_ResourcesLeft'
+                next: (bar: () => boolean) => 'Tools_Resources'
             }
         },
-        Tools_ResourcesLeft: {
+        Tools_Resources: {
             edge: new Edge(['Tools', 'bottom'], ['ResourcesLeft', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'ResourcesLeft_Tools',
+                reverse: 'Resources_Tools',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'ResourcesLeft_Tools'
+                next: (bar: () => boolean) => 'Resources_Tools'
             }
         },
-        ResourcesLeft_Tools: {
+        Resources_Tools: {
             edge: new Edge(['ResourcesLeft', 'top'], ['Tools', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(0, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Tools_ResourcesLeft',
+                reverse: 'Tools_Resources',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -171,25 +171,25 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'Clients_ResourcesRight'
+                next: (bar: () => boolean) => 'Clients_Resources'
             }
         },
-        Clients_ResourcesRight: {
+        Clients_Resources: {
             edge: new Edge(['Clients', 'bottom'], ['ResourcesRight', 'top'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'ResourcesRight_Clients',
+                reverse: 'Resources_Clients',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
-                next: (bar: () => boolean) => 'ResourcesRight_Clients'
+                next: (bar: () => boolean) => 'Resources_Clients'
             }
         },
-        ResourcesRight_Clients: {
+        Resources_Clients: {
             edge: new Edge(['ResourcesRight', 'top'], ['Clients', 'bottom'], nodes, cellWidth, cellHeight),
             config: {
                 controlPoint: [new Cell(4, 3, cellWidth, cellHeight), 'left'],
-                reverse: 'Clients_ResourcesRight',
+                reverse: 'Clients_Resources',
                 drawInOrder: (foo, key, edgeWithConfig) => {
                     foo(key, edgeWithConfig);
                 },
@@ -202,7 +202,7 @@ export const getEdgesWithConfig = (cellWidth: number, cellHeight: number): Recor
 
 export const path: Array<[GraphsElementNameType[], string]> = [
     [[], pathDescriptions[0].Description],
-    [['Clients_ResourcesRight'], pathDescriptions[1].Description],
+    [['Clients_Resources'], pathDescriptions[1].Description],
     [['Clients_Graphs'], pathDescriptions[2].Description],
     [['Graphs_GraphsPrivate'], pathDescriptions[3].Description],
     [['GraphsPrivate_Graphs'], pathDescriptions[4].Description],
@@ -213,9 +213,9 @@ export const path: Array<[GraphsElementNameType[], string]> = [
     [['Graphs_GraphsPrivate'], pathDescriptions[9].Description],
     [['Graphs_Resources'], pathDescriptions[10].Description],
     [['Graphs_Tools'], pathDescriptions[11].Description],
-    [['ResourcesLeft_Tools'], pathDescriptions[12].Description],
+    [['Resources_Tools'], pathDescriptions[12].Description],
     [['Tools_ToolsPrivate', 'ToolsPrivate_Tools', 'Tools_Graphs'], pathDescriptions[13].Description],
-    [['Tools_ResourcesLeft'], pathDescriptions[14].Description],
+    [['Tools_Resources'], pathDescriptions[14].Description],
 ];
 
 

@@ -14,12 +14,12 @@ type Beta =
     | 'ClientsPrivate_Clients'
 
 type Gamma =
-    | 'Tools_ResourcesLeft'
-    | 'ResourcesLeft_Tools'
+    | 'Tools_Resources'
+    | 'Resources_Tools'
     | 'Graphs_Resources'
     | 'Resources_Graphs'
-    | 'Clients_ResourcesRight'
-    | 'ResourcesRight_Clients'
+    | 'Clients_Resources'
+    | 'Resources_Clients'
 
 
 type Edge = Alpha | Beta | Gamma;
@@ -38,63 +38,111 @@ type ChannelDocking =
 
 type Channel = ChannelInternal | ChannelDocking;
 
+type AlphaChannelsSpec = Record<Alpha, Channel[]>;
+const alphaChannelsSpec = {
+    'Tools_Graphs': [['candidate']],
+    'Graphs_Tools': [['anchor', 'target']],
+    'Graphs_Clients': [],
+    'Clients_Graphs': [],
+} satisfies AlphaChannelsSpec;
+
+type BetaChannelsSpec = Record<Beta, Channel[]>;
+const betaChannelsSpec = {
+    'Tools_ToolsPrivate': [],
+    'ToolsPrivate_Tools': [],
+    'Graphs_GraphsPrivate': [['anchor', 'target'], ['candidate']],
+    'GraphsPrivate_Graphs': [['anchor', 'target']],
+    'Clients_ClientsPrivate': [],
+    'ClientsPrivate_Clients': [],
+} satisfies BetaChannelsSpec;
+
 type GammaChannelsSpec = Record<Gamma, Channel[]>;
 const gammaChannelsSpec = {
-    'Tools_ResourcesLeft': [['result']],
-    'ResourcesLeft_Tools': [['candidate', 'target']],
+    'Tools_Resources': [['result']],
+    'Resources_Tools': [['candidate', 'target']],
     'Graphs_Resources': [['candidate']],
-    'Resources_Graphs': [],
-    'Clients_ResourcesRight': [['employment'], ['anchor', 'target']],
-    'ResourcesRight_Clients': [],
+    'Resources_Graphs': [['anchor', 'target']],
+    'Clients_Resources': [['employment'], ['anchor', 'target']],
+    'Resources_Clients': [],
 } satisfies GammaChannelsSpec;
 
 
-type GammaChannels<T extends Gamma> = typeof gammaChannelsSpec[T][number];
+type ValidChannelsForAlpha<T extends Alpha> = typeof alphaChannelsSpec[T][number];
 
-const channelsOne: GammaChannels<'Tools_ResourcesLeft'> = ['result'];
-// @ts-expect-error: ['candidate', 'target'] is not assignable a valid channel for 'Tools_ResourcesLeft'
-const channelsTwo: GammaChannels<'Tools_ResourcesLeft'> = ['candidate', 'target'];
+type ValidChannelsForBeta<T extends Beta> = typeof betaChannelsSpec[T][number];
 
+type ValidChannelsForGamma<T extends Gamma> = typeof gammaChannelsSpec[T][number];
+
+const testOne: ValidChannelsForGamma<'Tools_Resources'> = ['result'];
+// @ts-expect-error: ['candidate', 'target'] is not a valid channel for 'Tools_Resources'
+const testTwo: ValidChannelsForGamma<'Tools_Resources'> = ['candidate', 'target'];
+
+
+type AlphaChannel<T extends Alpha> = {
+    alpha: T;
+    channel: ValidChannelsForAlpha<T>;
+};
+
+type BetaChannel<T extends Beta> = {
+    beta: T;
+    channel: ValidChannelsForBeta<T>;
+};
 
 type GammaChannel<T extends Gamma> = {
     gamma: T;
-    channel: GammaChannels<T>;
+    channel: ValidChannelsForGamma<T>;
 };
 
 
-const gammaChannelsForNode: (
-    | GammaChannel<'Tools_ResourcesLeft'>
-    | GammaChannel<'ResourcesLeft_Tools'>
-    | GammaChannel<'Graphs_Resources'>
+// nodeLoadInputs
+const channelsForNodeOne: (
     | GammaChannel<'Resources_Graphs'>
-    | GammaChannel<'Clients_ResourcesRight'>
-    | GammaChannel<'ResourcesRight_Clients'>
+    | BetaChannel<'Graphs_GraphsPrivate'>
 )[] = [
         {
-            gamma: 'Tools_ResourcesLeft',
-            channel: ['result'],
-        },
-        {
-            gamma: 'ResourcesLeft_Tools',
-            channel: ['candidate', 'target'],
-        },
-        {
-            gamma: 'Clients_ResourcesRight',
+            gamma: 'Resources_Graphs',
             channel: ['anchor', 'target'],
         },
         {
-            gamma: 'Clients_ResourcesRight',
-            channel: ['employment'],
-        },
-        // @ts-expect-error: 'employment' is not a valid channel for 'ResourcesLeft_Tools'
-        {
-            gamma: 'ResourcesLeft_Tools',
-            channel: ['employment'],
+            beta: 'Graphs_GraphsPrivate',
+            channel: ['anchor', 'target'],
         },
     ];
 
 
+// nodeGenerateCandidate
+const channelsForNodeTwo: (
+    | BetaChannel<'GraphsPrivate_Graphs'>
+    | AlphaChannel<'Graphs_Tools'>
+    | AlphaChannel<'Tools_Graphs'>
+    | BetaChannel<'Graphs_GraphsPrivate'>
+    | GammaChannel<'Graphs_Resources'>
+)[] = [
+        {
+            beta: 'GraphsPrivate_Graphs',
+            channel: ['anchor', 'target'],
+        },
+        {
+            alpha: 'Graphs_Tools',
+            channel: ['anchor', 'target'], // Sent to the AI-model
+        },
+        {
+            alpha: 'Tools_Graphs',
+            channel: ['candidate'], // Returned from the AI-model
+        },
+        {
+            beta: 'Graphs_GraphsPrivate',
+            channel: ['candidate'],
+        },
+        {
+            gamma: 'Graphs_Resources',
 
+            channel: ['candidate'],
+        },
+    ];
+
+
+// LangGraph nodes as pulse orhestrators
 
 
 
