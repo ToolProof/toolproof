@@ -1,5 +1,5 @@
 'use client'
-import MyGraph from '@/components/smultron/smultron';
+import Canvas from '@/components/canvas/canvas';
 import { useAppDispatch } from '@/redux/hooks';
 import { setShowSideBar } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
@@ -11,5 +11,5 @@ export default function Home() {
     dispatch(setShowSideBar(false));
   }, [dispatch]);
 
-  return <MyGraph />;
+  return <Canvas />;
 }

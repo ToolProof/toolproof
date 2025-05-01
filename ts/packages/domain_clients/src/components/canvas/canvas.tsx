@@ -16,7 +16,7 @@ function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
 }
 
 
-export default function MyGraph() {
+export default function Canvas() {
     const fgRef = useRef();
     const [activeAlphaId, setActiveAlphaId] = useState<string | Node>('AlphaSuper');
     const [activeBetaId, setActiveBetaId] = useState<string | Node>('');
