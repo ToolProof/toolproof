@@ -26,16 +26,8 @@ type Edge = Alpha | Beta | Gamma;
 
 type Resource = 'employment' | 'anchor' | 'candidate' | 'target' | 'result';
 
-type ResourceTuple<T extends Resource[]> = T;
-
-type ChannelInternal = ResourceTuple<['employment']>;
-
-type ChannelDocking =
-    | ResourceTuple<['anchor', 'target']>
-    | ResourceTuple<['candidate', 'target']>
-    | ResourceTuple<['candidate']>
-    | ResourceTuple<['result']>;
-
+type ChannelInternal = ['employment'];
+type ChannelDocking = ['anchor', 'target'] | ['candidate', 'target'] | ['candidate'] | ['result'];
 type Channel = ChannelInternal | ChannelDocking;
 
 type AlphaChannelsSpec = Record<Alpha, Channel[]>;

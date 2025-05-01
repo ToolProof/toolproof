@@ -1,5 +1,5 @@
 'use client'
-import Wall from '@/components/lasagna/Wall';
+import MyGraph from '@/components/smultron/smultron';
 import { useAppDispatch } from '@/redux/hooks';
 import { setShowSideBar } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
@@ -11,5 +11,5 @@ export default function Home() {
     dispatch(setShowSideBar(false));
   }, [dispatch]);
 
-  return <Wall />;
+  return <MyGraph />;
 }
