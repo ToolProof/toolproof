@@ -6,7 +6,7 @@ import * as THREE from 'three';
 
 
 const FRAME_DURATION = 1000 / 60;
-const DESIRED_TRAVEL_MS = 500;
+const DESIRED_TRAVEL_MS = 2000;
 
 
 function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
@@ -20,6 +20,7 @@ export default function Canvas() {
     const fgRef = useRef();
     const [activeAlphaId, setActiveAlphaId] = useState<string | Node>('AlphaSuper');
     const [activeBetaId, setActiveBetaId] = useState<string | Node>('');
+    const [isDeltaActive, setIsDeltaActive] = useState(false);
     const [isGammaActive, setIsGammaActive] = useState(false);
 
     /* const linkNames = data.links.map(link => link.name);
@@ -33,7 +34,7 @@ export default function Canvas() {
             if (cancelled || !fgRef.current) return;
 
             if (i === path.length) {
-                i = 2;
+                i = 6;
             }
             const linkNames = path.map(link => link.name);
             const linkName = linkNames[i];
@@ -48,6 +49,11 @@ export default function Canvas() {
                 setActiveBetaId(typeof link.source === 'string' ? link.source : link.source.id);
             } else if (path[i].switchBeta === -1) {
                 setActiveBetaId('');
+            }
+            if (path[i].switchDelta === 1) {
+                setIsDeltaActive(true);
+            } else if (path[i].switchDelta === -1) {
+                setIsDeltaActive(false);
             }
             if (path[i].switchGamma === 1) {
                 setIsGammaActive(true);
@@ -81,7 +87,16 @@ export default function Canvas() {
                 // 🔷 Determine shape and color
                 let mesh: THREE.Object3D;
 
-                if (node.group === 2) {
+                if (node.group === 3) {
+                    // 🟦 Delta node (tetrahedron)
+                    // const geometry = new THREE.TetrahedronGeometry(baseSize, 0);
+                    baseSize *= 0.5;
+                    const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
+                    const material = new THREE.MeshLambertMaterial({
+                        color: isDeltaActive ? 'green' : 'red'
+                    });
+                    mesh = new THREE.Mesh(geometry, material);
+                } else if (node.group === 2) {
                     // 🟩 Gamma node (cube)
                     baseSize *= 0.5;
                     const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
@@ -89,7 +104,6 @@ export default function Canvas() {
                         color: isGammaActive ? 'green' : 'red'
                     });
                     mesh = new THREE.Mesh(geometry, material);
-
                 } else if (node.group === 1) {
                     // 🔵 Beta node (cone)
                     const radius = baseSize * 0.4;
@@ -99,8 +113,7 @@ export default function Canvas() {
                         color: node.id === activeBetaId ? 'blue' : 'red'
                     });
                     mesh = new THREE.Mesh(geometry, material);
-                    mesh.rotation.x = Math.PI / 1; 
-
+                    mesh.rotation.x = Math.PI / 1;
                 } else if (node.group === 0) {
                     // 🟡 Alpha node (sphere)
                     const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
@@ -108,7 +121,6 @@ export default function Canvas() {
                         color: node.id === activeAlphaId ? 'yellow' : 'red'
                     });
                     mesh = new THREE.Mesh(geometry, material);
-
                 } else {
                     throw new Error(`Unknown node group: ${node.group}`);
                 }
