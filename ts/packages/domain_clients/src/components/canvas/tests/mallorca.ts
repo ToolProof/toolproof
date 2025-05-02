@@ -1,41 +1,40 @@
 
-
 type DirectionType = 'read' | 'write';
-type StorageType = 'shared' | 'private';
+type StorageType = 'private' | 'shared';
 
 type ResourceType = 'anchor' | 'target' | 'candidate' | 'results' | 'desicion';
 
-interface ResourceAccess {
+interface ResourceOperation {
     direction: DirectionType;
-    storage: StorageType;
     resources: ResourceType[];
 }
 
-interface ResourceExchange {
-    inputs: ResourceType[];
-    outputs: ResourceType[];
+interface ResourceOperationGraphNode extends ResourceOperation {
+    storage: StorageType;
 }
 
-type Operation = ResourceAccess | ResourceExchange;
+interface ResourceOperationToolNode extends ResourceOperation {
+    storage: 'shared';
+}
 
 interface Strategy {
     nodes: GraphNode[];
 }
 
-interface GraphNode {
+interface GenericNode {
     name: string;
     description: string;
-    tool: string | null;
-    operations: Operation[];
+}
+
+interface GraphNode extends GenericNode {
+    tool: ToolNode | null;
+    resourceOperations: ResourceOperationGraphNode[];
     nexts: string[];
 }
 
-/* interface ToolNode {
-    name: string;
-    Node: string;
-    inputs: string[];
-    outputs: string[];
-} */
+interface ToolNode extends GenericNode {
+    resourceOperations: ResourceOperationToolNode[];
+}
 
 
 const strategy: Strategy = {
@@ -44,7 +43,7 @@ const strategy: Strategy = {
             name: 'LoadInputs',
             description: '',
             tool: null,
-            operations: [
+            resourceOperations: [
                 {
                     direction: 'read',
                     storage: 'shared',
@@ -61,16 +60,16 @@ const strategy: Strategy = {
         {
             name: 'GenerateCandidate',
             description: '',
-            tool: 'OpenAI-1',
-            operations: [
+            tool: {
+                name: 'OpenAI-1',
+                description: '',
+                resourceOperations: []
+            },
+            resourceOperations: [
                 {
                     direction: 'read',
                     storage: 'private',
                     resources: ['anchor', 'target']
-                },
-                {
-                    inputs: ['anchor', 'target'],
-                    outputs: ['candidate']
                 },
                 {
                     direction: 'write',
@@ -88,30 +87,30 @@ const strategy: Strategy = {
         {
             name: 'InvokeDocking',
             description: '',
-            tool: 'SchrodingerSuite',
-            operations: [
-                {
-                    direction: 'read',
-                    storage: 'shared',
-                    resources: ['candidate', 'target']
-                },
-                {
-                    inputs: ['candidate', 'target'],
-                    outputs: ['results'] // ATTENTION: is this accurate?
-                },
-                {
-                    direction: 'write',
-                    storage: 'shared',
-                    resources: ['results']
-                }
-            ],
+            tool: {
+                name: 'SchrodingerSuite',
+                description: '',
+                resourceOperations: [
+                    {
+                        direction: 'read',
+                        storage: 'shared',
+                        resources: ['candidate', 'target']
+                    },
+                    {
+                        direction: 'write',
+                        storage: 'shared',
+                        resources: ['results']
+                    }
+                ],
+            },
+            resourceOperations: [],
             nexts: ['LoadResults']
         },
         {
             name: 'LoadResults',
             description: '',
             tool: null,
-            operations: [
+            resourceOperations: [
                 {
                     direction: 'read',
                     storage: 'shared',
@@ -128,16 +127,16 @@ const strategy: Strategy = {
         {
             name: 'EvaluateResults',
             description: '',
-            tool: 'OpenAI-2',
-            operations: [
+            tool: {
+                name: 'OpenAI-2',
+                description: '',
+                resourceOperations: []
+            },
+            resourceOperations: [
                 {
                     direction: 'read',
                     storage: 'private',
                     resources: ['results']
-                },
-                {
-                    inputs: ['results'],
-                    outputs: ['desicion']
                 },
                 {
                     direction: 'write',
