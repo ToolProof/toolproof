@@ -11,31 +11,32 @@ type ResourceOperation = {
     resources: ResourceType[];
 }
 
-interface ResourceOperationGraphNode extends ResourceOperation {
+type ToolInvocation = {
+    operations: OperationDisallowPrivate[];
+}
+
+interface ResourceOperationAllowPrivate extends ResourceOperation {
     storage: StorageType;
 }
 
-interface ResourceOperationToolNode extends ResourceOperation {
+interface ResourceOperationDisallowPrivate extends ResourceOperation {
     storage: 'shared';
 }
 
+type OperationAllowPrivate = ResourceOperationAllowPrivate | ToolInvocation;
+
+type OperationDisallowPrivate = ResourceOperationDisallowPrivate | ToolInvocation;
+
 interface Strategy {
-    nodes: GraphNode[];
+    nodes: Node[];
 }
 
-interface GenericNode {
+interface Node {
     name: string;
     description: string;
-}
-
-interface GraphNode extends GenericNode {
-    tool: ToolNode | null;
-    resourceOperations: ResourceOperationGraphNode[];
+    tool: string | null;
+    operations: OperationAllowPrivate[];
     nexts: string[];
-}
-
-interface ToolNode extends GenericNode {
-    resourceOperations: ResourceOperationToolNode[];
 }
 
 
@@ -45,7 +46,7 @@ const strategy: Strategy = {
             name: 'LoadInputs',
             description: '',
             tool: null,
-            resourceOperations: [
+            operations: [
                 {
                     direction: 'read',
                     storage: 'shared',
@@ -62,16 +63,15 @@ const strategy: Strategy = {
         {
             name: 'GenerateCandidate',
             description: '',
-            tool: {
-                name: 'OpenAI-1',
-                description: '',
-                resourceOperations: []
-            },
-            resourceOperations: [
+            tool: 'OpenAI-1',
+            operations: [
                 {
                     direction: 'read',
                     storage: 'private',
                     resources: ['anchor', 'target']
+                },
+                {
+                    operations: [],
                 },
                 {
                     direction: 'write',
@@ -89,30 +89,30 @@ const strategy: Strategy = {
         {
             name: 'InvokeDocking',
             description: '',
-            tool: {
-                name: 'SchrodingerSuite',
-                description: '',
-                resourceOperations: [
-                    {
-                        direction: 'read',
-                        storage: 'shared',
-                        resources: ['candidate', 'target']
-                    },
-                    {
-                        direction: 'write',
-                        storage: 'shared',
-                        resources: ['results']
-                    }
-                ],
-            },
-            resourceOperations: [],
+            tool: 'SchrodingerSuite',
+            operations: [
+                {
+                    operations: [
+                        {
+                            direction: 'read',
+                            storage: 'shared',
+                            resources: ['candidate', 'target']
+                        },
+                        {
+                            direction: 'write',
+                            storage: 'shared',
+                            resources: ['results']
+                        }
+                    ],
+                },
+            ],
             nexts: ['LoadResults']
         },
         {
             name: 'LoadResults',
             description: '',
             tool: null,
-            resourceOperations: [
+            operations: [
                 {
                     direction: 'read',
                     storage: 'shared',
@@ -129,16 +129,15 @@ const strategy: Strategy = {
         {
             name: 'EvaluateResults',
             description: '',
-            tool: {
-                name: 'OpenAI-2',
-                description: '',
-                resourceOperations: []
-            },
-            resourceOperations: [
+            tool: 'OpenAI-2',
+            operations: [
                 {
                     direction: 'read',
                     storage: 'private',
                     resources: ['results']
+                },
+                {
+                    operations: [],
                 },
                 {
                     direction: 'write',
