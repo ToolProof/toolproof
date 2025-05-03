@@ -90,10 +90,7 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 };
 
 
-const NodeLoadInputsState_I = Annotation.Root({
-});
-
-const NodeLoadInputsState_O = Annotation.Root({
+export const NodeLoadInputsState = Annotation.Root({
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -105,12 +102,6 @@ const NodeLoadInputsState_O = Annotation.Root({
     }),
 });
 
-
-export const NodeLoadInputsState = Annotation.Root({
-    ...NodeLoadInputsState_I.spec,
-    ...NodeLoadInputsState_O.spec,
-});
-
 type WithBaseState = typeof NodeLoadInputsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
@@ -118,7 +109,7 @@ type WithBaseState = typeof NodeLoadInputsState.State &
 class _NodeLoadInputs extends Runnable {
 
     static nodeSpecs: NodeSpecs = {
-        name: 'NodeLoadInputs',
+        name: 'NodeLoadInputs', // ATTENTION: Could this be inferred from the class name?
         description: '',
         operations: [
             {
