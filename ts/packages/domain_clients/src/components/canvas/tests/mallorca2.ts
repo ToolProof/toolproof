@@ -35,15 +35,15 @@ type OperationAllowPrivate = StorageOperationAllowPrivate | ToolInvocation | Swa
 
 type OperationDisallowPrivate = StorageOperationDisallowPrivate | ToolInvocation | SwapOperation;;
 
-interface Strategy {
-    nodes: Node[];
-}
-
-interface Node {
+interface NodeSpec {
     name: string;
     description: string;
     operations: OperationAllowPrivate[];
     nexts: string[];
+}
+
+interface Strategy {
+    nodes: NodeSpec[];
 }
 
 const strategy: Strategy = {
