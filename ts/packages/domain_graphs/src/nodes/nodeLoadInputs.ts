@@ -2,7 +2,7 @@ import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { NodeSpecs, BaseStateSpec, registerNode } from "./nodeUtils.js";
+import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
 
 // ATTENTION: factor out
 const storage = new Storage({
@@ -108,7 +108,7 @@ type WithBaseState = typeof NodeLoadInputsState.State &
 
 class _NodeLoadInputs extends Runnable {
 
-    static nodeSpecs: NodeSpecs = {
+    static nodeSpec: NodeSpec = {
         name: 'NodeLoadInputs', // ATTENTION: Could this be inferred from the class name?
         description: '',
         operations: [

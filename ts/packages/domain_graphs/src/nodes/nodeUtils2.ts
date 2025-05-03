@@ -12,22 +12,22 @@ type ResourceType = 'anchor' | 'target' | 'candidate' | 'results' | 'decision';
 
 type StorageOperationDirectionType = 'read' | 'write';
 
-type StorageOperationNatureType = 'private' | 'shared';
+type StorageOperationNatureType = 'alpha' | 'beta';
 
 type StorageOperation = {
     direction: StorageOperationDirectionType;
     resources: ResourceType[];
 }
 
-interface StorageOperationAllowPrivate extends StorageOperation {
+interface Gamma_AlphaBeta extends StorageOperation {
     storage: StorageOperationNatureType;
 }
 
-interface StorageOperationDisallowPrivate extends StorageOperation {
-    storage: 'shared'; // ATTENTION: must document this
+interface Delta_Alpha extends StorageOperation {
+    storage: 'alpha'; // ATTENTION: must document this
 }
-
-type ToolInvocation = {
+// What about naming the operations after the visualization?
+type ToolOperation = {
     name: string; // ATTENTION: tool name
     operations: OperationDisallowPrivate[];
 }
@@ -37,9 +37,9 @@ type SwapOperation = {
     outputs: ResourceType[];
 }
 
-type OperationAllowPrivate = StorageOperationAllowPrivate | ToolInvocation | SwapOperation;
+type OperationAllowPrivate = Gamma_AlphaBeta | ToolOperation | SwapOperation;
 
-type OperationDisallowPrivate = StorageOperationDisallowPrivate | ToolInvocation | SwapOperation;
+type OperationDisallowPrivate = Delta_Alpha | ToolOperation | SwapOperation;
 
 export interface NodeSpec {
     name: string;
