@@ -2,7 +2,7 @@ import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { registerNode, BaseStateSpec } from "./nodeUtils.js";
+import { NodeSpecs, BaseStateSpec, registerNode } from "./nodeUtils.js";
 
 // ATTENTION: factor out
 const storage = new Storage({
@@ -90,10 +90,7 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 };
 
 
-const NodeLoadInputsState_I = Annotation.Root({
-});
-
-const NodeLoadInputsState_O = Annotation.Root({
+export const NodeLoadInputsState = Annotation.Root({
     ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -105,28 +102,28 @@ const NodeLoadInputsState_O = Annotation.Root({
     }),
 });
 
-
-export const NodeLoadInputsState = Annotation.Root({
-    ...NodeLoadInputsState_I.spec,
-    ...NodeLoadInputsState_O.spec,
-});
-
 type WithBaseState = typeof NodeLoadInputsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeLoadInputs extends Runnable {
 
-    static meta = {
-        description: "Load inputs from the bucket",
-        stateSpecs: {
-            inputs: NodeLoadInputsState_I,
-            outputs: NodeLoadInputsState_O,
-        },
-        resourceSpecs: {
-            inputs: ["ligand", "receptor", "box"],
-            outputs: [],
-        },
+    static nodeSpecs: NodeSpecs = {
+        name: 'NodeLoadInputs', // ATTENTION: Could this be inferred from the class name?
+        description: '',
+        operations: [
+            {
+                direction: 'read',
+                storage: 'shared',
+                resources: ['anchor', 'target']
+            } as const,
+            {
+                direction: 'write',
+                storage: 'private',
+                resources: ['anchor', 'target']
+            } as const
+        ],
+        nexts: ['GenerateCandidate']
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -246,7 +243,4 @@ class _NodeLoadInputs extends Runnable {
 
 }
 
-export const NodeLoadInputs = registerNode<typeof NodeLoadInputsState_I | typeof NodeLoadInputsState_O, typeof _NodeLoadInputs>(_NodeLoadInputs);
-
-
-
+export const NodeLoadInputs = registerNode<typeof _NodeLoadInputs>(_NodeLoadInputs);

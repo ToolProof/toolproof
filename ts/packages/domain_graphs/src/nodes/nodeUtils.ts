@@ -8,33 +8,54 @@ export const BaseStateSpec = {
     }),
 };
 
+type ResourceType = 'anchor' | 'target' | 'candidate' | 'results' | 'decision';
 
-export interface NodeSpecs<TState> {
-    meta: {
-        description: string;
-        stateSpecs: {
-            inputs: TState;
-            outputs: TState;
-        };
-        resourceSpecs: {
-            inputs: string[];
-            outputs: string[];
-        };
-    };
+type DirectionType = 'read' | 'write';
+
+type StorageType = 'private' | 'shared';
+
+type StorageOperation = {
+    direction: DirectionType;
+    resources: ResourceType[];
 }
 
-// ATTENTION_RONAK: The purpose of this is to enforce the contract of specs in the node class
+interface StorageOperationAllowPrivate extends StorageOperation {
+    storage: StorageType;
+}
+
+interface StorageOperationDisallowPrivate extends StorageOperation {
+    storage: 'shared';
+}
+
+type ToolInvocation = {
+    name: string; // ATTENTION: tool name
+    operations: OperationDisallowPrivate[];
+}
+
+type SwapOperation = {
+    inputs: ResourceType[];
+    outputs: ResourceType[];
+}
+
+type OperationAllowPrivate = StorageOperationAllowPrivate | ToolInvocation | SwapOperation;
+
+type OperationDisallowPrivate = StorageOperationDisallowPrivate | ToolInvocation | SwapOperation;
+
+export interface NodeSpecs {
+    name: string;
+    description: string;
+    operations: OperationAllowPrivate[];
+    nexts: string[];
+}
+
+interface NodeClass {
+    nodeSpecs: NodeSpecs;
+}
+
+
+// ATTENTION_RONAK: The purpose of this is to enforce the contract of nodeSpecs in the node class
 export function registerNode<
-    TState,
-    T extends NodeSpecs<TState> & (new (...args: any[]) => any)
+    T extends NodeClass & (new (...args: any[]) => any)
 >(cls: T): T {
-    /* const s = cls.specs;
-
-    if (!Array.isArray(s.resources?.inputSpecs) || !Array.isArray(s.resources?.outputSpecs)) {
-        throw new Error(`Node ${cls.name} is missing required resource specs`);
-    } */
-
     return cls;
 }
-
-
