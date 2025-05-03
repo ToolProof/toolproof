@@ -1,31 +1,39 @@
 
 export { };
 
+
+type ResourceType = 'anchor' | 'target' | 'candidate' | 'results' | 'decision';
+
 type DirectionType = 'read' | 'write';
+
 type StorageType = 'private' | 'shared';
 
-type ResourceType = 'anchor' | 'target' | 'candidate' | 'results' | 'desicion';
-
-type ResourceOperation = {
+type StorageOperation = {
     direction: DirectionType;
     resources: ResourceType[];
 }
 
-type ToolInvocation = {
-    operations: OperationDisallowPrivate[];
-}
-
-interface ResourceOperationAllowPrivate extends ResourceOperation {
+interface StorageOperationAllowPrivate extends StorageOperation {
     storage: StorageType;
 }
 
-interface ResourceOperationDisallowPrivate extends ResourceOperation {
+interface StorageOperationDisallowPrivate extends StorageOperation {
     storage: 'shared';
 }
 
-type OperationAllowPrivate = ResourceOperationAllowPrivate | ToolInvocation;
+type ToolInvocation = {
+    name: string; // ATTENTION: tool name
+    operations: OperationDisallowPrivate[];
+}
 
-type OperationDisallowPrivate = ResourceOperationDisallowPrivate | ToolInvocation;
+type SwapOperation = {
+    inputs: ResourceType[];
+    outputs: ResourceType[];
+}
+
+type OperationAllowPrivate = StorageOperationAllowPrivate | ToolInvocation | SwapOperation;
+
+type OperationDisallowPrivate = StorageOperationDisallowPrivate | ToolInvocation | SwapOperation;;
 
 interface Strategy {
     nodes: Node[];
@@ -34,18 +42,15 @@ interface Strategy {
 interface Node {
     name: string;
     description: string;
-    tool: string | null;
     operations: OperationAllowPrivate[];
     nexts: string[];
 }
-
 
 const strategy: Strategy = {
     nodes: [
         {
             name: 'LoadInputs',
             description: '',
-            tool: null,
             operations: [
                 {
                     direction: 'read',
@@ -63,7 +68,6 @@ const strategy: Strategy = {
         {
             name: 'GenerateCandidate',
             description: '',
-            tool: 'OpenAI-1',
             operations: [
                 {
                     direction: 'read',
@@ -71,7 +75,13 @@ const strategy: Strategy = {
                     resources: ['anchor', 'target']
                 },
                 {
-                    operations: [],
+                    name: 'OpenAI-1',
+                    operations: [
+                        {
+                            inputs: ['anchor', 'target'],
+                            outputs: ['candidate']
+                        }
+                    ],
                 },
                 {
                     direction: 'write',
@@ -89,9 +99,9 @@ const strategy: Strategy = {
         {
             name: 'InvokeDocking',
             description: '',
-            tool: 'SchrodingerSuite',
             operations: [
                 {
+                    name: 'SchrodingerSuite',
                     operations: [
                         {
                             direction: 'read',
@@ -111,7 +121,6 @@ const strategy: Strategy = {
         {
             name: 'LoadResults',
             description: '',
-            tool: null,
             operations: [
                 {
                     direction: 'read',
@@ -129,7 +138,6 @@ const strategy: Strategy = {
         {
             name: 'EvaluateResults',
             description: '',
-            tool: 'OpenAI-2',
             operations: [
                 {
                     direction: 'read',
@@ -137,12 +145,18 @@ const strategy: Strategy = {
                     resources: ['results']
                 },
                 {
-                    operations: [],
+                    name: 'OpenAI-2',
+                    operations: [
+                        {
+                            inputs: ['results'],
+                            outputs: ['decision']
+                        }
+                    ],
                 },
                 {
                     direction: 'write',
                     storage: 'private',
-                    resources: ['desicion']
+                    resources: ['decision']
                 },
             ],
             nexts: ['GenerateCandidate', 'END']
