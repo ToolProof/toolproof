@@ -65,7 +65,7 @@ export default function Canvas() {
             setTimeout(emitNext, DESIRED_TRAVEL_MS);
         }
 
-        emitNext();
+        // emitNext();
         return () => { cancelled = true; };
     }, []);
 

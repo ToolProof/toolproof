@@ -8,7 +8,7 @@ const alphaGammaYDistance = -100;
 
 
 const strategyUno = [
-    { name: 'NodeLoadInputs', externals: [] },
+    { name: 'NodeLoadInputs', externals: ['Longti', 'Lati', 'Alti'] },
     { name: 'NodeGenerateCandidate', externals: ['OpenAI-1'] },
     { name: 'NodeInvokeDocking', externals: ['SchrodingerSuite'] },
     { name: 'NodeLoadResults', externals: [] },
@@ -25,17 +25,33 @@ const alphaNodes: Node[] = strategyUno.map((node, index) => ({
     fz: radius * Math.sin((2 * Math.PI * index) / strategyUno.length),
 }));
 
-const betaNodes: Node[] = strategyUno.flatMap((node, index) =>
-    node.externals.map((external, externalIndex) => ({
-        id: external,
-        shape: 'sphere',
-        val: 3,
-        group: 1,
-        fx: radius * Math.cos((2 * Math.PI * index) / strategyUno.length),
-        fy: alphaBetaYDistance * (externalIndex + 1), // y-coordinate based on external index
-        fz: radius * Math.sin((2 * Math.PI * index) / strategyUno.length),
-    }))
-);
+const betaNodes: Node[] = strategyUno.flatMap((node, index) => {
+    const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / strategyUno.length);
+    const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / strategyUno.length);
+    const externalsCount = node.externals.length;
+
+    return node.externals.map((external, externalIndex) => {
+        const angle = (2 * Math.PI * externalIndex) / externalsCount; // Angle for circular placement
+        const betaNodeX =
+            externalsCount > 1
+                ? alphaNodeX + alphaBetaYDistance * Math.cos(angle)
+                : alphaNodeX; // If only one external, place it in the center
+        const betaNodeZ =
+            externalsCount > 1
+                ? alphaNodeZ + alphaBetaYDistance * Math.sin(angle)
+                : alphaNodeZ; // If only one external, place it in the center
+
+        return {
+            id: external,
+            shape: 'sphere',
+            val: 3,
+            group: 1,
+            fx: betaNodeX,
+            fy: alphaBetaYDistance, // y-coordinate above the alphaNode
+            fz: betaNodeZ,
+        };
+    });
+});
 
 const deltaNodes: Node[] = [
     {
