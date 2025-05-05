@@ -8,6 +8,7 @@ const alphaGammaYDistance = -100;
 
 
 const strategyUno = [
+    { name: 'NodeFetchInputPaths', externals: [] },
     { name: 'NodeLoadInputs', externals: ['Longti', 'Lati', 'Alti'] },
     { name: 'NodeGenerateCandidate', externals: ['OpenAI-1'] },
     { name: 'NodeInvokeDocking', externals: ['SchrodingerSuite'] },
