@@ -1,7 +1,7 @@
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { AIMessage } from '@langchain/core/messages';
-import { registerNode, BaseStateSpec } from "./nodeUtils.js";
+import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
 import * as path from 'path';
 import axios from 'axios';
 
@@ -12,31 +12,22 @@ interface ChunkInfo {
     content: string;
 }
 
-
-const NodeInvokeDockingState_I = Annotation.Root({
-    ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+export const NodeInvokeDockingState = Annotation.Root({
+    candidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
-    receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
+    target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
     box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
-});
-
-const NodeInvokeDockingState_O = Annotation.Root({
-    ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
+    docking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
         reducer: (prev, next) => next
     }),
-    ligandPose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
+    pose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
         reducer: (prev, next) => next
     }),
-});
-
-export const NodeInvokeDockingState = Annotation.Root({
-    ...NodeInvokeDockingState_I.spec,
-    ...NodeInvokeDockingState_O.spec,
 });
 
 type WithBaseState = typeof NodeInvokeDockingState.State &
@@ -45,17 +36,51 @@ type WithBaseState = typeof NodeInvokeDockingState.State &
 
 class _NodeInvokeDocking extends Runnable {
 
-    static meta = {
-        description: "Node to invoke AutoDock Vina.",
-        stateSpecs: {
-            inputs: NodeInvokeDockingState_I,
-            outputs: NodeInvokeDockingState_O,
-        },
-        resourceSpecs: {
-            inputs: ["ligand", "receptor", "box"],
-            outputs: ["docking", "pose"],
-        },
-    }
+    static nodeSpec: NodeSpec = {
+        name: 'NodeInvokeDocking',
+        description: '',
+        operations: [
+            {
+                name: 'SchrödingerWrapper',
+                description: '',
+                inputs: [
+                    { name: 'candidate', kind: 'path' },
+                    { name: 'target', kind: 'path' },
+                ],
+                outputs: [
+                    { name: 'docking', kind: 'path' },
+                    { name: 'pose', kind: 'path' },
+                ],
+                operations: [
+                    {
+                        direction: 'read',
+                        storage: 'shared',
+                        resources: [
+                            { name: 'candidate', kind: 'file' },
+                            { name: 'target', kind: 'file' },
+                        ],
+                    },
+                    {
+                        direction: 'write',
+                        storage: 'shared',
+                        resources: [
+                            { name: 'docking', kind: 'file' },
+                            { name: 'pose', kind: 'file' },
+                        ],
+                    },
+                ],
+            },
+            {
+                direction: 'write',
+                storage: 'private',
+                resources: [
+                    { name: 'docking', kind: 'path' },
+                    { name: 'pose', kind: 'path' },
+                ],
+            },
+        ],
+        nexts: ['NodeLoadResults'],
+    };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
@@ -69,9 +94,9 @@ class _NodeInvokeDocking extends Runnable {
                 return `tp_resources/${path}`;
             };
 
-            const ligandPath = addPrefix(state.ligandCandidate.path);
+            const ligandPath = addPrefix(state.candidate.path);
             const boxPath = addPrefix(state.box.path);
-            const receptorPath = addPrefix(state.receptor.path);
+            const receptorPath = addPrefix(state.target.path);
 
             // Extract paths from the resources
             const payload = {
@@ -125,11 +150,11 @@ class _NodeInvokeDocking extends Runnable {
 
                 return {
                     messages: [new AIMessage("Docking completed successfully")],
-                    ligandDocking: {
+                    docking: {
                         path: ligandDockingPath,
                         value: new Map()
                     },
-                    ligandPose: {
+                    pose: {
                         path: ligandPosePath,
                         value: new Map()
                     }
@@ -148,7 +173,7 @@ class _NodeInvokeDocking extends Runnable {
 
 }
 
-export const NodeInvokeDocking = registerNode<typeof NodeInvokeDockingState_I | typeof NodeInvokeDockingState_O, typeof _NodeInvokeDocking>(_NodeInvokeDocking);
+export const NodeInvokeDocking = registerNode<typeof _NodeInvokeDocking>(_NodeInvokeDocking);
 
 
 

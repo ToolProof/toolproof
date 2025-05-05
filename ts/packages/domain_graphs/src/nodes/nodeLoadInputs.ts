@@ -91,10 +91,10 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 
 
 export const NodeLoadInputsState = Annotation.Root({
-    ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+    anchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
-    receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
+    target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
     box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
@@ -109,22 +109,36 @@ type WithBaseState = typeof NodeLoadInputsState.State &
 class _NodeLoadInputs extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeLoadInputs', // ATTENTION: Could this be inferred from the class name?
-        description: '',
+        name: 'NodeLoadInputs',
+        description: 'Loads input files into memory',
         operations: [
             {
                 direction: 'read',
+                storage: 'private',
+                resources: [
+                    { name: 'anchor', kind: 'path' },
+                    { name: 'target', kind: 'path' }
+                ]
+            },
+            {
+                direction: 'read',
                 storage: 'shared',
-                resources: ['anchor', 'target']
-            } as const,
+                resources: [
+                    { name: 'anchor', kind: 'file' },
+                    { name: 'target', kind: 'file' }
+                ]
+            },
             {
                 direction: 'write',
                 storage: 'private',
-                resources: ['anchor', 'target']
-            } as const
+                resources: [
+                    { name: 'anchor', kind: 'value' },
+                    { name: 'target', kind: 'value' }
+                ]
+            }
         ],
         nexts: ['GenerateCandidate']
-    }
+    };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
@@ -228,8 +242,8 @@ class _NodeLoadInputs extends Runnable {
 
             return {
                 messages: [new AIMessage("Inputs loaded successfully")],
-                ligandAnchor: results.ligandAnchor,
-                receptor: results.receptor,
+                anchor: results.ligandAnchor,
+                target: results.receptor,
                 box: results.box,
             };
 

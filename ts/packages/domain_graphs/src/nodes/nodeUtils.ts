@@ -1,6 +1,8 @@
 import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 import { Employment } from '../engine/types';
 
+// === Base state spec ===
+
 export const BaseStateSpec = {
     ...MessagesAnnotation.spec,
     employment: Annotation<Employment>({
@@ -8,54 +10,110 @@ export const BaseStateSpec = {
     }),
 };
 
-type ResourceType = 'anchor' | 'target' | 'candidate' | 'results' | 'decision';
+// === Resource modeling ===
 
-type StorageOperationDirectionType = 'read' | 'write';
+export type ResourceType =
+    | 'anchor'
+    | 'target'
+    | 'box'
+    | 'candidate'
+    | 'docking'
+    | 'pose'
+    | 'decision';
 
-type StorageOperationNatureType = 'private' | 'shared';
+export type ResourceKind = 'file' | 'path' | 'value';
 
-type StorageOperation = {
+export type ResourceRef<
+    Name extends ResourceType = ResourceType,
+    Kind extends ResourceKind = ResourceKind
+> = {
+    name: Name;
+    kind: Kind;
+};
+
+// === Storage operations ===
+
+export type StorageOperationDirectionType = 'read' | 'write';
+
+/**
+ * For private operations, `kind: 'path'` and `kind: 'value'` are allowed
+ */
+export type PrivateOperation = {
     direction: StorageOperationDirectionType;
-    resources: ResourceType[];
-}
+    storage: 'private';
+    resources: ResourceRef<ResourceType, 'path' | 'value'>[];
+};
 
-interface StorageOperationAllowPrivate extends StorageOperation {
-    storage: StorageOperationNatureType;
-}
+/**
+ * For shared operations, only `kind: 'file'` is allowed
+ */
+export type SharedOperation = {
+    direction: StorageOperationDirectionType;
+    storage: 'shared';
+    resources: ResourceRef<ResourceType, 'file'>[];
+};
 
-interface StorageOperationDisallowPrivate extends StorageOperation {
-    storage: 'shared'; // ATTENTION: must document this
-}
+/**
+ * Union of all valid storage operations
+ */
+export type StorageOperation = PrivateOperation | SharedOperation;
 
-type ToolInvocation = {
-    name: string; // ATTENTION: tool name
-    operations: OperationDisallowPrivate[];
-}
+/**
+ * A storage operation that is explicitly a write to private
+ */
+export type WritePrivateOperation = {
+    direction: 'write';
+    storage: 'private';
+    resources: ResourceRef<ResourceType, 'path' | 'value'>[]; // or just ResourceRef[] if needed
+};
 
-type SwapOperation = {
-    inputs: ResourceType[];
-    outputs: ResourceType[];
-}
+// === Tool invocation ===
 
-type OperationAllowPrivate = StorageOperationAllowPrivate | ToolInvocation | SwapOperation;
-
-type OperationDisallowPrivate = StorageOperationDisallowPrivate | ToolInvocation | SwapOperation;
-
-export interface NodeSpec {
+export type ToolInvocation = {
     name: string;
     description: string;
-    operations: OperationAllowPrivate[];
-    nexts: string[];
-}
+    inputs: ResourceRef<ResourceType, 'path' | 'value'>[]; // inputs to the tool
+    outputs: ResourceRef<ResourceType, 'path' | 'value'>[]; // outputs from the tool
+    operations: OperationDisallowPrivate[]; // tools must not access private resources
+};
 
-interface NodeClass {
+// === Operation containers ===
+
+export type OperationAllowPrivate = StorageOperation | ToolInvocation;
+export type OperationDisallowPrivate = SharedOperation | ToolInvocation;
+
+// === Node specification ===
+
+/**
+ * NodeSpec with a constraint: the final operation must be a write to private
+ */
+export type NodeSpec = {
+    name: string;
+    description: string;
+    operations: [...OperationAllowPrivate[], WritePrivateOperation];
+    nexts: string[];
+};
+
+// === Node class type ===
+
+export interface NodeClass {
     nodeSpec: NodeSpec;
 }
 
+// === Registration helper to attach spec ===
 
-// ATTENTION_RONAK: The purpose of this is to enforce the contract of nodeSpecs in the node class
 export function registerNode<
     T extends NodeClass & (new (...args: any[]) => any)
 >(cls: T): T {
+    /* const lastOp = cls.nodeSpec.operations.at(-1);
+    if (
+        !lastOp ||
+        lastOp.direction !== 'write' ||
+        lastOp.storage !== 'private'
+    ) {
+        throw new Error(`Node ${cls.name} must end with a write to private operation.`);
+    } */
     return cls;
 }
+
+

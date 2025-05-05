@@ -3,12 +3,8 @@ import { Node, NamedLink } from './types';
 
 const radius = 200;
 const alphaBetaYDistance = 75;
-const alphaDeltaYDistance = -50;
-const alphaGammaYDistance = -100;
-
 
 const strategyUno = [
-    { name: 'NodeFetchInputPaths', externals: [] },
     { name: 'NodeLoadInputs', externals: ['Longti', 'Lati', 'Alti'] },
     { name: 'NodeGenerateCandidate', externals: ['OpenAI-1'] },
     { name: 'NodeInvokeDocking', externals: ['SchrodingerSuite'] },
@@ -22,7 +18,7 @@ const alphaNodes: Node[] = strategyUno.map((node, index) => ({
     val: 5,
     group: 0,
     fx: radius * Math.cos((2 * Math.PI * index) / strategyUno.length),
-    fy: 0,
+    fy: -75,
     fz: radius * Math.sin((2 * Math.PI * index) / strategyUno.length),
 }));
 
@@ -48,7 +44,7 @@ const betaNodes: Node[] = strategyUno.flatMap((node, index) => {
             val: 3,
             group: 1,
             fx: betaNodeX,
-            fy: alphaBetaYDistance, // y-coordinate above the alphaNode
+            fy: 75, // y-coordinate above the alphaNode
             fz: betaNodeZ,
         };
     });
@@ -61,7 +57,7 @@ const deltaNodes: Node[] = [
         val: 50,
         group: 3,
         fx: 0,
-        fy: alphaDeltaYDistance,
+        fy: -50,
         fz: 0,
     },
 ];
@@ -73,26 +69,10 @@ const gammaNodes: Node[] = [
         val: 500,
         group: 2,
         fx: 0,
-        fy: alphaGammaYDistance,
+        fy: 0,
         fz: 0,
     },
 ];
-
-const alphaSuperLinks: NamedLink[] = strategyUno.flatMap((node, index) => {
-    const circumferenceNode = node.name;
-    return [
-        {
-            source: 'AlphaSuper', // Source node
-            target: circumferenceNode, // Target node
-            name: `AlphaSuper_${circumferenceNode}`, // Name property
-        },
-        {
-            source: circumferenceNode, // Source node
-            target: 'AlphaSuper', // Target node
-            name: `${circumferenceNode}_AlphaSuper`, // Name property
-        },
-    ];
-});
 
 const alphaInterLinks: NamedLink[] = strategyUno.flatMap((nodeA, indexA) => {
     return strategyUno
@@ -175,14 +155,12 @@ const betaGammaLinks: NamedLink[] = strategyUno.flatMap((node, index) =>
 
 export const data = {
     nodes: [
-        { id: 'AlphaSuper', val: 50, group: 0, fx: 0, fy: 0, fz: 0 },
         ...alphaNodes,
         ...betaNodes,
         ...deltaNodes,
         ...gammaNodes,
     ],
     links: [
-        ...alphaSuperLinks,
         ...alphaInterLinks,
         ...alphaDeltaLinks,
         ...alphaGammaLinks,

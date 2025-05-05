@@ -2,10 +2,10 @@ import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { registerNode, BaseStateSpec } from "./nodeUtils.js";
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from "../../firebaseAdminInit.js";
+import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
 
 const storage = new Storage({
     credentials: {
@@ -25,24 +25,16 @@ interface ChunkInfo {
     content: string;
 }
 
-export const NodeGenerateCandidateState_I = Annotation.Root({
-    ligandAnchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
-    receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
-        reducer: (prev, next) => next
-    }),
-});
-
-export const NodeGenerateCandidateState_O = Annotation.Root({
-    ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
-});
-
 export const NodeGenerateCandidateState = Annotation.Root({
-    ...NodeGenerateCandidateState_I.spec,
-    ...NodeGenerateCandidateState_O.spec,
+    anchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+        reducer: (prev, next) => next
+    }),
+    target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
+        reducer: (prev, next) => next
+    }),
+    candidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+        reducer: (prev, next) => next
+    }),
 });
 
 type WithBaseState = typeof NodeGenerateCandidateState.State &
@@ -51,26 +43,44 @@ type WithBaseState = typeof NodeGenerateCandidateState.State &
 
 class _NodeGenerateCandidate extends Runnable {
 
-    static meta = {
-        description: "Generate candidate ligand from a given ligand and receptor.",
-        stateSpecs: {
-            inputs: NodeGenerateCandidateState_I,
-            outputs: NodeGenerateCandidateState_O,
-        },
-        resourceSpecs: {
-            inputs: ["ligand", "receptor", "box"],
-            outputs: ["candidate"],
-        },
-    }
-
+    static nodeSpec: NodeSpec = {
+        name: 'NodeGenerateCandidate',
+        description: '',
+        operations: [
+            {
+                direction: 'read',
+                storage: 'private',
+                resources: [
+                    { name: 'anchor', kind: 'value' },
+                    { name: 'target', kind: 'value' },
+                ],
+            },
+            {
+                direction: 'write',
+                storage: 'shared',
+                resources: [
+                    { name: 'candidate', kind: 'file' },
+                ],
+            },
+            {
+                direction: 'write',
+                storage: 'private',
+                resources: [
+                    { name: 'candidate', kind: 'path' },
+                    { name: 'candidate', kind: 'value' }, // Not strictly neccessary, but useful for subsequent iterations
+                ],
+            },
+        ],
+        nexts: ['GenerateCandidate'],
+    };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
         try {
-            const anchorContent: string = state.ligandAnchor.value;
-            const targetChunks: ChunkInfo[] = state.receptor.value;
+            const anchorContent: string = state.anchor.value;
+            const targetChunks: ChunkInfo[] = state.target.value;
 
             console.log('anchorContent:', anchorContent);
 
@@ -179,7 +189,7 @@ class _NodeGenerateCandidate extends Runnable {
                         metadata: {
                             createdAt: timestamp,
                             type: 'candidate',
-                            sourceAnchor: state.ligandAnchor.path,
+                            sourceAnchor: state.anchor.path,
                             firestoreDocId: docId
                         }
                     });
@@ -188,7 +198,7 @@ class _NodeGenerateCandidate extends Runnable {
 
                 return {
                     messages: [new AIMessage("Candidate generated")],
-                    ligandCandidate: {
+                    candidate: {
                         path: candidateFileName,
                         value: candidateSmiles,
                     }
@@ -209,7 +219,7 @@ class _NodeGenerateCandidate extends Runnable {
 
 }
 
-export const NodeGenerateCandidate = registerNode<typeof NodeGenerateCandidateState_I | typeof NodeGenerateCandidateState_O, typeof _NodeGenerateCandidate>(_NodeGenerateCandidate);
+export const NodeGenerateCandidate = registerNode<typeof _NodeGenerateCandidate>(_NodeGenerateCandidate);
 
 
 
