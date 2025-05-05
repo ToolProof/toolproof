@@ -72,6 +72,7 @@ export type WritePrivateOperation = {
 export type ToolInvocation = {
     name: string;
     description: string;
+    foo?: 'internal' | 'external'; // ATTENTION
     inputs: ResourceRef<ResourceType, 'path' | 'value'>[]; // inputs to the tool
     outputs: ResourceRef<ResourceType, 'path' | 'value'>[]; // outputs from the tool
     operations: OperationDisallowPrivate[]; // tools must not access private resources

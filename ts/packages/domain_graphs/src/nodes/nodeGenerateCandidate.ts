@@ -56,6 +56,18 @@ class _NodeGenerateCandidate extends Runnable {
                 ],
             },
             {
+                name: 'OpenAI',
+                description: '',
+                inputs: [
+                    { name: 'anchor', kind: 'value' },
+                    { name: 'target', kind: 'value' },
+                ],
+                outputs: [
+                    { name: 'candidate', kind: 'value' },
+                ],
+                operations: [],
+            },
+            {
                 direction: 'write',
                 storage: 'shared',
                 resources: [
