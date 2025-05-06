@@ -2,7 +2,7 @@ import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { registerNode, BaseStateSpec } from "./nodeUtils.js";
+import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
 
 const storage = new Storage({
     credentials: {
@@ -13,22 +13,13 @@ const storage = new Storage({
 });
 const bucketName = 'tp_resources';
 
-
-export const NodeLoadResultsState_I = Annotation.Root({
-});
-
-export const NodeLoadResultsState_O = Annotation.Root({
-    ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
-        reducer: (prev, next) => next
-    }),
-    ligandPose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
-        reducer: (prev, next) => next
-    }),
-});
-
 export const NodeLoadResultsState = Annotation.Root({
-    ...NodeLoadResultsState_I.spec,
-    ...NodeLoadResultsState_O.spec,
+    docking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
+        reducer: (prev, next) => next
+    }),
+    pose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
+        reducer: (prev, next) => next
+    }),
 });
 
 type WithBaseState = typeof NodeLoadResultsState.State &
@@ -37,16 +28,10 @@ type WithBaseState = typeof NodeLoadResultsState.State &
 
 class _NodeLoadResults extends Runnable {
 
-    static meta = {
-        description: "Load docking results from the bucket.",
-        stateSpecs: {
-            inputs: NodeLoadResultsState_I,
-            outputs: NodeLoadResultsState_O,
-        },
-        resourceSpecs: {
-            inputs: ["docking", "pose"],
-            outputs: [],
-        },
+    static nodeSpec: NodeSpec = {
+        name: 'NodeLoadResults',
+        description: '',
+        operations: [],
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -55,13 +40,13 @@ class _NodeLoadResults extends Runnable {
         // Here we load the docking results from the bucket and into GraphState.
 
         try {
-            if (!state.ligandDocking?.path || !state.ligandPose?.path) {
+            if (!state.docking?.path || !state.pose?.path) {
                 throw new Error("Missing ligandDocking or ligandPose paths");
             }
 
             const resources = [
-                { key: 'ligandDocking', path: state.ligandDocking.path },
-                { key: 'ligandPose', path: state.ligandPose.path }
+                { key: 'ligandDocking', path: state.docking.path },
+                { key: 'ligandPose', path: state.pose.path }
             ];
 
             const results: Record<string, any> = {};
@@ -102,8 +87,8 @@ class _NodeLoadResults extends Runnable {
 
             return {
                 messages: [new AIMessage("Results loaded")],
-                ligandDocking: results.ligandDocking,
-                ligandPose: results.ligandPose
+                docking: results.ligandDocking,
+                pose: results.ligandPose
             };
         } catch (error: any) {
             console.error("Error in nodeLoadResults:", error);
@@ -115,7 +100,7 @@ class _NodeLoadResults extends Runnable {
 
 }
 
-export const NodeLoadResults = registerNode<typeof NodeLoadResultsState_I | typeof NodeLoadResultsState_O, typeof _NodeLoadResults>(_NodeLoadResults);
+export const NodeLoadResults = registerNode<typeof _NodeLoadResults>(_NodeLoadResults);
 
 
 

@@ -64,7 +64,7 @@ export type StorageOperation = PrivateOperation | SharedOperation;
 export type WritePrivateOperation = {
     direction: 'write';
     storage: 'private';
-    resources: ResourceRef<ResourceType, 'path' | 'value'>[]; // or just ResourceRef[] if needed
+    resources: ResourceRef<ResourceType, 'path' | 'value'>[];
 };
 
 // === Tool invocation ===

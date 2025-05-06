@@ -1,21 +1,18 @@
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { AIMessage } from '@langchain/core/messages';
-import { registerNode, BaseStateSpec } from "./nodeUtils.js";
+import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 
 const openai = new OpenAI();
 
-export const NodeEvaluateResultsState_I = Annotation.Root({
-    ligandDocking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
+export const NodeEvaluateResultsState = Annotation.Root({
+    docking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
         reducer: (prev, next) => next
     }),
-    ligandPose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
+    pose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
         reducer: (prev, next) => next
     }),
-});
-
-export const NodeEvaluateResultsState_O = Annotation.Root({
     evaluation: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
@@ -24,29 +21,16 @@ export const NodeEvaluateResultsState_O = Annotation.Root({
     }),
 });
 
-
-
-export const NodeEvaluateResultsState = Annotation.Root({
-    ...NodeEvaluateResultsState_I.spec,
-    ...NodeEvaluateResultsState_O.spec,
-});
-
 type WithBaseState = typeof NodeEvaluateResultsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
 
 
 class _NodeEvaluateResults extends Runnable {
 
-    static meta = {
-        description: "Node to invoke AutoDock Vina.",
-        stateSpecs: {
-            inputs: NodeEvaluateResultsState_I,
-            outputs: NodeEvaluateResultsState_O,
-        },
-        resourceSpecs: {
-            inputs: ["ligand", "receptor", "box"],
-            outputs: ["evaluation"],
-        },
+    static nodeSpec: NodeSpec = {
+        name: 'NodeEvaluateResults',
+        description: '',
+        operations: [],
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -54,15 +38,15 @@ class _NodeEvaluateResults extends Runnable {
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         // Here we evaluate the results and decide whether to retry or not.
         try {
-            if (!state.ligandDocking?.value || !state.ligandPose?.value) {
+            if (!state.docking?.value || !state.pose?.value) {
                 throw new Error("Missing ligandDocking or ligandPose data");
             }
 
             // Prepare the results content for OpenAI evaluation
             let resultsContent = "";
 
-            const dockingContent = state.ligandDocking.value.get('content');
-            const poseContent = state.ligandPose.value.get('content');
+            const dockingContent = state.docking.value.get('content');
+            const poseContent = state.pose.value.get('content');
 
             if (dockingContent) {
                 resultsContent += `Docking Result:\n${dockingContent}\n\n`;
@@ -132,7 +116,7 @@ class _NodeEvaluateResults extends Runnable {
 
 }
 
-export const NodeEvaluateResults = registerNode<typeof NodeEvaluateResultsState_I | typeof NodeEvaluateResultsState_O, typeof _NodeEvaluateResults>(_NodeEvaluateResults);
+export const NodeEvaluateResults = registerNode<typeof _NodeEvaluateResults>(_NodeEvaluateResults);
 
 
 
