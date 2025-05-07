@@ -12,6 +12,7 @@ const storage = new Storage({
         project_id: process.env.GCP_PROJECT_ID,
     }
 });
+
 // ATTENTION: factor out to shared/src/constants.ts
 const bucketName = 'tp_resources';
 
