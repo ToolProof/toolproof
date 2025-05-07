@@ -1,102 +1,25 @@
+import { NodeSpec, BaseStateSpec, registerNode } from './nodeUtils.js';
+import { ChunkInfo } from 'src/localTools/chunkPDBContent.js';
+import { generateBoxPDB } from 'src/localTools/foo.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
-import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { registerNode, BaseStateSpec } from "./nodeUtils.js";
 import { z } from "zod";
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import { zodResponseFormat } from "openai/helpers/zod";
 
-const storage = new Storage({
-    credentials: {
-        client_email: process.env.GCP_CLIENT_EMAIL,
-        private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        project_id: process.env.GCP_PROJECT_ID,
-    }
-});
-const bucketName = 'tp_resources';
-
 const openai = new OpenAI();
 
-interface ResourceData {
-    description: string;
-    filetype: string;
-    generator: string;
-    tags: {
-        role?: string;
-        type?: string;
-    };
-    name: string;
-    timestamp: any;
-}
-
-interface ChunkInfo {
-    chainId: string;
-    startResidue: number;
-    endResidue: number;
-    content: string;
-}
-
-// Helper function to generate PDB format for the box
-const generateBoxPDB = (boxCoords: any): string => {
-    const { center_x, center_y, center_z, size_x, size_y, size_z } = boxCoords;
-
-    // Calculate corner points
-    const halfX = size_x / 2;
-    const halfY = size_y / 2;
-    const halfZ = size_z / 2;
-
-    // Generate PDB format with 8 corner points and connecting lines
-    let pdbContent = "HEADER    DOCKING BOX\n";
-
-    // Add 8 corner points as atoms
-    const corners = [
-        [center_x - halfX, center_y - halfY, center_z - halfZ],
-        [center_x + halfX, center_y - halfY, center_z - halfZ],
-        [center_x + halfX, center_y + halfY, center_z - halfZ],
-        [center_x - halfX, center_y + halfY, center_z - halfZ],
-        [center_x - halfX, center_y - halfY, center_z + halfZ],
-        [center_x + halfX, center_y - halfY, center_z + halfZ],
-        [center_x + halfX, center_y + halfY, center_z + halfZ],
-        [center_x - halfX, center_y + halfY, center_z + halfZ]
-    ];
-
-    corners.forEach((corner, i) => {
-        pdbContent += `ATOM  ${(i + 1).toString().padStart(5)} ${' C  '.padEnd(4)}BOX A${(i + 1).toString().padStart(4)}    ${corner[0].toFixed(3).padStart(8)}${corner[1].toFixed(3).padStart(8)}${corner[2].toFixed(3).padStart(8)}  1.00  0.00           C\n`;
-    });
-
-    // Add connecting lines as CONECT records
-    pdbContent += "CONECT    1    2    4    5\n";
-    pdbContent += "CONECT    2    1    3    6\n";
-    pdbContent += "CONECT    3    2    4    7\n";
-    pdbContent += "CONECT    4    1    3    8\n";
-    pdbContent += "CONECT    5    1    6    8\n";
-    pdbContent += "CONECT    6    2    5    7\n";
-    pdbContent += "CONECT    7    3    6    8\n";
-    pdbContent += "CONECT    8    4    5    7\n";
-    pdbContent += "END\n";
-
-    return pdbContent;
-};
-
-export const NodeGenerateBoxState_I = Annotation.Root({
-    receptor: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
+export const NodeGenerateBoxState = Annotation.Root({
+    candidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
-    ligandCandidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+    target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
-});
-
-export const NodeGenerateBoxState_O = Annotation.Root({
     box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
-});
-
-export const NodeGenerateBoxState = Annotation.Root({
-    ...NodeGenerateBoxState_I.spec,
-    ...NodeGenerateBoxState_O.spec,
 });
 
 type WithBaseState = typeof NodeGenerateBoxState.State &
@@ -105,24 +28,18 @@ type WithBaseState = typeof NodeGenerateBoxState.State &
 
 class _NodeGenerateBox extends Runnable {
 
-    static meta = {
-        description: "Generate the box.",
-        stateSpecs: {
-            inputs: NodeGenerateBoxState_I,
-            outputs: NodeGenerateBoxState_O,
-        },
-        resourceSpecs: {
-            inputs: [],
-            outputs: [],
-        },
+    static nodeSpec: NodeSpec = {
+        name: 'NodeGenerateBox',
+        description: '',
+        operations: [],
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
         try {
-            const candidateSmiles: string = state.ligandCandidate.value;
-            const targetChunks: ChunkInfo[] = state.receptor.value;
+            const candidateSmiles: string = state.candidate.value;
+            const targetChunks: ChunkInfo[] = state.target.value;
 
             if (!candidateSmiles || !targetChunks || targetChunks.length === 0) {
                 throw new Error("Missing candidate SMILES or receptor data");
@@ -203,7 +120,7 @@ class _NodeGenerateBox extends Runnable {
 
             return {
                 messages: [new AIMessage("Docking box generated")],
-                ligandBox: {
+                box: {
                     path: boxFileName,
                     value: boxPDB
                 }
@@ -219,7 +136,7 @@ class _NodeGenerateBox extends Runnable {
 
 }
 
-export const NodeGenerateBox = registerNode<typeof NodeGenerateBoxState_I | typeof NodeGenerateBoxState_O, typeof _NodeGenerateBox>(_NodeGenerateBox);
+export const NodeGenerateBox = registerNode<typeof _NodeGenerateBox>(_NodeGenerateBox);
 
 
 

@@ -82,8 +82,7 @@ class _NodeGenerateCandidate extends Runnable {
                     { name: 'candidate', kind: 'value' }, // Not strictly neccessary, but useful for subsequent iterations
                 ],
             },
-        ],
-        nexts: ['GenerateCandidate'],
+        ]
     };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
