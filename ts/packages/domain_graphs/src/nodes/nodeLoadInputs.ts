@@ -1,8 +1,8 @@
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from "@langchain/langgraph";
+import { Annotation } from '@langchain/langgraph';
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
+import { NodeSpec, BaseStateSpec, registerNode } from './nodeUtils.js';
 
 // ATTENTION: factor out
 const storage = new Storage({
@@ -14,19 +14,6 @@ const storage = new Storage({
 });
 // ATTENTION: factor out to shared/src/constants.ts
 const bucketName = 'tp_resources';
-
-// ATTENTION: factor out to types.ts
-interface ResourceData {
-    description: string;
-    filetype: string;
-    generator: string;
-    tags: {
-        role?: string;
-        type?: string;
-    };
-    name: string;
-    timestamp: any;
-}
 
 // ATTENTION: factor out to types.ts
 interface ChunkInfo {
@@ -91,33 +78,28 @@ const chunkPDBContent = (pdbContent: string, chunkSize: number = 1000): ChunkInf
 
 
 export const NodeLoadInputsState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
-    target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
-        reducer: (prev, next) => next
-    }),
-    box: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
-        reducer: (prev, next) => next
-    }),
+    anchor: Annotation<{ path: string, value: string }>(),
+    target: Annotation<{ path: string, value: ChunkInfo[] }>(),
+    box: Annotation<{ path: string, value: ChunkInfo[] }>(),
 });
 
 type WithBaseState = typeof NodeLoadInputsState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
+    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
 class _NodeLoadInputs extends Runnable {
 
     static nodeSpec: NodeSpec = {
         name: 'NodeLoadInputs',
-        description: 'Loads input files into memory',
+        description: '',
         operations: [
             {
                 direction: 'read',
                 storage: 'private',
                 resources: [
                     { name: 'anchor', kind: 'path' },
-                    { name: 'target', kind: 'path' }
+                    { name: 'target', kind: 'path' },
+                    { name: 'box', kind: 'path' }
                 ]
             },
             {
@@ -125,7 +107,8 @@ class _NodeLoadInputs extends Runnable {
                 storage: 'shared',
                 resources: [
                     { name: 'anchor', kind: 'file' },
-                    { name: 'target', kind: 'file' }
+                    { name: 'target', kind: 'file' },
+                    { name: 'box', kind: 'file' }
                 ]
             },
             {
@@ -133,11 +116,11 @@ class _NodeLoadInputs extends Runnable {
                 storage: 'private',
                 resources: [
                     { name: 'anchor', kind: 'value' },
-                    { name: 'target', kind: 'value' }
+                    { name: 'target', kind: 'value' },
+                    { name: 'box', kind: 'value' }
                 ]
             }
-        ],
-        nexts: ['GenerateCandidate']
+        ]
     };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
@@ -147,74 +130,22 @@ class _NodeLoadInputs extends Runnable {
 
             // Here we load the inputs from the bucket and into GraphState.
 
-            // Get input references
-            const inputs = state.employment.inputs || {};
-
-            // Handle nested structure - find the first key that contains the resources
-            let ligandRef: any, receptorRef: any, boxRef: any;
-
-            // Check if inputs has a nested structure
-            const firstKey = Object.keys(inputs)[0];
-            if (firstKey && typeof inputs[firstKey] === 'object' && inputs[firstKey].ligand) {
-                // Nested structure case
-                ligandRef = inputs[firstKey].ligand;
-                receptorRef = inputs[firstKey].receptor;
-                boxRef = inputs[firstKey].box;
-            } else {
-                // Direct structure case
-                ligandRef = inputs.ligand;
-                receptorRef = inputs.receptor;
-                boxRef = inputs.box;
-            }
-
-            if (!ligandRef || !receptorRef || !boxRef) {
-                throw new Error("Missing required resource references");
-            }
-
-            // Fetch resources in parallel
-            const [ligandSnap, receptorSnap, boxSnap] = await Promise.all([
-                ligandRef.get(),
-                receptorRef.get(),
-                boxRef.get()
-            ]);
-
-            // Extract resource data
-            const ligandData = ligandSnap.exists ? ligandSnap.data() as ResourceData : null;
-            const receptorData = receptorSnap.exists ? receptorSnap.data() as ResourceData : null;
-            const boxData = boxSnap.exists ? boxSnap.data() as ResourceData : null;
-
-            if (!ligandData || !receptorData || !boxData) {
-                throw new Error("One or more required resources not found");
-            }
-
-            const ligandPath = `${bucketName}/${ligandSnap.id}.${ligandData.filetype}`;
-            const receptorPath = `${bucketName}/${receptorSnap.id}.${receptorData.filetype}`;
-            const boxPath = `${bucketName}/${boxSnap.id}.${boxData.filetype}`;
-
-            console.log("Resource paths:", { ligandPath, receptorPath, boxPath });
-
             const resources = [
-                { key: 'ligandAnchor', path: ligandPath },
-                { key: 'receptor', path: receptorPath },
-                { key: 'box', path: boxPath }
+                { key: 'anchor', path: state.anchor.path },
+                { key: 'target', path: state.target.path },
+                { key: 'box', path: state.box.path }
             ];
 
             const results: Record<string, any> = {};
 
             for (const { key, path } of resources) {
                 try {
-                    // Try both tp_resources and tp-data formats
-                    const blobName = path
-                        .replace('tp_resources/', '');
-
-                    console.log(`Attempting download from ${bucketName}/${blobName}`);
-
                     const [content] = await storage
                         .bucket(bucketName)
-                        .file(blobName)
+                        .file(path)
                         .download();
 
-                    if (key === 'receptor' || key === 'box') {
+                    if (key === 'target' || key === 'box') {
                         // Pre-process PDB content into chunks
                         const pdbContent = content.toString();
                         const chunks = chunkPDBContent(pdbContent);
@@ -241,14 +172,14 @@ class _NodeLoadInputs extends Runnable {
             }
 
             return {
-                messages: [new AIMessage("Inputs loaded successfully")],
-                anchor: results.ligandAnchor,
-                target: results.receptor,
+                messages: [new AIMessage('Inputs loaded successfully')],
+                anchor: results.anchor,
+                target: results.target,
                 box: results.box,
             };
 
         } catch (error: any) {
-            console.error("Error in nodeLoadInputs:", error);
+            console.error('Error in nodeLoadInputs:', error);
             return {
                 messages: [new AIMessage(`Error loading inputs: ${error.message}`)]
             };

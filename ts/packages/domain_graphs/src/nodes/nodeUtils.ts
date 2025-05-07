@@ -1,13 +1,9 @@
-import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
-import { Employment } from '../engine/types';
+import { MessagesAnnotation } from '@langchain/langgraph';
 
 // === Base state spec ===
 
 export const BaseStateSpec = {
     ...MessagesAnnotation.spec,
-    employment: Annotation<Employment>({
-        reducer: (prev, next) => next,
-    }),
 };
 
 // === Resource modeling ===
@@ -92,7 +88,6 @@ export type NodeSpec = {
     name: string;
     description: string;
     operations: [...OperationAllowPrivate[], WritePrivateOperation];
-    nexts: string[];
 };
 
 // === Node class type ===
