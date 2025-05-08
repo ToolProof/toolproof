@@ -1,5 +1,5 @@
 {
-  "name": "tools",
+  "name": "domain_tools",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",

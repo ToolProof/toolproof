@@ -1,5 +1,5 @@
 {
-  "name": "graphs",
+  "name": "domain_graphs",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",

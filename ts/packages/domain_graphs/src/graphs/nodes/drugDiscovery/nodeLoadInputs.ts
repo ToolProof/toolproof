@@ -1,4 +1,4 @@
-import { NodeSpec, BaseStateSpec, registerNode } from './nodeUtils.js';
+import { NodeSpec, BaseStateSpec, registerNode } from '../../types.js';
 import { chunkPDBContent, ChunkInfo } from 'src/localTools/chunkPDBContent.js';
 import { storage, bucketName } from 'firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';

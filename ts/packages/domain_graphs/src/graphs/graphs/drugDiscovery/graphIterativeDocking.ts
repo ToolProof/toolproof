@@ -1,12 +1,11 @@
 import { StateGraph, Annotation, START, END } from "@langchain/langgraph";
-import { BaseStateSpec } from '../nodes/nodeUtils.js';
-import { NodeLoadInputs, NodeLoadInputsState } from '../nodes/nodeLoadInputs.js';
-import { NodeGenerateCandidate, NodeGenerateCandidateState } from '../nodes/nodeGenerateCandidate.js';
+import { BaseStateSpec } from '../../types.js';
+import { NodeLoadInputs, NodeLoadInputsState } from '../../nodes/drugDiscovery/nodeLoadInputs.js';
+import { NodeGenerateCandidate, NodeGenerateCandidateState } from '../../nodes/drugDiscovery/nodeGenerateCandidate.js';
 // import { NodeGenerateBox, NodeGenerateBoxState } from '../nodes/nodeGenerateBox.js';
-import { NodeInvokeDocking, NodeInvokeDockingState } from '../nodes/nodeInvokeDocking.js';
-import { NodeLoadResults, NodeLoadResultsState } from '../nodes/nodeLoadResults.js';
-import { NodeEvaluateResults, NodeEvaluateResultsState } from '../nodes/nodeEvaluateResults.js';
-import { AIMessage } from "@langchain/core/messages";
+import { NodeInvokeDocking, NodeInvokeDockingState } from '../../nodes/drugDiscovery/nodeInvokeDocking.js';
+import { NodeLoadResults, NodeLoadResultsState } from '../../nodes/drugDiscovery/nodeLoadResults.js';
+import { NodeEvaluateResults, NodeEvaluateResultsState } from '../../nodes/drugDiscovery/nodeEvaluateResults.js';
 
 const GraphState = Annotation.Root({
     ...BaseStateSpec,
@@ -28,24 +27,15 @@ const edgeShouldRetry = (state: typeof GraphState.State) => {
     }
 };
 
-const nodeStart = (state: typeof GraphState.State) => {
-    console.log('state :', state);
-    return {
-        messages: [new AIMessage("SubGraph Started successfully")],
-    };
-};
-
 
 const stateGraph = new StateGraph(GraphState)
-    .addNode("nodeStart", nodeStart)
     .addNode("nodeLoadInputs", new NodeLoadInputs())
     .addNode("nodeGenerateCandidate", new NodeGenerateCandidate())
     // .addNode("nodeGenerateBox", new NodeGenerateBox())
     .addNode("nodeInvokeDocking", new NodeInvokeDocking())
     .addNode("nodeLoadResults", new NodeLoadResults())
     .addNode("nodeEvaluateResults", new NodeEvaluateResults())
-    .addEdge(START, "nodeStart")
-    .addEdge("nodeStart", "nodeLoadInputs")
+    .addEdge(START, "nodeLoadInputs")
     .addEdge("nodeLoadInputs", "nodeGenerateCandidate")
     .addEdge("nodeGenerateCandidate", "nodeInvokeDocking")
     .addEdge("nodeInvokeDocking", "nodeLoadResults")

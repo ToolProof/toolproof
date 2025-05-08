@@ -4,8 +4,8 @@ import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import { FieldValue } from 'firebase-admin/firestore';
-import { db } from "../../../firebaseAdminInit.js";
-import { NodeSpec, BaseStateSpec, registerNode } from "./nodeUtils.js";
+import { db } from "../../../../firebaseAdminInit.js";
+import { NodeSpec, BaseStateSpec, registerNode } from "../../types.js";
 
 const storage = new Storage({
     credentials: {
