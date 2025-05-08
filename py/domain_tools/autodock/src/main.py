@@ -14,9 +14,9 @@ def autodock_basic():
         
         try:
             # Extract arguments from JSON payload
-            ligand = data.get("ligand") # /tp-data/resources/imatinib.txt"
-            receptor = data.get("receptor") # "tp-data/resources/1iep_no_lig.pdb"
-            box = data.get("box") # "tp-data/resources/xray-imatinib.pdb"
+            ligand = data.get("ligand") # /tp-resources/imatinib.smi"
+            receptor = data.get("receptor") # "tp-resources/1iep.pdb"
+            box = data.get("box") # "tp-resources/xray-imatinib.pdb"
 
             # Call the workflow from basic_docking
             result = basic_docking.run_simulation(ligand, receptor, box)
