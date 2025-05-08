@@ -1,8 +1,9 @@
+import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
-import { NodeSpec, BaseStateSpec, registerNode } from "../../types.js";
+
 
 const storage = new Storage({
     credentials: {

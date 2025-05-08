@@ -114,8 +114,9 @@ export function registerNode<
 
 
 interface ConditionalEdge {
+    name: string;
     source: string;
-    target: string[];
+    targets: string[];
 }
 
 export type GraphSpec = {

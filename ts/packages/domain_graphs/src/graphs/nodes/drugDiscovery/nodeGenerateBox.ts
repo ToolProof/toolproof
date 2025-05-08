@@ -1,4 +1,4 @@
-import { NodeSpec, BaseStateSpec, registerNode } from '../../types.js';
+import { NodeSpec, BaseStateSpec, registerNode } from 'src/graphs/types.js';
 import { ChunkInfo } from 'src/localTools/chunkPDBContent.js';
 import { generateBoxPDB } from 'src/localTools/foo.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';

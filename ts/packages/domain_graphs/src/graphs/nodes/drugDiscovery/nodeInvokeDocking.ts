@@ -1,7 +1,7 @@
+import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { AIMessage } from '@langchain/core/messages';
-import { NodeSpec, BaseStateSpec, registerNode } from "../../types.js";
 import * as path from 'path';
 import axios from 'axios';
 
