@@ -113,3 +113,18 @@ export function registerNode<
 }
 
 
+export type GraphSpec = {
+    name: string;
+    description: string;
+    operation: WritePrivateOperation
+}
+
+export interface GraphClass {
+    graphSpec: GraphSpec;
+}
+
+export const registerGraph = <T extends GraphClass>(cls: T): T => {
+    return cls;
+}
+
+

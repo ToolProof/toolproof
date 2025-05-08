@@ -1,11 +1,12 @@
 import { StateGraph, Annotation, START, END } from "@langchain/langgraph";
-import { BaseStateSpec } from '../../types.js';
-import { NodeLoadInputs, NodeLoadInputsState } from '../../nodes/drugDiscovery/nodeLoadInputs.js';
-import { NodeGenerateCandidate, NodeGenerateCandidateState } from '../../nodes/drugDiscovery/nodeGenerateCandidate.js';
+import { BaseStateSpec } from '../../../types.js';
+import { NodeIterativeDocking } from './nodeIterativeDocking.js';
+import { NodeLoadInputs, NodeLoadInputsState } from '../../../nodes/drugDiscovery/nodeLoadInputs.js';
+import { NodeGenerateCandidate, NodeGenerateCandidateState } from '../../../nodes/drugDiscovery/nodeGenerateCandidate.js';
 // import { NodeGenerateBox, NodeGenerateBoxState } from '../nodes/nodeGenerateBox.js';
-import { NodeInvokeDocking, NodeInvokeDockingState } from '../../nodes/drugDiscovery/nodeInvokeDocking.js';
-import { NodeLoadResults, NodeLoadResultsState } from '../../nodes/drugDiscovery/nodeLoadResults.js';
-import { NodeEvaluateResults, NodeEvaluateResultsState } from '../../nodes/drugDiscovery/nodeEvaluateResults.js';
+import { NodeInvokeDocking, NodeInvokeDockingState } from '../../../nodes/drugDiscovery/nodeInvokeDocking.js';
+import { NodeLoadResults, NodeLoadResultsState } from '../../../nodes/drugDiscovery/nodeLoadResults.js';
+import { NodeEvaluateResults, NodeEvaluateResultsState } from '../../../nodes/drugDiscovery/nodeEvaluateResults.js';
 
 const GraphState = Annotation.Root({
     ...BaseStateSpec,
@@ -29,13 +30,15 @@ const edgeShouldRetry = (state: typeof GraphState.State) => {
 
 
 const stateGraph = new StateGraph(GraphState)
+    .addNode("nodeIterativeDocking", new NodeIterativeDocking())
     .addNode("nodeLoadInputs", new NodeLoadInputs())
     .addNode("nodeGenerateCandidate", new NodeGenerateCandidate())
     // .addNode("nodeGenerateBox", new NodeGenerateBox())
     .addNode("nodeInvokeDocking", new NodeInvokeDocking())
     .addNode("nodeLoadResults", new NodeLoadResults())
     .addNode("nodeEvaluateResults", new NodeEvaluateResults())
-    .addEdge(START, "nodeLoadInputs")
+    .addEdge(START, "nodeIterativeDocking")
+    .addEdge("nodeIterativeDocking", "nodeLoadInputs")
     .addEdge("nodeLoadInputs", "nodeGenerateCandidate")
     .addEdge("nodeGenerateCandidate", "nodeInvokeDocking")
     .addEdge("nodeInvokeDocking", "nodeLoadResults")
