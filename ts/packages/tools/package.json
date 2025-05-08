@@ -1,5 +1,5 @@
 {
-  "name": "internal_tools",
+  "name": "tools",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
