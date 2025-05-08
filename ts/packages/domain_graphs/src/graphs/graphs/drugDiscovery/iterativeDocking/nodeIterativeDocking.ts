@@ -1,6 +1,6 @@
 import { GraphSpec, BaseStateSpec, registerGraph } from '../../../types.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from '@langchain/langgraph';
+import { Annotation, END } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 
 
@@ -15,11 +15,14 @@ class _NodeIterativeDocking extends Runnable {
             direction: 'write',
             storage: 'private',
             resources: [
-                { name: 'anchor', kind: 'value' },
-                { name: 'target', kind: 'value' },
-                { name: 'box', kind: 'value' }
             ]
-        }
+        },
+        conditionalEdges: [
+            {
+                source: 'nodeEvaluateResults',
+                target: ['nodeGenerateCandidate', END]
+            }
+        ]
     };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.

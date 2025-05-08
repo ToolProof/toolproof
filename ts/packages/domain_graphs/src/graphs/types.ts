@@ -113,10 +113,16 @@ export function registerNode<
 }
 
 
+interface ConditionalEdge {
+    source: string;
+    target: string[];
+}
+
 export type GraphSpec = {
     name: string;
     description: string;
     operation: WritePrivateOperation
+    conditionalEdges: ConditionalEdge[];
 }
 
 export interface GraphClass {
