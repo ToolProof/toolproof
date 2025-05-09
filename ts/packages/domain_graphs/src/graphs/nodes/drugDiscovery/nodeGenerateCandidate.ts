@@ -1,46 +1,27 @@
-import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
-import { db } from "src/firebaseAdminInit.js";
+import { NodeSpec, BaseStateSpec, registerNode } from 'src/graphs/types.js';
+import { ChunkInfo } from 'src/localTools/chunkPDBContent';
+import { storage, bucketName } from 'src/firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from "@langchain/langgraph";
-import { Storage } from '@google-cloud/storage';
+import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
-import { FieldValue } from 'firebase-admin/firestore';
-
-
-
-const storage = new Storage({
-    credentials: {
-        client_email: process.env.GCP_CLIENT_EMAIL,
-        private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        project_id: process.env.GCP_PROJECT_ID,
-    }
-});
-const bucketName = 'tp_resources';
 
 const openai = new OpenAI();
 
-interface ChunkInfo {
-    chainId: string;
-    startResidue: number;
-    endResidue: number;
-    content: string;
-}
-
 export const NodeGenerateCandidateState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+    anchor: Annotation<{ path: string, value: string }>({ // The type of 'value' should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
     target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
         reducer: (prev, next) => next
     }),
-    candidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+    candidate: Annotation<{ path: string, value: string }>({ // The type of 'value' should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
 });
 
 type WithBaseState = typeof NodeGenerateCandidateState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
+    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
 class _NodeGenerateCandidate extends Runnable {
@@ -98,21 +79,21 @@ class _NodeGenerateCandidate extends Runnable {
             console.log('anchorContent:', anchorContent);
 
             if (!anchorContent || !targetChunks || targetChunks.length === 0) {
-                throw new Error("Missing required resources");
+                throw new Error('Missing required resources');
             }
 
             // Analyze chunks sequentially to maintain context
             let analysisContext = '';
             for (const chunk of targetChunks) {
                 const response = await openai.chat.completions.create({
-                    model: "gpt-4o-mini",
+                    model: 'gpt-4o-mini',
                     messages: [
                         {
-                            role: "system",
-                            content: "You are analyzing protein structure chunks to identify binding site characteristics. Focus on key residues and potential interaction points."
+                            role: 'system',
+                            content: 'You are analyzing protein structure chunks to identify binding site characteristics. Focus on key residues and potential interaction points.'
                         },
                         {
-                            role: "user",
+                            role: 'user',
                             content: `
                                     Analyze the following protein chunk:
                                     Chain: ${chunk.chainId}
@@ -137,14 +118,14 @@ class _NodeGenerateCandidate extends Runnable {
 
             // Generate final candidate using accumulated analysis
             const finalResponse = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
+                model: 'gpt-4o-mini',
                 messages: [
                     {
-                        role: "system",
-                        content: "Generate an optimized / perfect SMILES string for a new molecule that could bind effectively to the target based on protein-ligand interactions."
+                        role: 'system',
+                        content: 'Generate an optimized / perfect SMILES string for a new molecule that could bind effectively to the target based on protein-ligand interactions.'
                     },
                     {
-                        role: "user",
+                        role: 'user',
                         content: `
                                 Using this protein analysis:
                                 ${analysisContext}
@@ -161,59 +142,38 @@ class _NodeGenerateCandidate extends Runnable {
                 max_tokens: 500
             });
 
-            const candidateSmiles = finalResponse.choices[0].message.content?.trim();
-            console.log('Generated candidate SMILES:', candidateSmiles);
+            const candidate = finalResponse.choices[0].message.content?.trim();
+            console.log('Generated candidate SMILES:', candidate);
 
-            if (!candidateSmiles) {
-                throw new Error("Failed to generate candidate SMILES string");
+            if (!candidate) {
+                throw new Error('Failed to generate candidate SMILES string');
             }
 
             // Create Firestore document for the candidate in resources collection
             const timestamp = new Date().toISOString();
 
             try {
-                // First create the document in Firestore
-                const resourcesRef = db.collection("resources");
-                const candidateDoc = resourcesRef.doc(); // Auto-generate document ID
-
-                await candidateDoc.set({
-                    "name": "imatinib",
-                    "description": "Generated candidate molecule",
-                    "filetype": "txt",
-                    "generator": "alpha",
-                    "tags": {
-                        "type": "ligand",
-                        "role": "candidate",
-                    },
-                    "timestamp": FieldValue.serverTimestamp(),
-                });
-
-                // Get the document ID
-                const docId = candidateDoc.id;
 
                 // Save candidate to GCS using the document ID
-                const candidateFileName = `${docId}.txt`;
+                const fileName = `adb/${timestamp}/candidate.smi`;
 
                 await storage
                     .bucket(bucketName)
-                    .file(candidateFileName)
-                    .save(candidateSmiles, {
+                    .file(fileName)
+                    .save(candidate, {
                         contentType: 'text/plain',
                         metadata: {
                             createdAt: timestamp,
-                            type: 'candidate',
-                            sourceAnchor: state.anchor.path,
-                            firestoreDocId: docId
                         }
                     });
 
-                console.log(`Candidate saved to gs://tp_resources/${candidateFileName} with Firestore ID: ${docId}`);
+                console.log(`Candidate saved to gs://tp_resources/${fileName}`);
 
                 return {
-                    messages: [new AIMessage("Candidate generated")],
+                    messages: [new AIMessage('Candidate generated')],
                     candidate: {
-                        path: candidateFileName,
-                        value: candidateSmiles,
+                        path: fileName,
+                        value: candidate,
                     }
                 };
 
@@ -223,7 +183,7 @@ class _NodeGenerateCandidate extends Runnable {
             }
 
         } catch (error: any) {
-            console.error("Error in nodeGenerateCandidate:", error);
+            console.error('Error in nodeGenerateCandidate:', error);
             return {
                 messages: [new AIMessage(`Error generating candidate: ${error.message}`)]
             };

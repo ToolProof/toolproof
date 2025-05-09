@@ -2,7 +2,13 @@
 FROM mambaorg/micromamba:latest
 
 # Set the working directory to /app/src
-WORKDIR /app/src
+WORKDIR /app
+
+# Copy the src folder into the container
+COPY src/ /app/src/
+
+# Copy the shared folder into the container
+COPY shared/ /app/shared/
 
 # Install necessary packages and set up the environment
 RUN micromamba create -c conda-forge -n ad_env python=3.9 -y && \
@@ -11,15 +17,12 @@ RUN micromamba create -c conda-forge -n ad_env python=3.9 -y && \
 # Install pip in the environment
 RUN micromamba run -n ad_env pip install --upgrade pip
 
-# Install Flask using pip within the micromamba environment
-RUN micromamba run -n ad_env pip install flask
+# Install additional Python packages
+RUN micromamba run -n ad_env pip install flask python-dotenv prody google-cloud-storage
 
 # Install git and build tools as root
 USER root
 RUN apt-get update && apt-get install -y git build-essential
-
-# Copy the src folder into the container
-COPY src/ /app/src/
 
 # Clone additional repositories and install using pip
 RUN micromamba run -n ad_env git clone --single-branch --branch develop https://github.com/ToolProof/molscrub.git && \
@@ -33,20 +36,9 @@ RUN micromamba run -n ad_env pip install git+https://github.com/forlilab/Meeko.g
 # RUN git clone --branch docwork --depth=1 --filter=tree:0 https://github.com/rwxayheee/Meeko.git && \
     # cd Meeko && git sparse-checkout set --no-cone example && git checkout
 
-# Install ProDy within the micromamba environment
-RUN micromamba run -n ad_env pip install prody
-
-# Install google-cloud-storage within the micromamba environment
-RUN micromamba run -n ad_env pip install google-cloud-storage
-
-# Install google-cloud-firestore within the micromamba environment
-RUN micromamba run -n ad_env pip install google-cloud-firestore
-
-# Install langchain and langchain-openai within the micromamba environment
-RUN micromamba run -n ad_env pip install langchain langchain_openai
-
 # Expose ports
 EXPOSE 8080
 
 # Set the command to run your Python script when the container starts
-CMD ["micromamba", "run", "-n", "ad_env", "python", "main.py"]
+CMD ["micromamba", "run", "-n", "ad_env", "python", "-m", "src.main"]
+

@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from .basic_docking import run_command, clear_tmp, retrieve_gcs_files, export_pose, add_protomers, prepare_receptor
-from shared.gcs_utils import upload_to_gcs
+from shared.src.gcs_utils import upload_to_gcs
 
 def prepare_reactive_ligand(lig_smiles, reactive_groups=None):
     print("Preparing reactive ligand...")

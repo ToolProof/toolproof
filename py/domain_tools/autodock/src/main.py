@@ -1,5 +1,5 @@
+from src import basic_docking, reactive_docking
 from flask import Flask, request, jsonify
-from autodock import basic_docking, reactive_docking
 import os
 
 app = Flask(__name__)
@@ -17,10 +17,13 @@ def autodock_basic():
             ligand = data.get("ligand") # /tp-resources/imatinib.smi"
             receptor = data.get("receptor") # "tp-resources/1iep.pdb"
             box = data.get("box") # "tp-resources/xray-imatinib.pdb"
+            
+            # Log the extracted values
+            print(f"Ligand: {ligand}, Receptor: {receptor}, Box: {box}")
 
             # Call the workflow from basic_docking
-            result = basic_docking.run_simulation(ligand, receptor, box)
-            return jsonify({"message": "Automation completed successfully", "result": result}), 200
+            # result = basic_docking.run_simulation(ligand, receptor, box)
+            # return jsonify({"message": "Automation completed successfully", "result": result}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 

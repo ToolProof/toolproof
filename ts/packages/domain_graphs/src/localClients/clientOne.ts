@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
@@ -21,12 +21,12 @@ export async function runRemoteGraph() {
         const thread = await client.threads.create();
 
         // Invoke the graph with the thread config
-        // const config = { configurable: { thread_id: "5426f0ae-0abf-41ac-865b-6b1c7abf9056" } };
+        // const config = { configurable: { thread_id: '5426f0ae-0abf-41ac-865b-6b1c7abf9056' } };
         // const config = { configurable: { thread_id: thread.thread_id } };
         // const result = await remoteGraph.invoke(
         //     {
         //         messages: [new HumanMessage('Graph is invoked')],
-        //         subGoal: "subGoal_1",
+        //         subGoal: 'subGoal_1',
         //         recipe: alpha,
         //     },
         //     config,
@@ -39,10 +39,12 @@ export async function runRemoteGraph() {
         const timeout = setTimeout(() => controller.abort(), 1800000); // 30 minutes
 
         try {
-            console.log("Invoking the graph")
+            console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                employmentId: "Q2k7FtvG2eSClgI4er9w",
+                anchor: '',
+                target: '',
+                box: '',
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,
