@@ -14,15 +14,15 @@ def autodock_basic():
         
         try:
             # Extract arguments from JSON payload
-            ligand = data.get("ligand") # /tp-resources/imatinib.smi"
-            receptor = data.get("receptor") # "tp-resources/1iep.pdb"
-            box = data.get("box") # "tp-resources/xray-imatinib.pdb"
+            ligand = data.get("ligand")
+            receptor = data.get("receptor")
+            box = data.get("box")
             
             # Log the extracted values
             print(f"Ligand: {ligand}, Receptor: {receptor}, Box: {box}")
 
             # Call the workflow from basic_docking
-            # result = basic_docking.run_simulation(ligand, receptor, box)
+            result = basic_docking.run_simulation(ligand, receptor, box)
             # return jsonify({"message": "Automation completed successfully", "result": result}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
