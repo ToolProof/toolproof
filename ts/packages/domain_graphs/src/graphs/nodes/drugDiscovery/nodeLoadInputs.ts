@@ -55,11 +55,18 @@ class _NodeLoadInputs extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+
+        if (state.isDryRun) {
+            return {
+                messages: [new AIMessage('NodeLoadInputs completed in DryRun mode')],
+            };
+        }
+
         try {
 
-            // Here we load the inputs from the bucket and into GraphState.
+            // Loading the inputs from SharedState into GraphState
 
-            const resources = [
+            const inputs = [
                 { key: 'anchor', path: state.anchor.path },
                 { key: 'target', path: state.target.path },
                 { key: 'box', path: state.box.path }
@@ -67,7 +74,7 @@ class _NodeLoadInputs extends Runnable {
 
             const results: Record<string, any> = {};
 
-            for (const { key, path } of resources) {
+            for (const { key, path } of inputs) {
                 try {
                     const [content] = await storage
                         .bucket(bucketName)
@@ -83,36 +90,32 @@ class _NodeLoadInputs extends Runnable {
                             value: chunks
                         };
                     } else {
-                        // For other resources, keep as string
+                        // For SMILES content, keep as string
                         results[key] = {
                             path,
                             value: content.toString()
                         };
                     }
-
-                    console.log(`Successfully downloaded ${key} resource`);
                 } catch (downloadError: any) {
                     console.error(`Download error for ${key}:`, downloadError);
-                    results[key] = {
-                        path,
-                        value: `Error downloading: ${downloadError.message}`
-                    };
+                    throw new Error(`Critical error while processing ${key}: ${downloadError.message}`);
                 }
             }
 
             return {
-                messages: [new AIMessage('Inputs loaded successfully')],
+                messages: [new AIMessage('NodeLoadInputs completed')],
                 anchor: results.anchor,
                 target: results.target,
                 box: results.box,
             };
 
         } catch (error: any) {
-            console.error('Error in nodeLoadInputs:', error);
+            console.error('Error in NodeLoadInputs:', error);
             return {
-                messages: [new AIMessage(`Error loading inputs: ${error.message}`)]
+                messages: [new AIMessage('NodeLoadInputs failed')],
             };
         }
+
     }
 
 }

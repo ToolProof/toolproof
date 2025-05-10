@@ -9,15 +9,9 @@ import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper 
 const openai = new OpenAI();
 
 export const NodeGenerateCandidateState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>({ // The type of 'value' should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
-    target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
-        reducer: (prev, next) => next
-    }),
-    candidate: Annotation<{ path: string, value: string }>({ // The type of 'value' should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
+    anchor: Annotation<{ path: string, value: string }>(),
+    target: Annotation<{ path: string, value: ChunkInfo[] }>(),
+    candidate: Annotation<{ path: string, value: string }>(),
 });
 
 type WithBaseState = typeof NodeGenerateCandidateState.State &
@@ -72,16 +66,22 @@ class _NodeGenerateCandidate extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
+        if (state.isDryRun) {
+            return {
+                messages: [new AIMessage('NodeGenerateCandidate completed in DryRun mode')],
+            };
+        }
+
         try {
             /* const anchorContent: string = state.anchor.value;
             const targetChunks: ChunkInfo[] = state.target.value;
-
+ 
             console.log('anchorContent:', anchorContent);
-
+ 
             if (!anchorContent || !targetChunks || targetChunks.length === 0) {
                 throw new Error('Missing required resources');
             }
-
+ 
             // Analyze chunks sequentially to maintain context
             let analysisContext = '';
             for (const chunk of targetChunks) {
@@ -112,10 +112,10 @@ class _NodeGenerateCandidate extends Runnable {
                     temperature: 0.7,
                     max_tokens: 500
                 });
-
+ 
                 analysisContext += '\n' + (response.choices[0].message.content?.trim() || '');
             }
-
+ 
             // Generate final candidate using accumulated analysis
             const finalResponse = await openai.chat.completions.create({
                 model: 'gpt-4o-mini',
@@ -171,7 +171,7 @@ class _NodeGenerateCandidate extends Runnable {
                 console.log(`Candidate saved to gs://tp_resources/${fileName}`);
 
                 return {
-                    messages: [new AIMessage('Candidate generated')],
+                    messages: [new AIMessage('NodeGenerateCandidate completed')],
                     candidate: {
                         path: fileName,
                         value: candidate,
@@ -184,11 +184,12 @@ class _NodeGenerateCandidate extends Runnable {
             }
 
         } catch (error: any) {
-            console.error('Error in nodeGenerateCandidate:', error);
+            console.error('Error in NodeGenerateCandidate:', error);
             return {
-                messages: [new AIMessage(`Error generating candidate: ${error.message}`)]
+                messages: [new AIMessage('NodeGenerateCandidate failed')],
             };
         }
+
     }
 
 }

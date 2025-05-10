@@ -35,8 +35,14 @@ class _NodeStart extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+        if (state.isDryRun) {
+            return {
+                messages: [new AIMessage('NodeStart completed in DryRun mode')],
+            };
+        }
+
         return {
-            messages: [new AIMessage('Iterative docking started')],
+            messages: [new AIMessage('NodeStart completed')],
         };
     }
 
@@ -71,17 +77,16 @@ const stateGraph = new StateGraph(GraphState)
     .addNode('nodeLoadInputs', new NodeLoadInputs())
     .addNode('nodeGenerateCandidate', new NodeGenerateCandidate())
     // .addNode('nodeGenerateBox', new NodeGenerateBox())
-    /* .addNode('nodeInvokeDocking', new NodeInvokeDocking())
+    .addNode('nodeInvokeDocking', new NodeInvokeDocking())
     .addNode('nodeLoadResults', new NodeLoadResults())
-    .addNode('nodeEvaluateResults', new NodeEvaluateResults()) */
+    .addNode('nodeEvaluateResults', new NodeEvaluateResults())
     .addEdge(START, 'nodeStart')
     .addEdge('nodeStart', 'nodeLoadInputs')
     .addEdge('nodeLoadInputs', 'nodeGenerateCandidate')
-    .addEdge('nodeGenerateCandidate', END)
-/* .addEdge('nodeGenerateCandidate', 'nodeInvokeDocking')
-.addEdge('nodeInvokeDocking', 'nodeLoadResults')
-.addEdge('nodeLoadResults', 'nodeEvaluateResults')
-.addConditionalEdges('nodeEvaluateResults', edgeShouldRetry); */
+    .addEdge('nodeGenerateCandidate', 'nodeInvokeDocking')
+    .addEdge('nodeInvokeDocking', 'nodeLoadResults')
+    .addEdge('nodeLoadResults', 'nodeEvaluateResults')
+    .addConditionalEdges('nodeEvaluateResults', edgeShouldRetry);
 
 
 export const graph = stateGraph.compile();

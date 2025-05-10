@@ -7,17 +7,12 @@ import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper 
 const openai = new OpenAI();
 
 export const NodeEvaluateResultsState = Annotation.Root({
-    docking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
-        reducer: (prev, next) => next
-    }),
-    pose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
-        reducer: (prev, next) => next
-    }),
-    evaluation: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
-        reducer: (prev, next) => next
-    }),
+    docking: Annotation<{ path: string, value: Map<string, any> }>(),
+    pose: Annotation<{ path: string, value: Map<string, any> }>(),
+    evaluation: Annotation<{ path: string, value: string }>(),
     shouldRetry: Annotation<boolean>({
-        reducer: (prev, next) => next
+        reducer: (prev, next) => next,
+        default: () => false,
     }),
 });
 
@@ -42,6 +37,14 @@ class _NodeEvaluateResults extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+
+        if (state.isDryRun) {
+            return {
+                messages: [new AIMessage('NodeEvaluateResults completed in DryRun mode')],
+            };
+        }
+
+
         // Here we evaluate the results and decide whether to retry or not.
         try {
             if (!state.docking?.value || !state.pose?.value) {

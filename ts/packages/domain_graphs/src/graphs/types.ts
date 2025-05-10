@@ -1,9 +1,11 @@
 import { MessagesAnnotation } from '@langchain/langgraph';
+import { Annotation } from '@langchain/langgraph';
 
 // === Base state spec ===
 
 export const BaseStateSpec = {
     ...MessagesAnnotation.spec,
+    isDryRun: Annotation<boolean>(),
 };
 
 // === Resource modeling ===

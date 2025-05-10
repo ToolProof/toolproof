@@ -6,12 +6,8 @@ import { AIMessage } from '@langchain/core/messages';
 
 
 export const NodeLoadResultsState = Annotation.Root({
-    docking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
-        reducer: (prev, next) => next
-    }),
-    pose: Annotation<{ path: string, value: Map<string, any> }>({  // Key and value of map to be determined.
-        reducer: (prev, next) => next
-    }),
+    docking: Annotation<{ path: string, value: Map<string, any> }>(),
+    pose: Annotation<{ path: string, value: Map<string, any> }>(),
 });
 
 type WithBaseState = typeof NodeLoadResultsState.State &
@@ -24,7 +20,7 @@ class _NodeLoadResults extends Runnable {
         name: 'NodeLoadResults',
         description: '',
         operations: [
-             {
+            {
                 direction: 'write',
                 storage: 'private',
                 resources: [],
@@ -35,6 +31,13 @@ class _NodeLoadResults extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+
+        if (state.isDryRun) {
+            return {
+                messages: [new AIMessage('NodeLoadResults completed in DryRun mode')],
+            };
+        }
+
         // Here we load the docking results from the bucket and into GraphState.
 
         try {
