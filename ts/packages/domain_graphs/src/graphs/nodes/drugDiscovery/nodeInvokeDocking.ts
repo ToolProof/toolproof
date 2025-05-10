@@ -1,7 +1,7 @@
-import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
+import { NodeSpec, BaseStateSpec, registerNode } from 'src/graphs/types.js';
 import { ChunkInfo } from 'src/localTools/chunkPDBContent';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from "@langchain/langgraph";
+import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import * as path from 'path';
 import axios from 'axios';
@@ -16,7 +16,7 @@ export const NodeInvokeDockingState = Annotation.Root({
 });
 
 type WithBaseState = typeof NodeInvokeDockingState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
+    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
 class _NodeInvokeDocking extends Runnable {
@@ -78,28 +78,13 @@ class _NodeInvokeDocking extends Runnable {
 
 
         try {
-            // Invoke docking and store the paths of the results in ligandDocking and ligandPose.
-
-            // Ensure paths have the tp_resources/ prefix
-            const addPrefix = (path: string) => {
-                if (path.startsWith('tp_resources/')) return path;
-                return `tp_resources/${path}`;
-            };
-
-            const ligandPath = addPrefix(state.candidate.path);
-            const boxPath = addPrefix(state.box.path);
-            const receptorPath = addPrefix(state.target.path);
 
             // Extract paths from the resources
             const payload = {
-                lig_name: "imatinib", // Static for now
-                ligand: ligandPath,
-                box: boxPath,
-                rec_name: "1iep", // Static for now
-                receptor: receptorPath
+                ligand: state.candidate.path,
+                receptor: state.target.path,
+                box: state.box.path,
             };
-
-            console.log("Sending payload to /adv:", payload);
 
             // Create a new Map to store the results
 
@@ -115,12 +100,12 @@ class _NodeInvokeDocking extends Runnable {
             );
 
             const result = response.data;
-            console.log('result:', result);
+            // console.log('result:', result);
 
             // Process actual results if available
             if (result?.result?.uploaded_files) {
-                let ligandDockingPath = '';
-                let ligandPosePath = '';
+                let dockingPath = '';
+                let posePath = '';
 
                 // Process each uploaded file
                 result.result.uploaded_files.forEach((filePath: string) => {
@@ -129,34 +114,34 @@ class _NodeInvokeDocking extends Runnable {
                     // Determine file type based on extension
                     if (fileName.endsWith('.pdbqt') || fileName.endsWith('.pdb')) {
                         // This is the docking result file
-                        ligandDockingPath = filePath;
+                        dockingPath = filePath;
                     } else if (fileName.endsWith('.sdf')) {
                         // This is the pose file
-                        ligandPosePath = filePath;
+                        posePath = filePath;
                     }
                 });
 
-                if (!ligandDockingPath || !ligandPosePath) {
-                    console.warn("Missing expected file types in response:", result.result.uploaded_files);
+                if (!dockingPath || !posePath) {
+                    console.warn('Missing expected file types in response:', result.result.uploaded_files);
                 }
 
                 return {
-                    messages: [new AIMessage("Docking completed successfully")],
+                    messages: [new AIMessage('Docking completed successfully')],
                     docking: {
-                        path: ligandDockingPath,
+                        path: dockingPath,
                         value: new Map()
                     },
                     pose: {
-                        path: ligandPosePath,
+                        path: posePath,
                         value: new Map()
                     }
                 };
             } else {
-                throw new Error("No uploaded files in response");
+                throw new Error('No uploaded files in response');
             }
 
         } catch (error: any) {
-            console.error("Error in nodeInvokeDocking:", error);
+            console.error('Error in nodeInvokeDocking:', error);
             return {
                 messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
             };

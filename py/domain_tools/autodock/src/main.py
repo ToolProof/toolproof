@@ -5,49 +5,49 @@ import os
 app = Flask(__name__)
     
 
-@app.route("/autodock_basic", methods=["GET", "POST"])
+@app.route('/autodock_basic', methods=['GET', 'POST'])
 def autodock_basic():
-    if request.method == "POST":
+    if request.method == 'POST':
         data = request.json
         if not data:
-            return jsonify({"error": "No JSON payload provided"}), 400
+            return jsonify({'error': 'No JSON payload provided'}), 400
         
         try:
             # Extract arguments from JSON payload
-            ligand = data.get("ligand")
-            receptor = data.get("receptor")
-            box = data.get("box")
+            ligand = data.get('ligand')
+            receptor = data.get('receptor')
+            box = data.get('box')
             
             # Log the extracted values
-            print(f"Ligand: {ligand}, Receptor: {receptor}, Box: {box}")
+            print(f'Ligand: {ligand}, Receptor: {receptor}, Box: {box}')
 
             # Call the workflow from basic_docking
             result = basic_docking.run_simulation(ligand, receptor, box)
-            return jsonify({"message": "Automation completed successfully", "result": ligand}), 200
+            return jsonify({'message': 'Automation completed successfully', 'result': result}), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({'error': str(e)}), 500
 
-    return jsonify({"message": "Basic docking endpoint"})
+    return jsonify({'message': 'Basic docking endpoint'})
 
 
-@app.route('/autodock_reactive', methods=["GET", "POST"])
+@app.route('/autodock_reactive', methods=['GET', 'POST'])
 def autodock_reactive():
-    if request.method == "POST":
+    if request.method == 'POST':
         data = request.json
         if not data:
-            return jsonify({"error": "No JSON payload provided"}), 400
+            return jsonify({'error': 'No JSON payload provided'}), 400
 
         data = request.get_json()
         
         try:
             # Extract arguments from JSON payload
-            lig_name = data.get("lig_name")
-            lig_smiles_path = data.get("lig_smiles_path")
-            lig_box_path = data.get("lig_box_path")
-            rec_name = data.get("rec_name")
-            rec_no_lig_path = data.get("rec_no_lig_path")
-            reactive_groups = data.get("reactive_groups", None)
-            reactive_residues = data.get("reactive_residues", None)
+            lig_name = data.get('lig_name')
+            lig_smiles_path = data.get('lig_smiles_path')
+            lig_box_path = data.get('lig_box_path')
+            rec_name = data.get('rec_name')
+            rec_no_lig_path = data.get('rec_no_lig_path')
+            reactive_groups = data.get('reactive_groups', None)
+            reactive_residues = data.get('reactive_residues', None)
 
             # Call the workflow from reactive_docking
             result = reactive_docking.run_simulation(
@@ -59,12 +59,12 @@ def autodock_reactive():
                 reactive_groups,
                 reactive_residues
             )
-            return jsonify({"message": "Reactive docking completed successfully", "result": result}), 200
+            return jsonify({'message': 'Reactive docking completed successfully', 'result': result}), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({'error': str(e)}), 500
         
-    return jsonify({"message": "Reactive docking endpoint"})
+    return jsonify({'message': 'Reactive docking endpoint'})
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Expose the app on port 8080
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)

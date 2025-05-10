@@ -190,11 +190,11 @@ def run_simulation(ligand, receptor, box):
         
         pose = export_pose(docking) 
         
-        filePath = "adb/"
+        folder = os.path.dirname(ligand) + "/"
         
         files_to_upload = [
-            (docking, f"{filePath}{os.path.basename(docking)}"),
-            (pose, f"{filePath}{os.path.basename(pose)}")
+            (docking, f"{folder}{os.path.basename(docking)}"),
+            (pose, f"{folder}{os.path.basename(pose)}")
         ]
         
         success_files = []

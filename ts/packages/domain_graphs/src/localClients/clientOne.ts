@@ -26,7 +26,7 @@ export async function runRemoteGraph() {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                isDryRun: true,
+                isDryRun: false,
                 anchor: { path: 'imatinib.smi', value: [] },
                 target: { path: '1iep.pdb', value: [] },
                 box: { path: 'xray-imatinib.pdb', value: [] },

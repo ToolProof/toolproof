@@ -66,22 +66,20 @@ class _NodeGenerateCandidate extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (state.isDryRun && false) {
+        if (state.isDryRun) {
             return {
                 messages: [new AIMessage('NodeGenerateCandidate completed in DryRun mode')],
             };
         }
 
         try {
-            /* const anchorContent: string = state.anchor.value;
-            const targetChunks: ChunkInfo[] = state.target.value;
- 
-            console.log('anchorContent:', anchorContent);
- 
-            if (!anchorContent || !targetChunks || targetChunks.length === 0) {
+            const anchor = state.anchor.value;
+            const targetChunks = state.target.value;
+
+            if (!anchor || !targetChunks || targetChunks.length === 0) {
                 throw new Error('Missing required resources');
             }
- 
+
             // Analyze chunks sequentially to maintain context
             let analysisContext = '';
             for (const chunk of targetChunks) {
@@ -112,39 +110,37 @@ class _NodeGenerateCandidate extends Runnable {
                     temperature: 0.7,
                     max_tokens: 500
                 });
- 
+
                 analysisContext += '\n' + (response.choices[0].message.content?.trim() || '');
             }
- 
+
             // Generate final candidate using accumulated analysis
             const finalResponse = await openai.chat.completions.create({
                 model: 'gpt-4o-mini',
                 messages: [
                     {
                         role: 'system',
-                        content: 'Generate an optimized / perfect SMILES string for a new molecule that could bind effectively to the target based on protein-ligand interactions.'
+                        content: 'Generate an optimized SMILES string for a new molecule that could bind effectively to the target based on ligand-receptor interactions.'
                     },
                     {
                         role: 'user',
                         content: `
-                                Using this protein analysis:
+                                Using this target protein analysis:
                                 ${analysisContext}
         
                                 And this anchor molecule SMILES:
-                                ${anchorContent}
+                                ${anchor}
         
-                                Generate a perfect candidate molecule using single SMILES string.
+                                Generate an optimized candidate molecule using single SMILES string.
                                 Respond with only the SMILES string.
                             `
                     }
                 ],
                 temperature: 0.7,
                 max_tokens: 500
-            }); */
+            });
 
-            // const candidate = finalResponse.choices[0].message.content?.trim();
-            const candidate = 'Hi, how are you?'; // ATTENTION: Placeholder for the actual candidate generation logic
-            console.log('Generated candidate SMILES:', candidate);
+            const candidate = finalResponse.choices[0].message.content?.trim();
 
             if (!candidate) {
                 throw new Error('Failed to generate candidate SMILES string');
@@ -167,8 +163,6 @@ class _NodeGenerateCandidate extends Runnable {
                             createdAt: timestamp,
                         }
                     });
-
-                console.log(`Candidate saved to gs://tp_resources/${fileName}`);
 
                 return {
                     messages: [new AIMessage('NodeGenerateCandidate completed')],
