@@ -1,16 +1,11 @@
 import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
+import { ChunkInfo } from 'src/localTools/chunkPDBContent';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { AIMessage } from '@langchain/core/messages';
 import * as path from 'path';
 import axios from 'axios';
 
-interface ChunkInfo {
-    chainId: string;
-    startResidue: number;
-    endResidue: number;
-    content: string;
-}
 
 export const NodeInvokeDockingState = Annotation.Root({
     candidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
@@ -78,8 +73,7 @@ class _NodeInvokeDocking extends Runnable {
                     { name: 'pose', kind: 'path' },
                 ],
             },
-        ],
-        nexts: ['NodeLoadResults'],
+        ]
     };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.

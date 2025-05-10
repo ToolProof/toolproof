@@ -73,7 +73,7 @@ class _NodeGenerateCandidate extends Runnable {
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
         try {
-            const anchorContent: string = state.anchor.value;
+            /* const anchorContent: string = state.anchor.value;
             const targetChunks: ChunkInfo[] = state.target.value;
 
             console.log('anchorContent:', anchorContent);
@@ -140,9 +140,10 @@ class _NodeGenerateCandidate extends Runnable {
                 ],
                 temperature: 0.7,
                 max_tokens: 500
-            });
+            }); */
 
-            const candidate = finalResponse.choices[0].message.content?.trim();
+            // const candidate = finalResponse.choices[0].message.content?.trim();
+            const candidate = 'Hi, how are you?'; // ATTENTION: Placeholder for the actual candidate generation logic
             console.log('Generated candidate SMILES:', candidate);
 
             if (!candidate) {

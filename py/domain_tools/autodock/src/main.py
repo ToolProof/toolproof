@@ -23,7 +23,7 @@ def autodock_basic():
 
             # Call the workflow from basic_docking
             result = basic_docking.run_simulation(ligand, receptor, box)
-            # return jsonify({"message": "Automation completed successfully", "result": result}), 200
+            return jsonify({"message": "Automation completed successfully", "result": ligand}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 

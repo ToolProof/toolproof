@@ -30,7 +30,13 @@ class _NodeEvaluateResults extends Runnable {
     static nodeSpec: NodeSpec = {
         name: 'NodeEvaluateResults',
         description: '',
-        operations: [],
+        operations: [
+            {
+                direction: 'write',
+                storage: 'private',
+                resources: [],
+            },
+        ],
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.

@@ -71,19 +71,20 @@ const stateGraph = new StateGraph(GraphState)
     .addNode('nodeLoadInputs', new NodeLoadInputs())
     .addNode('nodeGenerateCandidate', new NodeGenerateCandidate())
     // .addNode('nodeGenerateBox', new NodeGenerateBox())
-    .addNode('nodeInvokeDocking', new NodeInvokeDocking())
+    /* .addNode('nodeInvokeDocking', new NodeInvokeDocking())
     .addNode('nodeLoadResults', new NodeLoadResults())
-    .addNode('nodeEvaluateResults', new NodeEvaluateResults())
+    .addNode('nodeEvaluateResults', new NodeEvaluateResults()) */
     .addEdge(START, 'nodeStart')
     .addEdge('nodeStart', 'nodeLoadInputs')
     .addEdge('nodeLoadInputs', 'nodeGenerateCandidate')
-    .addEdge('nodeGenerateCandidate', 'nodeInvokeDocking')
-    .addEdge('nodeInvokeDocking', 'nodeLoadResults')
-    .addEdge('nodeLoadResults', 'nodeEvaluateResults')
-    .addConditionalEdges('nodeEvaluateResults', edgeShouldRetry);
+    .addEdge('nodeGenerateCandidate', END)
+/* .addEdge('nodeGenerateCandidate', 'nodeInvokeDocking')
+.addEdge('nodeInvokeDocking', 'nodeLoadResults')
+.addEdge('nodeLoadResults', 'nodeEvaluateResults')
+.addConditionalEdges('nodeEvaluateResults', edgeShouldRetry); */
 
 
-export const graphIterativeDocking = stateGraph.compile();
+export const graph = stateGraph.compile();
 
 
 

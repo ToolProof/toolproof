@@ -42,9 +42,9 @@ export async function runRemoteGraph() {
             console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                anchor: '',
-                target: '',
-                box: '',
+                anchor: 'tp_resources/imatinib.smi',
+                target: 'tp_resources/1iep.pdb',
+                box: 'tp_resources/xray-imatinib.pdb',
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

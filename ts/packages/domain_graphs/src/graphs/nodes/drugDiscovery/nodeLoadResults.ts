@@ -1,18 +1,9 @@
 import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
+import { storage, bucketName } from 'src/firebaseAdminInit.js'
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
-import { Storage } from '@google-cloud/storage';
 import { AIMessage } from '@langchain/core/messages';
 
-
-const storage = new Storage({
-    credentials: {
-        client_email: process.env.GCP_CLIENT_EMAIL,
-        private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        project_id: process.env.GCP_PROJECT_ID,
-    }
-});
-const bucketName = 'tp_resources';
 
 export const NodeLoadResultsState = Annotation.Root({
     docking: Annotation<{ path: string, value: Map<string, any> }>({  // The key of the map should be a string holding a "row_identifier" and the value should be a custom data type that represents a PDBQT row.
@@ -32,7 +23,13 @@ class _NodeLoadResults extends Runnable {
     static nodeSpec: NodeSpec = {
         name: 'NodeLoadResults',
         description: '',
-        operations: [],
+        operations: [
+             {
+                direction: 'write',
+                storage: 'private',
+                resources: [],
+            },
+        ],
     }
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
