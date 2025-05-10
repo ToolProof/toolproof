@@ -66,7 +66,7 @@ class _NodeGenerateCandidate extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (state.isDryRun) {
+        if (state.isDryRun && false) {
             return {
                 messages: [new AIMessage('NodeGenerateCandidate completed in DryRun mode')],
             };

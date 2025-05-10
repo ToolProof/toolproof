@@ -56,7 +56,7 @@ class _NodeLoadInputs extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (state.isDryRun) {
+        if (state.isDryRun && false) {
             return {
                 messages: [new AIMessage('NodeLoadInputs completed in DryRun mode')],
             };
