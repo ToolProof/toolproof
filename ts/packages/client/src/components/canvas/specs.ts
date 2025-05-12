@@ -1,173 +1,174 @@
-import { Node, NamedLink } from './types';
+import { Node, NamedLink, RawData } from './types';
 
 
 const radius = 200;
 const alphaBetaYDistance = 75;
 
-const strategyUno = [
-    { name: 'NodeLoadInputs', externals: ['Longti', 'Lati', 'Alti'] },
-    { name: 'NodeGenerateCandidate', externals: ['OpenAI-1'] },
-    { name: 'NodeInvokeDocking', externals: ['SchrodingerSuite'] },
-    { name: 'NodeLoadResults', externals: [] },
-    { name: 'NodeEvaluateResults', externals: ['OpenAI-2'] },
-]
 
-const alphaNodes: Node[] = strategyUno.map((node, index) => ({
-    id: node.name,
-    shape: 'sphere',
-    val: 5,
-    group: 0,
-    fx: radius * Math.cos((2 * Math.PI * index) / strategyUno.length),
-    fy: -75,
-    fz: radius * Math.sin((2 * Math.PI * index) / strategyUno.length),
-}));
+export const getData = (rawData: RawData[]) => {
 
-const betaNodes: Node[] = strategyUno.flatMap((node, index) => {
-    const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / strategyUno.length);
-    const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / strategyUno.length);
-    const externalsCount = node.externals.length;
 
-    return node.externals.map((external, externalIndex) => {
-        const angle = (2 * Math.PI * externalIndex) / externalsCount; // Angle for circular placement
-        const betaNodeX =
-            externalsCount > 1
-                ? alphaNodeX + alphaBetaYDistance * Math.cos(angle)
-                : alphaNodeX; // If only one external, place it in the center
-        const betaNodeZ =
-            externalsCount > 1
-                ? alphaNodeZ + alphaBetaYDistance * Math.sin(angle)
-                : alphaNodeZ; // If only one external, place it in the center
+    const alphaNodes: Node[] = rawData.map((node, index) => ({
+        id: node.name,
+        shape: 'sphere',
+        val: 5,
+        group: 0,
+        fx: radius * Math.cos((2 * Math.PI * index) / rawData.length),
+        fy: -75,
+        fz: radius * Math.sin((2 * Math.PI * index) / rawData.length),
+    }));
 
-        return {
-            id: external,
-            shape: 'sphere',
-            val: 3,
-            group: 1,
-            fx: betaNodeX,
-            fy: 75, // y-coordinate above the alphaNode
-            fz: betaNodeZ,
-        };
+    const betaNodes: Node[] = rawData.flatMap((node, index) => {
+        const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / rawData.length);
+        const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / rawData.length);
+        const toolsCount = node.tools.length;
+
+        return node.tools.map((tool, toolIndex) => {
+            const angle = (2 * Math.PI * toolIndex) / toolsCount; // Angle for circular placement
+            const betaNodeX =
+                toolsCount > 1
+                    ? alphaNodeX + alphaBetaYDistance * Math.cos(angle)
+                    : alphaNodeX; // If only one tool, place it in the center
+            const betaNodeZ =
+                toolsCount > 1
+                    ? alphaNodeZ + alphaBetaYDistance * Math.sin(angle)
+                    : alphaNodeZ; // If only one tool, place it in the center
+
+            return {
+                id: tool,
+                shape: 'sphere',
+                val: 3,
+                group: 1,
+                fx: betaNodeX,
+                fy: 75, // y-coordinate above the alphaNode
+                fz: betaNodeZ,
+            };
+        });
     });
-});
 
-const deltaNodes: Node[] = [
-    {
-        id: 'GraphState',
-        shape: 'square',
-        val: 50,
-        group: 3,
-        fx: 0,
-        fy: -50,
-        fz: 0,
-    },
-];
-
-const gammaNodes: Node[] = [
-    {
-        id: 'SharedResources',
-        shape: 'square',
-        val: 500,
-        group: 2,
-        fx: 0,
-        fy: 0,
-        fz: 0,
-    },
-];
-
-const alphaInterLinks: NamedLink[] = strategyUno.flatMap((nodeA, indexA) => {
-    return strategyUno
-        .filter((_, indexB) => indexB > indexA) // Avoid duplicate pairs
-        .flatMap((nodeB) => [
-            {
-                source: nodeA.name, // Source node
-                target: nodeB.name, // Target node
-                name: `${nodeA.name}_${nodeB.name}`, // Name property
-            },
-            {
-                source: nodeB.name, // Source node
-                target: nodeA.name, // Target node
-                name: `${nodeB.name}_${nodeA.name}`, // Name property
-            },
-        ]);
-});
-
-const alphaBetaLinks: NamedLink[] = strategyUno.flatMap((node, index) =>
-    node.externals.flatMap((external) => [
+    const deltaNodes: Node[] = [
         {
-            source: node.name, // alphaNode ID
-            target: external, // betaNode ID
-            name: `${node.name}_${external}`, // Name property
-        },
-        {
-            source: external, // betaNode ID
-            target: node.name, // alphaNode ID
-            name: `${external}_${node.name}`, // Name property
-        },
-    ])
-);
-
-const alphaDeltaLinks: NamedLink[] = strategyUno.flatMap((node, index) => {
-    const circumferenceNode = node.name;
-    return [
-        {
-            source: 'GraphState', // deltaNode ID
-            target: circumferenceNode, // alphaNode ID
-            name: `GraphState_${circumferenceNode}`, // Name property
-        },
-        {
-            source: circumferenceNode, // alphaNode ID
-            target: 'GraphState', // deltaNode ID
-            name: `${circumferenceNode}_GraphState`, // Name property
+            id: 'GraphState',
+            shape: 'square',
+            val: 50,
+            group: 3,
+            fx: 0,
+            fy: -50,
+            fz: 0,
         },
     ];
-});
 
-const alphaGammaLinks: NamedLink[] = strategyUno.flatMap((node, index) => {
-    const circumferenceNode = node.name;
-    return [
+    const gammaNodes: Node[] = [
         {
-            source: 'SharedResources', // gammaNode ID
-            target: circumferenceNode, // alphaNode ID
-            name: `SharedResources_${circumferenceNode}`, // Name property
-        },
-        {
-            source: circumferenceNode, // alphaNode ID
-            target: 'SharedResources', // gammaNode ID
-            name: `${circumferenceNode}_SharedResources`, // Name property
+            id: 'SharedResources',
+            shape: 'square',
+            val: 500,
+            group: 2,
+            fx: 0,
+            fy: 0,
+            fz: 0,
         },
     ];
-});
 
-const betaGammaLinks: NamedLink[] = strategyUno.flatMap((node, index) =>
-    node.externals.flatMap((external) => [
-        {
-            source: external, // betaNode ID
-            target: 'SharedResources', // gammaNode ID
-            name: `${external}_SharedResources`, // Name property
-        },
-        {
-            source: 'SharedResources', // gammaNode ID
-            target: external, // betaNode ID
-            name: `SharedResources_${external}`, // Name property
-        },
-    ])
-);
+    const alphaInterLinks: NamedLink[] = rawData.flatMap((nodeA, indexA) => {
+        return rawData
+            .filter((_, indexB) => indexB > indexA) // Avoid duplicate pairs
+            .flatMap((nodeB) => [
+                {
+                    source: nodeA.name, // Source node
+                    target: nodeB.name, // Target node
+                    name: `${nodeA.name}_${nodeB.name}`, // Name property
+                },
+                {
+                    source: nodeB.name, // Source node
+                    target: nodeA.name, // Target node
+                    name: `${nodeB.name}_${nodeA.name}`, // Name property
+                },
+            ]);
+    });
 
-export const data = {
-    nodes: [
-        ...alphaNodes,
-        ...betaNodes,
-        ...deltaNodes,
-        ...gammaNodes,
-    ],
-    links: [
-        ...alphaInterLinks,
-        ...alphaDeltaLinks,
-        ...alphaGammaLinks,
-        ...alphaBetaLinks,
-        ...betaGammaLinks,
-    ]
-};
+    const alphaBetaLinks: NamedLink[] = rawData.flatMap((node, index) =>
+        node.tools.flatMap((tool) => [
+            {
+                source: node.name, // alphaNode ID
+                target: tool, // betaNode ID
+                name: `${node.name}_${tool}`, // Name property
+            },
+            {
+                source: tool, // betaNode ID
+                target: node.name, // alphaNode ID
+                name: `${tool}_${node.name}`, // Name property
+            },
+        ])
+    );
+
+    const alphaDeltaLinks: NamedLink[] = rawData.flatMap((node, index) => {
+        const circumferenceNode = node.name;
+        return [
+            {
+                source: 'GraphState', // deltaNode ID
+                target: circumferenceNode, // alphaNode ID
+                name: `GraphState_${circumferenceNode}`, // Name property
+            },
+            {
+                source: circumferenceNode, // alphaNode ID
+                target: 'GraphState', // deltaNode ID
+                name: `${circumferenceNode}_GraphState`, // Name property
+            },
+        ];
+    });
+
+    const alphaGammaLinks: NamedLink[] = rawData.flatMap((node, index) => {
+        const circumferenceNode = node.name;
+        return [
+            {
+                source: 'SharedResources', // gammaNode ID
+                target: circumferenceNode, // alphaNode ID
+                name: `SharedResources_${circumferenceNode}`, // Name property
+            },
+            {
+                source: circumferenceNode, // alphaNode ID
+                target: 'SharedResources', // gammaNode ID
+                name: `${circumferenceNode}_SharedResources`, // Name property
+            },
+        ];
+    });
+
+    const betaGammaLinks: NamedLink[] = rawData.flatMap((node, index) =>
+        node.tools.flatMap((tool) => [
+            {
+                source: tool, // betaNode ID
+                target: 'SharedResources', // gammaNode ID
+                name: `${tool}_SharedResources`, // Name property
+            },
+            {
+                source: 'SharedResources', // gammaNode ID
+                target: tool, // betaNode ID
+                name: `SharedResources_${tool}`, // Name property
+            },
+        ])
+    );
+
+    const data = {
+        nodes: [
+            ...alphaNodes,
+            ...betaNodes,
+            ...deltaNodes,
+            ...gammaNodes,
+        ],
+        links: [
+            ...alphaInterLinks,
+            ...alphaDeltaLinks,
+            ...alphaGammaLinks,
+            ...alphaBetaLinks,
+            ...betaGammaLinks,
+        ]
+    };
+
+    return data;
+}
+
+
 
 
 type StepType = {

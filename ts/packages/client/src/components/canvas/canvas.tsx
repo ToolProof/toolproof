@@ -1,5 +1,5 @@
-import { data, path } from './specs';
-import { Node, NamedLink } from './types';
+import { getData, path } from './specs';
+import { Node, NamedLink, RawData } from './types';
 import { useEffect, useRef, useState } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
@@ -16,17 +16,23 @@ function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
 }
 
 
-export default function Canvas() {
+type CanvasProps = {
+    rawData: RawData[];
+}
+
+export default function Canvas({ rawData }: CanvasProps) {
     const fgRef = useRef();
     const [activeAlphaId, setActiveAlphaId] = useState<string | Node>('AlphaSuper');
     const [activeBetaId, setActiveBetaId] = useState<string | Node>('');
     const [isDeltaActive, setIsDeltaActive] = useState(false);
     const [isGammaActive, setIsGammaActive] = useState(false);
 
+    const data = getData(rawData);
+
     /* const linkNames = data.links.map(link => link.name);
     console.log('linkNames', linkNames); */
 
-    useEffect(() => {
+    /* useEffect(() => {
         let i = 0;
         let cancelled = false;
 
@@ -67,7 +73,7 @@ export default function Canvas() {
 
         // emitNext();
         return () => { cancelled = true; };
-    }, []);
+    }, []); */
 
     return (
         <ForceGraph3D

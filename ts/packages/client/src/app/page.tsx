@@ -1,8 +1,9 @@
 'use client'
-import Canvas from '@/components/canvas/canvas';
+import Foo from '@/components/canvas/foo';
 import { useAppDispatch } from '@/redux/hooks';
 import { setShowSideBar } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
+
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -11,5 +12,5 @@ export default function Home() {
     dispatch(setShowSideBar(false));
   }, [dispatch]);
 
-  return <Canvas />;
+  return <Foo />;
 }
