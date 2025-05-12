@@ -6,6 +6,7 @@ import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import * as path from 'path';
 import axios from 'axios';
+import WebSocket from 'ws';
 
 
 export const NodeInvokeDockingState = Annotation.Root({
@@ -71,7 +72,25 @@ class _NodeInvokeDocking extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (state.isDryRun) {
+        if (state.dryRunModeManager.dryRunMode) {
+            await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
+
+            // Connect to WebSocket server
+            const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
+
+            ws.on('open', () => {
+                console.log('Connected to WebSocket server (DryRun)');
+                ws.send(JSON.stringify({
+                    node: 'NodeInvokeDocking',
+                    message: 'Completed DryRun Mode'
+                }));
+                ws.close();
+            });
+
+            ws.on('error', (error) => {
+                console.error('WebSocket Error:', error);
+            });
+
             return {
                 messages: [new AIMessage('NodeInvokeDocking completed in DryRun mode')],
             };

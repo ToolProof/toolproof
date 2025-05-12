@@ -1,7 +1,6 @@
 import { BaseStateSpec, GraphSpec, registerGraph } from 'src/graphs/types.js';
 import { NodeLoadInputs, NodeLoadInputsState } from 'src/graphs/nodes/drugDiscovery/nodeLoadInputs.js';
 import { NodeGenerateCandidate, NodeGenerateCandidateState } from 'src/graphs/nodes/drugDiscovery/nodeGenerateCandidate.js';
-// import { NodeGenerateBox, NodeGenerateBoxState } from 'src/graphs/nodes/drugDiscovery/nodeGenerateBox.js';
 import { NodeInvokeDocking, NodeInvokeDockingState } from 'src/graphs/nodes/drugDiscovery/nodeInvokeDocking.js';
 import { NodeLoadResults, NodeLoadResultsState } from 'src/graphs/nodes/drugDiscovery/nodeLoadResults.js';
 import { NodeEvaluateResults, NodeEvaluateResultsState } from 'src/graphs/nodes/drugDiscovery/nodeEvaluateResults.js';
@@ -35,7 +34,8 @@ class _NodeStart extends Runnable {
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
-        if (state.isDryRun) {
+        if (state.dryRunModeManager.dryRunMode) {
+            // await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
             return {
                 messages: [new AIMessage('NodeStart completed in DryRun mode')],
             };
@@ -55,7 +55,6 @@ const GraphState = Annotation.Root({
     ...BaseStateSpec,
     ...NodeLoadInputsState.spec,
     ...NodeGenerateCandidateState.spec,
-    // ...NodeGenerateBoxState.spec,
     ...NodeInvokeDockingState.spec,
     ...NodeLoadResultsState.spec,
     ...NodeEvaluateResultsState.spec,
@@ -76,7 +75,6 @@ const stateGraph = new StateGraph(GraphState)
     .addNode('nodeStart', new NodeStart())
     .addNode('nodeLoadInputs', new NodeLoadInputs())
     .addNode('nodeGenerateCandidate', new NodeGenerateCandidate())
-    // .addNode('nodeGenerateBox', new NodeGenerateBox())
     .addNode('nodeInvokeDocking', new NodeInvokeDocking())
     .addNode('nodeLoadResults', new NodeLoadResults())
     .addNode('nodeEvaluateResults', new NodeEvaluateResults())

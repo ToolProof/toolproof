@@ -3,6 +3,7 @@ import { storage, bucketName } from 'src/firebaseAdminInit.js'
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
+import WebSocket from 'ws';
 
 
 export const NodeLoadResultsState = Annotation.Root({
@@ -32,7 +33,25 @@ class _NodeLoadResults extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (state.isDryRun) {
+        if (state.dryRunModeManager.dryRunMode) {
+            await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
+
+            // Connect to WebSocket server
+            const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
+
+            ws.on('open', () => {
+                console.log('Connected to WebSocket server (DryRun)');
+                ws.send(JSON.stringify({
+                    node: 'NodeLoadResults',
+                    message: 'Completed DryRun Mode'
+                }));
+                ws.close();
+            });
+
+            ws.on('error', (error) => {
+                console.error('WebSocket Error:', error);
+            });
+
             return {
                 messages: [new AIMessage('NodeLoadResults completed in DryRun mode')],
             };

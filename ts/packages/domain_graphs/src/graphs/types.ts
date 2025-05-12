@@ -4,7 +4,10 @@ import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 
 export const BaseStateSpec = {
     ...MessagesAnnotation.spec,
-    isDryRun: Annotation<boolean>(),
+    dryRunModeManager: Annotation<{
+        dryRunMode: boolean;
+        delay: number;
+    }>(),
 };
 
 // === Resource modeling ===

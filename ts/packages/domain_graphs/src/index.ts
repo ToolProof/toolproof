@@ -1,3 +1,3 @@
-import { runRemoteGraph } from "./localClients/clientTwo.js";
+import { runRemoteGraph } from './localClients/clientOne.js';
 
 runRemoteGraph();
