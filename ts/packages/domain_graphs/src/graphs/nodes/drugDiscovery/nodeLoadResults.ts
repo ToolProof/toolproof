@@ -42,12 +42,12 @@ class _NodeLoadResults extends Runnable {
 
         try {
             if (!state.docking?.path || !state.pose?.path) {
-                throw new Error('Missing ligandDocking or ligandPose paths');
+                throw new Error('Missing docking or pose paths');
             }
 
             const resources = [
-                { key: 'ligandDocking', path: state.docking.path },
-                { key: 'ligandPose', path: state.pose.path }
+                { key: 'docking', path: state.docking.path },
+                { key: 'pose', path: state.pose.path }
             ];
 
             const results: Record<string, any> = {};
@@ -88,8 +88,8 @@ class _NodeLoadResults extends Runnable {
 
             return {
                 messages: [new AIMessage('NodeLoadResults completed')],
-                docking: results.ligandDocking,
-                pose: results.ligandPose
+                docking: results.docking,
+                pose: results.pose
             };
         } catch (error: any) {
             console.error('Error in NodeLoadResults:', error);

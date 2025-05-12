@@ -48,7 +48,7 @@ class _NodeEvaluateResults extends Runnable {
         // Here we evaluate the results and decide whether to retry or not.
         try {
             /* if (!state.docking?.value || !state.pose?.value) {
-                throw new Error('Missing ligandDocking or ligandPose data');
+                throw new Error('Missing docking or pose data');
             }
 
             // Prepare the results content for OpenAI evaluation

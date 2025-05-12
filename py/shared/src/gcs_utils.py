@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 # Load environment variables at the top of the file
 load_dotenv()
 
+# ATTENTION: This file must be edited only in the shared directory
+
 # Check for environment variables first
 if os.getenv("GCP_CLIENT_EMAIL") and os.getenv("GCP_PRIVATE_KEY") and os.getenv("GCP_PROJECT_ID"):
     print("Using GCP credentials from environment variables")
@@ -51,7 +53,7 @@ def download_from_gcs(remote_path):
         print(f"Failed to download {remote_path}: {e}")
         raise
 
-
+# ATTENTION: This method is now tied to explicit basic_docking logic
 def upload_to_gcs(local_path, foldername, filename):
     """Uploads a file to GCS."""
     try:
