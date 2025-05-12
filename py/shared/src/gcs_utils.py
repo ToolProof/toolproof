@@ -33,35 +33,37 @@ else:
     raise RuntimeError("No Google Cloud credentials found. Set GCP_* environment variables or GOOGLE_APPLICATION_CREDENTIALS.")
 
 
-def download_from_gcs(gcs_path):
+def download_from_gcs(remote_path):
     """Downloads a file from GCS to /tmp and returns the local path."""
     try:
-        if gcs_path.startswith("gs://"):
-            gcs_path = gcs_path[len("gs://"):]
-        bucket_name, blob_name = gcs_path.split("/", 1)
+        if remote_path.startswith("gs://"):
+            remote_path = remote_path[len("gs://"):]
+        bucketname, blobname = remote_path.split("/", 1)
 
-        local_path = f"/tmp/{os.path.basename(blob_name)}"
-        bucket = storage_client.bucket(bucket_name)
-        blob = bucket.blob(blob_name)
+        local_path = f"/tmp/{os.path.basename(blobname)}"
+        bucket = storage_client.bucket(bucketname)
+        blob = bucket.blob(blobname)
         blob.download_to_filename(local_path)
 
-        print(f"Downloaded {gcs_path} to {local_path}")
+        print(f"Downloaded {remote_path} to {local_path}")
         return local_path
     except Exception as e:
-        print(f"Failed to download {gcs_path}: {e}")
+        print(f"Failed to download {remote_path}: {e}")
         raise
 
 
-def upload_to_gcs(local_path, bucket_name, destination_blob_name):
+def upload_to_gcs(local_path, foldername, filename):
     """Uploads a file to GCS."""
     try:
-        print(f"Uploading {local_path} to GCS bucket {bucket_name} as {destination_blob_name}...")
-        bucket = storage_client.bucket(bucket_name)
-        blob = bucket.blob(destination_blob_name)
+        bucketname, blobname = foldername.split("/", 1)
+        blobname = os.path.join(blobname, filename)
+        bucket = storage_client.bucket(bucketname)
+        blob = bucket.blob(blobname)
         blob.upload_from_filename(local_path)
 
-        print(f"File {local_path} uploaded to {bucket_name}/{destination_blob_name}.")
+        print(f"File {local_path} uploaded to {bucketname}/{blobname}.")
         return True
     except Exception as e:
         print(f"Failed to upload {local_path} to GCS: {e}")
         return False
+
