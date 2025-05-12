@@ -1,7 +1,7 @@
 import { BaseStateSpec, GraphSpec, registerGraph } from 'src/graphs/types.js';
 import { NodeLoadInputs, NodeLoadInputsState } from 'src/graphs/nodes/drugDiscovery/nodeLoadInputs.js';
 import { NodeGenerateCandidate, NodeGenerateCandidateState } from 'src/graphs/nodes/drugDiscovery/nodeGenerateCandidate.js';
-// import { NodeGenerateBox, NodeGenerateBoxState } from '../nodes/nodeGenerateBox.js';
+// import { NodeGenerateBox, NodeGenerateBoxState } from 'src/graphs/nodes/drugDiscovery/nodeGenerateBox.js';
 import { NodeInvokeDocking, NodeInvokeDockingState } from 'src/graphs/nodes/drugDiscovery/nodeInvokeDocking.js';
 import { NodeLoadResults, NodeLoadResultsState } from 'src/graphs/nodes/drugDiscovery/nodeLoadResults.js';
 import { NodeEvaluateResults, NodeEvaluateResultsState } from 'src/graphs/nodes/drugDiscovery/nodeEvaluateResults.js';

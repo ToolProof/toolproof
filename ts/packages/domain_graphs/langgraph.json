@@ -6,7 +6,7 @@
         "../shared"
     ],
     "graphs": {
-        "graph": "./src/graphs/graphs/drugDiscovery/graphIterativeDocking.ts:graph"
+        "graph": "./src/graphs/graphs/meta/graphReader.ts:graph"
     },
     "env": ".env"
 }

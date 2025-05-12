@@ -26,7 +26,7 @@ class _NodeLoadResults extends Runnable {
                 resources: [],
             },
         ],
-    }
+    };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 

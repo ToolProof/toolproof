@@ -1,5 +1,4 @@
-import { MessagesAnnotation } from '@langchain/langgraph';
-import { Annotation } from '@langchain/langgraph';
+import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 
 // === Base state spec ===
 
@@ -86,7 +85,7 @@ export type OperationDisallowPrivate = SharedOperation | ToolInvocation;
 /**
  * NodeSpec with a constraint: the final operation must be a write to private
  */
-export type NodeSpec = {
+export type NodeSpec = { // ATTENTION: must be valid JSON
     name: string;
     description: string;
     operations: [...OperationAllowPrivate[], WritePrivateOperation];

@@ -29,10 +29,10 @@ class _NodeEvaluateResults extends Runnable {
             {
                 direction: 'write',
                 storage: 'private',
-                resources: [],
+                resources: []
             },
         ],
-    }
+    };
 
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
