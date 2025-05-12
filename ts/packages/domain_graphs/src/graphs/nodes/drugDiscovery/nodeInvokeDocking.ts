@@ -1,5 +1,6 @@
 import { NodeSpec, BaseStateSpec, registerNode } from 'src/graphs/types.js';
 import { ChunkInfo } from 'src/localTools/chunkPDBContent';
+import { bucketName } from 'src/firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
@@ -81,9 +82,9 @@ class _NodeInvokeDocking extends Runnable {
 
             // Extract paths from the resources
             const payload = {
-                ligand: state.candidate.path,
-                receptor: state.target.path,
-                box: state.box.path,
+                ligand: `${bucketName}/${state.candidate.path}`,
+                receptor: `${bucketName}/${state.target.path}`,
+                box: `${bucketName}/${state.box.path}`,
             };
 
             // Create a new Map to store the results

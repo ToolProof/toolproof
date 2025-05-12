@@ -178,49 +178,40 @@ def run_simulation(ligand, receptor, box):
         )
 
         # Extract local paths for function calls
-        ligand = local_files["ligand"]
-        box = local_files["box"]
-        receptor = local_files["receptor"]
+        ligand_local = local_files["ligand"]
+        receptor_local = local_files["receptor"]
+        box_local = local_files["box"]
         
-        ligand_prepared = prepare_ligand(ligand)
+        ligand_prepared = prepare_ligand(ligand_local)
         
-        receptor_prepared = prepare_receptor(receptor, box)
+        receptor_prepared = prepare_receptor(receptor_local, box_local)
         
         docking = run_docking(ligand_prepared, receptor_prepared)
         
         pose = export_pose(docking) 
         
-        foldername = os.path.dirname(ligand) + "/"
-        fileNameDocking = os.path.basename(docking)
-        fileNamePose = os.path.basename(pose)
-        
-        # Log the values
-        print(f"foldername: {foldername}")
-        print(f"fileNameDocking: {fileNameDocking}")
-        print(f"fileNamePose: {fileNamePose}")
+        foldername = os.path.dirname(ligand)
         
         # Upload files to GCS
         
         files_to_upload = [
-            (docking, f"{foldername}{fileNameDocking}"),
-            (pose, f"{foldername}{fileNamePose}"),
+            (docking, os.path.basename(docking)),
+            (pose, os.path.basename(pose)),
         ]
         
         success_files = []
         failed_files = []
 
-        bucket_name = "tp_resources"
-
         # Upload files to GCS
-        for local_path, blob_name in files_to_upload:
+        for local_path, filename in files_to_upload:
             if os.path.exists(local_path):
-                if upload_to_gcs(local_path, bucket_name, blob_name):
-                    success_files.append(blob_name)
+                if upload_to_gcs(local_path, foldername, filename):
+                    success_files.append(filename)
                 else:
-                    failed_files.append(blob_name)
+                    failed_files.append(filename)
             else:
                 print(f"File not found: {local_path}")
-                failed_files.append(blob_name)
+                failed_files.append(filename)
         
         print("Upload summary:")
         print(f"Successfully uploaded: {success_files}")
@@ -228,6 +219,6 @@ def run_simulation(ligand, receptor, box):
 
         if failed_files:
             return {"status": "partial_success", "uploaded_files": success_files, "failed_files": failed_files}
-        return {"status": "success", "uploaded_files": success_files} 
+        return {"status": "success", "uploaded_files": success_files, "foldername": foldername, "filename_docking": os.path.basename(docking), "filename_pose": os.path.basename(pose)} 
     except Exception as e:
-        raise RuntimeError(f"Workflow failed: {e}") from e
+        raise RuntimeError(f"Workflow failed: {e}")

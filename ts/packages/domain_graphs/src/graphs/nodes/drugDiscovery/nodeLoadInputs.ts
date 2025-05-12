@@ -7,7 +7,12 @@ import { AIMessage } from '@langchain/core/messages';
 
 
 export const NodeLoadInputsState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>(),
+    anchor: Annotation<{ path: string, value: string }>(
+        {
+            reducer: (prev, next) => next,
+            default: () => { return { path: 'dd', value: 'dd' } },
+        }
+    ),
     target: Annotation<{ path: string, value: ChunkInfo[] }>(),
     box: Annotation<{ path: string, value: ChunkInfo[] }>(),
 });
