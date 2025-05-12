@@ -1,7 +1,7 @@
-import { NodeSpec, BaseStateSpec, registerNode } from "src/graphs/types.js";
+import { NodeSpec, BaseStateSpec, registerNode } from 'src/graphs/types.js';
 import { storage, bucketName } from 'src/firebaseAdminInit.js'
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from "@langchain/langgraph";
+import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 
 
@@ -11,7 +11,7 @@ export const NodeLoadResultsState = Annotation.Root({
 });
 
 type WithBaseState = typeof NodeLoadResultsState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
+    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
 class _NodeLoadResults extends Runnable {
@@ -42,7 +42,7 @@ class _NodeLoadResults extends Runnable {
 
         try {
             if (!state.docking?.path || !state.pose?.path) {
-                throw new Error("Missing ligandDocking or ligandPose paths");
+                throw new Error('Missing ligandDocking or ligandPose paths');
             }
 
             const resources = [
@@ -87,14 +87,14 @@ class _NodeLoadResults extends Runnable {
             }
 
             return {
-                messages: [new AIMessage("Results loaded")],
+                messages: [new AIMessage('NodeLoadResults completed')],
                 docking: results.ligandDocking,
                 pose: results.ligandPose
             };
         } catch (error: any) {
-            console.error("Error in nodeLoadResults:", error);
+            console.error('Error in NodeLoadResults:', error);
             return {
-                messages: [new AIMessage(`Error loading results: ${error.message}`)]
+                messages: [new AIMessage('NodeLoadResults failed')],
             };
         }
     }

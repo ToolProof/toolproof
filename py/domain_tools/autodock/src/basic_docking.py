@@ -190,11 +190,20 @@ def run_simulation(ligand, receptor, box):
         
         pose = export_pose(docking) 
         
-        folder = os.path.dirname(ligand) + "/"
+        foldername = os.path.dirname(ligand) + "/"
+        fileNameDocking = os.path.basename(docking)
+        fileNamePose = os.path.basename(pose)
+        
+        # Log the values
+        print(f"foldername: {foldername}")
+        print(f"fileNameDocking: {fileNameDocking}")
+        print(f"fileNamePose: {fileNamePose}")
+        
+        # Upload files to GCS
         
         files_to_upload = [
-            (docking, f"{folder}{os.path.basename(docking)}"),
-            (pose, f"{folder}{os.path.basename(pose)}")
+            (docking, f"{foldername}{fileNameDocking}"),
+            (pose, f"{foldername}{fileNamePose}"),
         ]
         
         success_files = []

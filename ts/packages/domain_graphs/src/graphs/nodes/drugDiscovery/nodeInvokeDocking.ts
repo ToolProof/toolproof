@@ -126,7 +126,7 @@ class _NodeInvokeDocking extends Runnable {
                 }
 
                 return {
-                    messages: [new AIMessage('Docking completed successfully')],
+                    messages: [new AIMessage('NodeInvokeDocking completed')],
                     docking: {
                         path: dockingPath,
                         value: new Map()
@@ -141,9 +141,9 @@ class _NodeInvokeDocking extends Runnable {
             }
 
         } catch (error: any) {
-            console.error('Error in nodeInvokeDocking:', error);
+            console.error('Error in NodeInvokeDocking:', error);
             return {
-                messages: [new AIMessage(`Error invoking docking: ${error.message}`)]
+                messages: [new AIMessage('NodeInvokeDocking failed')],
             };
         }
     }
