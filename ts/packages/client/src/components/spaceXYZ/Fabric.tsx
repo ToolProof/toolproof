@@ -1,5 +1,5 @@
-import { getData, path } from './specs';
-import { Node, NamedLink, RawData } from './types';
+import { getData, path } from './utils';
+import { Node, NamedLink, NodeData } from './types';
 import { useEffect, useRef, useState } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
@@ -16,11 +16,12 @@ function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
 }
 
 
-type CanvasProps = {
-    rawData: RawData[];
+type FabricProps = {
+    rawData: NodeData[];
+    message: string;
 }
 
-export default function Canvas({ rawData }: CanvasProps) {
+export default function Fabric({ rawData, message }: FabricProps) {
     const fgRef = useRef();
     const [activeAlphaId, setActiveAlphaId] = useState<string | Node>('AlphaSuper');
     const [activeBetaId, setActiveBetaId] = useState<string | Node>('');
@@ -124,7 +125,8 @@ export default function Canvas({ rawData }: CanvasProps) {
                     // 🟡 Alpha node (sphere)
                     const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
                     const material = new THREE.MeshLambertMaterial({
-                        color: node.id === activeAlphaId ? 'yellow' : 'red'
+                        // color: node.id === activeAlphaId ? 'yellow' : 'red'
+                        color: message.includes(node.id) ? 'yellow' : 'red'
                     });
                     mesh = new THREE.Mesh(geometry, material);
                 } else {

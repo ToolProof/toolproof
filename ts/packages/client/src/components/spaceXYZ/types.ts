@@ -18,7 +18,7 @@ export interface NamedLink extends Link {
     name: string;
 }
 
-export type RawData = {
+export type NodeData = {
   name: string;
   tools: string[];
 }

@@ -1,5 +1,5 @@
 'use client'
-import Foo from '@/components/canvas/foo';
+import SpaceXYZ from '@/components/spaceXYZ/SpaceXYZ';
 import { useAppDispatch } from '@/redux/hooks';
 import { setShowSideBar } from '@/redux/features/configSlice';
 import { useEffect } from 'react';
@@ -12,5 +12,5 @@ export default function Home() {
     dispatch(setShowSideBar(false));
   }, [dispatch]);
 
-  return <Foo />;
+  return <SpaceXYZ />;
 }

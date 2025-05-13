@@ -1,11 +1,11 @@
-import { Node, NamedLink, RawData } from './types';
+import { Node, NamedLink, NodeData } from './types';
 
 
 const radius = 200;
 const alphaBetaYDistance = 75;
 
 
-export const getData = (rawData: RawData[]) => {
+export const getData = (rawData: NodeData[]) => {
 
 
     const alphaNodes: Node[] = rawData.map((node, index) => ({
