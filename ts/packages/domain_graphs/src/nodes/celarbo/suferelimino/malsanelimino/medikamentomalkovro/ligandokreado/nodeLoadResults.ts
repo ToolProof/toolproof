@@ -1,4 +1,4 @@
-import { NodeSpec, BaseStateSpec, registerNode } from 'src/graphs/types.js';
+import { NodeSpec, BaseStateSpec, registerNode } from 'src/types.js';
 import { storage, bucketName } from 'src/firebaseAdminInit.js'
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';

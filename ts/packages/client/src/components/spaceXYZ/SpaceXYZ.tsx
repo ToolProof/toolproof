@@ -1,8 +1,8 @@
 'use client'
 import Fabric from '@/components/spaceXYZ/Fabric';
 import { NodeData } from '@/components/spaceXYZ/types';
-import { runRemoteGraphTwo } from '@/lib/chat/actionTwo';
-import { runRemoteGraphOne } from '@/lib/chat/actionOne';
+import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
+import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
 
 
@@ -13,7 +13,7 @@ export default function SpaceXYZ() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await runRemoteGraphTwo();
+                const result = await runGrafumilo();
                 // console.log('result:', JSON.stringify(result, null, 2));
 
                 const nodes = result.nodes || [];
@@ -47,7 +47,7 @@ export default function SpaceXYZ() {
 
     useEffect(() => {
         if (message === 'Start' || message.includes('NodeEvaluateResults')) {
-            runRemoteGraphOne();
+            runLigandokreado();
         }
     }, [message]);
 

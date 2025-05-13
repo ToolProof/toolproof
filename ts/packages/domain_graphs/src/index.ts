@@ -1,3 +1,3 @@
-import { runRemoteGraph } from './localClients/clientOne.js';
+import { runRemoteGraph } from './localClients/clientLigandokreado.js';
 
 runRemoteGraph();
