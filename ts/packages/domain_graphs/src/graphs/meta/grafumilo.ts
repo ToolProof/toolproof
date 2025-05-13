@@ -76,7 +76,7 @@ const nodeInspectGitRepo = async (state: typeof GraphState.State) => {
         const fileContent = await response.text();
         graph.content = fileContent;
 
-        const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"](src\/graphs\/nodes\/.*?)['"]/g);
+        const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"](src\/nodes\/.*?)['"]/g);
 
         for (const match of importMatches) {
             const _importPath = 'ts/packages/domain_graphs/' + match[1];
