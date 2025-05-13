@@ -16,7 +16,7 @@ const GraphState = Annotation.Root({
     path: Annotation<string>(
         {
             reducer: (prev, next) => next,
-            default: () => { return 'ts/packages/domain_graphs/src/graphs/graphs/drugDiscovery/graphIterativeDocking.ts' },
+            default: () => { return 'ts/packages/domain_graphs/src/graphs/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado.ts' },
         }
     ),
     graph: Annotation<{

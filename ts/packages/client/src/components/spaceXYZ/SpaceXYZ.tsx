@@ -1,4 +1,3 @@
-'use client'
 import Fabric from '@/components/spaceXYZ/Fabric';
 import { NodeData } from '@/components/spaceXYZ/types';
 import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
@@ -14,7 +13,7 @@ export default function SpaceXYZ() {
         const fetchData = async () => {
             try {
                 const result = await runGrafumilo();
-                // console.log('result:', JSON.stringify(result, null, 2));
+                console.log('result:', JSON.stringify(result, null, 2));
 
                 const nodes = result.nodes || [];
                 const extractedData: NodeData[] = nodes.map((node: any) => {

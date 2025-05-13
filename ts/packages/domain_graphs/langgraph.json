@@ -7,7 +7,7 @@
     ],
     "graphs": {
         "grafumilo": "./src/graphs/meta/grafumilo.ts:graph",
-        "ligandokreado": "./src/graphs/celarbo/suferelimino/malsanelimini/medikamentomalkovro/ligandokreado.ts:graph"
+        "ligandokreado": "./src/graphs/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado.ts:graph"
     },
     "env": ".env"
 }

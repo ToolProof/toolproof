@@ -28,7 +28,7 @@ export async function runLigandokreado() {
                 messages: [new HumanMessage('Graph is invoked')],
                 dryRunModeManager: {
                     dryRunMode: true,
-                    delay: 1000,
+                    delay: 3000,
                 },
                 anchor: { path: 'imatinib.smi', value: [] },
                 target: { path: '1iep.pdb', value: [] },
