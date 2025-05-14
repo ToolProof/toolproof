@@ -1,4 +1,5 @@
 import { NodeSpec, BaseStateSpec, registerNode } from 'src/types.js';
+import { extractNodeSpec } from 'src/tools/meta/extractNodeSpec';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
 // import { AIMessage } from '@langchain/core/messages';
@@ -36,41 +37,6 @@ export const NodeFooState = Annotation.Root({
 
 type WithBaseState = typeof NodeFooState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
-
-
-const extractNodeSpec = (fileContent: string): string | null => {
-    const start = fileContent.indexOf('static nodeSpec: NodeSpec = {');
-    if (start === -1) return null;
-
-    let braceCount = 0;
-    let inString = false;
-    let escape = false;
-    let specContent = '';
-
-    for (let i = start; i < fileContent.length; i++) {
-        const char = fileContent[i];
-
-        if (char === '"' || char === "'") {
-            if (!escape) inString = !inString;
-        }
-
-        if (!inString) {
-            if (char === '{') braceCount++;
-            if (char === '}') braceCount--;
-        }
-
-        specContent += char;
-
-        if (braceCount === 0 && specContent.trim().endsWith('};')) {
-            return specContent;
-        }
-
-        escape = char === '\\' && !escape;
-    }
-
-    return null; // Failed to extract properly
-}
-
 
 class _NodeFoo extends Runnable {
 
@@ -141,6 +107,7 @@ class _NodeFoo extends Runnable {
 
                     if (nodeSpecString) {
                         try {
+                            console.log('nodeSpecString:', nodeSpecString);
                             const cleanedNodeSpec = nodeSpecString.replace(/static\s+nodeSpec\s*:\s*NodeSpec\s*=\s*/, '').replace(/;$/, '');
                             const nodeSpecObject = eval(`(${cleanedNodeSpec})`);
                             nodes.push({ path: importPath, content: nodeSpecObject });
