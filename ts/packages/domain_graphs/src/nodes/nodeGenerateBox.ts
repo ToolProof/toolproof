@@ -1,17 +1,17 @@
-import { NodeSpec, BaseStateSpec, registerNode } from 'src/types.js';
-import { ChunkInfo } from 'src/tools/chunkPDBContent.js';
-import { generateBoxPDB } from 'src/tools/generateBoxPDB.js';
+import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
+import { ChunkInfo } from '../tools/chunkPDBContent.js';
+import { generateBoxPDB } from '../tools/generateBoxPDB.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from "@langchain/langgraph";
+import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
-import { z } from "zod";
+import { z } from 'zod';
 import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
-import { zodResponseFormat } from "openai/helpers/zod";
+import { zodResponseFormat } from 'openai/helpers/zod';
 
 const openai = new OpenAI();
 
 export const NodeGenerateBoxState = Annotation.Root({
-    candidate: Annotation<{ path: string, value: string }>({ // The type of "value" should represent SMILES strings (if possible).
+    candidate: Annotation<{ path: string, value: string }>({ // The type of 'value' should represent SMILES strings (if possible).
         reducer: (prev, next) => next
     }),
     target: Annotation<{ path: string, value: ChunkInfo[] }>({ // Store pre-processed chunks
@@ -23,7 +23,7 @@ export const NodeGenerateBoxState = Annotation.Root({
 });
 
 type WithBaseState = typeof NodeGenerateBoxState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>["State"];
+    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
 class _NodeGenerateBox extends Runnable {
@@ -42,7 +42,7 @@ class _NodeGenerateBox extends Runnable {
             const targetChunks: ChunkInfo[] = state.target.value;
 
             if (!candidateSmiles || !targetChunks || targetChunks.length === 0) {
-                throw new Error("Missing candidate SMILES or receptor data");
+                throw new Error('Missing candidate SMILES or receptor data');
             }
 
             // Prepare target information for the prompt
@@ -68,14 +68,14 @@ class _NodeGenerateBox extends Runnable {
             });
 
             const response = await openai.beta.chat.completions.parse({
-                model: "gpt-4o-mini",
+                model: 'gpt-4o-mini',
                 messages: [
                     {
-                        role: "system",
-                        content: "Generate a docking box for the candidate molecule and target protein. The box should encompass the binding site."
+                        role: 'system',
+                        content: 'Generate a docking box for the candidate molecule and target protein. The box should encompass the binding site.'
                     },
                     {
-                        role: "user",
+                        role: 'user',
                         content: `
                                 Candidate SMILES: ${candidateSmiles}
                                 
@@ -88,13 +88,13 @@ class _NodeGenerateBox extends Runnable {
                             `
                     }
                 ],
-                response_format: zodResponseFormat(BoxSchema, "box_generator")
+                response_format: zodResponseFormat(BoxSchema, 'box_generator')
             });
 
             const parsedResponse = response.choices[0].message.parsed;
 
             if (!parsedResponse) {
-                throw new Error("Failed to parse box generation response");
+                throw new Error('Failed to parse box generation response');
             }
 
             // Generate PDB-format box representation
@@ -119,7 +119,7 @@ class _NodeGenerateBox extends Runnable {
             // console.log(`Box saved to gs://tp_data/${boxFileName}`);
 
             return {
-                messages: [new AIMessage("Docking box generated")],
+                messages: [new AIMessage('Docking box generated')],
                 box: {
                     path: boxFileName,
                     value: boxPDB
@@ -127,7 +127,7 @@ class _NodeGenerateBox extends Runnable {
             };
 
         } catch (error: any) {
-            console.error("Error in nodeGenerateBox:", error);
+            console.error('Error in nodeGenerateBox:', error);
             return {
                 messages: [new AIMessage(`Error generating box: ${error.message}`)]
             };

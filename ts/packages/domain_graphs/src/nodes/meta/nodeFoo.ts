@@ -1,5 +1,5 @@
-import { NodeSpec, BaseStateSpec, registerNode } from 'src/types.js';
-import { extractNodeSpec } from 'src/tools/meta/extractNodeSpec';
+import { NodeSpec, BaseStateSpec, registerNode } from '../../types.js';
+import { extractNodeSpec } from '../../tools/meta/extractNodeSpec';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
 // import { AIMessage } from '@langchain/core/messages';
@@ -93,7 +93,7 @@ class _NodeFoo extends Runnable {
             const fileContent = await response.text();
             graph.content = fileContent;
 
-            const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"](src\/nodes\/.*?)['"]/g);
+            const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"](nodes\/.*?)['"]/g);
 
             for (const match of importMatches) {
                 const _importPath = 'ts/packages/domain_graphs/' + match[1];

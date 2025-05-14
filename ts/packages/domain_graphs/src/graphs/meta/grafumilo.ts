@@ -1,5 +1,5 @@
-import { BaseStateSpec, GraphSpec, registerGraph } from 'src/types.js';
-import { NodeFoo, NodeFooState } from 'src/nodes/meta/nodeFoo.js';
+import { BaseStateSpec, GraphSpec, registerGraph } from '../../types.js';
+import { NodeFoo, NodeFooState } from '../../nodes/meta/nodeFoo.js';
 import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
