@@ -85,7 +85,7 @@ export default function Page() {
         Goals define the objectives that ToolProof aims to achieve.
       </p>
       <p className="mb-4">
-        In ToolProof 1.0, the Goals are predefined: to eliminate all diseases on Earth. Each disease listed in the ICD-11 standard (a global framework for classifying diseases) is mapped directly to a corresponding Goal—resulting in a long list of entries like “Eliminate cancer,” “Eliminate diabetes,” and so on. The word "Eliminate" is used because it encompasses both prevention and cure.
+        In ToolProof 1.0, the Goals are predefined: to eliminate all diseases on Earth. Each disease listed in the ICD-11 standard (a global framework for classifying diseases) is mapped directly to a corresponding Goal—resulting in a long list of entries like “Eliminate cancer,” “Eliminate diabetes,” and so on. The word Eliminate is used because it encompasses both prevention and cure.
       </p>
       <p className="mb-4">
         That said, specifying Goals is often considered one of the most challenging aspects of designing useful AI systems. A cautionary tale involves a civilization that instructed its powerful AI to eliminate a virulent disease—only for the AI to respond by eliminating the civilization itself, thereby achieving the Goal in an unintended way. ToolProof mitigates such risks by enabling human oversight and control throughout the system: upstream (in defining Goals) and downstream (in executing Strategies). Future versions of ToolProof may support a broader range of Goals, with mechanisms to democratize Goal setting so that users can collectively guide the system.

@@ -56,6 +56,7 @@ export default function SpaceXYZ() {
                 console.log('result:', JSON.stringify(result, null, 2));
 
                 const nodes = result.nodes || [];
+                // eslint-disable-next-line
                 const graphSpecs: GraphSpec[] = nodes.map((node: any) => {
                     if (typeof node.content === 'string') {
                         return {
@@ -65,7 +66,9 @@ export default function SpaceXYZ() {
                     }
 
                     const tools: string[] = (node.content.operations || [])
+                        // eslint-disable-next-line
                         .filter((operation: any) => typeof operation.name === 'string')
+                        // eslint-disable-next-line
                         .map((operation: any) => operation.name);
 
                     return {
