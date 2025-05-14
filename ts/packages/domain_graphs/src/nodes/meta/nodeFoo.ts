@@ -93,7 +93,7 @@ class _NodeFoo extends Runnable {
             const fileContent = await response.text();
             graph.content = fileContent;
 
-            const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"](nodes\/.*?)['"]/g);
+            const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"]([^'"]*nodes\/[^'"]*)['"]/g);
 
             for (const match of importMatches) {
                 const _importPath = 'ts/packages/domain_graphs/' + match[1];
