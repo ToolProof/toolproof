@@ -11,4 +11,8 @@
     @apply bg-[#fee987];
   }
 
+  #__next {
+    height: 100%;
+  }
+
 }

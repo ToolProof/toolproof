@@ -36,8 +36,8 @@ export default function SideBar() {
     if (!showSideBar) return null;
 
     return (
-        <div className='flex flex-col h-screen py-0 overflow-x-hidden'>
-            <div className='flex-1'>
+        <div className='flex flex-col min-h-full w-full py-0 overflow-x-hidden'>
+            {/* <div className='flex-1'>
                 {true && (
                     <button
                         onClick={handleAddChat}
@@ -63,7 +63,7 @@ export default function SideBar() {
                     width={48} // Adjust the width as needed
                     height={48} // Adjust the height as needed
                 />
-            )}
+            )} */}
         </div>
     );
 }

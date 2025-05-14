@@ -21,15 +21,18 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions)
 
   return (
-    <html lang='en'>
-      <body>
+    <html lang='en' className='h-full w-full'>
+      <body className='h-full w-full'>
         <SessionProvider session={session}>
           <StoreProvider>
-            <div className=''>
-              {/* <div className='hidden sm:block sm:w-[300px] py-0 bg-black'>
+            <div className='flex h-full w-full overflow-hidden'>
+              {/* Sidebar: fixed width */}
+              {/* <div className='hidden sm:block sm:w-[300px] h-full w-full bg-white text-white'>
                 <SideBar />
               </div> */}
-              <div className=''>
+
+              {/* Graph area: fills remaining space */}
+              <div className='flex-1 h-full'>
                 {children}
               </div>
             </div>

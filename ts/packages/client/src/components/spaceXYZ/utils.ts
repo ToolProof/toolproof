@@ -1,5 +1,5 @@
 import { Node, NamedLink, GraphSpec, ActiveStates } from './types';
-import {NodeObject} from 'react-force-graph-3d';
+import { NodeObject } from 'react-force-graph-3d';
 import * as THREE from 'three';
 
 
@@ -20,28 +20,52 @@ export function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
 export const getGraphData = (graphSpec: GraphSpec[]) => {
 
 
-    const alphaNodes: Node[] = graphSpec.map((node, index) => ({
+    const nodes_Alpha: Node[] = graphSpec.map((node, index) => ({
         id: node.name,
         shape: 'sphere',
         val: 5,
-        group: 0,
+        group: 'Alpha',
         fx: radius * Math.cos((2 * Math.PI * index) / graphSpec.length),
         fy: -75,
         fz: radius * Math.sin((2 * Math.PI * index) / graphSpec.length),
     }));
 
-    const betaNodes: Node[] = graphSpec.flatMap((node, index) => {
+    const nodes_BetaOne: Node[] = [
+        {
+            id: 'GraphState',
+            shape: 'square',
+            val: 50,
+            group: 'BetaOne',
+            fx: 0,
+            fy: -50,
+            fz: 0,
+        },
+    ];
+
+    const nodes_BetaTwo: Node[] = [
+        {
+            id: 'SharedResources',
+            shape: 'square',
+            val: 500,
+            group: 'BetaTwo',
+            fx: 0,
+            fy: 0,
+            fz: 0,
+        },
+    ];
+
+    const nodes_Gamma: Node[] = graphSpec.flatMap((node, index) => {
         const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / graphSpec.length);
         const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / graphSpec.length);
         const toolsCount = node.tools.length;
 
         return node.tools.map((tool, toolIndex) => {
             const angle = (2 * Math.PI * toolIndex) / toolsCount; // Angle for circular placement
-            const betaNodeX =
+            const gammaNodeX =
                 toolsCount > 1
                     ? alphaNodeX + alphaBetaYDistance * Math.cos(angle)
                     : alphaNodeX; // If only one tool, place it in the center
-            const betaNodeZ =
+            const gammaNodeZ =
                 toolsCount > 1
                     ? alphaNodeZ + alphaBetaYDistance * Math.sin(angle)
                     : alphaNodeZ; // If only one tool, place it in the center
@@ -50,39 +74,17 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
                 id: tool,
                 shape: 'sphere',
                 val: 3,
-                group: 1,
-                fx: betaNodeX,
+                group: 'Gamma',
+                fx: gammaNodeX,
                 fy: 75, // y-coordinate above the alphaNode
-                fz: betaNodeZ,
+                fz: gammaNodeZ,
             };
         });
     });
 
-    const deltaNodes: Node[] = [
-        {
-            id: 'GraphState',
-            shape: 'square',
-            val: 50,
-            group: 3,
-            fx: 0,
-            fy: -50,
-            fz: 0,
-        },
-    ];
 
-    const gammaNodes: Node[] = [
-        {
-            id: 'SharedResources',
-            shape: 'square',
-            val: 500,
-            group: 2,
-            fx: 0,
-            fy: 0,
-            fz: 0,
-        },
-    ];
 
-    const alphaInterLinks: NamedLink[] = graphSpec.flatMap((nodeA, indexA) => {
+    const links_Alpha_Alpha: NamedLink[] = graphSpec.flatMap((nodeA, indexA) => {
         return graphSpec
             .filter((_, indexB) => indexB > indexA) // Avoid duplicate pairs
             .flatMap((nodeB) => [
@@ -99,7 +101,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
             ]);
     });
 
-    const alphaBetaLinks: NamedLink[] = graphSpec.flatMap((node, index) =>
+    const links_Alpha_Gamma: NamedLink[] = graphSpec.flatMap((node, index) =>
         node.tools.flatMap((tool) => [
             {
                 source: node.name, // alphaNode ID
@@ -114,7 +116,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ])
     );
 
-    const alphaDeltaLinks: NamedLink[] = graphSpec.flatMap((node, index) => {
+    const links_Alpha_BetaOne: NamedLink[] = graphSpec.flatMap((node, index) => {
         const circumferenceNode = node.name;
         return [
             {
@@ -130,7 +132,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ];
     });
 
-    const alphaGammaLinks: NamedLink[] = graphSpec.flatMap((node, index) => {
+    const links_Alpha_BetaTwo: NamedLink[] = graphSpec.flatMap((node, index) => {
         const circumferenceNode = node.name;
         return [
             {
@@ -146,7 +148,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ];
     });
 
-    const betaGammaLinks: NamedLink[] = graphSpec.flatMap((node, index) =>
+    const links_BetaTwo_Gamma: NamedLink[] = graphSpec.flatMap((node, index) =>
         node.tools.flatMap((tool) => [
             {
                 source: tool, // betaNode ID
@@ -161,61 +163,24 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ])
     );
 
-    const data = {
+    const graphData = {
         nodes: [
-            ...alphaNodes,
-            ...betaNodes,
-            ...deltaNodes,
-            ...gammaNodes,
+            ...nodes_Alpha,
+            ...nodes_Gamma,
+            ...nodes_BetaOne,
+            ...nodes_BetaTwo,
         ],
         links: [
-            ...alphaInterLinks,
-            ...alphaDeltaLinks,
-            ...alphaGammaLinks,
-            ...alphaBetaLinks,
-            ...betaGammaLinks,
+            ...links_Alpha_Alpha,
+            ...links_Alpha_BetaOne,
+            ...links_Alpha_Gamma,
+            ...links_Alpha_Gamma,
+            ...links_BetaTwo_Gamma,
         ]
     };
 
-    return data;
+    return graphData;
 }
-
-
-type StepType = {
-    name: string; // ATTENTION: better type
-    switchAlpha: 0 | 1;
-    switchBeta: -1 | 0 | 1;
-    switchDelta: -1 | 0 | 1;
-    switchGamma: -1 | 0 | 1;
-}
-
-export const path: StepType[] = [
-    { name: 'AlphaSuper_NodeLoadInputs', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
-    { name: 'NodeLoadInputs_SharedResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'SharedResources_NodeLoadInputs', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeLoadInputs_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: -1 },
-    { name: 'GraphState_NodeLoadInputs', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
-    { name: 'NodeLoadInputs_NodeGenerateCandidate', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },
-    { name: 'NodeGenerateCandidate_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'GraphState_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
-    { name: 'NodeGenerateCandidate_OpenAI-1', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },
-    { name: 'OpenAI-1_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeGenerateCandidate_SharedResources', switchAlpha: 0, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
-    { name: 'SharedResources_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
-    { name: 'NodeGenerateCandidate_NodeInvokeDocking', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeInvokeDocking_SchrodingerSuite', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'SchrodingerSuite_SharedResources', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
-    { name: 'SharedResources_SchrodingerSuite', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
-    { name: 'SchrodingerSuite_NodeInvokeDocking', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeInvokeDocking_NodeLoadResults', switchAlpha: 0, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeLoadResults_SharedResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'SharedResources_NodeLoadResults', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeLoadResults_NodeEvaluateResults', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: -1 },
-    { name: 'NodeEvaluateResults_OpenAI-2', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'OpenAI-2_NodeEvaluateResults', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeEvaluateResults_NodeGenerateCandidate', switchAlpha: 1, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
-];
-
 
 
 export const getNodeThreeObject = (node: NodeObject<NodeObject<Node>>, activeStates: ActiveStates, message: string) => {
@@ -227,35 +192,31 @@ export const getNodeThreeObject = (node: NodeObject<NodeObject<Node>>, activeSta
     // 🔷 Determine shape and color
     let mesh: THREE.Object3D;
 
-    if (node.group === 3) {
-        // 🟦 Delta node (tetrahedron)
+    if (node.group === 'BetaTwo') {
         // const geometry = new THREE.TetrahedronGeometry(baseSize, 0);
         baseSize *= 0.5;
         const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
         const material = new THREE.MeshLambertMaterial({
-            color: activeStates.isDeltaActive ? 'green' : 'red'
+            color: 'pink' //activeStates.isDeltaActive ? 'green' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
-    } else if (node.group === 2) {
-        // 🟩 Gamma node (cube)
+    } else if (node.group === 'BetaOne') {
         baseSize *= 0.5;
         const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
         const material = new THREE.MeshLambertMaterial({
-            color: activeStates.isGammaActive ? 'green' : 'red'
+            color: 'pink' //activeStates.isGammaActive ? 'green' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
-    } else if (node.group === 1) {
-        // 🔵 Beta node (cone)
+    } else if (node.group === 'Gamma') {
         const radius = baseSize * 0.4;
         const height = baseSize;
         const geometry = new THREE.ConeGeometry(radius, height, 16);
         const material = new THREE.MeshLambertMaterial({
-            color: node.id === activeStates.activeBetaId ? 'blue' : 'red'
+            color: 'pink' //node.id === activeStates.activeBetaId ? 'blue' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = Math.PI / 1;
-    } else if (node.group === 0) {
-        // 🟡 Alpha node (sphere)
+    } else if (node.group === 'Alpha') {
         const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
         const material = new THREE.MeshLambertMaterial({
             // color: node.id === activeAlphaId ? 'yellow' : 'red'
@@ -296,3 +257,39 @@ export const getNodeThreeObject = (node: NodeObject<NodeObject<Node>>, activeSta
 
     return group;
 }
+
+
+type StepType = {
+    name: string; // ATTENTION: better type
+    switchAlpha: 0 | 1;
+    switchBeta: -1 | 0 | 1;
+    switchDelta: -1 | 0 | 1;
+    switchGamma: -1 | 0 | 1;
+}
+
+export const path: StepType[] = [
+    { name: 'AlphaSuper_NodeLoadInputs', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
+    { name: 'NodeLoadInputs_SharedResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'SharedResources_NodeLoadInputs', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeLoadInputs_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: -1 },
+    { name: 'GraphState_NodeLoadInputs', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
+    { name: 'NodeLoadInputs_NodeGenerateCandidate', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },
+    { name: 'NodeGenerateCandidate_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'GraphState_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
+    { name: 'NodeGenerateCandidate_OpenAI-1', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },
+    { name: 'OpenAI-1_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeGenerateCandidate_SharedResources', switchAlpha: 0, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
+    { name: 'SharedResources_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
+    { name: 'NodeGenerateCandidate_NodeInvokeDocking', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeInvokeDocking_SchrodingerSuite', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'SchrodingerSuite_SharedResources', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
+    { name: 'SharedResources_SchrodingerSuite', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
+    { name: 'SchrodingerSuite_NodeInvokeDocking', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeInvokeDocking_NodeLoadResults', switchAlpha: 0, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeLoadResults_SharedResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'SharedResources_NodeLoadResults', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeLoadResults_NodeEvaluateResults', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: -1 },
+    { name: 'NodeEvaluateResults_OpenAI-2', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'OpenAI-2_NodeEvaluateResults', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeEvaluateResults_NodeGenerateCandidate', switchAlpha: 1, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
+];

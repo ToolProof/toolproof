@@ -18,6 +18,18 @@ export default function Fabric({ graphSpec, message }: FabricProps) {
 
     const graphData = getGraphData(graphSpec);
 
+    useEffect(() => {
+        if (fgRef.current) {
+            // Set the camera position directly (x, y, z) and lookAt (default is origin)
+            fgRef.current.cameraPosition(
+                { x: 0, y: 0, z: 400 }, // Move the camera farther away from the center
+                undefined,              // Look at center (default: {x: 0, y: 0, z: 0})
+                0                      // Transition time (0 = immediate)
+            );
+        }
+    }, []);
+
+
     /* const linkNames = data.links.map(link => link.name);
     console.log('linkNames', linkNames); */
 
