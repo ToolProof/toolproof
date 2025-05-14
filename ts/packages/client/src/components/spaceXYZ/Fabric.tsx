@@ -22,7 +22,7 @@ export default function Fabric({ graphData, message }: FabricProps) {
             // Set the camera position directly (x, y, z) and lookAt (default is origin
 
             const hack = fgRef.current as {
-                cameraPosition: (foo: { x: number, y: number, z: number }, lookAt?: { x: number, y: number, z: number }, transitionTime?: number) => void;
+                cameraPosition: (position: { x: number, y: number, z: number }, lookAt?: { x: number, y: number, z: number }, transitionTime?: number) => void;
             }
 
             hack.cameraPosition(

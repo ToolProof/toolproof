@@ -1,6 +1,6 @@
 import * as Constants from 'shared/src/constants';
-import dbAdmin from 'shared/src/firebaseAdminInit';
-import admin from 'firebase-admin';
+// import dbAdmin from 'shared/src/firebaseAdminInit';
+// import admin from 'firebase-admin';
 import { Storage, UploadResponse } from '@google-cloud/storage';
 
 
