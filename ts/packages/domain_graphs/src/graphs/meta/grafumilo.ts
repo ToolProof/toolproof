@@ -1,6 +1,6 @@
 import { BaseStateSpec, GraphSpec, registerGraph } from 'src/types.js';
 import { NodeFoo, NodeFooState } from 'src/nodes/meta/nodeFoo.js';
-import { StateGraph, Annotation, MessagesAnnotation, START, END } from '@langchain/langgraph';
+import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 
@@ -50,5 +50,6 @@ const stateGraph = new StateGraph(GraphState)
     .addNode('nodeFoo', new NodeFoo())
     .addEdge(START, 'nodeFoo')
     .addEdge('nodeFoo', END);
+    
 
 export const graph = stateGraph.compile();

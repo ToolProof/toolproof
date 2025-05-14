@@ -81,11 +81,7 @@ class _NodeFoo extends Runnable {
             {
                 direction: 'write',
                 storage: 'private',
-                resources: [
-                    { name: 'anchor', kind: 'value' },
-                    { name: 'target', kind: 'value' },
-                    { name: 'box', kind: 'value' }
-                ]
+                resources: []
             }
         ]
     };

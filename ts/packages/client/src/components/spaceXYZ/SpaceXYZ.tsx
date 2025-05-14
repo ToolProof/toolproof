@@ -9,14 +9,17 @@ export default function SpaceXYZ() {
     const [graphSpec, setGraphSpec] = useState<GraphSpec[]>([]);
     const [message, setMessage] = useState<string>('Start');
 
+    const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
+    const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await runGrafumilo('ts/packages/domain_graphs/src/graphs/ligandokreado.ts');
+                const result = await runGrafumilo(path0);
                 console.log('result:', JSON.stringify(result, null, 2));
 
                 const nodes = result.nodes || [];
-                const extractedData: GraphSpec[] = nodes.map((node: any) => {
+                const graphSpec: GraphSpec[] = nodes.map((node: any) => {
                     if (typeof node.content === 'string') {
                         return {
                             name: node.path,
@@ -34,7 +37,7 @@ export default function SpaceXYZ() {
                     };
                 });
 
-                setGraphSpec(extractedData);
+                setGraphSpec(graphSpec);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
