@@ -2,7 +2,7 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { Storage } from '@google-cloud/storage';
 
-const serviceAccount = {
+/* const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n') || "",
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL
@@ -14,7 +14,7 @@ const app = getApps().length === 0
   })
   : getApps()[0];
 
-const db = getFirestore(app);
+const db = getFirestore(app); */
 
 const storage = new Storage({
   credentials: {
@@ -26,4 +26,4 @@ const storage = new Storage({
 
 const bucketName = 'tp_resources';
 
-export { db, storage, bucketName };
+export { storage, bucketName };
