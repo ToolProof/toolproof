@@ -7,7 +7,15 @@ export const BaseStateSpec = {
     dryRunModeManager: Annotation<{
         dryRunMode: boolean;
         delay: number;
-    }>(),
+    }>(
+        {
+            reducer: (prev, next) => next,
+            default: () => ({
+                dryRunMode: false,
+                delay: 0,
+            }),
+        }
+    ),
 };
 
 // === Resource modeling ===

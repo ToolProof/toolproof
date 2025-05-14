@@ -1,25 +1,62 @@
 import Fabric from '@/components/spaceXYZ/Fabric';
-import { GraphSpec } from '@/components/spaceXYZ/types';
+import { GraphData, GraphSpec, Celarbo } from '@/components/spaceXYZ/types'
+import { getGraphDataFromGraphSpecs, getGraphDataFromCelarbo } from '@/components/spaceXYZ/utils';
 import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
 import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
 
 
 export default function SpaceXYZ() {
-    const [graphSpec, setGraphSpec] = useState<GraphSpec[]>([]);
+    const [graphData, setGraphData] = useState<GraphData | null>(null);
     const [message, setMessage] = useState<string>('Start');
 
-    const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
-    const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
+    // Viusualizes Celarbo
+    /* useEffect(() => {
+        const celarbo: Celarbo = {
+            name: 'Vivplibonigo',
+            branches: [
+                {
+                    name: 'Suferelimino',
+                    branches: [
+                        {
+                            name: 'Malsanelimino',
+                            branches: [
+                                {
+                                    name: 'Medikamentomalkovro',
+                                    branches: [
+                                        {
+                                            name: 'Ligandokreado',
+                                            branches: 'category'
+                                        }
+                                    ]
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
+                    name: 'Bonfartsubteno',
+                    branches: []
+                },
+            ]
+        }
 
+        const graphData = getGraphDataFromCelarbo(celarbo);
+        setGraphData(graphData);
+    }, []); */
+
+
+    // Invokes Grafumilo
     useEffect(() => {
         const fetchData = async () => {
+            const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
+            const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
             try {
-                const result = await runGrafumilo(path0);
+                const result = await runGrafumilo(path1);
                 console.log('result:', JSON.stringify(result, null, 2));
 
                 const nodes = result.nodes || [];
-                const graphSpec: GraphSpec[] = nodes.map((node: any) => {
+                const graphSpecs: GraphSpec[] = nodes.map((node: any) => {
                     if (typeof node.content === 'string') {
                         return {
                             name: node.path,
@@ -37,7 +74,7 @@ export default function SpaceXYZ() {
                     };
                 });
 
-                setGraphSpec(graphSpec);
+                setGraphData(getGraphDataFromGraphSpecs(graphSpecs));
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -47,15 +84,16 @@ export default function SpaceXYZ() {
     }, []);
 
 
-    /* useEffect(() => {
+    // Invokes Ligandokreado
+    useEffect(() => {
         if (message === 'Start' || message.includes('NodeEvaluateResults')) {
             runLigandokreado();
         }
-    }, [message]); */
+    }, [message]);
 
 
     // WebSocket Connection for Broadcast Messages
-    /* useEffect(() => {
+    useEffect(() => {
         const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
 
         ws.onopen = () => {
@@ -79,9 +117,12 @@ export default function SpaceXYZ() {
         return () => {
             ws.close();
         };
-    }, []); */
+    }, []);
 
+    return (
+        graphData && (
+            <Fabric graphData={graphData} message={message} />
+        )
+    );
 
-
-    return <Fabric graphSpec={graphSpec} message={message} />;
 }

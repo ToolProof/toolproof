@@ -1,4 +1,4 @@
-import { Node, NamedLink, GraphSpec, ActiveStates } from './types';
+import { Node, NamedLink, GraphSpec, ActiveStates, Celarbo, Greek, GroupType } from './types';
 import { NodeObject } from 'react-force-graph-3d';
 import * as THREE from 'three';
 
@@ -17,17 +17,16 @@ export function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
 }
 
 
-export const getGraphData = (graphSpec: GraphSpec[]) => {
+export const getGraphDataFromGraphSpecs = (graphSpecs: GraphSpec[]) => {
 
-
-    const nodes_Alpha: Node[] = graphSpec.map((node, index) => ({
+    const nodes_Alpha: Node[] = graphSpecs.map((node, index) => ({
         id: node.name,
         shape: 'sphere',
         val: 5,
         group: 'Alpha',
-        fx: radius * Math.cos((2 * Math.PI * index) / graphSpec.length),
+        fx: radius * Math.cos((2 * Math.PI * index) / graphSpecs.length),
         fy: -75,
-        fz: radius * Math.sin((2 * Math.PI * index) / graphSpec.length),
+        fz: radius * Math.sin((2 * Math.PI * index) / graphSpecs.length),
     }));
 
     const nodes_BetaOne: Node[] = [
@@ -54,9 +53,9 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         },
     ];
 
-    const nodes_Gamma: Node[] = graphSpec.flatMap((node, index) => {
-        const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / graphSpec.length);
-        const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / graphSpec.length);
+    const nodes_Gamma: Node[] = graphSpecs.flatMap((node, index) => {
+        const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / graphSpecs.length);
+        const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / graphSpecs.length);
         const toolsCount = node.tools.length;
 
         return node.tools.map((tool, toolIndex) => {
@@ -82,10 +81,8 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         });
     });
 
-
-
-    const links_Alpha_Alpha: NamedLink[] = graphSpec.flatMap((nodeA, indexA) => {
-        return graphSpec
+    const links_Alpha_Alpha: NamedLink[] = graphSpecs.flatMap((nodeA, indexA) => {
+        return graphSpecs
             .filter((_, indexB) => indexB > indexA) // Avoid duplicate pairs
             .flatMap((nodeB) => [
                 {
@@ -101,7 +98,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
             ]);
     });
 
-    const links_Alpha_Gamma: NamedLink[] = graphSpec.flatMap((node, index) =>
+    const links_Alpha_Gamma: NamedLink[] = graphSpecs.flatMap((node, index) =>
         node.tools.flatMap((tool) => [
             {
                 source: node.name, // alphaNode ID
@@ -116,7 +113,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ])
     );
 
-    const links_Alpha_BetaOne: NamedLink[] = graphSpec.flatMap((node, index) => {
+    const links_Alpha_BetaOne: NamedLink[] = graphSpecs.flatMap((node, index) => {
         const circumferenceNode = node.name;
         return [
             {
@@ -132,7 +129,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ];
     });
 
-    const links_Alpha_BetaTwo: NamedLink[] = graphSpec.flatMap((node, index) => {
+    const links_Alpha_BetaTwo: NamedLink[] = graphSpecs.flatMap((node, index) => {
         const circumferenceNode = node.name;
         return [
             {
@@ -148,7 +145,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         ];
     });
 
-    const links_BetaTwo_Gamma: NamedLink[] = graphSpec.flatMap((node, index) =>
+    const links_BetaTwo_Gamma: NamedLink[] = graphSpecs.flatMap((node, index) =>
         node.tools.flatMap((tool) => [
             {
                 source: tool, // betaNode ID
@@ -173,6 +170,7 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
         links: [
             ...links_Alpha_Alpha,
             ...links_Alpha_BetaOne,
+            ...links_Alpha_BetaTwo,
             ...links_Alpha_Gamma,
             ...links_Alpha_Gamma,
             ...links_BetaTwo_Gamma,
@@ -183,7 +181,108 @@ export const getGraphData = (graphSpec: GraphSpec[]) => {
 }
 
 
-export const getNodeThreeObject = (node: NodeObject<NodeObject<Node>>, activeStates: ActiveStates, message: string) => {
+export const getGraphDataFromCelarbo = (celarbo: Celarbo) => {
+    const nodes: Node[] = [];
+    const links: NamedLink[] = [];
+
+    const verticalSpacing = 100;
+    const horizontalSpacing = 100;
+
+    // ATTENTION: maintenance 
+    const groupLabels: Greek[] = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega'];
+    const groupOfLevel = (level: number): GroupType => {
+        if (level >= groupLabels.length) {
+            throw new Error(`Level ${level} exceeds available group labels.`);
+        }
+        return groupLabels[level];
+    };
+
+    const nodeIndex = 0;
+
+    const traverse = (
+        celarbo: Celarbo,
+        level: number,
+        xOffset: number,
+        parentId?: string
+    ): { width: number; centerX: number } => {
+        const nodeId = celarbo.name;
+        const group = groupOfLevel(level);
+        const y = -level * verticalSpacing + 200;
+
+        // If it's a leaf node ('category'), treat as having no children
+        const isLeaf = celarbo.branches === 'category' || celarbo.branches.length === 0;
+
+        if (isLeaf) {
+            const x = xOffset;
+            nodes.push({
+                id: nodeId,
+                shape: 'square',
+                val: 5,
+                group,
+                fx: x,
+                fy: y,
+                fz: 0,
+            });
+            if (parentId) {
+                links.push({
+                    source: parentId,
+                    target: nodeId,
+                    name: `${parentId}_${nodeId}`,
+                });
+            }
+            return { width: horizontalSpacing, centerX: x };
+        }
+
+        // Recursively layout children
+        const childResults = (celarbo.branches as Celarbo[]).map((child, i) =>
+            traverse(child, level + 1, xOffset + i * horizontalSpacing)
+        );
+
+        const totalWidth = childResults.reduce((acc, r) => acc + r.width, 0);
+        const centerX = childResults.length === 1
+            ? childResults[0].centerX
+            : (childResults[0].centerX + childResults[childResults.length - 1].centerX) / 2;
+
+        nodes.push({
+            id: nodeId,
+            shape: 'square',
+            val: 10,
+            group,
+            fx: centerX,
+            fy: y,
+            fz: 0,
+        });
+
+        if (parentId) {
+            links.push({
+                source: parentId,
+                target: nodeId,
+                name: `${parentId}_${nodeId}`,
+            });
+        }
+
+        // Link parent to children
+        for (const child of celarbo.branches as Celarbo[]) {
+            links.push({
+                source: nodeId,
+                target: child.name,
+                name: `${nodeId}_${child.name}`,
+            });
+        }
+
+        return { width: totalWidth || horizontalSpacing, centerX };
+    };
+
+    traverse(celarbo, 0, 0);
+
+    console.log('nodes.length', nodes.length);
+    console.log('links.length', links.length);
+
+    return { nodes, links };
+};
+
+
+export const getNodeThreeObjectForComputable = (node: NodeObject<NodeObject<Node>>, activeStates: ActiveStates, message: string) => {
     const group = new THREE.Group();
 
     // 🎯 Base node size scaling
@@ -225,6 +324,64 @@ export const getNodeThreeObject = (node: NodeObject<NodeObject<Node>>, activeSta
         mesh = new THREE.Mesh(geometry, material);
     } else {
         throw new Error(`Unknown node group: ${node.group}`);
+    }
+
+    group.add(mesh);
+
+    // 🏷️ Label sprite
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d')!;
+    const labelFontSize = 16;
+    const text = node.id;
+
+    context.font = `${labelFontSize}px Arial`;
+    const textWidth = context.measureText(text).width;
+    canvas.width = textWidth;
+    canvas.height = labelFontSize + 10;
+
+    context.font = `${labelFontSize}px Arial`;
+    context.fillStyle = 'white';
+    context.fillText(text, 0, labelFontSize);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const sprite = new THREE.Sprite(spriteMaterial);
+
+    // ✏️ Size and position of label
+    sprite.scale.set(textWidth / 4, canvas.height / 4, 1);
+    const labelGap = 4;
+    sprite.position.set(0, baseSize * 0.6 + labelGap, 0);
+
+    group.add(sprite);
+
+    return group;
+}
+
+
+export const getNodeThreeObjectForCelarbo = (node: NodeObject<NodeObject<Node>>, activeStates: ActiveStates, message: string) => {
+    const group = new THREE.Group();
+
+    // 🎯 Base node size scaling
+    let baseSize = Math.cbrt(node.val ?? 1) * 10;
+
+    // 🔷 Determine shape and color
+    let mesh: THREE.Object3D;
+
+    if (node.group === 'Epsilon') {
+        // const geometry = new THREE.TetrahedronGeometry(baseSize, 0);
+        baseSize *= 0.5;
+        const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
+        const material = new THREE.MeshLambertMaterial({
+            color: 'pink' //activeStates.isDeltaActive ? 'green' : 'red'
+        });
+        mesh = new THREE.Mesh(geometry, material);
+    } else {
+        const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
+        const material = new THREE.MeshLambertMaterial({
+            // color: node.id === activeAlphaId ? 'yellow' : 'red'
+            color: message.includes(node.id) ? 'yellow' : 'red'
+        });
+        mesh = new THREE.Mesh(geometry, material);
     }
 
     group.add(mesh);
