@@ -14,7 +14,7 @@ const client = new Client({
 const remoteGraph = new RemoteGraph({ graphId, url });
 
 
-export async function runGrafumilo() {
+export async function runGrafumilo(path: string) {
 
     try {
         // Create a thread (or use an existing thread instead)
@@ -26,6 +26,7 @@ export async function runGrafumilo() {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
+                path: path,
             });
 
             // console.log('threadId:', thread.thread_id);

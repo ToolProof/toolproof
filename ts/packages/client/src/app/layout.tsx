@@ -26,7 +26,9 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <StoreProvider>
             <div className=''>
-              {/* <div className='hidden sm:block sm:w-[300px] py-0 bg-black'><SideBar /></div> */}
+              {/* <div className='hidden sm:block sm:w-[300px] py-0 bg-black'>
+                <SideBar />
+              </div> */}
               <div className=''>
                 {children}
               </div>

@@ -18,7 +18,14 @@ export interface NamedLink extends Link {
     name: string;
 }
 
-export type NodeData = {
+export type GraphSpec = {
   name: string;
   tools: string[];
+}
+
+export interface ActiveStates {
+    activeAlphaId: string | Node;
+    activeBetaId: string | Node;
+    isDeltaActive: boolean;
+    isGammaActive: boolean;
 }

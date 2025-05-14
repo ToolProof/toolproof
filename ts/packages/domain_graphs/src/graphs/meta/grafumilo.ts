@@ -1,6 +1,7 @@
-import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
+import { StateGraph, Annotation, MessagesAnnotation, START, END } from '@langchain/langgraph';
 
 const GraphState = Annotation.Root({
+    ...MessagesAnnotation.spec,
     repo: Annotation<string>(
         {
             reducer: (prev, next) => next,
@@ -16,7 +17,7 @@ const GraphState = Annotation.Root({
     path: Annotation<string>(
         {
             reducer: (prev, next) => next,
-            default: () => { return 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts' },
+            default: () => { return 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts' },
         }
     ),
     graph: Annotation<{

@@ -9,7 +9,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setShowSideBar(false));
+    dispatch(setShowSideBar(true));
   }, [dispatch]);
 
   return <SpaceXYZ />;

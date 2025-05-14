@@ -1,22 +1,22 @@
 import Fabric from '@/components/spaceXYZ/Fabric';
-import { NodeData } from '@/components/spaceXYZ/types';
+import { GraphSpec } from '@/components/spaceXYZ/types';
 import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
 import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
 
 
 export default function SpaceXYZ() {
-    const [rawData, setRawData] = useState<NodeData[]>([]);
+    const [graphSpec, setGraphSpec] = useState<GraphSpec[]>([]);
     const [message, setMessage] = useState<string>('Start');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await runGrafumilo();
+                const result = await runGrafumilo('ts/packages/domain_graphs/src/graphs/ligandokreado.ts');
                 console.log('result:', JSON.stringify(result, null, 2));
 
                 const nodes = result.nodes || [];
-                const extractedData: NodeData[] = nodes.map((node: any) => {
+                const extractedData: GraphSpec[] = nodes.map((node: any) => {
                     if (typeof node.content === 'string') {
                         return {
                             name: node.path,
@@ -34,7 +34,7 @@ export default function SpaceXYZ() {
                     };
                 });
 
-                setRawData(extractedData);
+                setGraphSpec(extractedData);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -80,5 +80,5 @@ export default function SpaceXYZ() {
 
 
 
-    return <Fabric rawData={rawData} message={message} />;
+    return <Fabric graphSpec={graphSpec} message={message} />;
 }

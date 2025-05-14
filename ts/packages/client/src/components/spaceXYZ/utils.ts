@@ -1,26 +1,38 @@
-import { Node, NamedLink, NodeData } from './types';
+import { Node, NamedLink, GraphSpec, ActiveStates } from './types';
+import {NodeObject} from 'react-force-graph-3d';
+import * as THREE from 'three';
 
 
 const radius = 200;
 const alphaBetaYDistance = 75;
 
+const FRAME_DURATION = 1000 / 60;
+const DESIRED_TRAVEL_MS = 2000;
 
-export const getData = (rawData: NodeData[]) => {
+
+export function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
+    const speed = FRAME_DURATION / desiredMs;
+    // console.log('speed', speed);
+    return speed;
+}
 
 
-    const alphaNodes: Node[] = rawData.map((node, index) => ({
+export const getGraphData = (graphSpec: GraphSpec[]) => {
+
+
+    const alphaNodes: Node[] = graphSpec.map((node, index) => ({
         id: node.name,
         shape: 'sphere',
         val: 5,
         group: 0,
-        fx: radius * Math.cos((2 * Math.PI * index) / rawData.length),
+        fx: radius * Math.cos((2 * Math.PI * index) / graphSpec.length),
         fy: -75,
-        fz: radius * Math.sin((2 * Math.PI * index) / rawData.length),
+        fz: radius * Math.sin((2 * Math.PI * index) / graphSpec.length),
     }));
 
-    const betaNodes: Node[] = rawData.flatMap((node, index) => {
-        const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / rawData.length);
-        const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / rawData.length);
+    const betaNodes: Node[] = graphSpec.flatMap((node, index) => {
+        const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / graphSpec.length);
+        const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / graphSpec.length);
         const toolsCount = node.tools.length;
 
         return node.tools.map((tool, toolIndex) => {
@@ -70,8 +82,8 @@ export const getData = (rawData: NodeData[]) => {
         },
     ];
 
-    const alphaInterLinks: NamedLink[] = rawData.flatMap((nodeA, indexA) => {
-        return rawData
+    const alphaInterLinks: NamedLink[] = graphSpec.flatMap((nodeA, indexA) => {
+        return graphSpec
             .filter((_, indexB) => indexB > indexA) // Avoid duplicate pairs
             .flatMap((nodeB) => [
                 {
@@ -87,7 +99,7 @@ export const getData = (rawData: NodeData[]) => {
             ]);
     });
 
-    const alphaBetaLinks: NamedLink[] = rawData.flatMap((node, index) =>
+    const alphaBetaLinks: NamedLink[] = graphSpec.flatMap((node, index) =>
         node.tools.flatMap((tool) => [
             {
                 source: node.name, // alphaNode ID
@@ -102,7 +114,7 @@ export const getData = (rawData: NodeData[]) => {
         ])
     );
 
-    const alphaDeltaLinks: NamedLink[] = rawData.flatMap((node, index) => {
+    const alphaDeltaLinks: NamedLink[] = graphSpec.flatMap((node, index) => {
         const circumferenceNode = node.name;
         return [
             {
@@ -118,7 +130,7 @@ export const getData = (rawData: NodeData[]) => {
         ];
     });
 
-    const alphaGammaLinks: NamedLink[] = rawData.flatMap((node, index) => {
+    const alphaGammaLinks: NamedLink[] = graphSpec.flatMap((node, index) => {
         const circumferenceNode = node.name;
         return [
             {
@@ -134,7 +146,7 @@ export const getData = (rawData: NodeData[]) => {
         ];
     });
 
-    const betaGammaLinks: NamedLink[] = rawData.flatMap((node, index) =>
+    const betaGammaLinks: NamedLink[] = graphSpec.flatMap((node, index) =>
         node.tools.flatMap((tool) => [
             {
                 source: tool, // betaNode ID
@@ -167,8 +179,6 @@ export const getData = (rawData: NodeData[]) => {
 
     return data;
 }
-
-
 
 
 type StepType = {
@@ -205,3 +215,84 @@ export const path: StepType[] = [
     { name: 'OpenAI-2_NodeEvaluateResults', switchAlpha: 0, switchBeta: 1, switchDelta: 0, switchGamma: 0 },
     { name: 'NodeEvaluateResults_NodeGenerateCandidate', switchAlpha: 1, switchBeta: -1, switchDelta: 0, switchGamma: 0 },
 ];
+
+
+
+export const getNodeThreeObject = (node: NodeObject<NodeObject<Node>>, activeStates: ActiveStates, message: string) => {
+    const group = new THREE.Group();
+
+    // 🎯 Base node size scaling
+    let baseSize = Math.cbrt(node.val ?? 1) * 10;
+
+    // 🔷 Determine shape and color
+    let mesh: THREE.Object3D;
+
+    if (node.group === 3) {
+        // 🟦 Delta node (tetrahedron)
+        // const geometry = new THREE.TetrahedronGeometry(baseSize, 0);
+        baseSize *= 0.5;
+        const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
+        const material = new THREE.MeshLambertMaterial({
+            color: activeStates.isDeltaActive ? 'green' : 'red'
+        });
+        mesh = new THREE.Mesh(geometry, material);
+    } else if (node.group === 2) {
+        // 🟩 Gamma node (cube)
+        baseSize *= 0.5;
+        const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
+        const material = new THREE.MeshLambertMaterial({
+            color: activeStates.isGammaActive ? 'green' : 'red'
+        });
+        mesh = new THREE.Mesh(geometry, material);
+    } else if (node.group === 1) {
+        // 🔵 Beta node (cone)
+        const radius = baseSize * 0.4;
+        const height = baseSize;
+        const geometry = new THREE.ConeGeometry(radius, height, 16);
+        const material = new THREE.MeshLambertMaterial({
+            color: node.id === activeStates.activeBetaId ? 'blue' : 'red'
+        });
+        mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.x = Math.PI / 1;
+    } else if (node.group === 0) {
+        // 🟡 Alpha node (sphere)
+        const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
+        const material = new THREE.MeshLambertMaterial({
+            // color: node.id === activeAlphaId ? 'yellow' : 'red'
+            color: message.includes(node.id) ? 'yellow' : 'red'
+        });
+        mesh = new THREE.Mesh(geometry, material);
+    } else {
+        throw new Error(`Unknown node group: ${node.group}`);
+    }
+
+    group.add(mesh);
+
+    // 🏷️ Label sprite
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d')!;
+    const labelFontSize = 16;
+    const text = node.id;
+
+    context.font = `${labelFontSize}px Arial`;
+    const textWidth = context.measureText(text).width;
+    canvas.width = textWidth;
+    canvas.height = labelFontSize + 10;
+
+    context.font = `${labelFontSize}px Arial`;
+    context.fillStyle = 'white';
+    context.fillText(text, 0, labelFontSize);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const sprite = new THREE.Sprite(spriteMaterial);
+
+    // ✏️ Size and position of label
+    sprite.scale.set(textWidth / 4, canvas.height / 4, 1);
+    const labelGap = 4;
+    sprite.position.set(0, baseSize * 0.6 + labelGap, 0);
+
+    group.add(sprite);
+
+    return group;
+}
