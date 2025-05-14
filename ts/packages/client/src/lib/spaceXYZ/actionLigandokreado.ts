@@ -1,3 +1,4 @@
+'use server';
 import dotenv from 'dotenv';
 dotenv.config();
 import { Client } from '@langchain/langgraph-sdk';
@@ -6,12 +7,17 @@ import { HumanMessage } from '@langchain/core/messages';
 
 const urlLocal = `http://localhost:8123`;
 const urlRemote = `https://deployment-typescript-48b9b40b9bac500f8fe557700e4c49d9.us.langgraph.app`;
-const url = urlLocal; //process.env.URL || urlLocal;
+const url = urlRemote; //process.env.URL || urlLocal;
 const graphId = 'ligandokreado';
 const client = new Client({
     apiUrl: url,
+    apiKey: process.env.LANGCHAIN_API_KEY,
 });
-const remoteGraph = new RemoteGraph({ graphId, url });
+const remoteGraph = new RemoteGraph({
+    graphId,
+    url,
+    apiKey: process.env.LANGCHAIN_API_KEY,
+});
 
 
 export async function runLigandokreado() {

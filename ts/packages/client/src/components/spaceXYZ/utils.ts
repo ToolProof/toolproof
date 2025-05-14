@@ -296,14 +296,14 @@ export const getNodeThreeObjectForComputable = (node: NodeObject<NodeObject<Node
         baseSize *= 0.5;
         const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
         const material = new THREE.MeshLambertMaterial({
-            color: 'pink' //activeStates.isDeltaActive ? 'green' : 'red'
+            color: 'red' //activeStates.isDeltaActive ? 'green' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
     } else if (node.group === 'BetaOne') {
         baseSize *= 0.5;
         const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
         const material = new THREE.MeshLambertMaterial({
-            color: 'pink' //activeStates.isGammaActive ? 'green' : 'red'
+            color: 'red' //activeStates.isGammaActive ? 'green' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
     } else if (node.group === 'Gamma') {
@@ -311,7 +311,7 @@ export const getNodeThreeObjectForComputable = (node: NodeObject<NodeObject<Node
         const height = baseSize;
         const geometry = new THREE.ConeGeometry(radius, height, 16);
         const material = new THREE.MeshLambertMaterial({
-            color: 'pink' //node.id === activeStates.activeBetaId ? 'blue' : 'red'
+            color: 'red' //node.id === activeStates.activeBetaId ? 'blue' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = Math.PI / 1;
@@ -372,7 +372,7 @@ export const getNodeThreeObjectForCelarbo = (node: NodeObject<NodeObject<Node>>,
         baseSize *= 0.5;
         const geometry = new THREE.BoxGeometry(baseSize, baseSize, baseSize);
         const material = new THREE.MeshLambertMaterial({
-            color: 'pink' //activeStates.isDeltaActive ? 'green' : 'red'
+            color: 'red' //activeStates.isDeltaActive ? 'green' : 'red'
         });
         mesh = new THREE.Mesh(geometry, material);
     } else {

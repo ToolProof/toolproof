@@ -8,12 +8,7 @@ import WebSocket from 'ws';
 
 
 export const NodeLoadInputsState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>(
-        {
-            reducer: (prev, next) => next,
-            default: () => { return { path: 'dd', value: 'dd' } },
-        }
-    ),
+    anchor: Annotation<{ path: string, value: string }>(),
     target: Annotation<{ path: string, value: ChunkInfo[] }>(),
     box: Annotation<{ path: string, value: ChunkInfo[] }>(),
 });
