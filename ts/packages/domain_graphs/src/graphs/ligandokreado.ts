@@ -1,9 +1,9 @@
 import { BaseStateSpec, GraphSpec, registerGraph } from 'src/types.js';
-import { NodeLoadInputs, NodeLoadInputsState } from 'src/nodes/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/nodeLoadInputs.js';
-import { NodeGenerateCandidate, NodeGenerateCandidateState } from 'src/nodes/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/nodeGenerateCandidate.js';
-import { NodeInvokeDocking, NodeInvokeDockingState } from 'src/nodes/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/nodeInvokeDocking.js';
-import { NodeLoadResults, NodeLoadResultsState } from 'src/nodes/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/nodeLoadResults.js';
-import { NodeEvaluateResults, NodeEvaluateResultsState } from 'src/nodes/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/nodeEvaluateResults.js';
+import { NodeLoadInputs, NodeLoadInputsState } from 'src/nodes/nodeLoadInputs.js';
+import { NodeGenerateCandidate, NodeGenerateCandidateState } from 'src/nodes/nodeGenerateCandidate.js';
+import { NodeInvokeDocking, NodeInvokeDockingState } from 'src/nodes/nodeInvokeDocking.js';
+import { NodeLoadResults, NodeLoadResultsState } from 'src/nodes/nodeLoadResults.js';
+import { NodeEvaluateResults, NodeEvaluateResultsState } from 'src/nodes/nodeEvaluateResults.js';
 import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
