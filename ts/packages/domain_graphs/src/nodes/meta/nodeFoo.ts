@@ -96,7 +96,7 @@ class _NodeFoo extends Runnable {
             const importMatches = fileContent.matchAll(/import\s+.*?from\s+['"][^'"]*(nodes\/[^'"]*)['"]/g);
 
             for (const match of importMatches) {
-                const _importPath = 'ts/packages/domain_graphs/src' + match[1];
+                const _importPath = 'ts/packages/domain_graphs/src/' + match[1];
                 const importPath = _importPath.replace(/\.js$/, '.ts');
                 const importUrl = `https://raw.githubusercontent.com/${repo}/${branch}/${importPath}`;
 
