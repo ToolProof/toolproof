@@ -16,7 +16,7 @@ export const NodeFooState = Annotation.Root({
     branch: Annotation<string>(
         {
             reducer: (prev, next) => next,
-            default: () => { return 'branch_rene' },
+            default: () => { return 'master' },
         }
     ),
     path: Annotation<string>(
