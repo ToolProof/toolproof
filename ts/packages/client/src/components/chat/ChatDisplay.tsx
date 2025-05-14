@@ -62,7 +62,7 @@ export default function ChatDisplay({ chat }: Props) {
     }, []); // Empty dependency array ensures this runs only once on mount
 
 
-    const isNewMessage = (messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) => {
+    /* const isNewMessage = (messageTimestamp: FirebaseFirestore.Timestamp | null, index: number, arrayLength: number) => {
 
         // Check if it's the last message
         if (index !== arrayLength - 1) {
@@ -80,7 +80,7 @@ export default function ChatDisplay({ chat }: Props) {
         const timeBetweenMessageCreationAndComponentMount = (messageCreationTime.getTime() - componentMountTime.getTime()) / 1000;
 
         return timeBetweenMessageCreationAndComponentMount > 0 && timeSinceMessageCreation < 30;
-    };
+    }; */
 
 
     useEffect(() => {

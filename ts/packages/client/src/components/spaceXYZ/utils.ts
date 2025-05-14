@@ -9,8 +9,7 @@ const alphaBetaYDistance = 75;
 const FRAME_DURATION = 1000 / 60;
 const DESIRED_TRAVEL_MS = 2000;
 
-
-export function computeSpeedForDuration(_link, desiredMs = DESIRED_TRAVEL_MS) {
+export function computeSpeedForDuration(desiredMs = DESIRED_TRAVEL_MS) {
     const speed = FRAME_DURATION / desiredMs;
     // console.log('speed', speed);
     return speed;

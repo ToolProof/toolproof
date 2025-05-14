@@ -19,8 +19,13 @@ export default function Fabric({ graphData, message }: FabricProps) {
 
     useEffect(() => {
         if (fgRef.current) {
-            // Set the camera position directly (x, y, z) and lookAt (default is origin)
-            fgRef.current.cameraPosition(
+            // Set the camera position directly (x, y, z) and lookAt (default is origin
+
+            const hack = fgRef.current as {
+                cameraPosition: (foo: { x: number, y: number, z: number }, lookAt?: { x: number, y: number, z: number }, transitionTime?: number) => void;
+            }
+
+            hack.cameraPosition(
                 { x: 0, y: 0, z: 400 }, // Move the camera farther away from the center
                 undefined,              // Look at center (default: {x: 0, y: 0, z: 0})
                 0                      // Transition time (0 = immediate)
@@ -94,7 +99,7 @@ export default function Fabric({ graphData, message }: FabricProps) {
             linkOpacity={0.3}
             linkDirectionalParticles={0}
             linkDirectionalParticleWidth={2}
-            linkDirectionalParticleSpeed={link => computeSpeedForDuration(link)}
+            linkDirectionalParticleSpeed={link => computeSpeedForDuration()}
             onNodeClick={node => console.log(node)}
         />
     );
