@@ -120,6 +120,8 @@ class _NodeFoo extends Runnable {
                         // nodes.push({ path: importPath, content: "No nodeSpec found in the file." });
                     }
                 } else {
+                    const msg = `Failed to fetch: ${importResponse.status} ${importResponse.statusText}`;
+                    console.error(`${msg} — URL: ${importUrl}`);
                     throw new Error(`3: Error parsing nodeSpec JSON`);
                     // nodes.push({ path: importPath, content: `Failed to fetch: ${importResponse.statusText}` });
                 }
