@@ -1,5 +1,5 @@
 import { NodeSpec, BaseStateSpec, registerNode } from 'src/types.js';
-import { ChunkInfo } from 'src/localTools/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/chunkPDBContent';
+import { ChunkInfo } from 'src/tools/chunkPDBContent';
 import { storage, bucketName } from 'src/firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';

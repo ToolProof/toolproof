@@ -1,6 +1,6 @@
 import { NodeSpec, BaseStateSpec, registerNode } from 'src/types.js';
-import { ChunkInfo } from 'src/localTools/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/chunkPDBContent.js';
-import { generateBoxPDB } from 'src/localTools/celarbo/suferelimino/malsanelimino/medikamentomalkovro/ligandokreado/generateBoxPDB.js';
+import { ChunkInfo } from 'src/tools/chunkPDBContent.js';
+import { generateBoxPDB } from 'src/tools/generateBoxPDB.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from "@langchain/langgraph";
 import { AIMessage } from '@langchain/core/messages';
