@@ -1,17 +1,20 @@
 import Fabric from '@/components/spaceXYZ/Fabric';
-import { GraphData, GraphSpec, Celarbo } from '@/components/spaceXYZ/types'
-import { getGraphDataFromGraphSpecs, getGraphDataFromCelarbo } from '@/components/spaceXYZ/utils';
+import { Node, GraphData, GraphSpec, Celarbo, ToolProofSpace, CelarboSpace } from '@/components/spaceXYZ/types';
 import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
 import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
+import { NodeObject } from 'react-force-graph-3d';
+import * as THREE from 'three';
 
 
 export default function SpaceXYZ() {
     const [graphData, setGraphData] = useState<GraphData | null>(null);
+    // ATTENTION: can't Fabric instead take a Space object?
+    const [getNodeThreeObject, setGetNodeThreeObject] = useState(() => (node: NodeObject<Node>, message: string) => new THREE.Object3D());
     const [message, setMessage] = useState<string>('Start');
 
-    // Viusualizes Celarbo
-    /* useEffect(() => {
+    // Viusualizes CelarboSpace
+    useEffect(() => {
         const celarbo: Celarbo = {
             name: 'Vivplibonigo',
             branches: [
@@ -41,12 +44,14 @@ export default function SpaceXYZ() {
             ]
         }
 
-        const graphData = getGraphDataFromCelarbo(celarbo);
-        setGraphData(graphData);
-    }, []); */
+        const celarboSpace = new CelarboSpace();
+        setGraphData(celarboSpace.generateGraphData(celarbo));
+        setGetNodeThreeObject(celarboSpace.getNodeThreeObject);
+    }, []);
 
 
     // Invokes Grafumilo
+    // Visualizes ToolProofSpace
     useEffect(() => {
         const fetchData = async () => {
             const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
@@ -77,7 +82,9 @@ export default function SpaceXYZ() {
                     };
                 });
 
-                setGraphData(getGraphDataFromGraphSpecs(graphSpecs));
+                const toolProofSpace = new ToolProofSpace();
+                setGraphData(toolProofSpace.generateGraphData(graphSpecs));
+                setGetNodeThreeObject(toolProofSpace.getNodeThreeObject);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -124,7 +131,7 @@ export default function SpaceXYZ() {
 
     return (
         graphData && (
-            <Fabric graphData={graphData} message={message} />
+            <Fabric graphData={graphData} getNodeThreeObject={getNodeThreeObject} message={message} />
         )
     );
 

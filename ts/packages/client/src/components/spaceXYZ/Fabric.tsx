@@ -1,15 +1,17 @@
-import { getGraphDataFromGraphSpecs, getNodeThreeObjectForComputable, getNodeThreeObjectForCelarbo, computeSpeedForDuration, path } from './utils';
+import { computeSpeedForDuration } from './utils';
 import { Node, NamedLink, GraphData } from './types';
 import { useEffect, useRef, useState } from 'react';
-import ForceGraph3D from 'react-force-graph-3d';
+import ForceGraph3D, { NodeObject } from 'react-force-graph-3d';
+import * as THREE from 'three';
 
 
 type FabricProps = {
     graphData: GraphData;
+    getNodeThreeObject(node: NodeObject<Node>, message: string): THREE.Object3D
     message: string;
 }
 
-export default function Fabric({ graphData, message }: FabricProps) {
+export default function Fabric({ graphData, getNodeThreeObject, message }: FabricProps) {
     const fgRef = useRef();
     const [activeAlphaId, setActiveAlphaId] = useState<string | Node>('AlphaSuper');
     const [activeBetaId, setActiveBetaId] = useState<string | Node>('');
@@ -86,14 +88,8 @@ export default function Fabric({ graphData, message }: FabricProps) {
             graphData={graphData}
             nodeLabel='id'
             nodeVal='val'
-            nodeThreeObject={node => getNodeThreeObjectForComputable(
+            nodeThreeObject={node => getNodeThreeObject(
                 node,
-                {
-                    activeAlphaId,
-                    activeBetaId,
-                    isDeltaActive,
-                    isGammaActive,
-                },
                 message,
             )}
             linkOpacity={0.3}
