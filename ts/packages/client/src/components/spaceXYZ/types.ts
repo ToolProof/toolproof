@@ -8,7 +8,6 @@ export type GroupType = Greek | `${Greek}${Digit}`;
 
 export interface GraphNode {
     id: string;
-    shape: 'sphere' | 'square';
     val: number;
     group: GroupType;
     fx: number;
@@ -84,7 +83,6 @@ export class ToolProofSpace extends Space<GraphSpec_ToolProof> {
         const nodes_Alpha: GraphNode[] = graphSpec.spec.map((node, index) => {
             return {
                 id: node.name,
-                shape: 'sphere',
                 val: 5,
                 group: 'Alpha',
                 fx: radius * Math.cos((2 * Math.PI * index) / graphSpec.spec.length),
@@ -96,7 +94,6 @@ export class ToolProofSpace extends Space<GraphSpec_ToolProof> {
         const nodes_BetaOne: GraphNode[] = [
             {
                 id: 'GraphState',
-                shape: 'square',
                 val: 50,
                 group: 'BetaOne',
                 fx: 0,
@@ -108,7 +105,6 @@ export class ToolProofSpace extends Space<GraphSpec_ToolProof> {
         const nodes_BetaTwo: GraphNode[] = [
             {
                 id: 'SharedResources',
-                shape: 'square',
                 val: 500,
                 group: 'BetaTwo',
                 fx: 0,
@@ -135,7 +131,6 @@ export class ToolProofSpace extends Space<GraphSpec_ToolProof> {
 
                 return {
                     id: tool,
-                    shape: 'sphere',
                     val: 3,
                     group: 'Gamma',
                     fx: gammaNodeX,
@@ -363,7 +358,6 @@ export class CelarboSpace extends Space<GraphSpec_Celarbo> {
                 const x = xOffset;
                 nodes.push({
                     id: nodeId,
-                    shape: 'square',
                     val: 5,
                     group,
                     fx: x,
@@ -392,7 +386,6 @@ export class CelarboSpace extends Space<GraphSpec_Celarbo> {
 
             nodes.push({
                 id: nodeId,
-                shape: 'square',
                 val: 10,
                 group,
                 fx: centerX,
