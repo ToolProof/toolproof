@@ -1,97 +1,104 @@
 import Fabric from '@/components/spaceXYZ/Fabric';
-import { Node, GraphData, GraphSpec, Celarbo, ToolProofSpace, CelarboSpace } from '@/components/spaceXYZ/types';
+import { _GraphSpec_ToolProof, GraphSpec_ToolProof, GraphSpec_Celarbo, SpaceInterface, ToolProofSpace, CelarboSpace } from '@/components/spaceXYZ/types';
 import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
 import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
-import { NodeObject } from 'react-force-graph-3d';
-import * as THREE from 'three';
 
+const foo = false;
 
 export default function SpaceXYZ() {
-    const [graphData, setGraphData] = useState<GraphData | null>(null);
-    // ATTENTION: can't Fabric instead take a Space object?
-    const [getNodeThreeObject, setGetNodeThreeObject] = useState(() => (node: NodeObject<Node>, message: string) => new THREE.Object3D());
+    const [graphSpec, setGraphSpec] = useState<GraphSpec_Celarbo | GraphSpec_ToolProof | null>(null);
+    const [space, setSpace] = useState<SpaceInterface | null>(null);
     const [message, setMessage] = useState<string>('Start');
 
-    // Viusualizes CelarboSpace
+    // Fetch GraphSpecs 
     useEffect(() => {
-        const celarbo: Celarbo = {
-            name: 'Vivplibonigo',
-            branches: [
-                {
-                    name: 'Suferelimino',
+        if (foo) {
+            const celarbo: GraphSpec_Celarbo = {
+                spec: {
+                    name: 'Vivplibonigo',
                     branches: [
                         {
-                            name: 'Malsanelimino',
+                            name: 'Suferelimino',
                             branches: [
                                 {
-                                    name: 'Medikamentomalkovro',
+                                    name: 'Malsanelimino',
                                     branches: [
                                         {
-                                            name: 'Ligandokreado',
-                                            branches: 'category'
-                                        }
+                                            name: 'Medikamentomalkovro',
+                                            branches: [
+                                                {
+                                                    name: 'Ligandokreado',
+                                                    branches: 'category'
+                                                }
+                                            ]
+                                        },
                                     ]
                                 },
                             ]
                         },
+                        {
+                            name: 'Bonfartsubteno',
+                            branches: []
+                        },
                     ]
                 },
-                {
-                    name: 'Bonfartsubteno',
-                    branches: []
-                },
-            ]
-        }
-
-        const celarboSpace = new CelarboSpace();
-        setGraphData(celarboSpace.generateGraphData(celarbo));
-        setGetNodeThreeObject(celarboSpace.getNodeThreeObject);
-    }, []);
-
-
-    // Invokes Grafumilo
-    // Visualizes ToolProofSpace
-    useEffect(() => {
-        const fetchData = async () => {
-            const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
-            const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
-            try {
-                const result = await runGrafumilo(path1);
-                console.log('result:', JSON.stringify(result, null, 2));
-
-                const nodes = result.nodes || [];
-                // eslint-disable-next-line
-                const graphSpecs: GraphSpec[] = nodes.map((node: any) => {
-                    if (typeof node.content === 'string') {
-                        return {
-                            name: node.path,
-                            tools: [],
-                        };
-                    }
-
-                    const tools: string[] = (node.content.operations || [])
-                        // eslint-disable-next-line
-                        .filter((operation: any) => typeof operation.name === 'string')
-                        // eslint-disable-next-line
-                        .map((operation: any) => operation.name);
-
-                    return {
-                        name: node.content.name || node.path,
-                        tools,
-                    };
-                });
-
-                const toolProofSpace = new ToolProofSpace();
-                setGraphData(toolProofSpace.generateGraphData(graphSpecs));
-                setGetNodeThreeObject(toolProofSpace.getNodeThreeObject);
-            } catch (error) {
-                console.error('Error fetching data:', error);
             }
-        };
+            setGraphSpec(celarbo);
+        } else {
+            const fetchData = async () => {
+                const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
+                const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
+                try {
+                    const result = await runGrafumilo(path1);
+                    console.log('result:', JSON.stringify(result, null, 2));
 
-        fetchData();
+                    const nodes = result.nodes || [];
+                    // eslint-disable-next-line
+                    const _graphSpecs: _GraphSpec_ToolProof[] = nodes.map((node: any) => {
+                        if (typeof node.content === 'string') {
+                            return {
+                                name: node.path,
+                                tools: [],
+                            };
+                        }
+
+                        const tools: string[] = (node.content.operations || [])
+                            // eslint-disable-next-line
+                            .filter((operation: any) => typeof operation.name === 'string')
+                            // eslint-disable-next-line
+                            .map((operation: any) => operation.name);
+
+                        return {
+                            name: node.content.name || node.path,
+                            tools,
+                        };
+                    });
+
+                    setGraphSpec({
+                        spec: _graphSpecs,
+                    });
+                } catch (error) {
+                    throw new Error(`Error fetching data: ${error}`);
+                }
+            };
+
+            fetchData();
+        }
     }, []);
+
+
+    // Instantiate Space
+    useEffect(() => {
+        if (!graphSpec) return;
+        if (foo) {
+            const celarboSpace = new CelarboSpace(graphSpec as GraphSpec_Celarbo);
+            setSpace(celarboSpace);
+        } else {
+            const toolProofSpace = new ToolProofSpace(graphSpec as GraphSpec_ToolProof);
+            setSpace(toolProofSpace);
+        }
+    }, [graphSpec]);
 
 
     // Invokes Ligandokreado
@@ -130,8 +137,8 @@ export default function SpaceXYZ() {
     }, []); */
 
     return (
-        graphData && (
-            <Fabric graphData={graphData} getNodeThreeObject={getNodeThreeObject} message={message} />
+        (space) && (
+            <Fabric space={space} message={message} />
         )
     );
 

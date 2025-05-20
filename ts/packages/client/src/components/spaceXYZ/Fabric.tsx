@@ -1,20 +1,17 @@
 import { computeSpeedForDuration } from './utils';
-import { Node, NamedLink, GraphData } from './types';
+import { GraphNode, NamedGraphLink, SpaceInterface } from './types';
 import { useEffect, useRef, useState } from 'react';
-import ForceGraph3D, { NodeObject } from 'react-force-graph-3d';
-import * as THREE from 'three';
-
+import ForceGraph3D from 'react-force-graph-3d';
 
 type FabricProps = {
-    graphData: GraphData;
-    getNodeThreeObject(node: NodeObject<Node>, message: string): THREE.Object3D
+    space: SpaceInterface;
     message: string;
 }
 
-export default function Fabric({ graphData, getNodeThreeObject, message }: FabricProps) {
+export default function Fabric({ space, message }: FabricProps) {
     const fgRef = useRef();
-    const [activeAlphaId, setActiveAlphaId] = useState<string | Node>('AlphaSuper');
-    const [activeBetaId, setActiveBetaId] = useState<string | Node>('');
+    const [activeAlphaId, setActiveAlphaId] = useState<string | GraphNode>('AlphaSuper');
+    const [activeBetaId, setActiveBetaId] = useState<string | GraphNode>('');
     const [isDeltaActive, setIsDeltaActive] = useState(false);
     const [isGammaActive, setIsGammaActive] = useState(false);
 
@@ -85,10 +82,10 @@ export default function Fabric({ graphData, getNodeThreeObject, message }: Fabri
     return (
         <ForceGraph3D
             ref={fgRef}
-            graphData={graphData}
+            graphData={space.graphData}
             nodeLabel='id'
             nodeVal='val'
-            nodeThreeObject={node => getNodeThreeObject(
+            nodeThreeObject={node => space.getNodeThreeObject(
                 node,
                 message,
             )}

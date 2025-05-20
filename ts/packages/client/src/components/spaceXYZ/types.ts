@@ -6,7 +6,7 @@ type Digit = 'One' | 'Two' | 'Three' | 'Four';     // Extend as needed
 
 export type GroupType = Greek | `${Greek}${Digit}`;
 
-export interface Node {
+export interface GraphNode {
     id: string;
     shape: 'sphere' | 'square';
     val: number;
@@ -16,75 +16,84 @@ export interface Node {
     fz: number;
 }
 
-export interface Link {
+export interface GraphLink {
     source: string;
     target: string;
 }
 
-export interface NamedLink extends Link {
+export interface NamedGraphLink extends GraphLink {
     name: string;
 }
 
 export interface GraphData {
-    nodes: Node[];
-    links: NamedLink[];
+    nodes: GraphNode[];
+    links: NamedGraphLink[];
 }
 
-export type GraphSpec = {
+interface GraphSpec<T> {
+    spec: T;
+}
+
+export interface _GraphSpec_ToolProof {
     name: string;
     tools: string[];
 }
 
-export interface ActiveStates {
-    activeAlphaId: string | Node;
-    activeBetaId: string | Node;
-    isDeltaActive: boolean;
-    isGammaActive: boolean;
-}
+export interface GraphSpec_ToolProof extends GraphSpec<_GraphSpec_ToolProof[]> { }
 
-export type Celarbo = {
+interface _GraphSpec_Celarbo {
     name: string;
     description?: string;
-    branches: Celarbo[] | 'category';
+    branches: _GraphSpec_Celarbo[] | 'category';
+}
+
+export interface GraphSpec_Celarbo extends GraphSpec<_GraphSpec_Celarbo> { }
+
+
+export interface SpaceInterface {
+    graphData: GraphData;
+    getNodeThreeObject(node: NodeObject<GraphNode>, message: string): THREE.Object3D;
 }
 
 
-export abstract class Space<T> {
+abstract class Space<T> implements SpaceInterface {
+    graphData: GraphData;
 
-    abstract generateGraphData(t: T): GraphData;
+    constructor(input: T) {
+        this.graphData = this.generateGraphData(input);
+    }
 
-    abstract getNodeThreeObject(node: NodeObject<NodeObject<Node>>, message: string): THREE.Object3D;
+    protected abstract generateGraphData(input: T): GraphData;
 
+    abstract getNodeThreeObject(node: NodeObject<NodeObject<GraphNode>>, message: string): THREE.Object3D;
 }
 
 
-export class ToolProofSpace extends Space<GraphSpec[]> {
 
-    // ATTENTION: should be a property of the class
-    generateGraphData(graphSpecs: GraphSpec[]): GraphData {
+export class ToolProofSpace extends Space<GraphSpec_ToolProof> {
+
+    constructor(graphSpec: GraphSpec_ToolProof) {
+        super(graphSpec);
+    }
+
+    protected generateGraphData(graphSpec: GraphSpec_ToolProof): GraphData {
 
         const radius = 200;
         const alphaBetaYDistance = 75;
 
-        const nodes_Alpha: Node[] = graphSpecs.map((node, index) => {
-
-            const node2: Node = {
+        const nodes_Alpha: GraphNode[] = graphSpec.spec.map((node, index) => {
+            return {
                 id: node.name,
                 shape: 'sphere',
                 val: 5,
                 group: 'Alpha',
-                fx: radius * Math.cos((2 * Math.PI * index) / graphSpecs.length),
+                fx: radius * Math.cos((2 * Math.PI * index) / graphSpec.spec.length),
                 fy: -75,
-                fz: radius * Math.sin((2 * Math.PI * index) / graphSpecs.length),
-            }
-
-            return {
-                ...node2,
-                shape: this.getNodeThreeObject(node2, ''),
-            }
+                fz: radius * Math.sin((2 * Math.PI * index) / graphSpec.spec.length),
+            };
         });
 
-        const nodes_BetaOne: Node[] = [
+        const nodes_BetaOne: GraphNode[] = [
             {
                 id: 'GraphState',
                 shape: 'square',
@@ -96,7 +105,7 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
             },
         ];
 
-        const nodes_BetaTwo: Node[] = [
+        const nodes_BetaTwo: GraphNode[] = [
             {
                 id: 'SharedResources',
                 shape: 'square',
@@ -108,9 +117,9 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
             },
         ];
 
-        const nodes_Gamma: Node[] = graphSpecs.flatMap((node, index) => {
-            const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / graphSpecs.length);
-            const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / graphSpecs.length);
+        const nodes_Gamma: GraphNode[] = graphSpec.spec.flatMap((node, index) => {
+            const alphaNodeX = radius * Math.cos((2 * Math.PI * index) / graphSpec.spec.length);
+            const alphaNodeZ = radius * Math.sin((2 * Math.PI * index) / graphSpec.spec.length);
             const toolsCount = node.tools.length;
 
             return node.tools.map((tool, toolIndex) => {
@@ -136,8 +145,8 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
             });
         });
 
-        const links_Alpha_Alpha: NamedLink[] = graphSpecs.flatMap((nodeA, indexA) => {
-            return graphSpecs
+        const links_Alpha_Alpha: NamedGraphLink[] = graphSpec.spec.flatMap((nodeA, indexA) => {
+            return graphSpec.spec
                 .filter((_, indexB) => indexB > indexA) // Avoid duplicate pairs
                 .flatMap((nodeB) => [
                     {
@@ -153,7 +162,7 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
                 ]);
         });
 
-        const links_Alpha_Gamma: NamedLink[] = graphSpecs.flatMap((node, index) =>
+        const links_Alpha_Gamma: NamedGraphLink[] = graphSpec.spec.flatMap((node, index) =>
             node.tools.flatMap((tool) => [
                 {
                     source: node.name, // alphaNode ID
@@ -168,7 +177,7 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
             ])
         );
 
-        const links_Alpha_BetaOne: NamedLink[] = graphSpecs.flatMap((node, index) => {
+        const links_Alpha_BetaOne: NamedGraphLink[] = graphSpec.spec.flatMap((node, index) => {
             const circumferenceNode = node.name;
             return [
                 {
@@ -184,7 +193,7 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
             ];
         });
 
-        const links_Alpha_BetaTwo: NamedLink[] = graphSpecs.flatMap((node, index) => {
+        const links_Alpha_BetaTwo: NamedGraphLink[] = graphSpec.spec.flatMap((node, index) => {
             const circumferenceNode = node.name;
             return [
                 {
@@ -200,7 +209,7 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
             ];
         });
 
-        const links_BetaTwo_Gamma: NamedLink[] = graphSpecs.flatMap((node, index) =>
+        const links_BetaTwo_Gamma: NamedGraphLink[] = graphSpec.spec.flatMap((node, index) =>
             node.tools.flatMap((tool) => [
                 {
                     source: tool, // betaNode ID
@@ -235,7 +244,7 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
         return graphData;
     }
 
-    getNodeThreeObject(node: NodeObject<Node>, message: string): THREE.Object3D {
+    getNodeThreeObject(node: NodeObject<GraphNode>, message: string): THREE.Object3D {
         const group = new THREE.Group();
 
         // 🎯 Base node size scaling
@@ -313,11 +322,15 @@ export class ToolProofSpace extends Space<GraphSpec[]> {
 }
 
 
-export class CelarboSpace extends Space<Celarbo> {
+export class CelarboSpace extends Space<GraphSpec_Celarbo> {
 
-    generateGraphData(celarbo: Celarbo): GraphData {
-        const nodes: Node[] = [];
-        const links: NamedLink[] = [];
+    constructor(graphSpec_Celarbo: GraphSpec_Celarbo) {
+        super(graphSpec_Celarbo);
+    }
+
+    protected generateGraphData(graphSpec_Celarbo: GraphSpec_Celarbo): GraphData {
+        const nodes: GraphNode[] = [];
+        const links: NamedGraphLink[] = [];
 
         const verticalSpacing = 100;
         const horizontalSpacing = 100;
@@ -334,7 +347,7 @@ export class CelarboSpace extends Space<Celarbo> {
         const nodeIndex = 0;
 
         const traverse = (
-            celarbo: Celarbo,
+            celarbo: _GraphSpec_Celarbo,
             level: number,
             xOffset: number,
             parentId?: string
@@ -368,7 +381,7 @@ export class CelarboSpace extends Space<Celarbo> {
             }
 
             // Recursively layout children
-            const childResults = (celarbo.branches as Celarbo[]).map((child, i) =>
+            const childResults = (celarbo.branches as _GraphSpec_Celarbo[]).map((child, i) =>
                 traverse(child, level + 1, xOffset + i * horizontalSpacing)
             );
 
@@ -396,7 +409,7 @@ export class CelarboSpace extends Space<Celarbo> {
             }
 
             // Link parent to children
-            for (const child of celarbo.branches as Celarbo[]) {
+            for (const child of celarbo.branches as _GraphSpec_Celarbo[]) {
                 links.push({
                     source: nodeId,
                     target: child.name,
@@ -407,7 +420,7 @@ export class CelarboSpace extends Space<Celarbo> {
             return { width: totalWidth || horizontalSpacing, centerX };
         };
 
-        traverse(celarbo, 0, 0);
+        traverse(graphSpec_Celarbo.spec, 0, 0);
 
         console.log('nodes.length', nodes.length);
         console.log('links.length', links.length);
@@ -415,7 +428,7 @@ export class CelarboSpace extends Space<Celarbo> {
         return { nodes, links };
     }
 
-    getNodeThreeObject(node: NodeObject<Node>, message: string): THREE.Object3D {
+    getNodeThreeObject(node: NodeObject<GraphNode>, message: string): THREE.Object3D {
         const group = new THREE.Group();
 
         // 🎯 Base node size scaling
