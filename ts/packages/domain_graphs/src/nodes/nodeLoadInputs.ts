@@ -23,6 +23,7 @@ class _NodeLoadInputs extends Runnable {
         description: '',
         operations: [
             {
+                kind: 'StorageOperation',
                 direction: 'read',
                 storage: 'private',
                 resources: [
@@ -32,6 +33,7 @@ class _NodeLoadInputs extends Runnable {
                 ]
             },
             {
+                kind: 'StorageOperation',
                 direction: 'read',
                 storage: 'shared',
                 resources: [
@@ -41,6 +43,7 @@ class _NodeLoadInputs extends Runnable {
                 ]
             },
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'private',
                 resources: [

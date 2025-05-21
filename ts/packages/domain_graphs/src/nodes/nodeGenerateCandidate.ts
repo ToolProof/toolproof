@@ -25,6 +25,7 @@ class _NodeGenerateCandidate extends Runnable {
         description: '',
         operations: [
             {
+                kind: 'StorageOperation',
                 direction: 'read',
                 storage: 'private',
                 resources: [
@@ -33,6 +34,7 @@ class _NodeGenerateCandidate extends Runnable {
                 ],
             },
             {
+                kind: 'ToolInvocation',
                 name: 'OpenAI',
                 description: '',
                 inputs: [
@@ -45,6 +47,7 @@ class _NodeGenerateCandidate extends Runnable {
                 operations: [],
             },
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'shared',
                 resources: [
@@ -52,6 +55,7 @@ class _NodeGenerateCandidate extends Runnable {
                 ],
             },
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'private',
                 resources: [

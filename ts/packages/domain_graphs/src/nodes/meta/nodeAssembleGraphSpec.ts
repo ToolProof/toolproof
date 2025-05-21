@@ -12,7 +12,7 @@ export const NodeAssembleGraphSpecState = Annotation.Root({
         content: string,
     }[]>,
     graphSpec: Annotation<{
-        spec: { // ATTENTION
+        spec: { // ATTENTION: should have a single source of truth 
             name: string,
             tools: string[],
         }[],
@@ -28,6 +28,7 @@ class _NodeAssembleGraphSpec extends Runnable {
         description: '',
         operations: [
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'private',
                 resources: []
@@ -80,7 +81,7 @@ class _NodeAssembleGraphSpec extends Runnable {
                     const nodeSpecObject = eval(`(${cleanedNodeSpec})`);
                     const tools: string[] = (nodeSpecObject.operations || [])
                         // eslint-disable-next-line
-                        .filter((operation: any) => typeof operation.name === 'string')
+                        .filter((operation: any) => operation.kind === 'ToolInvocation')
                         // eslint-disable-next-line
                         .map((operation: any) => operation.name);
                     nodeSpecs.push({

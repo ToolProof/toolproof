@@ -43,11 +43,16 @@ export type Resource<
 
 export type StorageOperationDirectionType = 'read' | 'write';
 
+
+type BaseStorageOperation = {
+    kind: 'StorageOperation';
+    direction: StorageOperationDirectionType;
+}
+
 /**
  * For private operations, `format: 'path'` and `format: 'value'` are allowed
  */
-export type PrivateOperation = {
-    direction: StorageOperationDirectionType;
+export type PrivateStorageOperation = BaseStorageOperation & {
     storage: 'private';
     resources: Resource<ResourceRole, 'path' | 'value'>[];
 };
@@ -55,8 +60,7 @@ export type PrivateOperation = {
 /**
  * For shared operations, only `format: 'file'` is allowed
  */
-export type SharedOperation = {
-    direction: StorageOperationDirectionType;
+export type SharedStorageOperation = BaseStorageOperation & {
     storage: 'shared';
     resources: Resource<ResourceRole, 'file'>[];
 };
@@ -64,12 +68,13 @@ export type SharedOperation = {
 /**
  * Union of valid storage operations
  */
-export type StorageOperation = PrivateOperation | SharedOperation;
+export type StorageOperation = PrivateStorageOperation | SharedStorageOperation;
 
 /**
  * A storage operation that is explicitly a write to private
  */
 export type WritePrivateOperation = {
+    kind: 'StorageOperation';
     direction: 'write';
     storage: 'private';
     resources: Resource<ResourceRole, 'path' | 'value'>[];
@@ -78,18 +83,19 @@ export type WritePrivateOperation = {
 // === Tool invocation ===
 
 export type ToolInvocation = {
+    kind: 'ToolInvocation';
     name: string;
     description: string;
-    foo?: 'local' | 'internal' | 'external'; // ATTENTION
-    inputs: Resource<ResourceRole, 'path' | 'value'>[]; // inputs to the tool
-    outputs: Resource<ResourceRole, 'path' | 'value'>[]; // outputs from the tool
+    deployment?: 'local' | 'internal' | 'external'; // ATTENTION: to be implemented
+    inputs: Resource<ResourceRole, 'path' | 'value'>[];
+    outputs: Resource<ResourceRole, 'path' | 'value'>[];
     operations: OperationDisallowPrivate[]; // tools cannot access private resources
 };
 
 // === Operation containers ===
 
 export type OperationAllowPrivate = StorageOperation | ToolInvocation;
-export type OperationDisallowPrivate = SharedOperation | ToolInvocation;
+export type OperationDisallowPrivate = SharedStorageOperation | ToolInvocation;
 
 // === Node specification ===
 

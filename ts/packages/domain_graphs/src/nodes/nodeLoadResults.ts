@@ -21,6 +21,7 @@ class _NodeLoadResults extends Runnable {
         description: '',
         operations: [
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'private',
                 resources: [],

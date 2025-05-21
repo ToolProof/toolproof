@@ -27,6 +27,7 @@ class _NodeEvaluateResults extends Runnable {
         description: '',
         operations: [
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'private',
                 resources: []

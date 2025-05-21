@@ -27,6 +27,7 @@ class _NodeInvokeDocking extends Runnable {
         description: '',
         operations: [
             {
+                kind: 'ToolInvocation',
                 name: 'AutoDockWrapper',
                 description: '',
                 inputs: [
@@ -39,6 +40,7 @@ class _NodeInvokeDocking extends Runnable {
                 ],
                 operations: [
                     {
+                        kind: 'StorageOperation',
                         direction: 'read',
                         storage: 'shared',
                         resources: [
@@ -47,6 +49,7 @@ class _NodeInvokeDocking extends Runnable {
                         ],
                     },
                     {
+                        kind: 'StorageOperation',
                         direction: 'write',
                         storage: 'shared',
                         resources: [
@@ -57,6 +60,7 @@ class _NodeInvokeDocking extends Runnable {
                 ],
             },
             {
+                kind: 'StorageOperation',
                 direction: 'write',
                 storage: 'private',
                 resources: [
