@@ -1,3 +1,4 @@
+import { GraphSpec, GraphSpec_ToolProof } from 'shared/src/types.js';
 import { NodeObject } from 'react-force-graph-3d';
 import * as THREE from 'three';
 
@@ -29,16 +30,6 @@ export interface GraphData {
     links: NamedGraphLink[];
 }
 
-interface GraphSpec<T> {
-    spec: T;
-}
-
-export interface _GraphSpec_ToolProof {
-    name: string;
-    tools: string[];
-}
-
-export interface GraphSpec_ToolProof extends GraphSpec<_GraphSpec_ToolProof[]> { }
 
 interface _GraphSpec_Celarbo {
     name: string;

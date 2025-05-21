@@ -1,3 +1,4 @@
+import { GraphSpec_ToolProof, _GraphSpec_ToolProof } from 'shared/src/types.js';
 import { NodeSpec, BaseStateSpec, registerNode } from '../../types.js';
 import { extractNodeSpec } from '../../tools/meta/extractNodeSpec.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
@@ -11,12 +12,7 @@ export const NodeAssembleGraphSpecState = Annotation.Root({
         path: string,
         content: string,
     }[]>,
-    graphSpec: Annotation<{
-        spec: { // ATTENTION: should have a single source of truth 
-            name: string,
-            tools: string[],
-        }[],
-    }>,
+    graphSpec: Annotation<GraphSpec_ToolProof>,
 });
 
 type WithBaseState = typeof NodeAssembleGraphSpecState.State &
@@ -64,8 +60,7 @@ class _NodeAssembleGraphSpec extends Runnable {
             };
         } */
 
-
-        let nodeSpecs: { name: string, tools: string[] }[] = [];
+        let nodeSpecs: _GraphSpec_ToolProof[] = [];
 
         for (const nodeFile of state.nodeFiles) {
 

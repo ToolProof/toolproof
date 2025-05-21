@@ -1,5 +1,6 @@
+import { GraphSpec_ToolProof } from 'shared/src/types';
+import { GraphSpec_Celarbo, SpaceInterface, ToolProofSpace, CelarboSpace } from '@/components/spaceXYZ/types';
 import Fabric from '@/components/spaceXYZ/Fabric';
-import { _GraphSpec_ToolProof, GraphSpec_ToolProof, GraphSpec_Celarbo, SpaceInterface, ToolProofSpace, CelarboSpace } from '@/components/spaceXYZ/types';
 import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
 import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
@@ -50,7 +51,7 @@ export default function SpaceXYZ() {
                 const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
                 const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
                 try {
-                    const result = await runGrafumilo(path1);
+                    const result = await runGrafumilo(path0);
                     console.log('graphSpec:', JSON.stringify(result.graphSpec, null, 2));
                     setGraphSpec(result.graphSpec as GraphSpec_ToolProof);
                 } catch (error) {
