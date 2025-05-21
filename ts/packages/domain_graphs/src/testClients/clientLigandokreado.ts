@@ -27,12 +27,13 @@ export async function runRemoteGraph() {
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 dryRunModeManager: {
-                    dryRunMode: true,
+                    dryRunMode: false,
                     delay: 1000,
+                    drySocketMode: false,
                 },
-                anchor: { path: 'ligandocreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi', value: [] },
-                target: { path: 'ligandocreado/1iep/target.pdb', value: [] },
-                box: { path: 'ligandocreado/1iep/box.pdb', value: [] },
+                anchor: { path: 'ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi', value: [] },
+                target: { path: 'ligandokreado/1iep/target.pdb', value: [] },
+                box: { path: 'ligandokreado/1iep/box.pdb', value: [] },
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

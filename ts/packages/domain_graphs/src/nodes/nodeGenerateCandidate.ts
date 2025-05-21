@@ -70,17 +70,14 @@ class _NodeGenerateCandidate extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (state.dryRunModeManager.dryRunMode) {
-            await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
+        if (!state.dryRunModeManager.drySocketMode) {
 
             // Connect to WebSocket server
             const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
-
+            
             ws.on('open', () => {
-                console.log('Connected to WebSocket server (DryRun)');
                 ws.send(JSON.stringify({
                     node: 'NodeGenerateCandidate',
-                    message: 'Completed DryRun Mode'
                 }));
                 ws.close();
             });
@@ -88,6 +85,10 @@ class _NodeGenerateCandidate extends Runnable {
             ws.on('error', (error) => {
                 console.error('WebSocket Error:', error);
             });
+        }
+
+        if (state.dryRunModeManager.dryRunMode) {
+            await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
 
             return {
                 messages: [new AIMessage('NodeGenerateCandidate completed in DryRun mode')],

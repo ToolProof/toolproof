@@ -78,11 +78,12 @@ export default function SpaceXYZ() {
 
 
     // Invokes Ligandokreado
-    useEffect(() => {
+    /* useEffect(() => {
         if (message === '') { // || message.includes('NodeEvaluateResults')
             runLigandokreado();
+            setMessage('dummy message');
         }
-    }, [message]);
+    }, [message]); */
 
 
     // WebSocket Connection for Broadcast Messages

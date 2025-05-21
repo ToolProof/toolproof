@@ -7,12 +7,14 @@ export const BaseStateSpec = {
     dryRunModeManager: Annotation<{
         dryRunMode: boolean;
         delay: number;
+        drySocketMode: boolean;
     }>(
         {
             reducer: (prev, next) => next,
             default: () => ({
                 dryRunMode: false,
                 delay: 0,
+                drySocketMode: false,
             }),
         }
     ),
