@@ -24,11 +24,10 @@ type WithBaseState = typeof NodeInvokeDockingState.State &
 class _NodeInvokeDocking extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeInvokeDocking',
         description: '',
         operations: [
             {
-                name: 'SchrödingerWrapper',
+                name: 'AutoDockWrapper',
                 description: '',
                 inputs: [
                     { role: 'candidate', format: 'path' },

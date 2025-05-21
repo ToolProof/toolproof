@@ -97,7 +97,7 @@ export type OperationDisallowPrivate = SharedOperation | ToolInvocation;
  * NodeSpec with a constraint: the final operation must be a write to private
  */
 export type NodeSpec = { // ATTENTION: must be valid JSON
-    name: ''; // Infered from the class name
+    // name: ''; // Infered from the class name and added dynamically
     description: string;
     operations: [...OperationAllowPrivate[], WritePrivateOperation];
 };
@@ -121,28 +121,6 @@ export function registerNode<
     ) {
         throw new Error(`Node ${cls.name} must end with a write to private operation.`);
     } */
-    return cls;
-}
-
-
-interface ConditionalEdge {
-    name: string;
-    source: string;
-    targets: string[];
-}
-
-export type GraphSpec = {
-    name: string;
-    description: string;
-    operation: WritePrivateOperation
-    conditionalEdges: ConditionalEdge[];
-}
-
-export interface GraphClass {
-    graphSpec: GraphSpec;
-}
-
-export const registerGraph = <T extends GraphClass>(cls: T): T => {
     return cls;
 }
 

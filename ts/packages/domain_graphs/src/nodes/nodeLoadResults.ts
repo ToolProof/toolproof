@@ -18,7 +18,6 @@ type WithBaseState = typeof NodeLoadResultsState.State &
 class _NodeLoadResults extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeLoadResults',
         description: '',
         operations: [
             {

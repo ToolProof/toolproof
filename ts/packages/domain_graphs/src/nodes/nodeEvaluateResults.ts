@@ -24,7 +24,6 @@ type WithBaseState = typeof NodeEvaluateResultsState.State &
 class _NodeEvaluateResults extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeEvaluateResults',
         description: '',
         operations: [
             {

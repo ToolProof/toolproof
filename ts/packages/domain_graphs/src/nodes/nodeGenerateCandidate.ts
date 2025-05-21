@@ -22,7 +22,6 @@ type WithBaseState = typeof NodeGenerateCandidateState.State &
 class _NodeGenerateCandidate extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeGenerateCandidate',
         description: '',
         operations: [
             {

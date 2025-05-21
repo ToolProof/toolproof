@@ -29,7 +29,6 @@ type WithBaseState = typeof NodeGenerateBoxState.State &
 class _NodeGenerateBox extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeGenerateBox',
         description: '',
         operations: [],
     }

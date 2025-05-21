@@ -20,7 +20,6 @@ type WithBaseState = typeof NodeLoadInputsState.State &
 class _NodeLoadInputs extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeLoadInputs',
         description: '',
         operations: [
             {
