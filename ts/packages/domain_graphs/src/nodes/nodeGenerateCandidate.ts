@@ -29,19 +29,19 @@ class _NodeGenerateCandidate extends Runnable {
                 direction: 'read',
                 storage: 'private',
                 resources: [
-                    { name: 'anchor', kind: 'value' },
-                    { name: 'target', kind: 'value' },
+                    { role: 'anchor', format: 'value' },
+                    { role: 'target', format: 'value' },
                 ],
             },
             {
                 name: 'OpenAI',
                 description: '',
                 inputs: [
-                    { name: 'anchor', kind: 'value' },
-                    { name: 'target', kind: 'value' },
+                    { role: 'anchor', format: 'value' },
+                    { role: 'target', format: 'value' },
                 ],
                 outputs: [
-                    { name: 'candidate', kind: 'value' },
+                    { role: 'candidate', format: 'value' },
                 ],
                 operations: [],
             },
@@ -49,15 +49,15 @@ class _NodeGenerateCandidate extends Runnable {
                 direction: 'write',
                 storage: 'shared',
                 resources: [
-                    { name: 'candidate', kind: 'file' },
+                    { role: 'candidate', format: 'file' },
                 ],
             },
             {
                 direction: 'write',
                 storage: 'private',
                 resources: [
-                    { name: 'candidate', kind: 'path' },
-                    { name: 'candidate', kind: 'value' }, // Not strictly neccessary, but useful for subsequent iterations
+                    { role: 'candidate', format: 'path' },
+                    { role: 'candidate', format: 'value' }, // Not strictly neccessary, but useful for subsequent iterations
                 ],
             },
         ]

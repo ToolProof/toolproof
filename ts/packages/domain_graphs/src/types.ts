@@ -20,7 +20,7 @@ export const BaseStateSpec = {
 
 // === Resource modeling ===
 
-export type ResourceType =
+export type ResourceRole =
     | 'anchor'
     | 'target'
     | 'box'
@@ -29,14 +29,14 @@ export type ResourceType =
     | 'pose'
     | 'decision';
 
-export type ResourceKind = 'file' | 'path' | 'value';
+export type ResourceFormat = 'file' | 'path' | 'value';
 
-export type ResourceRef<
-    Name extends ResourceType = ResourceType,
-    Kind extends ResourceKind = ResourceKind
+export type Resource<
+    Role extends ResourceRole = ResourceRole,
+    Format extends ResourceFormat = ResourceFormat
 > = {
-    name: Name;
-    kind: Kind;
+    role: Role;
+    format: Format;
 };
 
 // === Storage operations ===
@@ -44,25 +44,25 @@ export type ResourceRef<
 export type StorageOperationDirectionType = 'read' | 'write';
 
 /**
- * For private operations, `kind: 'path'` and `kind: 'value'` are allowed
+ * For private operations, `format: 'path'` and `format: 'value'` are allowed
  */
 export type PrivateOperation = {
     direction: StorageOperationDirectionType;
     storage: 'private';
-    resources: ResourceRef<ResourceType, 'path' | 'value'>[];
+    resources: Resource<ResourceRole, 'path' | 'value'>[];
 };
 
 /**
- * For shared operations, only `kind: 'file'` is allowed
+ * For shared operations, only `format: 'file'` is allowed
  */
 export type SharedOperation = {
     direction: StorageOperationDirectionType;
     storage: 'shared';
-    resources: ResourceRef<ResourceType, 'file'>[];
+    resources: Resource<ResourceRole, 'file'>[];
 };
 
 /**
- * Union of all valid storage operations
+ * Union of valid storage operations
  */
 export type StorageOperation = PrivateOperation | SharedOperation;
 
@@ -72,7 +72,7 @@ export type StorageOperation = PrivateOperation | SharedOperation;
 export type WritePrivateOperation = {
     direction: 'write';
     storage: 'private';
-    resources: ResourceRef<ResourceType, 'path' | 'value'>[];
+    resources: Resource<ResourceRole, 'path' | 'value'>[];
 };
 
 // === Tool invocation ===
@@ -80,10 +80,10 @@ export type WritePrivateOperation = {
 export type ToolInvocation = {
     name: string;
     description: string;
-    foo?: 'internal' | 'external'; // ATTENTION
-    inputs: ResourceRef<ResourceType, 'path' | 'value'>[]; // inputs to the tool
-    outputs: ResourceRef<ResourceType, 'path' | 'value'>[]; // outputs from the tool
-    operations: OperationDisallowPrivate[]; // tools must not access private resources
+    foo?: 'local' | 'internal' | 'external'; // ATTENTION
+    inputs: Resource<ResourceRole, 'path' | 'value'>[]; // inputs to the tool
+    outputs: Resource<ResourceRole, 'path' | 'value'>[]; // outputs from the tool
+    operations: OperationDisallowPrivate[]; // tools cannot access private resources
 };
 
 // === Operation containers ===
@@ -97,7 +97,7 @@ export type OperationDisallowPrivate = SharedOperation | ToolInvocation;
  * NodeSpec with a constraint: the final operation must be a write to private
  */
 export type NodeSpec = { // ATTENTION: must be valid JSON
-    name: string;
+    name: ''; // Infered from the class name
     description: string;
     operations: [...OperationAllowPrivate[], WritePrivateOperation];
 };

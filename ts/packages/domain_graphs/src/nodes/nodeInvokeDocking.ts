@@ -31,28 +31,28 @@ class _NodeInvokeDocking extends Runnable {
                 name: 'SchrödingerWrapper',
                 description: '',
                 inputs: [
-                    { name: 'candidate', kind: 'path' },
-                    { name: 'target', kind: 'path' },
+                    { role: 'candidate', format: 'path' },
+                    { role: 'target', format: 'path' },
                 ],
                 outputs: [
-                    { name: 'docking', kind: 'path' },
-                    { name: 'pose', kind: 'path' },
+                    { role: 'docking', format: 'path' },
+                    { role: 'pose', format: 'path' },
                 ],
                 operations: [
                     {
                         direction: 'read',
                         storage: 'shared',
                         resources: [
-                            { name: 'candidate', kind: 'file' },
-                            { name: 'target', kind: 'file' },
+                            { role: 'candidate', format: 'file' },
+                            { role: 'target', format: 'file' },
                         ],
                     },
                     {
                         direction: 'write',
                         storage: 'shared',
                         resources: [
-                            { name: 'docking', kind: 'file' },
-                            { name: 'pose', kind: 'file' },
+                            { role: 'docking', format: 'file' },
+                            { role: 'pose', format: 'file' },
                         ],
                     },
                 ],
@@ -61,8 +61,8 @@ class _NodeInvokeDocking extends Runnable {
                 direction: 'write',
                 storage: 'private',
                 resources: [
-                    { name: 'docking', kind: 'path' },
-                    { name: 'pose', kind: 'path' },
+                    { role: 'docking', format: 'path' },
+                    { role: 'pose', format: 'path' },
                 ],
             },
         ]

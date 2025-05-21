@@ -27,27 +27,27 @@ class _NodeLoadInputs extends Runnable {
                 direction: 'read',
                 storage: 'private',
                 resources: [
-                    { name: 'anchor', kind: 'path' },
-                    { name: 'target', kind: 'path' },
-                    { name: 'box', kind: 'path' }
+                    { role: 'anchor', format: 'path' },
+                    { role: 'target', format: 'path' },
+                    { role: 'box', format: 'path' }
                 ]
             },
             {
                 direction: 'read',
                 storage: 'shared',
                 resources: [
-                    { name: 'anchor', kind: 'file' },
-                    { name: 'target', kind: 'file' },
-                    { name: 'box', kind: 'file' }
+                    { role: 'anchor', format: 'file' },
+                    { role: 'target', format: 'file' },
+                    { role: 'box', format: 'file' }
                 ]
             },
             {
                 direction: 'write',
                 storage: 'private',
                 resources: [
-                    { name: 'anchor', kind: 'value' },
-                    { name: 'target', kind: 'value' },
-                    { name: 'box', kind: 'value' }
+                    { role: 'anchor', format: 'value' },
+                    { role: 'target', format: 'value' },
+                    { role: 'box', format: 'value' }
                 ]
             }
         ]

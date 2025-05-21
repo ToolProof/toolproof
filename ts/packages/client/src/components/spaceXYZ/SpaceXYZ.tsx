@@ -4,7 +4,7 @@ import { runGrafumilo } from '@/lib/spaceXYZ/actionGrafumilo';
 import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
 
-const foo = false;
+const foo = false; // Set to true to use the CelarboSpace, false for ToolProofSpace
 
 export default function SpaceXYZ() {
     const [graphSpec, setGraphSpec] = useState<GraphSpec_Celarbo | GraphSpec_ToolProof | null>(null);
@@ -50,34 +50,9 @@ export default function SpaceXYZ() {
                 const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
                 const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
                 try {
-                    const result = await runGrafumilo(path1);
-                    console.log('result:', JSON.stringify(result, null, 2));
-
-                    const nodes = result.nodes || [];
-                    // eslint-disable-next-line
-                    const _graphSpecs: _GraphSpec_ToolProof[] = nodes.map((node: any) => {
-                        if (typeof node.content === 'string') {
-                            return {
-                                name: node.path,
-                                tools: [],
-                            };
-                        }
-
-                        const tools: string[] = (node.content.operations || [])
-                            // eslint-disable-next-line
-                            .filter((operation: any) => typeof operation.name === 'string')
-                            // eslint-disable-next-line
-                            .map((operation: any) => operation.name);
-
-                        return {
-                            name: node.content.name || node.path,
-                            tools,
-                        };
-                    });
-
-                    setGraphSpec({
-                        spec: _graphSpecs,
-                    });
+                    const result = await runGrafumilo(path0);
+                    console.log('graphSpec:', JSON.stringify(result.graphSpec, null, 2));
+                    setGraphSpec(result.graphSpec as GraphSpec_ToolProof);
                 } catch (error) {
                     throw new Error(`Error fetching data: ${error}`);
                 }

@@ -1,5 +1,7 @@
 import { BaseStateSpec, GraphSpec, registerGraph } from '../../types.js';
 import { NodeFoo, NodeFooState } from '../../nodes/meta/nodeFoo.js';
+import { NodeBar, NodeBarState } from '../../nodes/meta/nodeBar.js';
+import { NodeBaz, NodeBazState } from '../../nodes/meta/nodeBaz.js';
 import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
@@ -43,13 +45,19 @@ export const NodeStart = registerGraph<typeof _NodeStart>(_NodeStart);
 const GraphState = Annotation.Root({
     ...BaseStateSpec,
     ...NodeFooState.spec,
+    ...NodeBarState.spec,
+    ...NodeBazState.spec,
 });
 
 
 const stateGraph = new StateGraph(GraphState)
     .addNode('nodeFoo', new NodeFoo())
+    .addNode('nodeBar', new NodeBar())
+    .addNode('nodeBaz', new NodeBaz())
     .addEdge(START, 'nodeFoo')
-    .addEdge('nodeFoo', END);
-    
+    .addEdge('nodeFoo', 'nodeBar')
+    .addEdge('nodeBar', 'nodeBaz')
+    .addEdge('nodeBaz', END);
+
 
 export const graph = stateGraph.compile();

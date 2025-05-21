@@ -6,7 +6,7 @@ import { Annotation } from '@langchain/langgraph';
 // import WebSocket from 'ws';
 
 
-export const NodeFooState = Annotation.Root({
+export const NodeBarState = Annotation.Root({
     repo: Annotation<string>(
         {
             reducer: (prev, next) => next,
@@ -23,15 +23,19 @@ export const NodeFooState = Annotation.Root({
         path: string,
         content: string,
     }>,
+    nodeFiles: Annotation<{
+        path: string,
+        content: string,
+    }[]>,
 });
 
-type WithBaseState = typeof NodeFooState.State &
+type WithBaseState = typeof NodeBarState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
-class _NodeFoo extends Runnable {
+class _NodeBar extends Runnable {
 
     static nodeSpec: NodeSpec = {
-        name: 'NodeFoo',
+        name: 'NodeBar',
         description: '',
         operations: [
             {
@@ -55,7 +59,7 @@ class _NodeFoo extends Runnable {
             ws.on('open', () => {
                 console.log('Connected to WebSocket server (DryRun)');
                 ws.send(JSON.stringify({
-                    node: 'NodeFoo',
+                    node: 'NodeBar',
                     message: 'Completed DryRun Mode'
                 }));
                 ws.close();
@@ -66,31 +70,42 @@ class _NodeFoo extends Runnable {
             });
 
             return {
-                messages: [new AIMessage('NodeFoo completed in DryRun mode')],
+                messages: [new AIMessage('NodeBar completed in DryRun mode')],
             };
         } */
 
         const { repo, branch } = state;
-        const url = `https://raw.githubusercontent.com/${repo}/${branch}/${state.graphFile.path}`;
-        let graphFile = { ...state.graphFile };
+        let nodeFiles: { path: string, content: string }[] = [];
 
         try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
+
+            const importMatches = state.graphFile.content.matchAll(/import\s+.*?from\s+['"][^'"]*(nodes\/[^'"]*)['"]/g);
+
+            for (const match of importMatches) {
+                const _importPath = 'ts/packages/domain_graphs/src/' + match[1];
+                const importPath = _importPath.replace(/\.js$/, '.ts');
+                const importUrl = `https://raw.githubusercontent.com/${repo}/${branch}/${importPath}`;
+
+                const importResponse = await fetch(importUrl);
+                if (importResponse.ok) {
+                    const importedContent = await importResponse.text();
+                    nodeFiles.push({ path: importPath, content: importedContent });
+                } else {
+                    const msg = `Failed to fetch: ${importResponse.status} ${importResponse.statusText}`;
+                    console.error(`${msg} — URL: ${importUrl}`);
+                    throw new Error(`Error fetching file: ${msg}`);
+                    // nodes.push({ path: importPath, content: `Failed to fetch: ${importResponse.statusText}` });
+                }
             }
-            graphFile.content = await response.text();
         } catch (error) {
             throw new Error(`Error fetching or processing file: ${error}`);
         }
-
         return {
-            graphFile
+            nodeFiles
         };
-
     }
 
 }
 
 
-export const NodeFoo = registerNode<typeof _NodeFoo>(_NodeFoo);
+export const NodeBar = registerNode<typeof _NodeBar>(_NodeBar);
