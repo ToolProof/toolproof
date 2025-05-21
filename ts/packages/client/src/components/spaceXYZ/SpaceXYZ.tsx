@@ -51,7 +51,7 @@ export default function SpaceXYZ() {
                 const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
                 const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
                 try {
-                    const result = await runGrafumilo(path0);
+                    const result = await runGrafumilo(path1);
                     console.log('graphSpec:', JSON.stringify(result.graphSpec, null, 2));
                     setGraphSpec(result.graphSpec as GraphSpec_ToolProof);
                 } catch (error) {
