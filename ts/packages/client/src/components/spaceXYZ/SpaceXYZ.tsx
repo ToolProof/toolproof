@@ -10,7 +10,7 @@ const foo = false; // Set to true to use the CelarboSpace, false for ToolProofSp
 export default function SpaceXYZ() {
     const [graphSpec, setGraphSpec] = useState<GraphSpec_Celarbo | GraphSpec_ToolProof | null>(null);
     const [space, setSpace] = useState<SpaceInterface | null>(null);
-    const [message, setMessage] = useState<string>('Start');
+    const [message, setMessage] = useState<string>('');
 
     // Fetch GraphSpecs 
     useEffect(() => {
@@ -78,11 +78,11 @@ export default function SpaceXYZ() {
 
 
     // Invokes Ligandokreado
-    /* useEffect(() => {
-        if (message === 'Start' || message.includes('NodeEvaluateResults')) {
+    useEffect(() => {
+        if (message === '') { // || message.includes('NodeEvaluateResults')
             runLigandokreado();
         }
-    }, [message]); */
+    }, [message]);
 
 
     // WebSocket Connection for Broadcast Messages

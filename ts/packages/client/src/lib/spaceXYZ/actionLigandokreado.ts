@@ -32,12 +32,12 @@ export async function runLigandokreado() {
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 dryRunModeManager: {
-                    dryRunMode: true,
+                    dryRunMode: false,
                     delay: 3000,
                 },
-                anchor: { path: 'imatinib.smi', value: [] },
-                target: { path: '1iep.pdb', value: [] },
-                box: { path: 'xray-imatinib.pdb', value: [] },
+                anchor: { path: 'ligandocreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi', value: [] },
+                target: { path: 'ligandocreado/1iep/target.pdb', value: [] },
+                box: { path: 'ligandocreado/1iep/box.pdb', value: [] },
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,
@@ -46,7 +46,6 @@ export async function runLigandokreado() {
             // console.log('threadId:', thread.thread_id);
             // console.log('result:', JSON.stringify(result, null, 2));
             return result;
-
         } finally {
             clearTimeout(timeout);
             if (!controller.signal.aborted) {

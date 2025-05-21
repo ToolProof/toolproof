@@ -102,7 +102,7 @@ class _NodeGenerateCandidate extends Runnable {
                 throw new Error('Missing required resources');
             }
 
-            // Analyze chunks sequentially to maintain context
+            /* // Analyze chunks sequentially to maintain context
             let analysisContext = '';
             for (const chunk of targetChunks) {
                 const response = await openai.chat.completions.create({
@@ -162,7 +162,9 @@ class _NodeGenerateCandidate extends Runnable {
                 max_tokens: 500
             });
 
-            const candidate = finalResponse.choices[0].message.content?.trim();
+            const candidate = finalResponse.choices[0].message.content?.trim(); */
+
+            const candidate = state.anchor.value; // ATTENTION: placeholder for now
 
             if (!candidate) {
                 throw new Error('Failed to generate candidate SMILES string');
@@ -173,12 +175,13 @@ class _NodeGenerateCandidate extends Runnable {
 
             try {
 
-                // Save candidate to GCS using the document ID
-                const fileName = `adb/${timestamp}/candidate.smi`;
+                const firstTwoSegmentsOfAnchorPath = state.anchor.path.split('/').slice(0, 2).join('/');
+                const filePath = `${firstTwoSegmentsOfAnchorPath}/${timestamp}/candidate.smi`;
 
+                // Save the candidate to Google Cloud Storage
                 await storage
                     .bucket(bucketName)
-                    .file(fileName)
+                    .file(filePath)
                     .save(candidate, {
                         contentType: 'text/plain',
                         metadata: {
@@ -189,7 +192,7 @@ class _NodeGenerateCandidate extends Runnable {
                 return {
                     messages: [new AIMessage('NodeGenerateCandidate completed')],
                     candidate: {
-                        path: fileName,
+                        path: filePath,
                         value: candidate,
                     }
                 };

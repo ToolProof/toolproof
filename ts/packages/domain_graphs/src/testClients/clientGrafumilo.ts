@@ -7,7 +7,7 @@ import { HumanMessage } from '@langchain/core/messages';
 const urlLocal = `http://localhost:8123`;
 const urlRemote = `https://deployment-typescript-48b9b40b9bac500f8fe557700e4c49d9.us.langgraph.app`;
 const url = urlLocal; //process.env.URL || urlLocal;
-const graphId = 'graph';
+const graphId = 'grafumilo';
 const client = new Client({
     apiUrl: url,
 });

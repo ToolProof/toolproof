@@ -7,7 +7,7 @@ import { HumanMessage } from '@langchain/core/messages';
 const urlLocal = `http://localhost:8123`;
 const urlRemote = `https://deployment-typescript-48b9b40b9bac500f8fe557700e4c49d9.us.langgraph.app`;
 const url = urlLocal; //process.env.URL || urlLocal;
-const graphId = 'graph';
+const graphId = 'ligandokreado';
 const client = new Client({
     apiUrl: url,
 });
@@ -28,11 +28,11 @@ export async function runRemoteGraph() {
                 messages: [new HumanMessage('Graph is invoked')],
                 dryRunModeManager: {
                     dryRunMode: true,
-                    delay: 5000,
+                    delay: 1000,
                 },
-                anchor: { path: 'imatinib.smi', value: [] },
-                target: { path: '1iep.pdb', value: [] },
-                box: { path: 'xray-imatinib.pdb', value: [] },
+                anchor: { path: 'ligandocreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi', value: [] },
+                target: { path: 'ligandocreado/1iep/target.pdb', value: [] },
+                box: { path: 'ligandocreado/1iep/box.pdb', value: [] },
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,
