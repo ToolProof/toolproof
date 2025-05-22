@@ -87,7 +87,7 @@ export default function SpaceXYZ() {
 
 
     // WebSocket Connection for Broadcast Messages
-    useEffect(() => {
+    /* useEffect(() => {
         const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
 
         ws.onopen = () => {
@@ -111,7 +111,7 @@ export default function SpaceXYZ() {
         return () => {
             ws.close();
         };
-    }, []);
+    }, []); */
 
     return (
         (space) && (
