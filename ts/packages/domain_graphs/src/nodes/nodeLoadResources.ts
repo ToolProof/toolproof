@@ -6,14 +6,21 @@ import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-export const NodeLoadInputsState = Annotation.Root({
+export const NodeLoadResourcesState = Annotation.Root({
     inputs: Annotation<Input[]>(),
 });
 
-type WithBaseState = typeof NodeLoadInputsState.State &
+type WithBaseState = typeof NodeLoadResourcesState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
-class _NodeLoadInputs extends Runnable {
+class _NodeLoadResources extends Runnable {
+
+    spec: string;
+
+    constructor(spec: string) {
+        super();
+        this.spec = spec;
+    }
 
     static nodeSpec: NodeSpec = {
         description: '',
@@ -62,7 +69,7 @@ class _NodeLoadInputs extends Runnable {
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({
-                    node: 'NodeLoadInputs',
+                    node: 'NodeLoadResources',
                 }));
                 ws.close();
             });
@@ -76,7 +83,7 @@ class _NodeLoadInputs extends Runnable {
             await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
 
             return {
-                messages: [new AIMessage('NodeLoadInputs completed in DryRun mode')],
+                messages: [new AIMessage('NodeLoadResources completed in DryRun mode')],
             };
         }
 
@@ -114,14 +121,14 @@ class _NodeLoadInputs extends Runnable {
             }
 
             return {
-                messages: [new AIMessage('NodeLoadInputs completed')],
+                messages: [new AIMessage(this.spec)],
                 inputs,
             };
 
         } catch (error: any) {
-            console.error('Error in NodeLoadInputs:', error);
+            console.error('Error in NodeLoadResources:', error);
             return {
-                messages: [new AIMessage('NodeLoadInputs failed')],
+                messages: [new AIMessage('NodeLoadResources failed')],
             };
         }
 
@@ -129,4 +136,4 @@ class _NodeLoadInputs extends Runnable {
 
 }
 
-export const NodeLoadInputs = registerNode<typeof _NodeLoadInputs>(_NodeLoadInputs);
+export const NodeLoadResources = registerNode<typeof _NodeLoadResources>(_NodeLoadResources);

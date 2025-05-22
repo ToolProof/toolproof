@@ -18,12 +18,12 @@ type StepType = {
 }
 
 export const path: StepType[] = [
-    { name: 'AlphaSuper_NodeLoadInputs', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
-    { name: 'NodeLoadInputs_SharedResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'SharedResources_NodeLoadInputs', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
-    { name: 'NodeLoadInputs_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: -1 },
-    { name: 'GraphState_NodeLoadInputs', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
-    { name: 'NodeLoadInputs_NodeGenerateCandidate', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },
+    { name: 'AlphaSuper_NodeLoadResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 1 },
+    { name: 'NodeLoadResources_SharedResources', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'SharedResources_NodeLoadResources', switchAlpha: 0, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
+    { name: 'NodeLoadResources_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: -1 },
+    { name: 'GraphState_NodeLoadResources', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
+    { name: 'NodeLoadResources_NodeGenerateCandidate', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },
     { name: 'NodeGenerateCandidate_GraphState', switchAlpha: 1, switchBeta: 0, switchDelta: 0, switchGamma: 0 },
     { name: 'GraphState_NodeGenerateCandidate', switchAlpha: 0, switchBeta: 0, switchDelta: 1, switchGamma: 0 },
     { name: 'NodeGenerateCandidate_OpenAI-1', switchAlpha: 1, switchBeta: 0, switchDelta: -1, switchGamma: 0 },

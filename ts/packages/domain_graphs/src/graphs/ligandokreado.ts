@@ -1,5 +1,5 @@
 import { BaseStateSpec } from '../types.js';
-import { NodeLoadInputs, NodeLoadInputsState } from '../nodes/nodeLoadInputs.js';
+import { NodeLoadResources, NodeLoadResourcesState } from '../nodes/nodeLoadResources.js';
 import { NodeGenerateCandidate, NodeGenerateCandidateState } from '../nodes/nodeGenerateCandidate.js';
 import { NodeInvokeDocking, NodeInvokeDockingState } from '../nodes/nodeInvokeDocking.js';
 import { NodeLoadResults, NodeLoadResultsState } from '../nodes/nodeLoadResults.js';
@@ -8,7 +8,7 @@ import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
 
 const GraphState = Annotation.Root({
     ...BaseStateSpec,
-    ...NodeLoadInputsState.spec,
+    ...NodeLoadResourcesState.spec,
     /* ...NodeGenerateCandidateState.spec,
     ...NodeInvokeDockingState.spec,
     ...NodeLoadResultsState.spec,
@@ -25,14 +25,14 @@ const GraphState = Annotation.Root({
 }; */
 
 const stateGraph = new StateGraph(GraphState)
-    .addNode('nodeLoadInputs', new NodeLoadInputs()) // What about passing a graph-specific spec to the constructor?
+    .addNode('nodeLoadResources', new NodeLoadResources('Wasted Love')) // What about passing a graph-specific spec to the constructor?
     /* .addNode('nodeGenerateCandidate', new NodeGenerateCandidate())
     .addNode('nodeInvokeDocking', new NodeInvokeDocking())
     .addNode('nodeLoadResults', new NodeLoadResults())
     .addNode('nodeEvaluateResults', new NodeEvaluateResults()) */
-    .addEdge(START, 'nodeLoadInputs')
-    .addEdge('nodeLoadInputs', END)
-/* .addEdge('nodeLoadInputs', 'nodeGenerateCandidate')
+    .addEdge(START, 'nodeLoadResources')
+    .addEdge('nodeLoadResources', END)
+/* .addEdge('nodeLoadResources', 'nodeGenerateCandidate')
 .addEdge('nodeGenerateCandidate', 'nodeInvokeDocking')
 .addEdge('nodeInvokeDocking', 'nodeLoadResults')
 .addEdge('nodeLoadResults', 'nodeEvaluateResults')

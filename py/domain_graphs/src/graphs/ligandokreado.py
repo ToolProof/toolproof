@@ -767,14 +767,14 @@ def should_retry(state):
 
 alpha_graph = (
     StateGraph(GraphState)
-    .add_node("nodeLoadInputs", node_load_inputs)
+    .add_node("nodeLoadResources", node_load_inputs)
     .add_node("nodeGenerateCandidate", node_generate_candidate)
     .add_node("nodeGenerateBox", node_generate_box)
     .add_node("nodeInvokeDocking", node_invoke_docking)
     .add_node("nodeLoadResults", node_load_results)
     .add_node("nodeEvaluateResults", node_evaluate_results)
-    .add_edge(START, "nodeLoadInputs")
-    .add_edge("nodeLoadInputs", "nodeGenerateCandidate")
+    .add_edge(START, "nodeLoadResources")
+    .add_edge("nodeLoadResources", "nodeGenerateCandidate")
     .add_edge("nodeGenerateCandidate", "nodeGenerateBox")
     .add_edge("nodeGenerateBox", "nodeInvokeDocking")
     .add_edge("nodeInvokeDocking", "nodeLoadResults")

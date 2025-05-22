@@ -156,6 +156,8 @@ export type MorphismOutputTypes = {
     [M in MorphismName]: MorphismOutput<M>
 };
 
+
+// ATTENTION: should be named 'Resource' instead, but this conflicts with the Resource type above
 export type Input<M extends MorphismName = MorphismName> = {
     path: string;
     morphism: M;
