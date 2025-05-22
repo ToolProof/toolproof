@@ -29,18 +29,32 @@ export async function runRemoteGraph() {
                 dryRunModeManager: {
                     dryRunMode: false,
                     delay: 1000,
-                    drySocketMode: false,
+                    drySocketMode: true,
                 },
-                anchor: { path: 'ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi', value: [] },
-                target: { path: 'ligandokreado/1iep/target.pdb', value: [] },
-                box: { path: 'ligandokreado/1iep/box.pdb', value: [] },
+                inputs: [
+                    {
+                        path: 'ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi',
+                        morphism: 'doNothing',
+                        value: null,
+                    },
+                    {
+                        path: 'ligandokreado/1iep/target.pdb',
+                        morphism: 'chunkPDBContent',
+                        value: null,
+                    },
+                    {
+                        path: 'ligandokreado/1iep/box.pdb',
+                        morphism: 'chunkPDBContent',
+                        value: null,
+                    },
+                ]
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,
             });
 
             // console.log('threadId:', thread.thread_id);
-            console.log('messages:', JSON.stringify(result.messages, null, 2));
+            console.log('result:', JSON.stringify(result.inputs[0], null, 2));
             return result;
 
         } finally {

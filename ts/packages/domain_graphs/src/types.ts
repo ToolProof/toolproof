@@ -133,3 +133,38 @@ export function registerNode<
 }
 
 
+export const morphismRegistry = {
+    doNothing: async () => {
+        return (s: string) => 'Hallelujah! ' + s;
+    },
+    chunkPDBContent: async () => {
+        const { chunkPDBContent } = await import('./tools/chunkPDBContent.js');
+        return chunkPDBContent; // assume: (s: string) => ChunkInfo[]
+    },
+} as const;
+
+export type MorphismName = keyof typeof morphismRegistry;
+
+// Extracts the resolved return type of a loader (i.e. the function returned)
+type LoadedFunction<M extends MorphismName> = Awaited<ReturnType<typeof morphismRegistry[M]>>;
+
+// Extracts the final return value of calling the loaded function
+type MorphismOutput<M extends MorphismName> = Awaited<ReturnType<LoadedFunction<M>>>;
+
+// The full output map
+export type MorphismOutputTypes = {
+    [M in MorphismName]: MorphismOutput<M>
+};
+
+export type Input<M extends MorphismName = MorphismName> = {
+    path: string;
+    morphism: M;
+    value: MorphismOutputTypes[M];
+};
+
+// Can be used instead of Input to get narrowing based on the morphism
+/* type InputUnion = {
+    [M in MorphismName]: Input<M>
+}[MorphismName]; */
+
+

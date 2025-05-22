@@ -1,21 +1,17 @@
+import { Input, morphismRegistry } from '../types.js';
 import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
-import { chunkPDBContent, ChunkInfo } from '../tools/chunkPDBContent.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-
 export const NodeLoadInputsState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>(),
-    target: Annotation<{ path: string, value: ChunkInfo[] }>(),
-    box: Annotation<{ path: string, value: ChunkInfo[] }>(),
+    inputs: Annotation<Input[]>(),
 });
 
 type WithBaseState = typeof NodeLoadInputsState.State &
     ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
-
 
 class _NodeLoadInputs extends Runnable {
 
@@ -63,7 +59,7 @@ class _NodeLoadInputs extends Runnable {
 
             // Connect to WebSocket server
             const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
-            
+
             ws.on('open', () => {
                 ws.send(JSON.stringify({
                     node: 'NodeLoadInputs',
@@ -88,47 +84,38 @@ class _NodeLoadInputs extends Runnable {
 
             // Loading the inputs from SharedState into GraphState
 
-            const inputs = [
-                { key: 'anchor', path: state.anchor.path },
-                { key: 'target', path: state.target.path },
-                { key: 'box', path: state.box.path }
-            ];
+            const inputs = [];
 
-            const results: Record<string, any> = {};
+            for (const { path, morphism, value } of state.inputs) {
 
-            for (const { key, path } of inputs) {
                 try {
                     const [content] = await storage
                         .bucket(bucketName)
                         .file(path)
                         .download();
 
-                    if (key === 'target' || key === 'box') {
-                        // Pre-process PDB content into chunks
-                        const pdbContent = content.toString();
-                        const chunks = chunkPDBContent(pdbContent);
-                        results[key] = {
-                            path,
-                            value: chunks
-                        };
-                    } else {
-                        // For SMILES content, keep as string
-                        results[key] = {
-                            path,
-                            value: content.toString()
-                        };
-                    }
+                    const contentStringified = content.toString()
+
+                    const loader = morphismRegistry[morphism];
+                    if (!loader) throw new Error(`Unknown morphism: ${morphism}`);
+
+                    const fn = await loader(); // Load actual function
+                    const value = await fn(contentStringified); // Call function
+
+                    inputs.push({
+                        path,
+                        morphism,
+                        value
+                    });
+
                 } catch (downloadError: any) {
-                    console.error(`Download error for ${key}:`, downloadError);
-                    throw new Error(`Critical error while processing ${key}: ${downloadError.message}`);
+                    throw new Error(`Error while processing: ${downloadError.message}`);
                 }
             }
 
             return {
                 messages: [new AIMessage('NodeLoadInputs completed')],
-                anchor: results.anchor,
-                target: results.target,
-                box: results.box,
+                inputs,
             };
 
         } catch (error: any) {
