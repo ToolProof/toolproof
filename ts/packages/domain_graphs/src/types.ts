@@ -18,6 +18,7 @@ export const BaseStateSpec = {
             }),
         }
     ),
+    resourceMap: Annotation<ResourceMap>(),
 };
 
 // === Resource modeling ===

@@ -6,12 +6,8 @@ import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-export const NodeLoadResourcesState = Annotation.Root({
-    resourceMap: Annotation<ResourceMap>(),
-});
 
-type WithBaseState = typeof NodeLoadResourcesState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
+type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 class _NodeLoadResources extends Runnable {
 
