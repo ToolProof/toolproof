@@ -11,7 +11,7 @@ import WebSocket from 'ws';
 type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
-class _NodeInvokeDocking extends Runnable {
+class _NodeGamma extends Runnable {
 
     spec: {
         inputKeys: string[];
@@ -82,7 +82,7 @@ class _NodeInvokeDocking extends Runnable {
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({
-                    node: 'NodeInvokeDocking',
+                    node: 'NodeGamma',
                 }));
                 ws.close();
             });
@@ -96,7 +96,7 @@ class _NodeInvokeDocking extends Runnable {
             await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             return {
-                messages: [new AIMessage('NodeInvokeDocking completed in DryRun mode')],
+                messages: [new AIMessage('NodeGamma completed in DryRun mode')],
             };
         }
 
@@ -150,7 +150,7 @@ class _NodeInvokeDocking extends Runnable {
                 }
 
                 return {
-                    messages: [new AIMessage('NodeInvokeDocking completed')],
+                    messages: [new AIMessage('NodeGamma completed')],
                     docking: {
                         path: dockingPath,
                         value: new Map()
@@ -165,16 +165,16 @@ class _NodeInvokeDocking extends Runnable {
             }
 
         } catch (error: any) {
-            console.error('Error in NodeInvokeDocking:', error);
+            console.error('Error in NodeGamma:', error);
             return {
-                messages: [new AIMessage('NodeInvokeDocking failed')],
+                messages: [new AIMessage('NodeGamma failed')],
             };
         }
     }
 
 }
 
-export const NodeInvokeDocking = registerNode<typeof _NodeInvokeDocking>(_NodeInvokeDocking);
+export const NodeGamma = registerNode<typeof _NodeGamma>(_NodeGamma);
 
 
 

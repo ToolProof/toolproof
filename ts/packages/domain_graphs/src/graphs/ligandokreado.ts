@@ -1,7 +1,7 @@
 import { BaseStateSpec } from '../types.js';
-import { NodeLoadResources } from '../nodes/nodeLoadResources.js';
-import { NodeGenerateCandidate } from '../nodes/nodeGenerateCandidate.js';
-import { NodeInvokeDocking } from '../nodes/nodeInvokeDocking.js';
+import { NodeAlpha } from '../nodes/nodeAlpha.js';
+import { NodeBeta } from '../nodes/nodeBeta.js';
+import { NodeGamma } from '../nodes/nodeGamma.js';
 import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
 
 const GraphState = Annotation.Root({
@@ -12,24 +12,54 @@ const GraphState = Annotation.Root({
 const edgeShouldRetry = (state: typeof GraphState.State) => {
     console.log('state :', state);
     if (state.shouldRetry) {
-        return 'nodeGenerateCandidate';
+        return 'nodeBeta';
     } else {
         return END;
     }
 };
 
 const stateGraph = new StateGraph(GraphState)
-    .addNode('nodeLoadResources', new NodeLoadResources({ inputKeys: ['anchor', 'target', 'box'] }))
-    .addNode('nodeGenerateCandidate', new NodeGenerateCandidate({ inputKeys: ['anchor', 'target'], outputKeys: ['candidate'] }))
-    .addNode('nodeInvokeDocking', new NodeInvokeDocking({ inputKeys: ['candidate', 'target', 'box'], outputKeys: ['docking', 'pose'] }))
-    .addNode('nodeLoadResources2', new NodeLoadResources({ inputKeys: ['docking', 'pose'] }))
-    .addNode('nodeGenerateCandidate2', new NodeGenerateCandidate({ inputKeys: ['docking', 'pose'], outputKeys: ['decision'] })) // ATTENTION
-    .addEdge(START, 'nodeLoadResources')
-    .addEdge('nodeLoadResources', 'nodeGenerateCandidate')
-    .addEdge('nodeGenerateCandidate', 'nodeInvokeDocking')
-    .addEdge('nodeInvokeDocking', 'nodeLoadResources2')
-    .addEdge('nodeLoadResources2', 'nodeGenerateCandidate2')
-    .addConditionalEdges('nodeGenerateCandidate2', edgeShouldRetry);
+    .addNode(
+        'nodeAlpha',
+        new NodeAlpha({
+            inputKeys: ['anchor', 'target', 'box'],
+        })
+    )
+    .addNode(
+        'nodeBeta',
+        new NodeBeta({
+            inputKeys: ['anchor', 'target'],
+            outputKeys: ['candidate'],
+            morphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+        })
+    )
+    .addNode(
+        'nodeGamma',
+        new NodeGamma({
+            inputKeys: ['candidate', 'target', 'box'],
+            outputKeys: ['docking', 'pose'],
+        })
+    )
+    .addNode(
+        'nodeAlpha2',
+        new NodeAlpha({
+            inputKeys: ['docking', 'pose'],
+        })
+    )
+    .addNode(
+        'nodeBeta2',
+        new NodeBeta({
+            inputKeys: ['docking', 'pose'],
+            outputKeys: ['decision'],
+            morphism: 'abc',
+        })
+    ) // ATTENTION
+    .addEdge(START, 'nodeAlpha')
+    .addEdge('nodeAlpha', 'nodeBeta')
+    .addEdge('nodeBeta', 'nodeGamma')
+    .addEdge('nodeGamma', 'nodeAlpha2')
+    .addEdge('nodeAlpha2', 'nodeBeta2')
+    .addConditionalEdges('nodeBeta2', edgeShouldRetry);
 
 export const graph = stateGraph.compile();
 

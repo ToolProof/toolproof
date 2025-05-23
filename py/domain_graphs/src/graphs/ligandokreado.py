@@ -760,24 +760,24 @@ def should_retry(state):
     """Conditional edge function to determine if we should retry candidate generation."""
     # print(f"State: {state}")
     if state.get("shouldRetry"):
-        return "nodeGenerateCandidate"
+        return "nodeBeta"
     else:
         return END
     
 
 alpha_graph = (
     StateGraph(GraphState)
-    .add_node("nodeLoadResources", node_load_inputs)
-    .add_node("nodeGenerateCandidate", node_generate_candidate)
+    .add_node("nodeAlpha", node_load_inputs)
+    .add_node("nodeBeta", node_generate_candidate)
     .add_node("nodeGenerateBox", node_generate_box)
-    .add_node("nodeInvokeDocking", node_invoke_docking)
+    .add_node("nodeGamma", node_invoke_docking)
     .add_node("nodeLoadResults", node_load_results)
     .add_node("nodeEvaluateResults", node_evaluate_results)
-    .add_edge(START, "nodeLoadResources")
-    .add_edge("nodeLoadResources", "nodeGenerateCandidate")
-    .add_edge("nodeGenerateCandidate", "nodeGenerateBox")
-    .add_edge("nodeGenerateBox", "nodeInvokeDocking")
-    .add_edge("nodeInvokeDocking", "nodeLoadResults")
+    .add_edge(START, "nodeAlpha")
+    .add_edge("nodeAlpha", "nodeBeta")
+    .add_edge("nodeBeta", "nodeGenerateBox")
+    .add_edge("nodeGenerateBox", "nodeGamma")
+    .add_edge("nodeGamma", "nodeLoadResults")
     .add_edge("nodeLoadResults", "nodeEvaluateResults")
     .add_conditional_edges("nodeEvaluateResults", should_retry)
     .compile()

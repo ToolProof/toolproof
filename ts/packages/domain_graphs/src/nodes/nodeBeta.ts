@@ -1,5 +1,5 @@
-import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
-import { ChunkInfo } from '../tools/chunkPDBContent';
+import { NodeSpec, BaseStateSpec, registerNode, morphismRegistry2, MorphismName2 } from '../types.js';
+import { ChunkInfo } from '../tools/chunkPDBContent.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
@@ -11,14 +11,15 @@ const openai = new OpenAI();
 
 type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
-class _NodeGenerateCandidate extends Runnable {
+class _NodeBeta extends Runnable {
 
     spec: {
         inputKeys: string[];
         outputKeys: string[];
+        morphism: MorphismName2;
     }
 
-    constructor(spec: { inputKeys: string[], outputKeys: string[]; }) {
+    constructor(spec: { inputKeys: string[], outputKeys: string[], morphism: MorphismName2; }) {
         super();
         this.spec = spec;
     }
@@ -79,7 +80,7 @@ class _NodeGenerateCandidate extends Runnable {
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({
-                    node: 'NodeGenerateCandidate',
+                    node: 'NodeBeta',
                 }));
                 ws.close();
             });
@@ -93,85 +94,21 @@ class _NodeGenerateCandidate extends Runnable {
             await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             return {
-                messages: [new AIMessage('NodeGenerateCandidate completed in DryRun mode')],
+                messages: [new AIMessage('NodeBeta completed in DryRun mode')],
             };
         }
 
         try {
-            const anchor = state.anchor.value;
-            const targetChunks = state.target.value;
 
-            if (!anchor || !targetChunks || targetChunks.length === 0) {
-                throw new Error('Missing required resources');
-            }
+            // Continue from here
+            // Need to look up the resources to pass from this.spec.inputKeys
+            // And the name and storage path of what's returned from this.spec.outputKeys
 
-            /* // Analyze chunks sequentially to maintain context
-            let analysisContext = '';
-            for (const chunk of targetChunks) {
-                const response = await openai.chat.completions.create({
-                    model: 'gpt-4o-mini',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'You are analyzing protein structure chunks to identify binding site characteristics. Focus on key residues and potential interaction points.'
-                        },
-                        {
-                            role: 'user',
-                            content: `
-                                    Analyze the following protein chunk:
-                                    Chain: ${chunk.chainId}
-                                    Residues: ${chunk.startResidue}-${chunk.endResidue}
-                                    
-                                    Structure:
-                                    ${chunk.content}
-                                    
-                                    Previous analysis context:
-                                    ${analysisContext}
-                                    
-                                    Identify potential binding interactions and suggest suitable ligand modifications.
-                                `
-                        }
-                    ],
-                    temperature: 0.7,
-                    max_tokens: 500
-                });
+            const loader = morphismRegistry2[this.spec.morphism];
+            if (!loader) throw new Error(`Unknown morphism: ${this.spec.morphism}`);
 
-                analysisContext += '\n' + (response.choices[0].message.content?.trim() || '');
-            }
-
-            // Generate final candidate using accumulated analysis
-            const finalResponse = await openai.chat.completions.create({
-                model: 'gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'Generate an optimized SMILES string for a new molecule that could bind effectively to the target based on ligand-receptor interactions.'
-                    },
-                    {
-                        role: 'user',
-                        content: `
-                                Using this target protein analysis:
-                                ${analysisContext}
-        
-                                And this anchor molecule SMILES:
-                                ${anchor}
-        
-                                Generate an optimized candidate molecule using single SMILES string.
-                                Respond with only the SMILES string.
-                            `
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 500
-            });
-
-            const candidate = finalResponse.choices[0].message.content?.trim(); */
-
-            const candidate = state.anchor.value; // ATTENTION: placeholder for now
-
-            if (!candidate) {
-                throw new Error('Failed to generate candidate SMILES string');
-            }
+            const fn = await loader(); // Load actual function
+            const value = await fn(); // Call function
 
             // Create Firestore document for the candidate in resources collection
             const timestamp = new Date().toISOString();
@@ -193,7 +130,7 @@ class _NodeGenerateCandidate extends Runnable {
                     });
 
                 return {
-                    messages: [new AIMessage('NodeGenerateCandidate completed')],
+                    messages: [new AIMessage('NodeBeta completed')],
                     candidate: {
                         path: filePath,
                         value: candidate,
@@ -206,9 +143,9 @@ class _NodeGenerateCandidate extends Runnable {
             }
 
         } catch (error: any) {
-            console.error('Error in NodeGenerateCandidate:', error);
+            console.error('Error in NodeBeta:', error);
             return {
-                messages: [new AIMessage('NodeGenerateCandidate failed')],
+                messages: [new AIMessage('NodeBeta failed')],
             };
         }
 
@@ -216,7 +153,7 @@ class _NodeGenerateCandidate extends Runnable {
 
 }
 
-export const NodeGenerateCandidate = registerNode<typeof _NodeGenerateCandidate>(_NodeGenerateCandidate);
+export const NodeBeta = registerNode<typeof _NodeBeta>(_NodeBeta);
 
 
 

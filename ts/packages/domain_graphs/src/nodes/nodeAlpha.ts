@@ -9,7 +9,7 @@ import WebSocket from 'ws';
 // ATTENTION: can this be simplified?
 type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
-class _NodeLoadResources extends Runnable {
+class _NodeAlpha extends Runnable {
 
     spec: {
         inputKeys: string[];
@@ -67,7 +67,7 @@ class _NodeLoadResources extends Runnable {
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({
-                    node: 'NodeLoadResources',
+                    node: 'NodeAlpha',
                 }));
                 ws.close();
             });
@@ -81,7 +81,7 @@ class _NodeLoadResources extends Runnable {
             await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             return {
-                messages: [new AIMessage('NodeLoadResources completed in DryRun mode')],
+                messages: [new AIMessage('NodeAlpha completed in DryRun mode')],
             };
         }
 
@@ -127,14 +127,14 @@ class _NodeLoadResources extends Runnable {
             }
 
             return {
-                messages: [new AIMessage('NodeLoadResources completed')],
+                messages: [new AIMessage('NodeAlpha completed')],
                 resourceMap,
             };
 
         } catch (error: any) {
-            console.error('Error in NodeLoadResources:', error);
+            console.error('Error in NodeAlpha:', error);
             return {
-                messages: [new AIMessage('NodeLoadResources failed')],
+                messages: [new AIMessage('NodeAlpha failed')],
             };
         }
 
@@ -142,4 +142,4 @@ class _NodeLoadResources extends Runnable {
 
 }
 
-export const NodeLoadResources = registerNode<typeof _NodeLoadResources>(_NodeLoadResources);
+export const NodeAlpha = registerNode<typeof _NodeAlpha>(_NodeAlpha);
