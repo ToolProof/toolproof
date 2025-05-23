@@ -1,5 +1,4 @@
 import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
-import { ChunkInfo } from '../tools/chunkPDBContent';
 import { bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
@@ -9,19 +8,20 @@ import axios from 'axios';
 import WebSocket from 'ws';
 
 
-export const NodeInvokeDockingState = Annotation.Root({
-    candidate: Annotation<{ path: string, value: string }>(),
-    target: Annotation<{ path: string, value: ChunkInfo[] }>(),
-    box: Annotation<{ path: string, value: ChunkInfo[] }>(),
-    docking: Annotation<{ path: string, value: Map<string, any> }>(),
-    pose: Annotation<{ path: string, value: Map<string, any> }>(),
-});
-
-type WithBaseState = typeof NodeInvokeDockingState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
+type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 
 class _NodeInvokeDocking extends Runnable {
+
+    spec: {
+        inputKeys: string[];
+        outputKeys: string[];
+    }
+
+    constructor(spec: { inputKeys: string[], outputKeys: string[]; }) {
+        super();
+        this.spec = spec;
+    }
 
     static nodeSpec: NodeSpec = {
         description: '',

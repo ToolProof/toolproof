@@ -9,17 +9,19 @@ import WebSocket from 'ws';
 
 const openai = new OpenAI();
 
-export const NodeGenerateCandidateState = Annotation.Root({
-    anchor: Annotation<{ path: string, value: string }>(),
-    target: Annotation<{ path: string, value: ChunkInfo[] }>(),
-    candidate: Annotation<{ path: string, value: string }>(),
-});
-
-type WithBaseState = typeof NodeGenerateCandidateState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
-
+type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 class _NodeGenerateCandidate extends Runnable {
+
+    spec: {
+        inputKeys: string[];
+        outputKeys: string[];
+    }
+
+    constructor(spec: { inputKeys: string[], outputKeys: string[]; }) {
+        super();
+        this.spec = spec;
+    }
 
     static nodeSpec: NodeSpec = {
         description: '',

@@ -6,14 +6,16 @@ import { Annotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-
+// ATTENTION: can this be simplified?
 type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
 class _NodeLoadResources extends Runnable {
 
-    spec: string[];
+    spec: {
+        inputKeys: string[];
+    }
 
-    constructor(spec: string[]) {
+    constructor(spec: { inputKeys: string[]; }) {
         super();
         this.spec = spec;
     }
@@ -89,7 +91,7 @@ class _NodeLoadResources extends Runnable {
 
             for (const key of Object.keys(state.resourceMap)) {
 
-                if (!this.spec.includes(key)) {
+                if (!this.spec.inputKeys.includes(key)) {
                     console.log('Skipping resource:', key);
                     continue;
                 } else {
