@@ -4,7 +4,7 @@ import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 
 export const BaseStateSpec = {
     ...MessagesAnnotation.spec,
-    dryRunModeManager: Annotation<{
+    dryModeManager: Annotation<{
         dryRunMode: boolean;
         delay: number;
         drySocketMode: boolean;
@@ -33,7 +33,7 @@ export type ResourceRole =
 
 export type ResourceFormat = 'file' | 'path' | 'value';
 
-export type Resource<
+export type Resource2<
     Role extends ResourceRole = ResourceRole,
     Format extends ResourceFormat = ResourceFormat
 > = {
@@ -56,7 +56,7 @@ type BaseStorageOperation = {
  */
 export type PrivateStorageOperation = BaseStorageOperation & {
     storage: 'private';
-    resources: Resource<ResourceRole, 'path' | 'value'>[];
+    resources: Resource2<ResourceRole, 'path' | 'value'>[];
 };
 
 /**
@@ -64,7 +64,7 @@ export type PrivateStorageOperation = BaseStorageOperation & {
  */
 export type SharedStorageOperation = BaseStorageOperation & {
     storage: 'shared';
-    resources: Resource<ResourceRole, 'file'>[];
+    resources: Resource2<ResourceRole, 'file'>[];
 };
 
 /**
@@ -79,7 +79,7 @@ export type WritePrivateOperation = {
     kind: 'StorageOperation';
     direction: 'write';
     storage: 'private';
-    resources: Resource<ResourceRole, 'path' | 'value'>[];
+    resources: Resource2<ResourceRole, 'path' | 'value'>[];
 };
 
 // === Tool invocation ===
@@ -89,8 +89,8 @@ export type ToolInvocation = {
     name: string;
     description: string;
     deployment?: 'local' | 'internal' | 'external'; // ATTENTION: to be implemented
-    inputs: Resource<ResourceRole, 'path' | 'value'>[];
-    outputs: Resource<ResourceRole, 'path' | 'value'>[];
+    inputs: Resource2<ResourceRole, 'path' | 'value'>[];
+    outputs: Resource2<ResourceRole, 'path' | 'value'>[];
     operations: OperationDisallowPrivate[]; // tools cannot access private resources
 };
 
@@ -156,17 +156,19 @@ export type MorphismOutputTypes = {
     [M in MorphismName]: MorphismOutput<M>
 };
 
-
-// ATTENTION: should be named 'Resource' instead, but this conflicts with the Resource type above
-export type Input<M extends MorphismName = MorphismName> = {
+export type Resource<M extends MorphismName = MorphismName> = {
     path: string;
     morphism: M;
     value: MorphismOutputTypes[M];
 };
 
-// Can be used instead of Input to get narrowing based on the morphism
-/* type InputUnion = {
-    [M in MorphismName]: Input<M>
+// Can be used instead of Resource to get narrowing based on the morphism
+/* type ResourceUnion = {
+    [M in MorphismName]: Resource<M>
 }[MorphismName]; */
+
+export type ResourceMap = {
+    [key: string]: Resource;
+}
 
 

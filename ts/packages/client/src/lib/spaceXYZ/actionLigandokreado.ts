@@ -31,7 +31,7 @@ export async function runLigandokreado() {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                dryRunModeManager: {
+                dryModeManager: {
                     dryRunMode: false,
                     delay: 3000,
                     drySocketMode: false,

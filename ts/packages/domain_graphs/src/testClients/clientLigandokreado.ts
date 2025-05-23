@@ -26,28 +26,28 @@ export async function runRemoteGraph() {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
-                dryRunModeManager: {
+                dryModeManager: {
                     dryRunMode: false,
                     delay: 1000,
                     drySocketMode: true,
                 },
-                inputs: [
-                    {
+                resourceMap: {
+                    anchor: {
                         path: 'ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi',
                         morphism: 'doNothing',
                         value: null,
                     },
-                    {
+                    target: {
                         path: 'ligandokreado/1iep/target.pdb',
                         morphism: 'chunkPDBContent',
                         value: null,
                     },
-                    {
+                    box: {
                         path: 'ligandokreado/1iep/box.pdb',
                         morphism: 'chunkPDBContent',
                         value: null,
                     },
-                ]
+                },
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

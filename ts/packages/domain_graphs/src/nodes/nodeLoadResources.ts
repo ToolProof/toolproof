@@ -1,4 +1,4 @@
-import { Input, morphismRegistry } from '../types.js';
+import { ResourceMap, morphismRegistry } from '../types.js';
 import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
@@ -7,7 +7,7 @@ import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
 export const NodeLoadResourcesState = Annotation.Root({
-    inputs: Annotation<Input[]>(),
+    resourceMap: Annotation<ResourceMap>(),
 });
 
 type WithBaseState = typeof NodeLoadResourcesState.State &
@@ -15,9 +15,9 @@ type WithBaseState = typeof NodeLoadResourcesState.State &
 
 class _NodeLoadResources extends Runnable {
 
-    spec: string;
+    spec: string[];
 
-    constructor(spec: string) {
+    constructor(spec: string[]) {
         super();
         this.spec = spec;
     }
@@ -62,7 +62,7 @@ class _NodeLoadResources extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        if (!state.dryRunModeManager.drySocketMode) {
+        if (!state.dryModeManager.drySocketMode) {
 
             // Connect to WebSocket server
             const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
@@ -79,8 +79,8 @@ class _NodeLoadResources extends Runnable {
             });
         }
 
-        if (state.dryRunModeManager.dryRunMode) {
-            await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
+        if (state.dryModeManager.dryRunMode) {
+            await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             return {
                 messages: [new AIMessage('NodeLoadResources completed in DryRun mode')],
@@ -89,11 +89,20 @@ class _NodeLoadResources extends Runnable {
 
         try {
 
-            // Loading the inputs from SharedState into GraphState
+            let resourceMap = state.resourceMap;
 
-            const inputs = [];
+            for (const key of Object.keys(state.resourceMap)) {
 
-            for (const { path, morphism, value } of state.inputs) {
+                if (!this.spec.includes(key)) {
+                    console.log('Skipping resource:', key);
+                    continue;
+                } else {
+                    console.log('Processing resource:', key);
+                }
+
+                const resource = state.resourceMap[key];
+                const path = resource.path;
+                const morphism = resource.morphism;
 
                 try {
                     const [content] = await storage
@@ -109,11 +118,10 @@ class _NodeLoadResources extends Runnable {
                     const fn = await loader(); // Load actual function
                     const value = await fn(contentStringified); // Call function
 
-                    inputs.push({
-                        path,
-                        morphism,
-                        value
-                    });
+                    resourceMap[key] = {
+                        ...resource,
+                        value,
+                    }
 
                 } catch (downloadError: any) {
                     throw new Error(`Error while processing: ${downloadError.message}`);
@@ -121,8 +129,8 @@ class _NodeLoadResources extends Runnable {
             }
 
             return {
-                messages: [new AIMessage(this.spec)],
-                inputs,
+                messages: [new AIMessage('NodeLoadResources completed')],
+                resourceMap,
             };
 
         } catch (error: any) {

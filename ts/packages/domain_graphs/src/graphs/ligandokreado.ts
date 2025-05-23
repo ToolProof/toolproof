@@ -25,7 +25,7 @@ const GraphState = Annotation.Root({
 }; */
 
 const stateGraph = new StateGraph(GraphState)
-    .addNode('nodeLoadResources', new NodeLoadResources('Wasted Love')) // What about passing a graph-specific spec to the constructor?
+    .addNode('nodeLoadResources', new NodeLoadResources(['anchor', 'box']))
     /* .addNode('nodeGenerateCandidate', new NodeGenerateCandidate())
     .addNode('nodeInvokeDocking', new NodeInvokeDocking())
     .addNode('nodeLoadResults', new NodeLoadResults())

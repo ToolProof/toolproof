@@ -36,8 +36,8 @@ class _NodeAssembleGraphSpec extends Runnable {
 
     async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
 
-        /* if (state.dryRunModeManager.dryRunMode) {
-            await new Promise(resolve => setTimeout(resolve, state.dryRunModeManager.delay));
+        /* if (state.dryModeManager.dryRunMode) {
+            await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             // Connect to WebSocket server
             const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
