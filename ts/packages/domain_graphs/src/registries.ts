@@ -119,56 +119,6 @@ export const interMorphismRegistry = {
     def: async () => {
         return (s: string) => 'Asdfgh! ' + s;
     },
-    invokdDocking: async () => {
-        return (anchor: string, target: string, box: string): string[] => {
-            // Extract paths from the resources
-            /* const payload = {
-                ligand: `${bucketName}/${state.candidate.path}`,
-                receptor: `${bucketName}/${state.target.path}`,
-                box: `${bucketName}/${state.box.path}`,
-            };
-
-            // Create a new Map to store the results
-
-            const response = await axios.post(
-                'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
-                payload,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: 30 * 60 * 1000, // 30 minutes in milliseconds
-                }
-            );
-
-            const result = response.data;
-            // console.log('result:', result);
-
-            // Process actual results if available
-            if (result?.result?.uploaded_files) {
-                let dockingPath = '';
-                let posePath = '';
-
-                // Process each uploaded file
-                result.result.uploaded_files.forEach((filePath: string) => {
-                    const fileName = path.basename(filePath);
-
-                    // Determine file type based on extension
-                    if (fileName.endsWith('.pdbqt') || fileName.endsWith('.pdb')) {
-                        // This is the docking result file
-                        dockingPath = filePath;
-                    } else if (fileName.endsWith('.sdf')) {
-                        // This is the pose file
-                        posePath = filePath;
-                    }
-                });
-
-                if (!dockingPath || !posePath) {
-                    console.warn('Missing expected file types in response:', result.result.uploaded_files);
-                } */
-            return ['docking.pdbqt', 'pose.sdf']; // ATTENTION: placeholder for now
-        }
-    }
 } as const;
 
 
