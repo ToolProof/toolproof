@@ -27,7 +27,7 @@ export async function runRemoteGraph() {
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 dryModeManager: {
-                    dryRunMode: false,
+                    dryRunMode: true,
                     delay: 1000,
                     drySocketMode: true,
                 },

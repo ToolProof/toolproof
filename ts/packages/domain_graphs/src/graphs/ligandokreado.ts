@@ -29,17 +29,17 @@ const stateGraph = new StateGraph(GraphState)
         'nodeBeta',
         new NodeBeta({
             inputKeys: ['anchor', 'target'],
-            outputKeys: ['candidate'],
+            outputKey: 'decision',
+            outputDir: '',
             interMorphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
-            outputPath: '',
-            outputFileName: '',
         })
     )
     .addNode(
         'nodeGamma',
         new NodeGamma({
+            url: 'https://example.com/autodock',
             inputKeys: ['candidate', 'target', 'box'],
-            outputKeys: ['docking', 'pose'],
+            outputPath: '',
         })
     )
     .addNode(
@@ -52,10 +52,9 @@ const stateGraph = new StateGraph(GraphState)
         'nodeBeta2',
         new NodeBeta({
             inputKeys: ['docking', 'pose'],
-            outputKeys: ['decision'],
+            outputKey: 'decision',
+            outputDir: '',
             interMorphism: 'abc',
-            outputPath: '',
-            outputFileName: '',
         })
     ) // ATTENTION
     .addEdge(START, 'nodeAlpha')
