@@ -111,7 +111,7 @@ class _NodeGamma extends Runnable {
                 // Maybe the tool only needs to return the output keys...
 
                 // Extract paths from the resources
-                const payload = {
+                const payload = { // ATTENTION: consider changing the payload structure in the tool instead of relying on complex keys
                     ligand: `${bucketName}/${state.candidate.path}`,
                     receptor: `${bucketName}/${state.target.path}`,
                     box: `${bucketName}/${state.box.path}`,
