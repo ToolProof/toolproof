@@ -30,7 +30,7 @@ const stateGraph = new StateGraph(GraphState)
         new NodeBeta({
             inputKeys: ['anchor', 'target'],
             outputKeys: ['candidate'],
-            morphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            interMorphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
             outputPath: '',
             outputFileName: '',
         })
@@ -53,7 +53,7 @@ const stateGraph = new StateGraph(GraphState)
         new NodeBeta({
             inputKeys: ['docking', 'pose'],
             outputKeys: ['decision'],
-            morphism: 'abc',
+            interMorphism: 'abc',
             outputPath: '',
             outputFileName: '',
         })

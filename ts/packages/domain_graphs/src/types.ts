@@ -2,7 +2,7 @@ import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 
 type Resource = {
     path: string;
-    morphism: string;
+    intraMorphism: string;
     value: any; // ATTENTION
 }
 

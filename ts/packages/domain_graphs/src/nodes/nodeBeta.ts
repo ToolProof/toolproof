@@ -1,4 +1,4 @@
-import { morphismRegistry2 } from '../registries.js';
+import { interMorphismRegistry } from '../registries.js';
 import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
@@ -15,13 +15,12 @@ class _NodeBeta extends Runnable {
 
     spec: {
         inputKeys: string[];
-        outputKeys: string[];
-        morphism: string;
-        outputPath: string;
-        outputFileName: string;
+        outputKey: string;
+        outputDir: string;
+        interMorphism: string;
     }
 
-    constructor(spec: { inputKeys: string[], outputKeys: string[], morphism: string, outputPath: string, outputFileName: string; }) {
+    constructor(spec: { inputKeys: string[], outputKey: string, outputDir: string, interMorphism: string }) {
         super();
         this.spec = spec;
     }
@@ -114,8 +113,8 @@ class _NodeBeta extends Runnable {
                 }
             });
 
-            const loader = morphismRegistry2[this.spec.morphism as keyof typeof morphismRegistry2];
-            if (!loader) throw new Error(`Unknown morphism: ${this.spec.morphism}`);
+            const loader = interMorphismRegistry[this.spec.interMorphism as keyof typeof interMorphismRegistry];
+            if (!loader) throw new Error(`Unknown morphism: ${this.spec.interMorphism}`);
 
             const fn = await loader() as (...args: any[]) => string;
             const value = await fn(...inputs);
@@ -124,14 +123,10 @@ class _NodeBeta extends Runnable {
 
             try {
 
-                /* const firstTwoSegmentsOfAnchorPath = state.anchor.path.split('/').slice(0, 2).join('/');
-                const filePath = `${firstTwoSegmentsOfAnchorPath}/${timestamp}/candidate.smi`; */
-
-                // Save the candidate to Google Cloud Storage
                 await storage
                     .bucket(bucketName)
-                    .file(this.spec.outputPath)
-                    .save(this.spec.outputFileName, {
+                    .file(this.spec.outputDir)
+                    .save(this.spec.outputKey, {
                         contentType: 'text/plain',
                         metadata: {
                             createdAt: timestamp,
@@ -142,9 +137,9 @@ class _NodeBeta extends Runnable {
                     messages: [new AIMessage('NodeBeta completed')],
                     resourceMap: {
                         ...state.resourceMap,
-                        outputFileName: {
-                            path: this.spec.outputPath,
-                            morphism: '',
+                        outputKey: {
+                            path: `${this.spec.outputDir}/${this.spec.outputKey}`,
+                            intraMorphism: '', // ATTENTION: what about this?
                             value: value,
                         },
                     }

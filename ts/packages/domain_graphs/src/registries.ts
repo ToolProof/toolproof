@@ -1,5 +1,5 @@
 
-export const morphismRegistry = {
+export const intraMorphismRegistry = {
     doNothing: async () => {
         return (s: string) => 'Hallelujah! ' + s;
     },
@@ -9,10 +9,10 @@ export const morphismRegistry = {
     },
 } as const;
 
-/* export type MorphismName = keyof typeof morphismRegistry;
+/* export type MorphismName = keyof typeof intraMorphismRegistry;
 
 // Extracts the resolved return type of a loader (i.e. the function returned)
-type LoadedFunction<M extends MorphismName> = Awaited<ReturnType<typeof morphismRegistry[M]>>;
+type LoadedFunction<M extends MorphismName> = Awaited<ReturnType<typeof intraMorphismRegistry[M]>>;
 
 // Extracts the final return value of calling the loaded function
 type MorphismOutput<M extends MorphismName> = Awaited<ReturnType<LoadedFunction<M>>>;
@@ -41,7 +41,7 @@ export type ResourceMap = {
 
 import { ChunkInfo } from './tools/chunkPDBContent.js';
 
-export const morphismRegistry2 = {
+export const interMorphismRegistry = {
     abc: async () => {
         return (anchor: string, target: ChunkInfo[]) => {
 
@@ -120,8 +120,5 @@ export const morphismRegistry2 = {
         return (s: string) => 'Asdfgh! ' + s;
     },
 } as const;
-
-
-// export type MorphismName2 = keyof typeof morphismRegistry2;
 
 
