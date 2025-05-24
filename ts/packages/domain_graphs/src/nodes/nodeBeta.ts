@@ -101,10 +101,6 @@ class _NodeBeta extends Runnable {
 
         try {
 
-            // Continue from here
-            // Need to look up the resources to pass from this.spec.inputKeys
-            // And the name and storage path of what's returned from this.spec.outputKeys
-
             const inputs: any[] = [];
 
             Object.entries(state.resourceMap).forEach(([key, resource]) => {

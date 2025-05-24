@@ -1,4 +1,5 @@
-import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
+import { interMorphismRegistry } from '../registries.js';
+import { NodeSpec, BaseStateSpec, registerNode, ResourceMap } from '../types.js';
 import { bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
@@ -16,9 +17,10 @@ class _NodeGamma extends Runnable {
     spec: {
         inputKeys: string[];
         outputKeys: string[];
+        url: string;
     }
 
-    constructor(spec: { inputKeys: string[], outputKeys: string[]; }) {
+    constructor(spec: { inputKeys: string[], outputKeys: string[], url: string; }) {
         super();
         this.spec = spec;
     }
@@ -103,67 +105,33 @@ class _NodeGamma extends Runnable {
 
         try {
 
-            // Extract paths from the resources
-            const payload = {
-                ligand: `${bucketName}/${state.candidate.path}`,
-                receptor: `${bucketName}/${state.target.path}`,
-                box: `${bucketName}/${state.box.path}`,
-            };
-
-            // Create a new Map to store the results
-
-            const response = await axios.post(
-                'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
-                payload,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: 30 * 60 * 1000, // 30 minutes in milliseconds
-                }
-            );
-
-            const result = response.data;
-            // console.log('result:', result);
-
-            // Process actual results if available
-            if (result?.result?.uploaded_files) {
-                let dockingPath = '';
-                let posePath = '';
-
-                // Process each uploaded file
-                result.result.uploaded_files.forEach((filePath: string) => {
-                    const fileName = path.basename(filePath);
-
-                    // Determine file type based on extension
-                    if (fileName.endsWith('.pdbqt') || fileName.endsWith('.pdb')) {
-                        // This is the docking result file
-                        dockingPath = filePath;
-                    } else if (fileName.endsWith('.sdf')) {
-                        // This is the pose file
-                        posePath = filePath;
-                    }
-                });
-
-                if (!dockingPath || !posePath) {
-                    console.warn('Missing expected file types in response:', result.result.uploaded_files);
-                }
-
-                return {
-                    messages: [new AIMessage('NodeGamma completed')],
-                    docking: {
-                        path: dockingPath,
-                        value: new Map()
-                    },
-                    pose: {
-                        path: posePath,
-                        value: new Map()
-                    }
-                };
-            } else {
-                throw new Error('No uploaded files in response');
+            const foo = (url: string, inputs: string[], outputs: string[]): { [key: string]: string } => {
+                // Here we must invoke the service at the given URL
+                return { outputKey: 'outputPath' };
             }
 
+            const paths = foo(
+                this.spec.url,
+                this.spec.inputKeys,
+                this.spec.outputKeys
+            );
+
+            const extraResources: ResourceMap = this.spec.outputKeys.reduce((acc, key) => {
+                acc[key] = {
+                    path: paths[key],
+                    intraMorphism: '', // ATTENTION: must be set here so that NodeAlpha can use it
+                    value: null,
+                };
+                return acc;
+            }, {} as ResourceMap);
+
+            return {
+                messages: [new AIMessage('NodeGamma completed')],
+                resourceMap: {
+                    ...state.resourceMap,
+                    ...extraResources,
+                }
+            };
         } catch (error: any) {
             console.error('Error in NodeGamma:', error);
             return {

@@ -6,7 +6,7 @@ type Resource = {
     value: any; // ATTENTION
 }
 
-type ResourceMap = {
+export type ResourceMap = {
     [key: string]: Resource;
 }
 
