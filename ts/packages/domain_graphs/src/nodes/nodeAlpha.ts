@@ -1,4 +1,4 @@
-import { ResourceMap, morphismRegistry } from '../types.js';
+import { morphismRegistry } from '../registries.js';
 import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
@@ -110,7 +110,7 @@ class _NodeAlpha extends Runnable {
 
                     const contentStringified = content.toString()
 
-                    const loader = morphismRegistry[morphism];
+                    const loader = morphismRegistry[morphism as keyof typeof morphismRegistry]; // ATTENTION
                     if (!loader) throw new Error(`Unknown morphism: ${morphism}`);
 
                     const fn = await loader(); // Load actual function

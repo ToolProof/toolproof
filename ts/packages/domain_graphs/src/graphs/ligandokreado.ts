@@ -30,7 +30,9 @@ const stateGraph = new StateGraph(GraphState)
         new NodeBeta({
             inputKeys: ['anchor', 'target'],
             outputKeys: ['candidate'],
-            morphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            morphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            outputPath: '',
+            outputFileName: '',
         })
     )
     .addNode(
@@ -52,6 +54,8 @@ const stateGraph = new StateGraph(GraphState)
             inputKeys: ['docking', 'pose'],
             outputKeys: ['decision'],
             morphism: 'abc',
+            outputPath: '',
+            outputFileName: '',
         })
     ) // ATTENTION
     .addEdge(START, 'nodeAlpha')

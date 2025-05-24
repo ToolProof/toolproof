@@ -1,5 +1,5 @@
-import { NodeSpec, BaseStateSpec, registerNode, morphismRegistry2, MorphismName2 } from '../types.js';
-import { ChunkInfo } from '../tools/chunkPDBContent.js';
+import { morphismRegistry2 } from '../registries.js';
+import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
@@ -16,10 +16,12 @@ class _NodeBeta extends Runnable {
     spec: {
         inputKeys: string[];
         outputKeys: string[];
-        morphism: MorphismName2;
+        morphism: string;
+        outputPath: string;
+        outputFileName: string;
     }
 
-    constructor(spec: { inputKeys: string[], outputKeys: string[], morphism: MorphismName2; }) {
+    constructor(spec: { inputKeys: string[], outputKeys: string[], morphism: string, outputPath: string, outputFileName: string; }) {
         super();
         this.spec = spec;
     }
@@ -104,25 +106,32 @@ class _NodeBeta extends Runnable {
             // Need to look up the resources to pass from this.spec.inputKeys
             // And the name and storage path of what's returned from this.spec.outputKeys
 
-            const loader = morphismRegistry2[this.spec.morphism];
+            const inputs: any[] = [];
+
+            Object.entries(state.resourceMap).forEach(([key, resource]) => {
+                if (this.spec.inputKeys.includes(key)) {
+                    inputs.push(resource.value);
+                }
+            });
+
+            const loader = morphismRegistry2[this.spec.morphism as keyof typeof morphismRegistry2];
             if (!loader) throw new Error(`Unknown morphism: ${this.spec.morphism}`);
 
-            const fn = await loader(); // Load actual function
-            const value = await fn(); // Call function
+            const fn = await loader() as (...args: any[]) => string;
+            const value = await fn(...inputs);
 
-            // Create Firestore document for the candidate in resources collection
             const timestamp = new Date().toISOString();
 
             try {
 
-                const firstTwoSegmentsOfAnchorPath = state.anchor.path.split('/').slice(0, 2).join('/');
-                const filePath = `${firstTwoSegmentsOfAnchorPath}/${timestamp}/candidate.smi`;
+                /* const firstTwoSegmentsOfAnchorPath = state.anchor.path.split('/').slice(0, 2).join('/');
+                const filePath = `${firstTwoSegmentsOfAnchorPath}/${timestamp}/candidate.smi`; */
 
                 // Save the candidate to Google Cloud Storage
                 await storage
                     .bucket(bucketName)
-                    .file(filePath)
-                    .save(candidate, {
+                    .file(this.spec.outputPath)
+                    .save(this.spec.outputFileName, {
                         contentType: 'text/plain',
                         metadata: {
                             createdAt: timestamp,
@@ -131,9 +140,13 @@ class _NodeBeta extends Runnable {
 
                 return {
                     messages: [new AIMessage('NodeBeta completed')],
-                    candidate: {
-                        path: filePath,
-                        value: candidate,
+                    resourceMap: {
+                        ...state.resourceMap,
+                        outputFileName: {
+                            path: this.spec.outputPath,
+                            morphism: '',
+                            value: value,
+                        },
                     }
                 };
 
