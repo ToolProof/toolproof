@@ -14,9 +14,10 @@ def autodock_basic():
         
         try:
             # Extract arguments from JSON payload
-            ligand = data.get('ligand')
-            receptor = data.get('receptor')
+            ligand = data.get('candidate')
+            receptor = data.get('target')
             box = data.get('box')
+            outputPath = data.get('outputPath')
             
             # Log the extracted values
             print(f'Ligand: {ligand}, Receptor: {receptor}, Box: {box}')

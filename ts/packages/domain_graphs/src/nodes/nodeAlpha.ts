@@ -87,7 +87,7 @@ class _NodeAlpha extends Runnable {
 
         try {
 
-            let resourceMap = state.resourceMap;
+            const resourceMap = state.resourceMap;
 
             for (const key of Object.keys(state.resourceMap)) {
 
@@ -100,7 +100,6 @@ class _NodeAlpha extends Runnable {
 
                 const resource = state.resourceMap[key];
                 const path = resource.path;
-                const morphism = resource.intraMorphism;
 
                 try {
                     const [content] = await storage
@@ -108,10 +107,12 @@ class _NodeAlpha extends Runnable {
                         .file(path)
                         .download();
 
-                    const contentStringified = content.toString()
+                    const contentStringified = content.toString();
 
-                    const loader = intraMorphismRegistry[morphism as keyof typeof intraMorphismRegistry]; // ATTENTION
-                    if (!loader) throw new Error(`Unknown morphism: ${morphism}`);
+                    const intraMorphism = resource.intraMorphism;
+
+                    const loader = intraMorphismRegistry[intraMorphism as keyof typeof intraMorphismRegistry]; // ATTENTION
+                    if (!loader) throw new Error(`Unknown morphism: ${intraMorphism}`);
 
                     const fn = await loader(); // Load actual function
                     const value = await fn(contentStringified); // Call function

@@ -101,27 +101,28 @@ class _NodeGamma extends Runnable {
             };
         }
 
-
         try {
 
-            const foo = async (url: string, inputKeys: string[], outputPath: string): Promise<{ [key: string]: string }> => {
+            const foo = async (url: string, inputKeys: string[], outputPath: string): Promise<string[]> => {
                 // Here we must invoke the service at the given URL
                 // This function cannot know about anything specific to Ligandokreado
                 // spec must specify all neccessary parameters
                 // Maybe the tool only needs to return the output keys...
 
-                // Extract paths from the resources
-                const payload = { // ATTENTION: consider changing the payload structure in the tool instead of relying on complex keys
-                    ligand: `${bucketName}/${state.candidate.path}`,
-                    receptor: `${bucketName}/${state.target.path}`,
-                    box: `${bucketName}/${state.box.path}`,
-                };
+                const payload: { [key: string]: string } = {};
+
+                inputKeys.forEach((key) => {
+                    payload[key] = `${bucketName}/${state.resourceMap[key].path}`;
+                });
 
                 // Create a new Map to store the results
 
                 const response = await axios.post(
-                    'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
-                    payload,
+                    url,
+                    {
+                        ...payload,
+                        outputPath: `${bucketName}/${outputPath}`,
+                    },
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -134,41 +135,19 @@ class _NodeGamma extends Runnable {
                 // console.log('result:', result);
 
                 // Process actual results if available
-                if (result?.result?.uploaded_files) {
-                    let dockingPath = '';
-                    let posePath = '';
 
-                    // Process each uploaded file
-                    result.result.uploaded_files.forEach((filePath: string) => {
-                        const fileName = path.basename(filePath);
-
-                        // Determine file type based on extension
-                        if (fileName.endsWith('.pdbqt') || fileName.endsWith('.pdb')) {
-                            // This is the docking result file
-                            dockingPath = filePath;
-                        } else if (fileName.endsWith('.sdf')) {
-                            // This is the pose file
-                            posePath = filePath;
-                        }
-                    });
-
-                    if (!dockingPath || !posePath) {
-                        console.warn('Missing expected file types in response:', result.result.uploaded_files);
-                    }
-
-                }
-                return { outputKey: 'outputPath' };
+                return result.result.outputKeys;
             }
 
-            const paths = await foo(
+            const outputKeys = await foo(
                 this.spec.url,
                 this.spec.inputKeys,
                 this.spec.outputPath
             );
 
-            const extraResources: ResourceMap = Object.keys(paths).reduce((acc, key) => {
+            const extraResources: ResourceMap = outputKeys.reduce((acc, key) => {
                 acc[key] = {
-                    path: paths[key],
+                    path: path.join(this.spec.outputPath, key),
                     intraMorphism: '', // ATTENTION: must be set here so that NodeAlpha can use it
                     value: null,
                 };

@@ -1,7 +1,7 @@
 
 export const intraMorphismRegistry = {
     doNothing: async () => {
-        return (s: string) => 'Hallelujah! ' + s;
+        return (s: string) => s;
     },
     chunkPDBContent: async () => {
         const { chunkPDBContent } = await import('./tools/chunkPDBContent.js');

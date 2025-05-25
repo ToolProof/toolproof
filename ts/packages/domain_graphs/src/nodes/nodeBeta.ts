@@ -16,11 +16,12 @@ class _NodeBeta extends Runnable {
     spec: {
         inputKeys: string[];
         outputKey: string;
+        intraMorphism: string; // ATTENTION: should be packed with the outputKey
         outputDir: string;
         interMorphism: string;
     }
 
-    constructor(spec: { inputKeys: string[], outputKey: string, outputDir: string, interMorphism: string }) {
+    constructor(spec: { inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string }) {
         super();
         this.spec = spec;
     }
@@ -113,16 +114,19 @@ class _NodeBeta extends Runnable {
             if (!loader) throw new Error(`Unknown morphism: ${this.spec.interMorphism}`);
 
             const fn = await loader() as (...args: any[]) => string;
-            const value = await fn(...inputs);
+            const value = await fn(...inputs); // ATTENTION: is the type misleading?
 
             const timestamp = new Date().toISOString();
+            const outputPath = `${this.spec.outputDir}/${timestamp}/${this.spec.outputKey}`;
+            // ATTENTION: nodeBeta should be passed a piece of logic that generates outputPath, or generate the timestamp callside
+            // ATTENTION: use join path
 
             try {
 
                 await storage
                     .bucket(bucketName)
-                    .file(this.spec.outputDir)
-                    .save(this.spec.outputKey, {
+                    .file(outputPath)
+                    .save(value, {
                         contentType: 'text/plain',
                         metadata: {
                             createdAt: timestamp,
@@ -133,9 +137,9 @@ class _NodeBeta extends Runnable {
                     messages: [new AIMessage('NodeBeta completed')],
                     resourceMap: {
                         ...state.resourceMap,
-                        outputKey: {
-                            path: `${this.spec.outputDir}/${this.spec.outputKey}`,
-                            intraMorphism: '', // ATTENTION: what about this?
+                        [this.spec.outputKey]: {
+                            path: `${outputPath}/${this.spec.outputKey}`,
+                            intraMorphism: this.spec.intraMorphism,
                             value: value,
                         },
                     }

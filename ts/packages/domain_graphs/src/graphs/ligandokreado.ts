@@ -29,19 +29,21 @@ const stateGraph = new StateGraph(GraphState)
         'nodeBeta',
         new NodeBeta({
             inputKeys: ['anchor', 'target'],
-            outputKey: 'decision',
-            outputDir: '',
-            interMorphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            outputKey: 'candidate',
+            intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
+            outputDir: 'ligandokreado/1iep',
+            interMorphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
         })
     )
     .addNode(
         'nodeGamma',
         new NodeGamma({
-            url: 'https://example.com/autodock',
+            url: 'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
             inputKeys: ['candidate', 'target', 'box'],
             outputPath: '',
         })
     )
+    /*
     .addNode(
         'nodeAlpha2',
         new NodeAlpha({
@@ -56,13 +58,15 @@ const stateGraph = new StateGraph(GraphState)
             outputDir: '',
             interMorphism: 'abc',
         })
-    ) // ATTENTION
+    ) */ // ATTENTION
     .addEdge(START, 'nodeAlpha')
     .addEdge('nodeAlpha', 'nodeBeta')
     .addEdge('nodeBeta', 'nodeGamma')
-    .addEdge('nodeGamma', 'nodeAlpha2')
-    .addEdge('nodeAlpha2', 'nodeBeta2')
-    .addConditionalEdges('nodeBeta2', edgeShouldRetry);
+    .addEdge('nodeGamma', END)
+/*
+.addEdge('nodeGamma', 'nodeAlpha2')
+.addEdge('nodeAlpha2', 'nodeBeta2')
+.addConditionalEdges('nodeBeta2', edgeShouldRetry); */
 
 export const graph = stateGraph.compile();
 
