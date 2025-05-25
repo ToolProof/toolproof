@@ -220,6 +220,6 @@ def run_simulation(ligand, receptor, box):
         if failed_files:
             return {"status": "partial_success", "uploaded_files": success_files, "failed_files": failed_files}
         return {"status": "success", "uploaded_files": success_files, "foldername": foldername, "filename_docking": os.path.basename(docking), "filename_pose": os.path.basename(pose),
-        "outputKeys"=["docking", "pose"]} 
+        "outputKeys": ["docking", "pose"]} 
     except Exception as e:
         raise RuntimeError(f"Workflow failed: {e}")

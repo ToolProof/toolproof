@@ -40,7 +40,7 @@ const stateGraph = new StateGraph(GraphState)
         new NodeGamma({
             url: 'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
             inputKeys: ['candidate', 'target', 'box'],
-            outputPath: '',
+            outputPath: 'dummyPath',
         })
     )
     /*

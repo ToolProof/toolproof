@@ -16,7 +16,7 @@ class _NodeGamma extends Runnable {
     spec: {
         url: string;
         inputKeys: string[];
-        outputPath: string;
+        outputPath: string; // ATTENTION: should be named outputDir for consistency
     }
 
     constructor(spec: { url: string, inputKeys: string[], outputPath: string; }) {
@@ -132,9 +132,8 @@ class _NodeGamma extends Runnable {
                 );
 
                 const result = response.data;
-                // console.log('result:', result);
 
-                // Process actual results if available
+                // console.log('result:', result);
 
                 return result.result.outputKeys;
             }
