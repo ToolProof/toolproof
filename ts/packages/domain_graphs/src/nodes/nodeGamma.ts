@@ -115,7 +115,7 @@ class _NodeGamma extends Runnable {
                     payload[key] = `${bucketName}/${state.resourceMap[key].path}`;
                 });
 
-                // Create a new Map to store the results
+                console.log('payload:', JSON.stringify(payload, null, 2));
 
                 const response = await axios.post(
                     url,
