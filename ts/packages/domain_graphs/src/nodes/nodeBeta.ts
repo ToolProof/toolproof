@@ -70,7 +70,7 @@ export class NodeBeta extends NodeBase<TSpec> {
             try {
 
                 const timestamp = new Date().toISOString();
-                const outputPath = this.spec.outputSpec.path.replace('{timestamp}', timestamp);
+                const outputPath = this.spec.outputSpec.path.replace('timestamp', timestamp);
                 // ATTENTION: consider passing a piece of logic to generate outputPath
 
                 await storage

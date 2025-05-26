@@ -82,9 +82,9 @@ export class NodeGamma extends NodeBase<TSpec> {
 
                 const result = response.data;
 
-                // console.log('result:', result);
+                console.log('result tool:', JSON.stringify(result, null, 2));
 
-                return result.result.outputFiles;
+                return result.result.uploaded_files;
             }
 
             const outputDir = path.dirname(state.resourceMap[this.spec.outputDir].path); // ATTENTION: temporary hack 
@@ -98,7 +98,7 @@ export class NodeGamma extends NodeBase<TSpec> {
             const extraResources: ResourceMap = outputFiles.reduce((acc, file) => {
                 acc[file.split('.')[0]] = {
                     path: path.join(outputDir, file),
-                    intraMorphism: this.spec.intraMorphism, // ATTENTION: what about this?
+                    intraMorphism: 'doNothing', // this.spec.intraMorphism, // ATTENTION: what about this? Could allocate it dynamically based on the file extension?
                     value: null,
                 };
                 return acc;
