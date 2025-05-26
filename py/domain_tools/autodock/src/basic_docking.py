@@ -166,7 +166,7 @@ def retrieve_gcs_files(**kwargs):
     return local_files
 
 
-def run_simulation(ligand, receptor, box):
+def run_simulation(ligand, receptor, box, dirname):
     try:
         clear_tmp()  # Clear temp files before running
         
@@ -190,8 +190,6 @@ def run_simulation(ligand, receptor, box):
         
         pose = export_pose(docking) 
         
-        foldername = os.path.dirname(ligand)
-        
         # Upload files to GCS
         
         files_to_upload = [
@@ -205,7 +203,7 @@ def run_simulation(ligand, receptor, box):
         # Upload files to GCS
         for local_path, filename in files_to_upload:
             if os.path.exists(local_path):
-                if upload_to_gcs(local_path, foldername, filename):
+                if upload_to_gcs(local_path, dirname, filename):
                     success_files.append(filename)
                 else:
                     failed_files.append(filename)
@@ -219,7 +217,6 @@ def run_simulation(ligand, receptor, box):
 
         if failed_files:
             return {"status": "partial_success", "uploaded_files": success_files, "failed_files": failed_files}
-        return {"status": "success", "uploaded_files": success_files, "foldername": foldername, "filename_docking": os.path.basename(docking), "filename_pose": os.path.basename(pose),
-        "outputKeys": ["docking", "pose"]} 
+        return {"status": "success", "uploaded_files": success_files, "output_files": ["docking.pdbqt", "pose.sdf"]} 
     except Exception as e:
         raise RuntimeError(f"Workflow failed: {e}")

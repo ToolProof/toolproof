@@ -84,21 +84,21 @@ export class NodeGamma extends NodeBase<TSpec> {
 
                 // console.log('result:', result);
 
-                return result.result.outputKeys;
+                return result.result.outputFiles;
             }
 
-            const outputDir = path.dirname(state.resourceMap[this.spec.outputDir].path); // ATTENTION: temporary hack
+            const outputDir = path.dirname(state.resourceMap[this.spec.outputDir].path); // ATTENTION: temporary hack 
 
-            const outputKeys = await foo(
+            const outputFiles = await foo(
                 this.spec.interMorphism,
                 this.spec.inputKeys,
                 outputDir
             );
 
-            const extraResources: ResourceMap = outputKeys.reduce((acc, key) => {
-                acc[key] = {
-                    path: path.join(outputDir, key === 'docking' ? 'docking.pdbqt' : 'pose.sdf'), // ATTENTION: temporary hack // ATTENTION: must do this for candidate, too
-                    intraMorphism: this.spec.intraMorphism,
+            const extraResources: ResourceMap = outputFiles.reduce((acc, file) => {
+                acc[file.split('.')[0]] = {
+                    path: path.join(outputDir, file),
+                    intraMorphism: this.spec.intraMorphism, // ATTENTION: what about this?
                     value: null,
                 };
                 return acc;

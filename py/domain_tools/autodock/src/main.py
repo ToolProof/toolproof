@@ -17,13 +17,13 @@ def autodock_basic():
             ligand = data.get('candidate')
             receptor = data.get('target')
             box = data.get('box')
-            outputDir = data.get('outputDir')
+            dirname = data.get('outputDir')
             
             # Log the extracted values
             print(f'Ligand: {ligand}, Receptor: {receptor}, Box: {box}')
 
             # Call the workflow from basic_docking
-            result = basic_docking.run_simulation(ligand, receptor, box)
+            result = basic_docking.run_simulation(ligand, receptor, box, dirname)
             return jsonify({'message': 'Automation completed successfully', 'result': result}), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500
