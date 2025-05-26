@@ -8,7 +8,7 @@ import { StateGraph, START, END } from '@langchain/langgraph';
 
 const edgeShouldRetry = (state: GraphState) => {
     // console.log('state :', state);
-    if (state.resourceMap.shouldRetry.value) {
+    if (state.metaResourceMap.shouldRetry) {
         console.log('edgeShouldRetry: shouldRetry is true');
         return 'nodeBeta';
     } else {

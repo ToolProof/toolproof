@@ -69,7 +69,7 @@ export class NodeDelta extends NodeBase<{ inputKeys: string[], outputKey: string
             return {
                 messages: [new AIMessage('NodeDelta completed')],
                 metaResourceMap: {
-                    ...state.metaResourceMap,
+                    ...(state.metaResourceMap ?? {}),
                     [this.spec.outputKey]: value,
                 }
             };
