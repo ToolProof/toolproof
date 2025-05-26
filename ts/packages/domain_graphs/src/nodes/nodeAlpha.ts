@@ -17,8 +17,6 @@ export class NodeAlpha extends NodeBase<{ inputKeys: string[]; }> {
         this.spec = spec;
     }
 
-    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
-
     async invoke(state: GraphState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<GraphState>> {
 
         if (!state.dryModeManager.drySocketMode) {

@@ -36,4 +36,6 @@ export abstract class NodeBase<TSpec> extends Runnable {
 
     abstract spec: TSpec;
 
+    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
+
 }
