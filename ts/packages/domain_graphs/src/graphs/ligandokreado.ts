@@ -42,7 +42,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         new NodeGamma({
             inputKeys: ['candidate', 'target', 'box'],
             outputDir: 'candidate', // ATTENTION: indicates same directory as candidate
-            interMorphism: 'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
+            interMorphism: 'https://service-autodock-384484325421.europe-west2.run.app/autodock_basic',
         })
     )
     .addNode(
