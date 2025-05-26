@@ -1,7 +1,7 @@
 import { Annotation, MessagesAnnotation } from '@langchain/langgraph';
 import { Runnable } from '@langchain/core/runnables';
 
-type Resource = {
+export type Resource = {
     path: string;
     intraMorphism: string;
     value: any; // ATTENTION

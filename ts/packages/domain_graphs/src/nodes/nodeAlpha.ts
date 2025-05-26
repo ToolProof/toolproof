@@ -5,14 +5,15 @@ import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
+interface TSpec {
+    inputKeys: string[];
+}
 
-export class NodeAlpha extends NodeBase<{ inputKeys: string[]; }> {
+export class NodeAlpha extends NodeBase<TSpec> {
 
-    spec: {
-        inputKeys: string[];
-    }
-
-    constructor(spec: { inputKeys: string[]; }) {
+    spec: TSpec;
+    
+    constructor(spec: TSpec) {
         super();
         this.spec = spec;
     }

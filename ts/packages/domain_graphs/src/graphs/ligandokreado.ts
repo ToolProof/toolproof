@@ -27,9 +27,12 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         'nodeBeta',
         new NodeBeta({
             inputKeys: ['anchor', 'target'],
-            outputKey: 'candidate',
-            intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
-            outputDir: 'ligandokreado/1iep',
+            outputSpec: {
+                outputKey: 'candidate',
+                path: 'ligandokreado/1iep/timestamp/candidate.smi',
+                intraMorphism: 'doNothing',
+                value: null,
+            },
             interMorphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
             writeToPrivate: true,
         })
@@ -37,10 +40,9 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeGamma',
         new NodeGamma({
-            url: 'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
             inputKeys: ['candidate', 'target', 'box'],
-            outputDir: 'candidate',
-            intraMorphism: 'doNothing', // ATTENTION: should be packed with the output keys
+            outputDir: 'candidate', // ATTENTION: indicates same directory as candidate
+            interMorphism: 'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
         })
     )
     .addNode(

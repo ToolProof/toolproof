@@ -6,17 +6,17 @@ import * as path from 'path';
 import axios from 'axios';
 import WebSocket from 'ws';
 
+interface TSpec {
+    inputKeys: string[];
+    outputDir: string;
+    interMorphism: string;
+}
 
-export class NodeGamma extends NodeBase<{ url: string, inputKeys: string[], outputDir: string, intraMorphism: string; }> {
+export class NodeGamma extends NodeBase<TSpec> {
 
-    spec: {
-        url: string;
-        inputKeys: string[];
-        outputDir: string;
-        intraMorphism: string; // ATTENTION: should be packed with the output keys
-    }
+    spec: TSpec;
 
-    constructor(spec: { url: string, inputKeys: string[], outputDir: string, intraMorphism: string; }) {
+    constructor(spec: TSpec) {
         super();
         this.spec = spec;
     }
@@ -90,7 +90,7 @@ export class NodeGamma extends NodeBase<{ url: string, inputKeys: string[], outp
             const outputDir = path.dirname(state.resourceMap[this.spec.outputDir].path); // ATTENTION: temporary hack
 
             const outputKeys = await foo(
-                this.spec.url,
+                this.spec.interMorphism,
                 this.spec.inputKeys,
                 outputDir
             );
