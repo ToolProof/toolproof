@@ -54,10 +54,10 @@ def download_from_gcs(remote_path):
         raise
 
 # ATTENTION: This method is now tied to explicit basic_docking logic
-def upload_to_gcs(local_path, foldername, filename):
+def upload_to_gcs(local_path, dirname, filename):
     """Uploads a file to GCS."""
     try:
-        bucketname, blobname = foldername.split("/", 1)
+        bucketname, blobname = dirname.split("/", 1)
         blobname = os.path.join(blobname, filename)
         bucket = storage_client.bucket(bucketname)
         blob = bucket.blob(blobname)
