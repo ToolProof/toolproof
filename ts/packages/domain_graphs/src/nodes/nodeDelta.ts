@@ -8,7 +8,7 @@ import WebSocket from 'ws';
 
 const openai = new OpenAI();
 
-export class NodeBeta extends NodeBase<{ inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string, writeToPrivate: boolean }> {
+export class NodeDelta extends NodeBase<{ inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string }> {
 
     spec: {
         inputKeys: string[];
@@ -16,10 +16,9 @@ export class NodeBeta extends NodeBase<{ inputKeys: string[], outputKey: string,
         intraMorphism: string; // ATTENTION: should be packed with the outputKey
         outputDir: string;
         interMorphism: string;
-        writeToPrivate: boolean;
     }
 
-    constructor(spec: { inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string, writeToPrivate: boolean; }) {
+    constructor(spec: { inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string; }) {
         super();
         this.spec = spec;
     }
@@ -33,7 +32,7 @@ export class NodeBeta extends NodeBase<{ inputKeys: string[], outputKey: string,
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({
-                    node: 'NodeBeta',
+                    node: 'NodeDelta',
                 }));
                 ws.close();
             });
@@ -47,7 +46,7 @@ export class NodeBeta extends NodeBase<{ inputKeys: string[], outputKey: string,
             await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             return {
-                messages: [new AIMessage('NodeBeta completed in DryRun mode')],
+                messages: [new AIMessage('NodeDelta completed in DryRun mode')],
             };
         }
 
@@ -67,44 +66,18 @@ export class NodeBeta extends NodeBase<{ inputKeys: string[], outputKey: string,
             const fn = await loader() as (...args: any[]) => string;
             const value = await fn(...inputs); // ATTENTION: is the type misleading?
 
-            try {
-
-                const timestamp = new Date().toISOString();
-                const outputPath = `${this.spec.outputDir}/${timestamp}/${this.spec.outputKey}`;
-                // ATTENTION: nodeBeta should be passed a piece of logic that generates outputPath, or generate the timestamp callside
-                // ATTENTION: use join path
-
-                await storage
-                    .bucket(bucketName)
-                    .file(outputPath)
-                    .save(value, {
-                        contentType: 'text/plain',
-                        metadata: {
-                            createdAt: timestamp,
-                        }
-                    });
-
-                return {
-                    messages: [new AIMessage('NodeBeta completed')],
-                    resourceMap: this.spec.writeToPrivate ? {
-                        ...state.resourceMap,
-                        [this.spec.outputKey]: {
-                            path: `${outputPath}`,
-                            intraMorphism: this.spec.intraMorphism,
-                            value: value,
-                        },
-                    }
-                        : state.resourceMap,
-                };
-
-            } catch (error: any) {
-                throw new Error(`Error while saving output: ${error.message}`);
-            }
+            return {
+                messages: [new AIMessage('NodeDelta completed')],
+                metaResourceMap: {
+                    ...state.metaResourceMap,
+                    [this.spec.outputKey]: value,
+                }
+            };
 
         } catch (error: any) {
-            console.error('Error in NodeBeta:', error);
+            console.error('Error in NodeDelta:', error);
             return {
-                messages: [new AIMessage('NodeBeta failed')],
+                messages: [new AIMessage('NodeDelta failed')],
             };
         }
 

@@ -2,6 +2,7 @@ import { GraphStateAnnotationRoot, GraphState } from '../types.js';
 import { NodeAlpha } from '../nodes/nodeAlpha.js';
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
+import { NodeDelta } from '../nodes/nodeDelta.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
@@ -30,7 +31,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
             outputDir: 'ligandokreado/1iep',
             interMorphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
-            writeToShared: true,
+            writeToPrivate: true,
         })
     )
     .addNode(
@@ -49,22 +50,21 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         })
     )
     .addNode(
-        'nodeBeta2',
-        new NodeBeta({
+        'nodeDelta',
+        new NodeDelta({
             inputKeys: ['docking', 'pose'],
             outputKey: 'shouldRetry',
             intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
             outputDir: '',
             interMorphism: 'def',
-            writeToShared: false,
         })
-    ) // ATTENTION
+    )
     .addEdge(START, 'nodeAlpha')
     .addEdge('nodeAlpha', 'nodeBeta')
     .addEdge('nodeBeta', 'nodeGamma')
     .addEdge('nodeGamma', 'nodeAlpha2')
-    .addEdge('nodeAlpha2', 'nodeBeta2')
-    .addConditionalEdges('nodeBeta2', edgeShouldRetry);
+    .addEdge('nodeAlpha2', 'nodeDelta')
+    .addConditionalEdges('nodeDelta', edgeShouldRetry);
 
 export const graph = stateGraph.compile();
 
