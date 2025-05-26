@@ -54,8 +54,6 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         new NodeDelta({
             inputKeys: ['docking', 'pose'],
             outputKey: 'shouldRetry',
-            intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
-            outputDir: '',
             interMorphism: 'def',
         })
     )

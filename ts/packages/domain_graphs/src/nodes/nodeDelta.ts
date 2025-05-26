@@ -8,17 +8,15 @@ import WebSocket from 'ws';
 
 const openai = new OpenAI();
 
-export class NodeDelta extends NodeBase<{ inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string }> {
+export class NodeDelta extends NodeBase<{ inputKeys: string[], outputKey: string, interMorphism: string }> {
 
     spec: {
         inputKeys: string[];
         outputKey: string;
-        intraMorphism: string; // ATTENTION: should be packed with the outputKey
-        outputDir: string;
         interMorphism: string;
     }
 
-    constructor(spec: { inputKeys: string[], outputKey: string, intraMorphism: string, outputDir: string, interMorphism: string; }) {
+    constructor(spec: { inputKeys: string[], outputKey: string, interMorphism: string; }) {
         super();
         this.spec = spec;
     }
