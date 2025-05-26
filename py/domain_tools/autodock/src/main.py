@@ -17,7 +17,7 @@ def autodock_basic():
             ligand = data.get('candidate')
             receptor = data.get('target')
             box = data.get('box')
-            outputPath = data.get('outputPath')
+            outputDir = data.get('outputDir')
             
             # Log the extracted values
             print(f'Ligand: {ligand}, Receptor: {receptor}, Box: {box}')

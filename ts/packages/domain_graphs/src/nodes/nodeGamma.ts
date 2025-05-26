@@ -1,80 +1,29 @@
-import { NodeSpec, BaseStateSpec, registerNode, ResourceMap } from '../types.js';
+import { NodeBase, GraphState, ResourceMap } from '../types.js';
 import { bucketName } from '../firebaseAdminInit.js';
-import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from '@langchain/langgraph';
+import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import * as path from 'path';
 import axios from 'axios';
 import WebSocket from 'ws';
 
 
-type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
-
-
-class _NodeGamma extends Runnable {
+export class NodeGamma extends NodeBase<{ url: string, inputKeys: string[], outputDir: string, intraMorphism: string; }> {
 
     spec: {
         url: string;
         inputKeys: string[];
-        outputPath: string; // ATTENTION: should be named outputDir for consistency
+        outputDir: string;
+        intraMorphism: string; // ATTENTION: should be packed with the output keys
     }
 
-    constructor(spec: { url: string, inputKeys: string[], outputPath: string; }) {
+    constructor(spec: { url: string, inputKeys: string[], outputDir: string, intraMorphism: string; }) {
         super();
         this.spec = spec;
     }
 
-    static nodeSpec: NodeSpec = {
-        description: '',
-        operations: [
-            {
-                kind: 'ToolInvocation',
-                name: 'AutoDockWrapper',
-                description: '',
-                inputs: [
-                    { role: 'candidate', format: 'path' },
-                    { role: 'target', format: 'path' },
-                ],
-                outputs: [
-                    { role: 'docking', format: 'path' },
-                    { role: 'pose', format: 'path' },
-                ],
-                operations: [
-                    {
-                        kind: 'StorageOperation',
-                        direction: 'read',
-                        storage: 'shared',
-                        resources: [
-                            { role: 'candidate', format: 'file' },
-                            { role: 'target', format: 'file' },
-                        ],
-                    },
-                    {
-                        kind: 'StorageOperation',
-                        direction: 'write',
-                        storage: 'shared',
-                        resources: [
-                            { role: 'docking', format: 'file' },
-                            { role: 'pose', format: 'file' },
-                        ],
-                    },
-                ],
-            },
-            {
-                kind: 'StorageOperation',
-                direction: 'write',
-                storage: 'private',
-                resources: [
-                    { role: 'docking', format: 'path' },
-                    { role: 'pose', format: 'path' },
-                ],
-            },
-        ]
-    };
-
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+    async invoke(state: GraphState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<GraphState>> {
 
         if (!state.dryModeManager.drySocketMode) {
 
@@ -103,26 +52,28 @@ class _NodeGamma extends Runnable {
 
         try {
 
-            const foo = async (url: string, inputKeys: string[], outputPath: string): Promise<string[]> => {
+            const foo = async (url: string, inputKeys: string[], outputDir: string): Promise<string[]> => {
                 // Here we must invoke the service at the given URL
                 // This function cannot know about anything specific to Ligandokreado
                 // spec must specify all neccessary parameters
                 // Maybe the tool only needs to return the output keys...
 
-                const payload: { [key: string]: string } = {};
+                let payload: { [key: string]: string } = {};
 
                 inputKeys.forEach((key) => {
                     payload[key] = `${bucketName}/${state.resourceMap[key].path}`;
                 });
 
+                payload = {
+                    ...payload,
+                    outputDir: `${bucketName}/${outputDir}`,
+                }
+
                 console.log('payload:', JSON.stringify(payload, null, 2));
 
                 const response = await axios.post(
                     url,
-                    {
-                        ...payload,
-                        outputPath: `${bucketName}/${outputPath}`,
-                    },
+                    payload,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -138,16 +89,18 @@ class _NodeGamma extends Runnable {
                 return result.result.outputKeys;
             }
 
+            const outputDir = path.dirname(state.resourceMap[this.spec.outputDir].path); // ATTENTION: temporary hack
+
             const outputKeys = await foo(
                 this.spec.url,
                 this.spec.inputKeys,
-                this.spec.outputPath
+                outputDir
             );
 
             const extraResources: ResourceMap = outputKeys.reduce((acc, key) => {
                 acc[key] = {
-                    path: path.join(this.spec.outputPath, key),
-                    intraMorphism: '', // ATTENTION: must be set here so that NodeAlpha can use it
+                    path: path.join(outputDir, key === 'docking' ? 'docking.pdbqt' : 'pose.sdf'), // ATTENTION: temporary hack // ATTENTION: must do this for candidate, too
+                    intraMorphism: this.spec.intraMorphism,
                     value: null,
                 };
                 return acc;
@@ -170,8 +123,6 @@ class _NodeGamma extends Runnable {
     }
 
 }
-
-export const NodeGamma = registerNode<typeof _NodeGamma>(_NodeGamma);
 
 
 

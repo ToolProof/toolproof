@@ -1,15 +1,12 @@
 import { intraMorphismRegistry } from '../registries.js';
-import { NodeSpec, BaseStateSpec, registerNode } from '../types.js';
+import { NodeBase, GraphState } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
-import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from '@langchain/langgraph';
+import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-// ATTENTION: can this be simplified?
-type WithBaseState = ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
 
-class _NodeAlpha extends Runnable {
+export class NodeAlpha extends NodeBase<{ inputKeys: string[]; }> {
 
     spec: {
         inputKeys: string[];
@@ -20,45 +17,9 @@ class _NodeAlpha extends Runnable {
         this.spec = spec;
     }
 
-    static nodeSpec: NodeSpec = {
-        description: '',
-        operations: [
-            {
-                kind: 'StorageOperation',
-                direction: 'read',
-                storage: 'private',
-                resources: [
-                    { role: 'anchor', format: 'path' },
-                    { role: 'target', format: 'path' },
-                    { role: 'box', format: 'path' }
-                ]
-            },
-            {
-                kind: 'StorageOperation',
-                direction: 'read',
-                storage: 'shared',
-                resources: [
-                    { role: 'anchor', format: 'file' },
-                    { role: 'target', format: 'file' },
-                    { role: 'box', format: 'file' }
-                ]
-            },
-            {
-                kind: 'StorageOperation',
-                direction: 'write',
-                storage: 'private',
-                resources: [
-                    { role: 'anchor', format: 'value' },
-                    { role: 'target', format: 'value' },
-                    { role: 'box', format: 'value' }
-                ]
-            }
-        ]
-    };
-
     lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
 
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+    async invoke(state: GraphState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<GraphState>> {
 
         if (!state.dryModeManager.drySocketMode) {
 
@@ -142,5 +103,3 @@ class _NodeAlpha extends Runnable {
     }
 
 }
-
-export const NodeAlpha = registerNode<typeof _NodeAlpha>(_NodeAlpha);

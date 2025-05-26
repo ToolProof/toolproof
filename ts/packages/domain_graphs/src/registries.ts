@@ -117,7 +117,7 @@ export const interMorphismRegistry = {
         }
     },
     def: async () => {
-        return (s: string) => 'Asdfgh! ' + s;
+        return (docking: string, pose: string) => false;
     },
 } as const;
 

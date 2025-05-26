@@ -1,24 +1,21 @@
-import { BaseStateSpec } from '../types.js';
+import { GraphStateAnnotationRoot, GraphState } from '../types.js';
 import { NodeAlpha } from '../nodes/nodeAlpha.js';
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
-import { StateGraph, Annotation, START, END } from '@langchain/langgraph';
+import { StateGraph, START, END } from '@langchain/langgraph';
 
-const GraphState = Annotation.Root({
-    ...BaseStateSpec,
-    shouldRetry: Annotation<boolean>(), // ATTENTION: consider moving to BaseStateSpec
-});
 
-const edgeShouldRetry = (state: typeof GraphState.State) => {
-    console.log('state :', state);
-    if (state.shouldRetry) {
+const edgeShouldRetry = (state: GraphState) => {
+    // console.log('state :', state);
+    if (state.resourceMap.shouldRetry.value) {
+        console.log('edgeShouldRetry: shouldRetry is true');
         return 'nodeBeta';
     } else {
         return END;
     }
 };
 
-const stateGraph = new StateGraph(GraphState)
+const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeAlpha',
         new NodeAlpha({
@@ -33,6 +30,7 @@ const stateGraph = new StateGraph(GraphState)
             intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
             outputDir: 'ligandokreado/1iep',
             interMorphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            writeToShared: true,
         })
     )
     .addNode(
@@ -40,10 +38,10 @@ const stateGraph = new StateGraph(GraphState)
         new NodeGamma({
             url: 'https://service-tp-tools-384484325421.europe-west2.run.app/autodock_basic',
             inputKeys: ['candidate', 'target', 'box'],
-            outputPath: 'dummyPath',
+            outputDir: 'candidate',
+            intraMorphism: 'doNothing', // ATTENTION: should be packed with the output keys
         })
     )
-    /*
     .addNode(
         'nodeAlpha2',
         new NodeAlpha({
@@ -54,19 +52,19 @@ const stateGraph = new StateGraph(GraphState)
         'nodeBeta2',
         new NodeBeta({
             inputKeys: ['docking', 'pose'],
-            outputKey: 'decision',
+            outputKey: 'shouldRetry',
+            intraMorphism: 'doNothing', // ATTENTION: should be packed with the outputKey
             outputDir: '',
-            interMorphism: 'abc',
+            interMorphism: 'def',
+            writeToShared: false,
         })
-    ) */ // ATTENTION
+    ) // ATTENTION
     .addEdge(START, 'nodeAlpha')
     .addEdge('nodeAlpha', 'nodeBeta')
     .addEdge('nodeBeta', 'nodeGamma')
-    .addEdge('nodeGamma', END)
-/*
-.addEdge('nodeGamma', 'nodeAlpha2')
-.addEdge('nodeAlpha2', 'nodeBeta2')
-.addConditionalEdges('nodeBeta2', edgeShouldRetry); */
+    .addEdge('nodeGamma', 'nodeAlpha2')
+    .addEdge('nodeAlpha2', 'nodeBeta2')
+    .addConditionalEdges('nodeBeta2', edgeShouldRetry);
 
 export const graph = stateGraph.compile();
 
