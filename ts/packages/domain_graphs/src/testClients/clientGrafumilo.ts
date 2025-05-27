@@ -26,6 +26,13 @@ export async function runRemoteGraph() {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
+                resourceMap: {
+                    anchor: {
+                        path: 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
+                        intraMorphism: 'doNothing',
+                        value: null,
+                    },
+                },
             });
 
             // console.log('threadId:', thread.thread_id);
