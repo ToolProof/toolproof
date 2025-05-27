@@ -1,5 +1,5 @@
 import { GraphStateAnnotationRoot, GraphState } from '../types.js';
-import { NodeAlpha } from '../nodes/nodeAlpha.js';
+import { NodeAlpha } from '../nodes/nodeAlpha.js'; // ATTENTION: consider default exports
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
 import { NodeDelta } from '../nodes/nodeDelta.js';

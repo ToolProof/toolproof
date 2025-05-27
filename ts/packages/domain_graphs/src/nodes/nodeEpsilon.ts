@@ -1,49 +1,23 @@
-import { NodeSpec, BaseStateSpec, registerNode } from '../../types.js';
+import { NodeBase, GraphState, Resource } from '../types.js';
 import { Runnable, RunnableConfig } from '@langchain/core/runnables';
 import { Annotation } from '@langchain/langgraph';
 // import { AIMessage } from '@langchain/core/messages';
 // import WebSocket from 'ws';
 
+interface TSpec {
+    foo: string;
+}
 
-export const NodeLoadGraphFileState = Annotation.Root({
-    repo: Annotation<string>(
-        {
-            reducer: (prev, next) => next,
-            default: () => { return 'ToolProof/toolproof' },
-        }
-    ),
-    branch: Annotation<string>(
-        {
-            reducer: (prev, next) => next,
-            default: () => { return 'master' },
-        }
-    ),
-    graphFile: Annotation<{
-        path: string,
-        content: string,
-    }>,
-});
+export class NodeEpsilon extends NodeBase<TSpec> {
 
-type WithBaseState = typeof NodeLoadGraphFileState.State &
-    ReturnType<typeof Annotation.Root<typeof BaseStateSpec>>['State'];
+    spec: TSpec;
 
-class _NodeLoadGraphFile extends Runnable {
+    constructor(spec: TSpec) {
+        super();
+        this.spec = spec;
+    }
 
-    static nodeSpec: NodeSpec = {
-        description: '',
-        operations: [
-            {
-                kind: 'StorageOperation',
-                direction: 'write',
-                storage: 'private',
-                resources: []
-            }
-        ]
-    };
-
-    lc_namespace = []; // ATTENTION: Assigning an empty array for now to honor the contract with the Runnable class, which implements RunnableInterface.
-
-    async invoke(state: WithBaseState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<WithBaseState>> {
+    async invoke(state: GraphState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<GraphState>> {
 
         /* if (state.dryModeManager.dryRunMode) {
             await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
@@ -90,6 +64,3 @@ class _NodeLoadGraphFile extends Runnable {
     }
 
 }
-
-
-export const NodeLoadGraphFile = registerNode<typeof _NodeLoadGraphFile>(_NodeLoadGraphFile);
