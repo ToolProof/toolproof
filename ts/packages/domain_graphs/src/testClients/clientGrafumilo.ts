@@ -36,7 +36,7 @@ export async function runRemoteGraph() {
             });
 
             // console.log('threadId:', thread.thread_id);
-            console.log('result:', JSON.stringify(result, null, 2));
+            console.log('result:', JSON.stringify(result.resourceMap.container.value, null, 2).slice(0, 10000));
             return result;
 
         } finally {

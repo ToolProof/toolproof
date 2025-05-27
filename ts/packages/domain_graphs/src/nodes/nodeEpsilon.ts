@@ -92,7 +92,7 @@ export class NodeEpsilon extends NodeBase<TSpec> {
                 });
 
 
-                resource.value = addNodes; // ATTENTION: should use resource.intraMorphism
+                resource.value = ast; // ATTENTION: should use resource.intraMorphism
                 resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly
             } catch (error) {
                 throw new Error(`Error fetching or processing file: ${error}`);
