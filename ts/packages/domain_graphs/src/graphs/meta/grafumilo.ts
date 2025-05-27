@@ -5,7 +5,7 @@ import { StateGraph, START, END } from '@langchain/langgraph';
 
 const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode('nodeEpsilon', new NodeEpsilon({
-        foo: 'bar',
+        inputKeys: ['container'],
     }))
     .addEdge(START, 'nodeEpsilon')
     .addEdge('nodeEpsilon', END);

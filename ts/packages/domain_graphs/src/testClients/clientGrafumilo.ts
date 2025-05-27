@@ -27,8 +27,8 @@ export async function runRemoteGraph() {
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 resourceMap: {
-                    anchor: {
-                        path: 'ToolProof/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
+                    container: {
+                        path: 'ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
                         intraMorphism: 'doNothing',
                         value: null,
                     },

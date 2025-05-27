@@ -49,7 +49,7 @@ export default function SpaceXYZ() {
         } else {
             const fetchData = async () => {
                 const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
-                const path1 = 'ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
+                const path1 = 'ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
                 try {
                     const result = await runGrafumilo(path1);
                     console.log('graphSpec:', JSON.stringify(result.graphSpec, null, 2));

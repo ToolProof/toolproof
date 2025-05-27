@@ -1,11 +1,10 @@
-import { NodeBase, GraphState, Resource } from '../types.js';
-import { Runnable, RunnableConfig } from '@langchain/core/runnables';
-import { Annotation } from '@langchain/langgraph';
-// import { AIMessage } from '@langchain/core/messages';
+import { NodeBase, GraphState } from '../types.js';
+import { RunnableConfig } from '@langchain/core/runnables';
+import { AIMessage } from '@langchain/core/messages';
 // import WebSocket from 'ws';
 
 interface TSpec {
-    foo: string;
+    inputKeys: string[];
 }
 
 export class NodeEpsilon extends NodeBase<TSpec> {
@@ -43,22 +42,37 @@ export class NodeEpsilon extends NodeBase<TSpec> {
             };
         } */
 
-        const { repo, branch } = state;
-        const url = `https://raw.githubusercontent.com/${repo}/${branch}/${state.graphFile.path}`;
-        let graphFile = { ...state.graphFile };
+        const resourceMap = state.resourceMap;
 
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
+        for (const key of Object.keys(state.resourceMap)) {
+
+            if (!this.spec.inputKeys.includes(key)) {
+                console.log('Skipping resource:', key);
+                continue;
+            } else {
+                console.log('Processing resource:', key);
             }
-            graphFile.content = await response.text();
-        } catch (error) {
-            throw new Error(`Error fetching or processing file: ${error}`);
+
+            const resource = state.resourceMap[key];
+
+            const url = `https://raw.githubusercontent.com/${resource.path}}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
+                }
+                resource.value = await response.text(); // ATTENTION: should use resource.intraMorphism
+                resourceMap[key] = resource; // Update the resourceMap with the fetched content
+            } catch (error) {
+                throw new Error(`Error fetching or processing file: ${error}`);
+            }
+
         }
 
         return {
-            graphFile
+            messages: [new AIMessage('NodeEpsilon completed')],
+            resourceMap,
         };
 
     }
