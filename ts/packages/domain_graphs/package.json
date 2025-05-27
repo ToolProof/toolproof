@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@babel/parser": "^7.27.3",
+    "@babel/traverse": "^7.27.3",
     "@google-cloud/storage": "^7.14.0",
     "@langchain/core": "^0.3.42",
     "@langchain/langgraph": "^0.2.54",
@@ -21,5 +23,8 @@
     "openai": "^4.87.3",
     "shared": "file:../shared",
     "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.7"
   }
 }

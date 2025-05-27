@@ -6,6 +6,7 @@
         "../shared"
     ],
     "graphs": {
+        "grafumilo": "./src/graphs/meta/grafumilo.ts:graph",
         "ligandokreado": "./src/graphs/ligandokreado.ts:graph"
     },
     "env": ".env"
