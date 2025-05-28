@@ -1,13 +1,13 @@
 import { GraphStateAnnotationRoot } from '../../types.js';
-import { NodeEpsilon } from '../../nodes/nodeEpsilon.js';
+import { NodeAlpha } from '../../nodes/nodeAlpha.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
 const stateGraph = new StateGraph(GraphStateAnnotationRoot)
-    .addNode('nodeEpsilon', new NodeEpsilon({
+    .addNode('nodeAlpha', new NodeAlpha({
         inputKeys: ['container'],
     }))
-    .addEdge(START, 'nodeEpsilon')
-    .addEdge('nodeEpsilon', END);
+    .addEdge(START, 'nodeAlpha')
+    .addEdge('nodeAlpha', END);
 
 export const graph = stateGraph.compile();
