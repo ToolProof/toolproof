@@ -57,15 +57,14 @@ export class NodeEpsilon extends NodeBase<TSpec> {
 
             const resource = state.resourceMap[key];
 
-            // const url = `https://raw.githubusercontent.com/${resource.path}`;
-
             try {
+                // ATTENTION: consider abstracting this fetch logic to a utility morphism
                 const response = await fetch(resource.path);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${resource.path})`);
                 }
 
-                const sourceCode = await response.text();
+                const content = await response.text();
 
                 const intraMorphism = resource.intraMorphism;
 
@@ -73,7 +72,7 @@ export class NodeEpsilon extends NodeBase<TSpec> {
                 if (!loader) throw new Error(`Unknown morphism: ${intraMorphism}`);
 
                 const fn = await loader(); // Load actual function
-                const value = await fn(sourceCode); // Call function
+                const value = await fn(content); // Call function
 
                 resource.value = value; // ATTENTION: should use resource.intraMorphism
                 resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly
