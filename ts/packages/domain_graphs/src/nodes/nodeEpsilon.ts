@@ -1,12 +1,8 @@
 import { NodeBase, GraphState } from '../types.js';
+import { intraMorphismRegistry } from '../registries.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 // import WebSocket from 'ws';
-
-import { parse } from '@babel/parser';
-const traverseModule = await import('@babel/traverse');
-const traverse = traverseModule.default;
-import * as t from '@babel/types';
 
 interface TSpec {
     inputKeys: string[];
@@ -70,29 +66,15 @@ export class NodeEpsilon extends NodeBase<TSpec> {
 
                 const sourceCode = await response.text();
 
-                const ast = parse(sourceCode, {
-                    sourceType: 'module',
-                    plugins: ['typescript'], // or 'jsx' if JSX used
-                });
+                const intraMorphism = resource.intraMorphism;
 
-                const addNodes: { nodeName: string; argsText: string }[] = [];
+                const loader = intraMorphismRegistry[intraMorphism as keyof typeof intraMorphismRegistry]; // ATTENTION
+                if (!loader) throw new Error(`Unknown morphism: ${intraMorphism}`);
 
-                traverse(ast, {
-                    CallExpression(path) {
-                        const callee = path.node.callee;
-                        if (t.isMemberExpression(callee) && t.isIdentifier(callee.property) && callee.property.name === 'addNode') {
-                            const args = path.node.arguments;
-                            if (args.length >= 2 && t.isStringLiteral(args[0])) {
-                                const nodeName = args[0].value;
-                                const argsText = sourceCode.slice(args[0].start!, path.node.end!);
-                                addNodes.push({ nodeName, argsText });
-                            }
-                        }
-                    },
-                });
+                const fn = await loader(); // Load actual function
+                const value = await fn(sourceCode); // Call function
 
-
-                resource.value = ast; // ATTENTION: should use resource.intraMorphism
+                resource.value = value; // ATTENTION: should use resource.intraMorphism
                 resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly
             } catch (error) {
                 throw new Error(`Error fetching or processing file: ${error}`);

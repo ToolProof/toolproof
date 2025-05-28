@@ -52,8 +52,9 @@ export default function SpaceXYZ() {
                 const path1 = 'ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
                 try {
                     const result = await runGrafumilo(path1);
-                    console.log('graphSpec:', JSON.stringify(result.graphSpec, null, 2));
-                    setGraphSpec(result.graphSpec as GraphSpec_ToolProof);
+                    const graphSpec = result.resourceMap.container.value as GraphSpec_ToolProof;
+                    console.log('graphSpec:', JSON.stringify(graphSpec, null, 2));
+                    setGraphSpec(graphSpec as GraphSpec_ToolProof);
                 } catch (error) {
                     throw new Error(`Error fetching data: ${error}`);
                 }

@@ -29,14 +29,14 @@ export async function runRemoteGraph() {
                 resourceMap: {
                     container: {
                         path: 'ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
-                        intraMorphism: 'doNothing',
+                        intraMorphism: 'ghi',
                         value: null,
                     },
                 },
             });
 
             // console.log('threadId:', thread.thread_id);
-            console.log('result:', JSON.stringify(result.resourceMap.container.value, null, 2).slice(0, 10000));
+            console.log('result:', JSON.stringify(result.resourceMap.container.value, null, 2));
             return result;
 
         } finally {
