@@ -1,5 +1,5 @@
 import { GraphStateAnnotationRoot, GraphState } from '../types.js';
-import { NodeAlpha } from '../nodes/nodeAlpha.js'; // ATTENTION: consider default exports
+import { NodeEpsilon } from '../nodes/nodeEpsilon.js'; // ATTENTION: consider default exports
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
 import { NodeDelta } from '../nodes/nodeDelta.js';
@@ -19,8 +19,8 @@ const edgeShouldRetry = (state: GraphState) => {
 
 const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
-        'nodeAlpha',
-        new NodeAlpha({
+        'nodeEpsilon',
+        new NodeEpsilon({
             inputKeys: ['anchor', 'target', 'box'],
         })
     )
@@ -47,8 +47,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         })
     )
     .addNode(
-        'nodeAlpha2',
-        new NodeAlpha({
+        'nodeEpsilon2',
+        new NodeEpsilon({
             inputKeys: ['docking', 'pose'],
         })
     )
@@ -60,11 +60,11 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             interMorphism: 'def',
         })
     )
-    .addEdge(START, 'nodeAlpha')
-    .addEdge('nodeAlpha', 'nodeBeta')
+    .addEdge(START, 'nodeEpsilon')
+    .addEdge('nodeEpsilon', 'nodeBeta')
     .addEdge('nodeBeta', 'nodeGamma')
-    .addEdge('nodeGamma', 'nodeAlpha2')
-    .addEdge('nodeAlpha2', 'nodeDelta')
+    .addEdge('nodeGamma', 'nodeEpsilon2')
+    .addEdge('nodeEpsilon2', 'nodeDelta')
     .addConditionalEdges('nodeDelta', edgeShouldRetry);
 
 export const graph = stateGraph.compile();

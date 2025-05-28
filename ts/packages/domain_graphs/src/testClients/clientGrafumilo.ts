@@ -28,7 +28,7 @@ export async function runRemoteGraph() {
                 messages: [new HumanMessage('Graph is invoked')],
                 resourceMap: {
                     container: {
-                        path: 'ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
+                        path: 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
                         intraMorphism: 'ghi',
                         value: null,
                     },

@@ -27,6 +27,8 @@ export async function runLigandokreado() {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 1800000); // 30 minutes
 
+        const bucketName = 'tp_resources';
+
         try {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
@@ -36,9 +38,23 @@ export async function runLigandokreado() {
                     delay: 3000,
                     drySocketMode: false,
                 },
-                anchor: { path: 'ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi', value: [] },
-                target: { path: 'ligandokreado/1iep/target.pdb', value: [] },
-                box: { path: 'ligandokreado/1iep/box.pdb', value: [] },
+                resourceMap: {
+                    anchor: {
+                        path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi`,
+                        intraMorphism: 'doNothing',
+                        value: null,
+                    },
+                    target: {
+                        path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/target.pdb`,
+                        intraMorphism: 'chunkPDBContent',
+                        value: null,
+                    },
+                    box: {
+                        path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/box.pdb`,
+                        intraMorphism: 'chunkPDBContent',
+                        value: null,
+                    },
+                },
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

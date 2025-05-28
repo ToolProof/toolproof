@@ -48,8 +48,8 @@ export default function SpaceXYZ() {
             setGraphSpec(celarbo);
         } else {
             const fetchData = async () => {
-                const path0 = 'ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
-                const path1 = 'ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
+                const path0 = 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
+                const path1 = 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
                 try {
                     const result = await runGrafumilo(path1);
                     const graphSpec = result.resourceMap.container.value as GraphSpec_ToolProof;

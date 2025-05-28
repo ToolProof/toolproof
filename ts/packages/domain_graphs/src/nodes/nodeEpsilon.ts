@@ -56,12 +56,12 @@ export class NodeEpsilon extends NodeBase<TSpec> {
 
             const resource = state.resourceMap[key];
 
-            const url = `https://raw.githubusercontent.com/${resource.path}`;
+            // const url = `https://raw.githubusercontent.com/${resource.path}`;
 
             try {
-                const response = await fetch(url);
+                const response = await fetch(resource.path);
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
+                    throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${resource.path})`);
                 }
 
                 const sourceCode = await response.text();

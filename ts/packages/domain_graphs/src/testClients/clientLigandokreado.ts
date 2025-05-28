@@ -22,6 +22,8 @@ export async function runRemoteGraph() {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 1800000); // 30 minutes
 
+        const bucketName = 'tp_resources';
+
         try {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
@@ -33,17 +35,17 @@ export async function runRemoteGraph() {
                 },
                 resourceMap: {
                     anchor: {
-                        path: 'ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi',
+                    path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi`,
                         intraMorphism: 'doNothing',
                         value: null,
                     },
                     target: {
-                        path: 'ligandokreado/1iep/target.pdb',
+                        path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/target.pdb`,
                         intraMorphism: 'chunkPDBContent',
                         value: null,
                     },
                     box: {
-                        path: 'ligandokreado/1iep/box.pdb',
+                        path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/box.pdb`,
                         intraMorphism: 'chunkPDBContent',
                         value: null,
                     },
