@@ -26,7 +26,7 @@ export class NodeGamma extends NodeBase<TSpec> {
         if (!state.dryModeManager.drySocketMode) {
 
             // Connect to WebSocket server
-            const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
+            const ws = new WebSocket('https://service-websocket-384484325421.europe-west2.run.app');
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({
@@ -59,7 +59,11 @@ export class NodeGamma extends NodeBase<TSpec> {
                 let payload: { [key: string]: string } = {};
 
                 inputKeys.forEach((key) => {
-                    payload[key] = `${bucketName}/${state.resourceMap[key].path}`;
+                    const toBeStrippedAway = 'https://storage.googleapis.com/'; // ATTENTION: temporary hack
+                    let strippedPath = state.resourceMap[key].path.replace(toBeStrippedAway, '');
+                    console.log('strippedPath:', strippedPath);
+                    strippedPath = key === 'candidate' ? `${bucketName}/${strippedPath}` : strippedPath; // ATTENTION: temporary hack
+                    payload[key] = `${strippedPath}`;
                 });
 
                 payload = {
@@ -96,8 +100,11 @@ export class NodeGamma extends NodeBase<TSpec> {
             );
 
             const extraResources: ResourceMap = outputFiles.reduce((acc, file) => {
+                let path2 = path.join(outputDir, file);
+                console.log('path2:', path2);
+                path2 = `https://storage.googleapis.com/${bucketName}/${path2}`; // ATTENTION: temporary hack
                 acc[file.split('.')[0]] = {
-                    path: path.join(outputDir, file),
+                    path: path2,
                     intraMorphism: 'doNothing', // this.spec.intraMorphism, // ATTENTION: what about this? Could allocate it dynamically based on the file extension?
                     value: null,
                 };

@@ -31,7 +31,7 @@ export async function runRemoteGraph() {
                 dryModeManager: {
                     dryRunMode: false,
                     delay: 1000,
-                    drySocketMode: true,
+                    drySocketMode: false,
                 },
                 resourceMap: {
                     anchor: {

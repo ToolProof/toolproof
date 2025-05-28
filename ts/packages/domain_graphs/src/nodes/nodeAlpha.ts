@@ -23,7 +23,7 @@ export class NodeAlpha extends NodeBase<TSpec> {
         if (!state.dryModeManager.drySocketMode) {
 
             // Connect to WebSocket server
-            const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
+            const ws = new WebSocket('https://service-websocket-384484325421.europe-west2.run.app');
 
             ws.on('open', () => {
                 ws.send(JSON.stringify({

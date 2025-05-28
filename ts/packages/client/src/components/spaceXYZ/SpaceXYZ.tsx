@@ -88,8 +88,8 @@ export default function SpaceXYZ() {
 
 
     // WebSocket Connection for Broadcast Messages
-    /* useEffect(() => {
-        const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
+    useEffect(() => {
+        const ws = new WebSocket('https://service-websocket-384484325421.europe-west2.run.app');
 
         ws.onopen = () => {
             console.log('Connected to WebSocket server');
@@ -112,7 +112,7 @@ export default function SpaceXYZ() {
         return () => {
             ws.close();
         };
-    }, []); */
+    }, []);
 
     return (
         (space) && (

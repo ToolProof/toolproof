@@ -2,7 +2,7 @@ import { NodeBase, GraphState } from '../types.js';
 import { intraMorphismRegistry } from '../registries.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
-// import WebSocket from 'ws';
+import WebSocket from 'ws';
 
 interface TSpec {
     inputKeys: string[];
@@ -19,17 +19,14 @@ export class NodeEpsilon extends NodeBase<TSpec> {
 
     async invoke(state: GraphState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<GraphState>> {
 
-        /* if (state.dryModeManager.dryRunMode) {
-            await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
+        if (!state.dryModeManager.drySocketMode) {
 
             // Connect to WebSocket server
-            const ws = new WebSocket('wss://service-tp-websocket-384484325421.europe-west2.run.app');
+            const ws = new WebSocket('https://service-websocket-384484325421.europe-west2.run.app');
 
             ws.on('open', () => {
-                console.log('Connected to WebSocket server (DryRun)');
                 ws.send(JSON.stringify({
-                    node: 'NodeLoadGraphFile',
-                    message: 'Completed DryRun Mode'
+                    node: 'NodeEpsilon',
                 }));
                 ws.close();
             });
@@ -37,11 +34,15 @@ export class NodeEpsilon extends NodeBase<TSpec> {
             ws.on('error', (error) => {
                 console.error('WebSocket Error:', error);
             });
+        }
+
+        if (state.dryModeManager.dryRunMode) {
+            await new Promise(resolve => setTimeout(resolve, state.dryModeManager.delay));
 
             return {
-                messages: [new AIMessage('NodeLoadGraphFile completed in DryRun mode')],
+                messages: [new AIMessage('NodeEpsilon completed in DryRun mode')],
             };
-        } */
+        }
 
         const resourceMap = state.resourceMap;
 

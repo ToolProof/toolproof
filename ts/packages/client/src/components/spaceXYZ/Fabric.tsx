@@ -15,7 +15,6 @@ export default function Fabric({ space, message }: FabricProps) {
     const [isDeltaActive, setIsDeltaActive] = useState(false);
     const [isGammaActive, setIsGammaActive] = useState(false);
 
-
     useEffect(() => {
         if (fgRef.current) {
             // Set the camera position directly (x, y, z) and lookAt (default is origin

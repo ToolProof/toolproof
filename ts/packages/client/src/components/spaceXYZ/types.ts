@@ -267,8 +267,11 @@ export class ToolProofSpace extends Space<GraphSpec_ToolProof> {
             const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
             const material = new THREE.MeshLambertMaterial({
                 // color: node.id === activeAlphaId ? 'yellow' : 'red'
-                color: message.includes(node.id) ? 'yellow' : 'red'
+                color: message.toLowerCase().includes(node.id.toLowerCase()) ? 'yellow' : 'red'
             });
+            console.log('node.id', node.id);
+            console.log('message', message);
+
             mesh = new THREE.Mesh(geometry, material);
         } else {
             throw new Error(`Unknown node group: ${node.group}`);
