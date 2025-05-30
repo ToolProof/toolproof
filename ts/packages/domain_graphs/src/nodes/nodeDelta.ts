@@ -1,17 +1,15 @@
-import { interMorphismRegistry } from '../registries.js';
-import { NodeBase, GraphState } from '../types.js';
+import { NodeBase, GraphState, ResourceMap } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
-import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import WebSocket from 'ws';
 
-const openai = new OpenAI();
 
 interface TSpec {
-    inputKeys: string[];
-    outputKey: string;
-    interMorphism: string;
+    inputSpecs: {
+        key: string;
+        path: string;
+    }[]
 }
 
 export class NodeDelta extends NodeBase<TSpec> {
@@ -52,28 +50,34 @@ export class NodeDelta extends NodeBase<TSpec> {
 
         try {
 
-            const inputs: any[] = [];
+            const resourceMapAugmentedWithPath: ResourceMap = {};
 
-            Object.entries(state.resourceMap).forEach(([key, resource]) => {
-                if (this.spec.inputKeys.includes(key)) {
-                    inputs.push(resource.value);
-                }
-            });
+            for (const inputSpec of this.spec.inputSpecs) {
+                const value = state.resourceMap[inputSpec.key].value;
 
-            const loader = interMorphismRegistry[this.spec.interMorphism as keyof typeof interMorphismRegistry];
-            if (!loader) throw new Error(`Unknown morphism: ${this.spec.interMorphism}`);
+                const timestamp = new Date().toISOString();
+                const outputPath = inputSpec.path.replace('timestamp', timestamp);
 
-            const fn = await loader() as (...args: any[]) => string;
-            const value = await fn(...inputs); // ATTENTION: is the type misleading?
+                await storage
+                    .bucket(bucketName)
+                    .file(outputPath)
+                    .save(value, {
+                        contentType: 'text/plain',
+                    });
+
+                resourceMapAugmentedWithPath[inputSpec.key] = {
+                    ...state.resourceMap[inputSpec.key],
+                    path: `${outputPath}`,
+                };
+            }
 
             return {
                 messages: [new AIMessage('NodeDelta completed')],
-                metaResourceMap: {
-                    ...(state.metaResourceMap ?? {}),
-                    [this.spec.outputKey]: value,
+                resourceMap: {
+                    ...state.resourceMap,
+                    ...resourceMapAugmentedWithPath,
                 }
             };
-
         } catch (error: any) {
             console.error('Error in NodeDelta:', error);
             return {

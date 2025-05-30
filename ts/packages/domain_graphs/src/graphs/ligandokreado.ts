@@ -3,13 +3,12 @@ import { NodeAlpha } from '../nodes/nodeAlpha.js'; // ATTENTION: consider defaul
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
 import { NodeDelta } from '../nodes/nodeDelta.js';
-import { NodeEpsilon } from '../nodes/nodeEpsilon.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
 const edgeShouldRetry = (state: GraphState) => {
     // console.log('state :', state);
-    if (state.metaResourceMap.shouldRetry) {
+    if (state.resourceMap.shouldRetry.value) {
         console.log('edgeShouldRetry: shouldRetry is true');
         return 'nodeBeta';
     } else {
@@ -39,8 +38,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         })
     )
     .addNode(
-        'nodeEpsilon',
-        new NodeEpsilon({
+        'nodeDelta',
+        new NodeDelta({
             inputSpecs: [
                 {
                     key: 'candidate',
@@ -64,20 +63,25 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
         })
     )
     .addNode(
-        'nodeDelta',
-        new NodeDelta({
+        'nodeBeta2',
+        new NodeBeta({
             inputKeys: ['docking', 'pose'],
-            outputKey: 'shouldRetry',
-            interMorphism: 'def',
+            outputSpec: {
+                outputKey: 'shouldRetry',
+                path: '',
+                intraMorphism: 'doNothing',
+                value: null,
+            },
+            interMorphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
         })
     )
     .addEdge(START, 'nodeAlpha')
     .addEdge('nodeAlpha', 'nodeBeta')
-    .addEdge('nodeBeta', 'nodeEpsilon')
-    .addEdge('nodeEpsilon', 'nodeGamma')
+    .addEdge('nodeBeta', 'nodeDelta')
+    .addEdge('nodeDelta', 'nodeGamma')
     .addEdge('nodeGamma', 'nodeAlpha2')
-    .addEdge('nodeAlpha2', 'nodeDelta')
-    .addConditionalEdges('nodeDelta', edgeShouldRetry);
+    .addEdge('nodeAlpha2', 'nodeBeta2')
+    .addConditionalEdges('nodeBeta2', edgeShouldRetry);
 
 export const graph = stateGraph.compile();
 

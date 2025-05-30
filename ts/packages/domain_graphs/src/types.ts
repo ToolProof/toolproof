@@ -7,14 +7,8 @@ export type Resource = {
     value: any; // ATTENTION
 }
 
-type MetaResource = string | number | boolean | null;
-
 export type ResourceMap = {
     [key: string]: Resource;
-}
-
-export type MetaResourceMap = {
-    [key: string]: MetaResource;
 }
 
 export const GraphStateAnnotationRoot = Annotation.Root({
@@ -34,7 +28,6 @@ export const GraphStateAnnotationRoot = Annotation.Root({
         }
     ),
     resourceMap: Annotation<ResourceMap>(),
-    metaResourceMap: Annotation<MetaResourceMap>(),
 });
 
 export type GraphState = typeof GraphStateAnnotationRoot.State;
