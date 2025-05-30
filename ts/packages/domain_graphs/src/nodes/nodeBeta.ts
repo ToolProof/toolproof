@@ -1,18 +1,14 @@
 import { interMorphismRegistry } from '../registries.js';
 import { NodeBase, GraphState, Resource } from '../types.js';
-import { storage, bucketName } from '../firebaseAdminInit.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
-import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
 import WebSocket from 'ws';
 
-const openai = new OpenAI();
 
 interface TSpec {
     inputKeys: string[];
-    outputSpec: Resource & { outputKey: string }; // ATTENTION: allows for only a sinle output resource
+    outputSpec: Resource & { outputKey: string }; // ATTENTION: allows for only a single output resource
     interMorphism: string;
-    writeToPrivate: boolean;
 }
 
 export class NodeBeta extends NodeBase<TSpec> {
@@ -67,49 +63,23 @@ export class NodeBeta extends NodeBase<TSpec> {
             const fn = await loader() as (...args: any[]) => string;
             const value = await fn(...inputs); // ATTENTION: is the type misleading?
 
-            try {
-
-                const timestamp = new Date().toISOString();
-                const outputPath = this.spec.outputSpec.path.replace('timestamp', timestamp);
-                // ATTENTION: consider passing a piece of logic to generate outputPath
-
-                await storage
-                    .bucket(bucketName)
-                    .file(outputPath)
-                    .save(value, {
-                        contentType: 'text/plain',
-                        metadata: {
-                            createdAt: timestamp,
-                        }
-                    });
-
-                return {
-                    messages: [new AIMessage('NodeBeta completed')],
-                    resourceMap: this.spec.writeToPrivate ? {
-                        ...state.resourceMap,
-                        [this.spec.outputSpec.outputKey]: {
-                            path: `${outputPath}`,
-                            intraMorphism: this.spec.outputSpec.intraMorphism,
-                            value: value, // ATTENTION: should be taken through intraMorphism
-                        },
-                    }
-                        : state.resourceMap,
-                };
-
-            } catch (error: any) {
-                console.error('Error in NodeBeta:', error);
-                return {
-                    messages: [new AIMessage('NodeBeta failed')],
-                };
-            }
-
+            return {
+                messages: [new AIMessage('NodeBeta completed')],
+                resourceMap: {
+                    ...state.resourceMap,
+                    [this.spec.outputSpec.outputKey]: {
+                        path: '',
+                        intraMorphism: this.spec.outputSpec.intraMorphism,
+                        value: value, // ATTENTION: should be taken through intraMorphism
+                    },
+                }
+            };
         } catch (error: any) {
             console.error('Error in NodeBeta:', error);
             return {
                 messages: [new AIMessage('NodeBeta failed')],
             };
         }
-
     }
 
 }

@@ -4,6 +4,21 @@ const traverseModule = await import('@babel/traverse');
 const traverse = traverseModule.default;
 import generate from '@babel/generator';
 import * as t from '@babel/types';
+import { OpenAI } from 'openai'; // ATTENTION: should use the langchain wrapper instead
+
+
+export const fooRegistry = {
+    fetchContentFromUrl: async () => {
+        return async (url: string) => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
+            }
+
+            return await response.text();
+        }
+    },
+}
 
 
 export const intraMorphismRegistry = {

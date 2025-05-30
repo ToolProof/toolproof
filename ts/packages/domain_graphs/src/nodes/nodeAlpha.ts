@@ -1,5 +1,5 @@
 import { NodeBase, GraphState } from '../types.js';
-import { intraMorphismRegistry } from '../registries.js';
+import { intraMorphismRegistry, fooRegistry } from '../registries.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
@@ -58,21 +58,17 @@ export class NodeAlpha extends NodeBase<TSpec> {
             const resource = state.resourceMap[key];
 
             try {
-                // ATTENTION: consider abstracting this fetch logic to a utility morphism
-                const response = await fetch(resource.path);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${resource.path})`);
-                }
-
-                const content = await response.text();
+                const loader_1 = fooRegistry['fetchContentFromUrl']; // ATTENTION: hardcoded
+                if (!loader_1) throw new Error(`Unknown morphism:`);
+                const fn_1 = await loader_1();
+                const content = await fn_1(resource.path);
 
                 const intraMorphism = resource.intraMorphism;
 
-                const loader = intraMorphismRegistry[intraMorphism as keyof typeof intraMorphismRegistry]; // ATTENTION
-                if (!loader) throw new Error(`Unknown morphism: ${intraMorphism}`);
-
-                const fn = await loader(); // Load actual function
-                const value = await fn(content); // Call function
+                const loader_2 = intraMorphismRegistry[intraMorphism as keyof typeof intraMorphismRegistry]; // ATTENTION
+                if (!loader_2) throw new Error(`Unknown morphism: ${intraMorphism}`);
+                const fn_2 = await loader_2();
+                const value = await fn_2(content);
 
                 resource.value = value; // ATTENTION: should use resource.intraMorphism
                 resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly

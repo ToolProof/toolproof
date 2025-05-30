@@ -3,6 +3,7 @@ import { NodeAlpha } from '../nodes/nodeAlpha.js'; // ATTENTION: consider defaul
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
 import { NodeDelta } from '../nodes/nodeDelta.js';
+import { NodeEpsilon } from '../nodes/nodeEpsilon.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
@@ -30,13 +31,23 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             inputKeys: ['anchor', 'target'],
             outputSpec: {
                 outputKey: 'candidate',
-                path: 'ligandokreado/1iep/timestamp/candidate.smi',
+                path: '',
                 intraMorphism: 'doNothing',
                 value: null,
             },
             interMorphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
-            writeToPrivate: true,
         })
+    )
+    .addNode(
+        'nodeEpsilon',
+        new NodeEpsilon({
+            inputSpecs: [
+                {
+                    key: 'candidate',
+                    path: 'ligandokreado/1iep/timestamp/candidate.smi',
+                }
+            ]
+        }),
     )
     .addNode(
         'nodeGamma',
@@ -62,7 +73,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     )
     .addEdge(START, 'nodeAlpha')
     .addEdge('nodeAlpha', 'nodeBeta')
-    .addEdge('nodeBeta', 'nodeGamma')
+    .addEdge('nodeBeta', 'nodeEpsilon')
+    .addEdge('nodeEpsilon', 'nodeGamma')
     .addEdge('nodeGamma', 'nodeAlpha2')
     .addEdge('nodeAlpha2', 'nodeDelta')
     .addConditionalEdges('nodeDelta', edgeShouldRetry);
