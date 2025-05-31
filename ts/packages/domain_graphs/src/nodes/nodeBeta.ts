@@ -1,4 +1,4 @@
-import { interMorphismRegistry } from '../registries.js';
+import { interMorphismRegistry } from '../registries/registries.js';
 import { NodeBase, GraphState, Resource } from '../types.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';

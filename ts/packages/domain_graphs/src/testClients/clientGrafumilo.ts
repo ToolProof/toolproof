@@ -29,7 +29,7 @@ export async function runRemoteGraph() {
                 resourceMap: {
                     container: {
                         path: 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
-                        intraMorphism: 'ghi',
+                        intraMorphism: 'getNodeInvocationsFromSourceCode',
                         value: null,
                     },
                 },

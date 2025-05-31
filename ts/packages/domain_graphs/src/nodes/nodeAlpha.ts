@@ -1,5 +1,5 @@
 import { NodeBase, GraphState } from '../types.js';
-import { intraMorphismRegistry, fooRegistry } from '../registries.js';
+import { intraMorphismRegistry, fooRegistry } from '../registries/registries.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';

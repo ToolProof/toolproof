@@ -1,4 +1,4 @@
-import { intraMorphismRegistry } from '../registries.js';
+import { intraMorphismRegistry } from '../registries/registries.js';
 import { NodeBase, GraphState } from '../types.js';
 import { storage, bucketName } from '../firebaseAdminInit.js';
 import { RunnableConfig } from '@langchain/core/runnables';

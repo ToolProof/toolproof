@@ -34,7 +34,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                 intraMorphism: 'doNothing',
                 value: null,
             },
-            interMorphism: 'abc', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            interMorphism: 'generateCandidate', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
         })
     )
     .addNode(
@@ -72,7 +72,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                 intraMorphism: 'doNothing',
                 value: null,
             },
-            interMorphism: 'def', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            interMorphism: 'evaluateDockingResults', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
         })
     )
     .addEdge(START, 'nodeAlpha')
