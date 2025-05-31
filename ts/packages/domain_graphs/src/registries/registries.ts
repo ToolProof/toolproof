@@ -1,8 +1,8 @@
-import { intraMorphismRegistry as intra_1, interMorphismRegistry as inter_1 } from "./ligandokreado";
-import { intraMorphismRegistry as intra_2, interMorphismRegistry as inter_2 } from "./grafumilo";
+import { intraMorphismRegistry as intraMR_grafumilo, interMorphismRegistry as interMR_grafumilo } from "./grafumilo";
+import { intraMorphismRegistry as intraMR_ligandokreado, interMorphismRegistry as interMR_ligandokreado } from "./ligandokreado";
 
 
-export const fooRegistry = {
+export const fetchRegistry = {
     fetchContentFromUrl: async () => {
         return async (url: string) => {
             const response = await fetch(url);
@@ -17,13 +17,13 @@ export const fooRegistry = {
 
 
 export const intraMorphismRegistry = {
-    ...intra_1,
-    ...intra_2,
+    ...intraMR_grafumilo,
+    ...intraMR_ligandokreado,
 }
 
 export const interMorphismRegistry = {
-    ...inter_1,
-    ...inter_2,
+    ...interMR_grafumilo,
+    ...interMR_ligandokreado,
 }
 
 

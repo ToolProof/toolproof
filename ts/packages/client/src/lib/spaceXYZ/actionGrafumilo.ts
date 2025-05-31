@@ -34,7 +34,7 @@ export async function runGrafumilo(path: string) {
                 resourceMap: {
                     container: {
                         path: path,
-                        intraMorphism: 'ghi',
+                        intraMorphism: 'getNodeInvocationsFromSourceCode',
                         value: null,
                     },
                 },

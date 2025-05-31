@@ -1,5 +1,5 @@
 import { NodeBase, GraphState } from '../types.js';
-import { intraMorphismRegistry, fooRegistry } from '../registries/registries.js';
+import { intraMorphismRegistry, fetchRegistry } from '../registries/registries.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
@@ -58,7 +58,7 @@ export class NodeAlpha extends NodeBase<TSpec> {
             const resource = state.resourceMap[key];
 
             try {
-                const loader_1 = fooRegistry['fetchContentFromUrl']; // ATTENTION: hardcoded
+                const loader_1 = fetchRegistry['fetchContentFromUrl']; // ATTENTION: hardcoded
                 if (!loader_1) throw new Error(`Unknown morphism:`);
                 const fn_1 = await loader_1();
                 const content = await fn_1(resource.path);
