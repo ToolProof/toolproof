@@ -78,8 +78,8 @@ export const intraMorphismRegistry = {
         };
     },
     getCandidates: async () => {
-        return (path: string) => {
-            return []
+        return (content: string) => {
+            return content;
         }
     },
 } as const;
