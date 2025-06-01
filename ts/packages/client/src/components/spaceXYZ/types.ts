@@ -40,6 +40,9 @@ interface _GraphSpec_Celarbo {
 export interface GraphSpec_Celarbo extends GraphSpec<_GraphSpec_Celarbo> { }
 
 
+export interface GraphSpec_Foo extends GraphSpec<string[]> { }
+
+
 export interface SpaceInterface {
     graphData: GraphData;
     getNodeThreeObject(node: NodeObject<GraphNode>, message: string): THREE.Object3D;
@@ -471,5 +474,82 @@ export class CelarboSpace extends Space<GraphSpec_Celarbo> {
 
         return group;
     }
+
+}
+
+export class FooSpace extends Space<GraphSpec_Foo> {
+
+    constructor(graphSpec_Foo: GraphSpec_Foo) {
+        super(graphSpec_Foo);
+    }
+
+    protected generateGraphData(graphSpec_Foo: GraphSpec_Foo): GraphData {
+        const nodes: GraphNode[] = graphSpec_Foo.spec.map((id, idx) => ({
+            id,
+            val: 5,
+            group: 'Alpha',
+            fx: idx * 50, // space nodes along x-axis
+            fy: 0,
+            fz: 0,
+        }));
+
+        const links: NamedGraphLink[] = [];
+        for (let i = 0; i < graphSpec_Foo.spec.length - 1; i++) {
+            links.push({
+                source: graphSpec_Foo.spec[i],
+                target: graphSpec_Foo.spec[i + 1],
+                name: `${graphSpec_Foo.spec[i]}_${graphSpec_Foo.spec[i + 1]}`,
+            });
+        }
+
+        return { nodes, links };
+    }
+
+    getNodeThreeObject(node: NodeObject<GraphNode>, message: string): THREE.Object3D {
+
+        const group = new THREE.Group();
+
+        // 🎯 Base node size scaling
+        const baseSize = Math.cbrt(node.val ?? 1) * 10;
+
+        // 🔷 Determine shape and color
+        const geometry = new THREE.SphereGeometry(baseSize / 2, 16, 16);
+        const material = new THREE.MeshLambertMaterial({
+            color: message.includes(node.id) ? 'yellow' : 'red'
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        group.add(mesh);
+
+        // 🏷️ Label sprite
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        const labelFontSize = 6;
+        const text = node.id;
+
+        context.font = `${labelFontSize}px Arial`;
+        const textWidth = context.measureText(text).width;
+        canvas.width = textWidth;
+        canvas.height = labelFontSize + 10;
+
+        context.font = `${labelFontSize}px Arial`;
+        context.fillStyle = 'white';
+        context.fillText(text, 0, labelFontSize);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+        const sprite = new THREE.Sprite(spriteMaterial);
+
+        // ✏️ Size and position of label
+        sprite.scale.set(textWidth / 4, canvas.height / 4, 1);
+        const labelGap = 4;
+        sprite.position.set(0, baseSize * 0.6 + labelGap, 0);
+
+        group.add(sprite);
+
+        return group;
+
+    }
+
 
 }
