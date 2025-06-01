@@ -32,12 +32,19 @@ export async function runGrafumilo(path: string) {
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 resourceMap: {
+                    candidate: {
+                        path: path,
+                        intraMorphisms: ['fetchContentFromUrl2', 'getCandidates'],
+                        value: null,
+                    },
+                },
+                /* resourceMap: {
                     container: {
                         path: path,
                         intraMorphism: 'getNodeInvocationsFromSourceCode',
                         value: null,
                     },
-                },
+                }, */
             });
 
             console.log('threadId:', thread.thread_id);

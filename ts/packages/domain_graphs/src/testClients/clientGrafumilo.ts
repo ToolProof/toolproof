@@ -4,6 +4,7 @@ import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
 
+const bucketName = 'tp_resources';
 const urlLocal = `http://localhost:8123`;
 const urlRemote = `https://deployment-typescript-48b9b40b9bac500f8fe557700e4c49d9.us.langgraph.app`;
 const url = urlLocal; //process.env.URL || urlLocal;
@@ -27,12 +28,19 @@ export async function runRemoteGraph() {
             const result = await remoteGraph.invoke({
                 messages: [new HumanMessage('Graph is invoked')],
                 resourceMap: {
+                    candidate: {
+                        path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/`,
+                        intraMorphisms: ['fetchContentFromUrl2', 'getCandidates'],
+                        value: null,
+                    },
+                },
+                /* resourceMap: {
                     container: {
                         path: 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
                         intraMorphism: 'getNodeInvocationsFromSourceCode',
                         value: null,
                     },
-                },
+                }, */
             });
 
             // console.log('threadId:', thread.thread_id);

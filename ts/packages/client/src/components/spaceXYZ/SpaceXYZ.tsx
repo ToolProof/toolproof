@@ -6,6 +6,7 @@ import { runLigandokreado } from '@/lib/spaceXYZ/actionLigandokreado';
 import { useState, useEffect } from 'react';
 
 const foo = false; // Set to true to use the CelarboSpace, false for ToolProofSpace
+const bucketName = 'tp_resources';
 
 export default function SpaceXYZ() {
     const [graphSpec, setGraphSpec] = useState<GraphSpec_Celarbo | GraphSpec_ToolProof | null>(null);
@@ -50,8 +51,9 @@ export default function SpaceXYZ() {
             const fetchData = async () => {
                 const path0 = 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/meta/grafumilo.ts';
                 const path1 = 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts';
+                const path2 = `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/`;
                 try {
-                    const result = await runGrafumilo(path1);
+                    const result = await runGrafumilo(path2);
                     const graphSpec = result.resourceMap.container.value as GraphSpec_ToolProof;
                     console.log('graphSpec:', JSON.stringify(graphSpec, null, 2));
                     setGraphSpec(graphSpec as GraphSpec_ToolProof);

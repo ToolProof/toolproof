@@ -31,7 +31,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             outputSpec: {
                 outputKey: 'candidate',
                 path: '',
-                intraMorphism: 'doNothing',
+                intraMorphisms: ['doNothing'],
                 value: null,
             },
             interMorphism: 'generateCandidate', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
@@ -69,7 +69,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             outputSpec: {
                 outputKey: 'shouldRetry',
                 path: '',
-                intraMorphism: 'doNothing',
+                intraMorphisms: ['doNothing'],
                 value: null,
             },
             interMorphism: 'evaluateDockingResults', // ATTENTION: must validate that this morphism corresponds to the keys for input and output

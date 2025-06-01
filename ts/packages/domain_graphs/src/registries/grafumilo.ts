@@ -77,6 +77,11 @@ export const intraMorphismRegistry = {
             return graphSpec;
         };
     },
+    getCandidates: async () => {
+        return (path: string) => {
+            return []
+        }
+    },
 } as const;
 
 

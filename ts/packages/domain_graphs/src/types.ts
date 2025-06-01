@@ -3,7 +3,7 @@ import { Runnable } from '@langchain/core/runnables';
 
 export type Resource = {
     path: string;
-    intraMorphism: string;
+    intraMorphisms: string[];
     value: any; // ATTENTION
 }
 

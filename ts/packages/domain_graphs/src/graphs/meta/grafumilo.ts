@@ -5,7 +5,8 @@ import { StateGraph, START, END } from '@langchain/langgraph';
 
 const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode('nodeAlpha', new NodeAlpha({
-        inputKeys: ['container'],
+        inputKeys: ['candidate'],
+        // inputKeys: ['container'],
     }))
     .addEdge(START, 'nodeAlpha')
     .addEdge('nodeAlpha', END);

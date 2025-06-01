@@ -58,17 +58,17 @@ export class NodeAlpha extends NodeBase<TSpec> {
             const resource = state.resourceMap[key];
 
             try {
-                const loader_1 = fetchRegistry['fetchContentFromUrl']; // ATTENTION: hardcoded
-                if (!loader_1) throw new Error(`Unknown morphism:`);
+                const intraMorphism_0 = resource.intraMorphisms[0];
+                const loader_0 = fetchRegistry[intraMorphism_0 as keyof typeof fetchRegistry];
+                if (!loader_0) throw new Error(`Unknown morphism:`);
+                const fn_0 = await loader_0();
+                const content = await fn_0(resource.path);
+
+                const intraMorphism_1 = resource.intraMorphisms[1];
+                const loader_1 = intraMorphismRegistry[intraMorphism_1 as keyof typeof intraMorphismRegistry]; // ATTENTION
+                if (!loader_1) throw new Error(`Unknown morphism: ${intraMorphism_1}`);
                 const fn_1 = await loader_1();
-                const content = await fn_1(resource.path);
-
-                const intraMorphism = resource.intraMorphism;
-
-                const loader_2 = intraMorphismRegistry[intraMorphism as keyof typeof intraMorphismRegistry]; // ATTENTION
-                if (!loader_2) throw new Error(`Unknown morphism: ${intraMorphism}`);
-                const fn_2 = await loader_2();
-                const value = await fn_2(content);
+                const value = await fn_1(content);
 
                 resource.value = value; // ATTENTION: should use resource.intraMorphism
                 resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly

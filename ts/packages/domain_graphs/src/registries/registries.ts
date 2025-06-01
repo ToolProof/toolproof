@@ -13,6 +13,16 @@ export const fetchRegistry = {
             return await response.text();
         }
     },
+    fetchContentFromUrl2: async () => {
+        return async (url: string) => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
+            }
+
+            return await response.text();
+        }
+    },
 }
 
 

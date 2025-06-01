@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import { ResourceMap } from '../types.js';
 import { Client } from '@langchain/langgraph-sdk';
 import { RemoteGraph } from '@langchain/langgraph/remote';
 import { HumanMessage } from '@langchain/core/messages';
@@ -37,17 +38,17 @@ export async function runRemoteGraph() {
                 resourceMap: {
                     anchor: {
                         path: `${prefix}2025-01-01T00:00:00.000Z/candidate.smi`,
-                        intraMorphism: 'doNothing',
+                        intraMorphisms: ['fetchContentFromUrl', 'doNothing'],
                         value: null,
                     },
                     target: {
                         path: `${prefix}target.pdb`,
-                        intraMorphism: 'chunkPDBContent',
+                        intraMorphisms: ['fetchContentFromUrl', 'chunkPDBContent'],
                         value: null,
                     },
                     box: {
                         path: `${prefix}box.pdb`,
-                        intraMorphism: 'chunkPDBContent',
+                        intraMorphisms: ['fetchContentFromUrl', 'chunkPDBContent'],
                         value: null,
                     },
                 },

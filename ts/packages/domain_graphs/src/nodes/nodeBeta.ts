@@ -69,7 +69,7 @@ export class NodeBeta extends NodeBase<TSpec> {
                     ...state.resourceMap,
                     [this.spec.outputSpec.outputKey]: {
                         path: '',
-                        intraMorphism: this.spec.outputSpec.intraMorphism,
+                        intraMorphisms: this.spec.outputSpec.intraMorphisms,
                         value: value, // ATTENTION: should be taken through intraMorphism
                     },
                 }
