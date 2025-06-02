@@ -6,7 +6,7 @@ import WebSocket from 'ws';
 
 
 interface TSpec {
-    inputSpecs: {
+    inputs: {
         key: string;
         path: string;
     }[]
@@ -52,7 +52,7 @@ export class NodeDelta extends NodeBase<TSpec> {
 
             const resourceMapAugmentedWithPath: ResourceMap = {};
 
-            for (const inputSpec of this.spec.inputSpecs) {
+            for (const inputSpec of this.spec.inputs) {
                 const value = state.resourceMap[inputSpec.key].value;
 
                 const timestamp = new Date().toISOString();

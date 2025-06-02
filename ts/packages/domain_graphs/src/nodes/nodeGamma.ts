@@ -7,9 +7,9 @@ import axios from 'axios';
 import WebSocket from 'ws';
 
 interface TSpec {
-    inputKeys: string[];
+    inputs: string[];
     outputDir: string;
-    interMorphism: string;
+    interMorphism: () => string;
 }
 
 export class NodeGamma extends NodeBase<TSpec> {
@@ -94,8 +94,8 @@ export class NodeGamma extends NodeBase<TSpec> {
             const outputDir = path.dirname(state.resourceMap[this.spec.outputDir].path); // ATTENTION: temporary hack 
 
             const outputFiles = await foo(
-                this.spec.interMorphism,
-                this.spec.inputKeys,
+                this.spec.interMorphism(),
+                this.spec.inputs,
                 outputDir
             );
 

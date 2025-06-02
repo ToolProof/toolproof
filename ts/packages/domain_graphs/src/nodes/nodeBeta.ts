@@ -7,7 +7,7 @@ import WebSocket from 'ws';
 interface TSpec {
     inputs: string[];
     outputs: { key: string, intraMorphisms: string[] }[];
-    interMorphism: string;
+    interMorphism: (...args: any[]) => string | boolean; // ATTENTION: must correspond to outputs
 }
 
 export class NodeBeta extends NodeBase<TSpec> {

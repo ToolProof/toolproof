@@ -3,7 +3,7 @@ import { NodeAlpha } from '../nodes/nodeAlpha.js'; // ATTENTION: consider defaul
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
 import { NodeDelta } from '../nodes/nodeDelta.js';
-import { intraMorphismRegistry, fetchRegistry } from '../registries/registries.js';
+import { fetchRegistry, intraMorphismRegistry, interMorphismRegistry } from '../registries/registries.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
@@ -56,13 +56,13 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                     key: 'candidate',
                     intraMorphisms: ['doNothing'],
                 }],
-            interMorphism: 'generateCandidate', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            interMorphism: interMorphismRegistry.generateCandidate
         })
     )
     .addNode(
         'nodeDelta',
         new NodeDelta({
-            inputSpecs: [
+            inputs: [
                 {
                     key: 'candidate',
                     path: 'ligandokreado/1iep/timestamp/candidate.smi',
@@ -73,9 +73,9 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeGamma',
         new NodeGamma({
-            inputKeys: ['candidate', 'target', 'box'],
+            inputs: ['candidate', 'target', 'box'],
             outputDir: 'candidate', // ATTENTION: indicates same directory as candidate
-            interMorphism: 'https://service-autodock-384484325421.europe-west2.run.app/autodock_basic',
+            interMorphism: () => 'https://service-autodock-384484325421.europe-west2.run.app/autodock_basic',
         })
     )
     .addNode(
@@ -102,14 +102,13 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeBeta2',
         new NodeBeta({
-            inputKeys: ['docking', 'pose'],
-            outputSpec: {
-                outputKey: 'shouldRetry',
-                intraMorphisms: ['doNothing'],
-                path: '',
-                value: null,
-            },
-            interMorphism: 'evaluateDockingResults', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
+            inputs: ['docking', 'pose'],
+            outputs: [
+                {
+                    key: 'shouldRetry',
+                    intraMorphisms: ['doNothing'],
+                }],
+            interMorphism: interMorphismRegistry.evaluateDockingResults
         })
     )
     .addEdge(START, 'nodeAlpha')
