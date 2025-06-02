@@ -41,17 +41,14 @@ export async function runLigandokreado() {
                 resourceMap: {
                     anchor: {
                         path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/2025-01-01T00:00:00.000Z/candidate.smi`,
-                        intraMorphism: 'doNothing',
                         value: null,
                     },
                     target: {
                         path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/target.pdb`,
-                        intraMorphism: 'chunkPDBContent',
                         value: null,
                     },
                     box: {
                         path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/box.pdb`,
-                        intraMorphism: 'chunkPDBContent',
                         value: null,
                     },
                 },

@@ -105,7 +105,6 @@ export class NodeGamma extends NodeBase<TSpec> {
                 path2 = `https://storage.googleapis.com/${bucketName}/${path2}`; // ATTENTION: temporary hack
                 acc[file.split('.')[0]] = {
                     path: path2,
-                    intraMorphisms: ['fetchContentFromUrl', 'doNothing'], // this.spec.intraMorphism, // ATTENTION: what about this? Could allocate it dynamically based on the file extension?
                     value: null,
                 };
                 return acc;

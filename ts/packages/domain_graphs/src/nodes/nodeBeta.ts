@@ -7,7 +7,7 @@ import WebSocket from 'ws';
 
 interface TSpec {
     inputKeys: string[];
-    outputSpec: Resource & { outputKey: string }; // ATTENTION: allows for only a single output resource
+    outputSpec: Resource & { outputKey: string, intraMorphisms: string[] }; // ATTENTION: allows for only a single output resource
     interMorphism: string;
 }
 
@@ -69,7 +69,6 @@ export class NodeBeta extends NodeBase<TSpec> {
                     ...state.resourceMap,
                     [this.spec.outputSpec.outputKey]: {
                         path: '',
-                        intraMorphisms: this.spec.outputSpec.intraMorphisms,
                         value: value, // ATTENTION: should be taken through intraMorphism
                     },
                 }

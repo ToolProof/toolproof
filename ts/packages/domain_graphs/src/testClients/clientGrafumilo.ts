@@ -30,14 +30,12 @@ export async function runRemoteGraph() {
                 resourceMap: {
                     candidate: {
                         path: `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/`,
-                        intraMorphisms: ['fetchContentFromUrl2', 'getCandidates'],
                         value: null,
                     },
                 },
                 /* resourceMap: {
                     container: {
                         path: 'https://raw.githubusercontent.com/ToolProof/toolproof/master/ts/packages/domain_graphs/src/graphs/ligandokreado.ts',
-                        intraMorphism: 'getNodeInvocationsFromSourceCode',
                         value: null,
                     },
                 }, */

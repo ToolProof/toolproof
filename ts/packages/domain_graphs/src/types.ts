@@ -3,7 +3,6 @@ import { Runnable } from '@langchain/core/runnables';
 
 export type Resource = {
     path: string;
-    intraMorphisms: string[]; // ATTENTION: Resources should not have inherent intraMorphisms, these should instead be defined when invoking the graph they are used in.
     value: any; // ATTENTION
 }
 

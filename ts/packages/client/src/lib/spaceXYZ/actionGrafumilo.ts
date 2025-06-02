@@ -34,14 +34,12 @@ export async function runGrafumilo(path: string) {
                 resourceMap: {
                     candidate: {
                         path: path,
-                        intraMorphisms: ['fetchContentFromUrl2', 'getCandidates'],
                         value: null,
                     },
                 },
                 /* resourceMap: {
                     container: {
                         path: path,
-                        intraMorphism: 'getNodeInvocationsFromSourceCode',
                         value: null,
                     },
                 }, */

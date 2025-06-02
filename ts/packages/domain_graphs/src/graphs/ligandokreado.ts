@@ -21,7 +21,29 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeAlpha',
         new NodeAlpha({
-            inputKeys: ['anchor', 'target', 'box'],
+            inputs: [
+                {
+                    key: 'anchor',
+                    intraMorphisms: {
+                        fetch: 'fetchContentFromUrl',
+                        transform: 'doNothing',
+                    }
+                },
+                {
+                    key: 'target',
+                    intraMorphisms: {
+                        fetch: 'fetchContentFromUrl',
+                        transform: 'chunkPDBContent',
+                    }
+                },
+                {
+                    key: 'box',
+                    intraMorphisms: {
+                        fetch: 'fetchContentFromUrl',
+                        transform: 'chunkPDBContent',
+                    }
+                },
+            ]
         })
     )
     .addNode(
@@ -30,8 +52,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             inputKeys: ['anchor', 'target'],
             outputSpec: {
                 outputKey: 'candidate',
-                path: '',
                 intraMorphisms: ['doNothing'],
+                path: '',
                 value: null,
             },
             interMorphism: 'generateCandidate', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
@@ -59,7 +81,22 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeAlpha2',
         new NodeAlpha({
-            inputKeys: ['docking', 'pose'],
+            inputs: [
+                {
+                    key: 'docking',
+                    intraMorphisms: {
+                        fetch: 'fetchContentFromUrl',
+                        transform: 'doNothing',
+                    }
+                },
+                {
+                    key: 'pose',
+                    intraMorphisms: {
+                        fetch: 'fetchContentFromUrl',
+                        transform: 'doNothing',
+                    }
+                },
+            ]
         })
     )
     .addNode(
@@ -68,8 +105,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             inputKeys: ['docking', 'pose'],
             outputSpec: {
                 outputKey: 'shouldRetry',
-                path: '',
                 intraMorphisms: ['doNothing'],
+                path: '',
                 value: null,
             },
             interMorphism: 'evaluateDockingResults', // ATTENTION: must validate that this morphism corresponds to the keys for input and output

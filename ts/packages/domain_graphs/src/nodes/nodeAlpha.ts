@@ -5,7 +5,13 @@ import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
 interface TSpec {
-    inputKeys: string[];
+    inputs: {
+        key: string;
+        intraMorphisms: {
+            fetch: string;
+            transform: string;
+        }
+    }[];
 }
 
 export class NodeAlpha extends NodeBase<TSpec> {
@@ -48,27 +54,29 @@ export class NodeAlpha extends NodeBase<TSpec> {
 
         for (const key of Object.keys(state.resourceMap)) {
 
-            if (!this.spec.inputKeys.includes(key)) {
+            if (!this.spec.inputs.map((input) => input.key).includes(key)) {
                 console.log('Skipping resource:', key);
                 continue;
             } else {
                 console.log('Processing resource:', key);
             }
 
+            const intraMorphisms = this.spec.inputs.find((input) => input.key === key)?.intraMorphisms;
+            if (!intraMorphisms) {
+                throw new Error(`No intraMorphisms defined for key: ${key}`);
+            }
             const resource = state.resourceMap[key];
 
             try {
-                const intraMorphism_0 = resource.intraMorphisms[0];
-                const loader_0 = fetchRegistry[intraMorphism_0 as keyof typeof fetchRegistry];
-                if (!loader_0) throw new Error(`Unknown morphism:`);
-                const fn_0 = await loader_0();
-                const content = await fn_0(resource.path);
+                const loaderFetch = fetchRegistry[intraMorphisms.fetch as keyof typeof fetchRegistry];
+                if (!loaderFetch) throw new Error(`Unknown morphism: ${intraMorphisms.fetch}`);
+                const fnFetch = await loaderFetch();
+                const content = await fnFetch(resource.path);
 
-                const intraMorphism_1 = resource.intraMorphisms[1];
-                const loader_1 = intraMorphismRegistry[intraMorphism_1 as keyof typeof intraMorphismRegistry]; // ATTENTION
-                if (!loader_1) throw new Error(`Unknown morphism: ${intraMorphism_1}`);
-                const fn_1 = await loader_1();
-                const value = await fn_1(content);
+                const loaderTransform = intraMorphismRegistry[intraMorphisms.transform as keyof typeof intraMorphismRegistry]; // ATTENTION
+                if (!loaderTransform) throw new Error(`Unknown morphism: ${intraMorphisms.transform}`);
+                const fnTransform = await loaderTransform();
+                const value = await fnTransform(content);
 
                 resource.value = value; // ATTENTION: should use resource.intraMorphism
                 resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly

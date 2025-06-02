@@ -38,17 +38,14 @@ export async function runRemoteGraph() {
                 resourceMap: {
                     anchor: {
                         path: `${prefix}2025-01-01T00:00:00.000Z/candidate.smi`,
-                        intraMorphisms: ['fetchContentFromUrl', 'doNothing'],
                         value: null,
                     },
                     target: {
                         path: `${prefix}target.pdb`,
-                        intraMorphisms: ['fetchContentFromUrl', 'chunkPDBContent'],
                         value: null,
                     },
                     box: {
                         path: `${prefix}box.pdb`,
-                        intraMorphisms: ['fetchContentFromUrl', 'chunkPDBContent'],
                         value: null,
                     },
                 },
