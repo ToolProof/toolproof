@@ -7,6 +7,16 @@ export const intraMorphismRegistry = {
 } as const;
 
 export const interMorphismRegistry = {
+    generateCandidate2: <K extends string>(...keys: K[]) => {
+        return (...args: any[]): { [P in K]: any } => {
+
+            // I need a zod/json schema here, based on P in K, that will be passed to the OpenAI API to generate structured output
+
+            // Example implementation:
+            // return keys.reduce((acc, key) => ({ ...acc, [key]: 'value' }), {} as any);
+            throw new Error('Not implemented');
+        };
+    },
     generateCandidate: (anchor: string, target: ChunkInfo[]) => {
 
         if (!anchor || !target || target.length === 0) {

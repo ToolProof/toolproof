@@ -4,17 +4,21 @@ import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-interface TSpec {
+type OutputSpec = { key: string; intraMorphisms: string[] };
+
+interface TSpec<Outputs extends readonly OutputSpec[] = OutputSpec[]> {
     inputs: string[];
-    outputs: { key: string, intraMorphisms: string[] }[];
-    interMorphism: (...args: any[]) => string | boolean; // ATTENTION: must correspond to outputs
+    outputs: Outputs;
+    interMorphism: (...args: any[]) => {
+        [K in Outputs[number]as K['key']]: any;
+    };
 }
 
-export class NodeBeta extends NodeBase<TSpec> {
+export class NodeBeta<Outputs extends readonly OutputSpec[]> extends NodeBase<TSpec<Outputs>> {
 
-    spec: TSpec;
+    spec: TSpec<Outputs>;
 
-    constructor(spec: TSpec) {
+    constructor(spec: TSpec<Outputs>) {
         super();
         this.spec = spec;
     }
