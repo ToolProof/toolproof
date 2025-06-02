@@ -49,13 +49,12 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
     .addNode(
         'nodeBeta',
         new NodeBeta({
-            inputKeys: ['anchor', 'target'],
-            outputSpec: {
-                outputKey: 'candidate',
-                intraMorphisms: ['doNothing'],
-                path: '',
-                value: null,
-            },
+            inputs: ['anchor', 'target'],
+            outputs: [
+                {
+                    key: 'candidate',
+                    intraMorphisms: ['doNothing'],
+                }],
             interMorphism: 'generateCandidate', // ATTENTION: must validate that this morphism corresponds to the keys for input and output
         })
     )

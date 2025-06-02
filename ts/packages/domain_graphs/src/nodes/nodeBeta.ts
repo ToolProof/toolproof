@@ -1,13 +1,13 @@
 import { interMorphismRegistry } from '../registries/registries.js';
-import { NodeBase, GraphState, Resource } from '../types.js';
+import { NodeBase, GraphState, ResourceMap } from '../types.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
 
 interface TSpec {
-    inputKeys: string[];
-    outputSpec: Resource & { outputKey: string, intraMorphisms: string[] }; // ATTENTION: allows for only a single output resource
+    inputs: string[];
+    outputs: { key: string, intraMorphisms: string[] }[];
     interMorphism: string;
 }
 
@@ -52,7 +52,7 @@ export class NodeBeta extends NodeBase<TSpec> {
             const inputs: any[] = [];
 
             Object.entries(state.resourceMap).forEach(([key, resource]) => {
-                if (this.spec.inputKeys.includes(key)) {
+                if (this.spec.inputs.includes(key)) {
                     inputs.push(resource.value);
                 }
             });
@@ -61,16 +61,24 @@ export class NodeBeta extends NodeBase<TSpec> {
             if (!loader) throw new Error(`Unknown morphism: ${this.spec.interMorphism}`);
 
             const fn = await loader() as (...args: any[]) => string;
-            const value = await fn(...inputs); // ATTENTION: is the type misleading?
+            const value: any[] = await fn(...inputs); // ATTENTION: value should be a tuple of the same length as this.spec.outputs? Or maybe use keys instead of indices? #StructuredOutputs
+
+            const extraResources: ResourceMap = this.spec.outputs.reduce((acc, output, i) => {
+                acc[output.key] = {
+                    path: '',
+                    value: value[i], // ATTENTION: should be taken through intraMorphism(s)
+                }
+                return acc;
+            }, {} as ResourceMap);
+
+
+
 
             return {
                 messages: [new AIMessage('NodeBeta completed')],
                 resourceMap: {
                     ...state.resourceMap,
-                    [this.spec.outputSpec.outputKey]: {
-                        path: '',
-                        value: value, // ATTENTION: should be taken through intraMorphism
-                    },
+                    ...extraResources,
                 }
             };
         } catch (error: any) {
