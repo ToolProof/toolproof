@@ -4,44 +4,39 @@ import { storage, bucketName } from '../firebaseAdminInit.js';
 
 
 export const fetchRegistry = {
-    fetchContentFromUrl: async () => {
-        return async (url: string) => {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
-            }
-
-            return await response.text();
+    fetchContentFromUrl: async (url: string) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file from GitHub: ${response.statusText} (URL: ${url})`);
         }
+        return await response.text();
     },
-    fetchContentFromUrl2: async () => {
-        return async (url: string) => {
-            // Extract the "directory" path from the URL
-            const match = url.match(/^https:\/\/storage\.googleapis\.com\/[^\/]+\/(.+)$/);
-            if (!match) throw new Error("Invalid GCP Storage URL");
-            const prefix = match[1].endsWith('/') ? match[1] : match[1] + '/';
+    fetchContentFromUrl2: async (url: string) => {
+        // Extract the "directory" path from the URL
+        const match = url.match(/^https:\/\/storage\.googleapis\.com\/[^\/]+\/(.+)$/);
+        if (!match) throw new Error("Invalid GCP Storage URL");
+        const prefix = match[1].endsWith('/') ? match[1] : match[1] + '/';
 
-            // List files and prefixes (subfolders) under the prefix
-            const [files] = await storage
-                .bucket(bucketName)
-                .getFiles({
-                    prefix,
-                    delimiter: '/',
-                });
+        // List files and prefixes (subfolders) under the prefix
+        const [files] = await storage
+            .bucket(bucketName)
+            .getFiles({
+                prefix,
+                delimiter: '/',
+            });
 
-            // The API returns subfolders in the second argument of getFiles
-            const [, , apiResponse] = await storage
-                .bucket(bucketName)
-                .getFiles({
-                    prefix,
-                    delimiter: '/',
-                });
+        // The API returns subfolders in the second argument of getFiles
+        const [, , apiResponse] = await storage
+            .bucket(bucketName)
+            .getFiles({
+                prefix,
+                delimiter: '/',
+            });
 
-            const subfolders: string[] = apiResponse.prefixes || [];
-            // Return subfolder names as a string (one per line)
-            return subfolders.join('\n');
-        }
-    },
+        const subfolders: string[] = apiResponse.prefixes || [];
+        // Return subfolder names as a string (one per line)
+        return subfolders.join('\n');
+    }
 }
 
 

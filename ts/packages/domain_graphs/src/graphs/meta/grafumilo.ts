@@ -1,5 +1,6 @@
 import { GraphStateAnnotationRoot } from '../../types.js';
 import { NodeAlpha } from '../../nodes/nodeAlpha.js';
+import { intraMorphismRegistry, fetchRegistry } from '../../registries/registries.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
@@ -9,8 +10,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             {
                 key: 'candidate',
                 intraMorphisms: {
-                    fetch: 'fetchContentFromUrl2',
-                    transform: 'getCandidates',
+                    fetch: fetchRegistry.fetchContentFromUrl2,
+                    transform: intraMorphismRegistry.getCandidates,
                 }
             },
         ]
@@ -18,8 +19,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
             {
                 key: 'container',
                 intraMorphisms: {
-                    fetch: 'fetchContentFromUrl',
-                    transform: 'getNodeInvocationsFromSourceCode',
+                    fetch: fetchRegistry.fetchContentFromUrl2,
+                    transform: intraMorphismRegistry.getNodeInvocationsFromSourceCode,
                 }
             },
         ] */

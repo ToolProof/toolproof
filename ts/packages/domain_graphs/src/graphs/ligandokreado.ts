@@ -3,6 +3,7 @@ import { NodeAlpha } from '../nodes/nodeAlpha.js'; // ATTENTION: consider defaul
 import { NodeBeta } from '../nodes/nodeBeta.js';
 import { NodeGamma } from '../nodes/nodeGamma.js';
 import { NodeDelta } from '../nodes/nodeDelta.js';
+import { intraMorphismRegistry, fetchRegistry } from '../registries/registries.js';
 import { StateGraph, START, END } from '@langchain/langgraph';
 
 
@@ -25,22 +26,22 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                 {
                     key: 'anchor',
                     intraMorphisms: {
-                        fetch: 'fetchContentFromUrl',
-                        transform: 'doNothing',
+                        fetch: fetchRegistry.fetchContentFromUrl,
+                        transform: intraMorphismRegistry.doNothing,
                     }
                 },
                 {
                     key: 'target',
                     intraMorphisms: {
-                        fetch: 'fetchContentFromUrl',
-                        transform: 'chunkPDBContent',
+                        fetch: fetchRegistry.fetchContentFromUrl,
+                        transform: intraMorphismRegistry.chunkPDBContent,
                     }
                 },
                 {
                     key: 'box',
                     intraMorphisms: {
-                        fetch: 'fetchContentFromUrl',
-                        transform: 'chunkPDBContent',
+                        fetch: fetchRegistry.fetchContentFromUrl,
+                        transform: intraMorphismRegistry.chunkPDBContent,
                     }
                 },
             ]
@@ -84,15 +85,15 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                 {
                     key: 'docking',
                     intraMorphisms: {
-                        fetch: 'fetchContentFromUrl',
-                        transform: 'doNothing',
+                        fetch: fetchRegistry.fetchContentFromUrl,
+                        transform: intraMorphismRegistry.doNothing,
                     }
                 },
                 {
                     key: 'pose',
                     intraMorphisms: {
-                        fetch: 'fetchContentFromUrl',
-                        transform: 'doNothing',
+                        fetch: fetchRegistry.fetchContentFromUrl,
+                        transform: intraMorphismRegistry.doNothing,
                     }
                 },
             ]

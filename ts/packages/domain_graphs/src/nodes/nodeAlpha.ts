@@ -1,5 +1,4 @@
 import { NodeBase, GraphState } from '../types.js';
-import { intraMorphismRegistry, fetchRegistry } from '../registries/registries.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
@@ -8,8 +7,8 @@ interface TSpec {
     inputs: {
         key: string;
         intraMorphisms: {
-            fetch: string;
-            transform: string;
+            fetch: (url: string) => Promise<string>;
+            transform: (content: string) => any | Promise<any>; // ATTENTION
         }
     }[];
 }
@@ -65,21 +64,15 @@ export class NodeAlpha extends NodeBase<TSpec> {
             if (!intraMorphisms) {
                 throw new Error(`No intraMorphisms defined for key: ${key}`);
             }
+
             const resource = state.resourceMap[key];
 
             try {
-                const loaderFetch = fetchRegistry[intraMorphisms.fetch as keyof typeof fetchRegistry];
-                if (!loaderFetch) throw new Error(`Unknown morphism: ${intraMorphisms.fetch}`);
-                const fnFetch = await loaderFetch();
-                const content = await fnFetch(resource.path);
+                const content = await intraMorphisms.fetch(resource.path);
+                const value = await intraMorphisms.transform(content);
 
-                const loaderTransform = intraMorphismRegistry[intraMorphisms.transform as keyof typeof intraMorphismRegistry]; // ATTENTION
-                if (!loaderTransform) throw new Error(`Unknown morphism: ${intraMorphisms.transform}`);
-                const fnTransform = await loaderTransform();
-                const value = await fnTransform(content);
-
-                resource.value = value; // ATTENTION: should use resource.intraMorphism
-                resourceMap[key] = resource; // ATTENTION: mutates resourceMap directly
+                resource.value = value;
+                resourceMap[key] = resource;
             } catch (error) {
                 throw new Error(`Error fetching or processing file: ${error}`);
             }

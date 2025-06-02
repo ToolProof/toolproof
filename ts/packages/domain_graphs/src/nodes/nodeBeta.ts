@@ -4,7 +4,6 @@ import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
 import WebSocket from 'ws';
 
-
 interface TSpec {
     inputs: string[];
     outputs: { key: string, intraMorphisms: string[] }[];
