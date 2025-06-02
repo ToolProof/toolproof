@@ -488,9 +488,9 @@ export class FooSpace extends Space<GraphSpec_Foo> {
             id,
             val: 5,
             group: 'Alpha',
-            fx: idx * 50, // space nodes along x-axis
+            fx: 0,
             fy: 0,
-            fz: 0,
+            fz: idx * 50,
         }));
 
         const links: NamedGraphLink[] = [];
