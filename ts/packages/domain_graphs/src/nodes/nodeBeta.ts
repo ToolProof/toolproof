@@ -23,6 +23,7 @@ export class NodeBeta<Outputs extends readonly OutputSpec[]> extends NodeBase<TS
         this.spec = spec;
     }
 
+
     async invoke(state: GraphState, options?: Partial<RunnableConfig<Record<string, any>>>): Promise<Partial<GraphState>> {
 
         if (!state.dryModeManager.drySocketMode) {
@@ -93,6 +94,7 @@ export class NodeBeta<Outputs extends readonly OutputSpec[]> extends NodeBase<TS
     }
 
 }
+
 
 
 

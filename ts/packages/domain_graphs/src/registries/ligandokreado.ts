@@ -7,13 +7,8 @@ export const intraMorphismRegistry = {
 } as const;
 
 export const interMorphismRegistry = {
-    generateCandidate2: <K extends string>(...keys: K[]) => {
+    generateCandidate2: <const K extends string>(...keys: K[]) => {
         return (...args: any[]): { [P in K]: any } => {
-
-            // I need a zod/json schema here, based on P in K, that will be passed to the OpenAI API to generate structured output
-
-            // Example implementation:
-            // return keys.reduce((acc, key) => ({ ...acc, [key]: 'value' }), {} as any);
             throw new Error('Not implemented');
         };
     },
@@ -53,10 +48,10 @@ export const interMorphismRegistry = {
                 temperature: 0.7,
                 max_tokens: 500
             });
-
+    
             analysisContext += '\n' + (response.choices[0].message.content?.trim() || '');
         }
-
+    
         // Generate final candidate using accumulated analysis
         const finalResponse = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
@@ -70,10 +65,10 @@ export const interMorphismRegistry = {
                     content: `
                             Using this target protein analysis:
                             ${analysisContext}
-    
+     
                             And this anchor molecule SMILES:
                             ${anchor}
-    
+     
                             Generate an optimized candidate molecule using single SMILES string.
                             Respond with only the SMILES string.
                         `
@@ -82,7 +77,7 @@ export const interMorphismRegistry = {
             temperature: 0.7,
             max_tokens: 500
         });
-
+    
         const candidate = finalResponse.choices[0].message.content?.trim(); */
 
         const candidate = anchor; // ATTENTION: placeholder for now
