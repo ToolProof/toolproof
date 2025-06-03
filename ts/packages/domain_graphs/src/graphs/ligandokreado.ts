@@ -61,7 +61,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                     intraMorphisms: ['doNothing'],
                 },
             ] as const,
-            interMorphism: interMorphismRegistry.generateCandidate2<'candidate' | 'foo'>('candidate', 'foo', 'bar')
+            interMorphism: interMorphismRegistry.generateCandidate2<'candidate' | 'foo'>('candidate') // ATTENTION: all outputs must be included in the interMorphism
         })
     )
     .addNode(
