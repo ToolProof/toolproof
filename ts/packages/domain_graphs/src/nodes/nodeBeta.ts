@@ -1,4 +1,3 @@
-import { interMorphismRegistry } from '../registries/registries.js';
 import { NodeBase, GraphState, ResourceMap } from '../types.js';
 import { RunnableConfig } from '@langchain/core/runnables';
 import { AIMessage } from '@langchain/core/messages';
@@ -61,22 +60,15 @@ export class NodeBeta<Outputs extends readonly OutputSpec[]> extends NodeBase<TS
                 }
             });
 
-            const loader = interMorphismRegistry[this.spec.interMorphism as keyof typeof interMorphismRegistry];
-            if (!loader) throw new Error(`Unknown morphism: ${this.spec.interMorphism}`);
+            const result = await this.spec.interMorphism(...inputs);
 
-            const fn = await loader() as (...args: any[]) => string;
-            const value: any[] = await fn(...inputs); // ATTENTION: value should be a tuple of the same length as this.spec.outputs? Or maybe use keys instead of indices? #StructuredOutputs
-
-            const extraResources: ResourceMap = this.spec.outputs.reduce((acc, output, i) => {
+            const extraResources: ResourceMap = this.spec.outputs.reduce((acc, output) => {
                 acc[output.key] = {
                     path: '',
-                    value: value[i], // ATTENTION: should be taken through intraMorphism(s)
+                    value: result[output.key as Outputs[number]['key']], // ATTENTION: should be taken through intraMorphism(s)
                 }
                 return acc;
             }, {} as ResourceMap);
-
-
-
 
             return {
                 messages: [new AIMessage('NodeBeta completed')],

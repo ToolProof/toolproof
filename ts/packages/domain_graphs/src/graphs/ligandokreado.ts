@@ -56,12 +56,8 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                     key: 'candidate',
                     intraMorphisms: ['doNothing'],
                 },
-                {
-                    key: 'foo',
-                    intraMorphisms: ['doNothing'],
-                },
             ] as const,
-            interMorphism: interMorphismRegistry.generateCandidate2('candidate', 'foo2'),
+            interMorphism: interMorphismRegistry.generateCandidate2('candidate'),
         })
     )
     .addNode(
@@ -113,10 +109,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                     key: 'shouldRetry',
                     intraMorphisms: ['doNothing'],
                 }] as const,
-            interMorphism: () => ({
-                shouldRetry: '',
-                shouldRetry2: '', // ATTENTION: no error
-            }) // interMorphismRegistry.evaluateDockingResults
+            interMorphism: interMorphismRegistry.evaluateDockingResults('shouldRetry'),
         })
     )
     .addEdge(START, 'nodeAlpha')
