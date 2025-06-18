@@ -524,7 +524,7 @@ export class FooSpace extends Space<GraphSpec_Foo> {
         // 🏷️ Label sprite
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d')!;
-        const labelFontSize = 6;
+        const labelFontSize = 16;
         const text = node.id;
 
         context.font = `${labelFontSize}px Arial`;

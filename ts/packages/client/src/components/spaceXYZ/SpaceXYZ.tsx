@@ -51,9 +51,12 @@ export default function SpaceXYZ() {
             const fetchData = async () => {
                 const path2 = `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/`;
                 try {
-                    const result = await runGrafumilo(path2);
+                    /* const result = await runGrafumilo(path2);
                     const graphSpec = result.resourceMap.candidate.value as GraphSpec_Foo;
-                    console.log('graphSpec:', JSON.stringify(graphSpec, null, 2));
+                    console.log('graphSpec:', JSON.stringify(graphSpec, null, 2)); */
+                    const graphSpec = {
+                        spec: ['Uno', 'Dos', 'Tres', 'Cuatro', 'Cinco'],
+                    }
                     setGraphSpec(graphSpec as GraphSpec_Foo);
                 } catch (error) {
                     throw new Error(`Error fetching data: ${error}`);
@@ -88,7 +91,7 @@ export default function SpaceXYZ() {
         if (foo) {
             /* const celarboSpace = new CelarboSpace(graphSpec as GraphSpec_Celarbo);
             setSpace(celarboSpace); */
-            const fooSpace = new FooSpace (graphSpec as GraphSpec_Foo);
+            const fooSpace = new FooSpace(graphSpec as GraphSpec_Foo);
             setSpace(fooSpace);
         } else {
             const toolProofSpace = new ToolProofSpace(graphSpec as GraphSpec_ToolProof);

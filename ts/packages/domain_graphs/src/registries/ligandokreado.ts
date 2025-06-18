@@ -82,9 +82,16 @@ export const interMorphismRegistry = {
 
         const candidate = anchor; // ATTENTION: placeholder for now
 
-        return candidate;
+        return {
+            candidate
+        };
     },
-    evaluateDockingResults: <const K extends string>(...keys: K[]) => {
+    evaluateDockingResults: () => {
+        return {
+            shouldRetry: false, // ATTENTION: placeholder for now
+        };
+    },
+    evaluateDockingResults2: <const K extends string>(...keys: K[]) => {
         return (...args: any[]): { [P in K]: any } => {
             throw new Error('Not implemented');
         };

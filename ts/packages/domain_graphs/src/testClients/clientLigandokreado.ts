@@ -26,6 +26,21 @@ export async function runRemoteGraph() {
         const bucketName = 'tp_resources';
         const prefix = `https://storage.googleapis.com/${bucketName}/ligandokreado/1iep/`;
 
+        const resourceMap: ResourceMap = {
+            anchor: {
+                path: `${prefix}2025-01-01T00:00:00.000Z/candidate.smi`,
+                value: null,
+            },
+            target: {
+                path: `${prefix}target.pdb`,
+                value: null,
+            },
+            box: {
+                path: `${prefix}box.pdb`,
+                value: null,
+            },
+        }
+
         try {
             // console.log('Invoking the graph')
             const result = await remoteGraph.invoke({
@@ -33,22 +48,9 @@ export async function runRemoteGraph() {
                 dryModeManager: {
                     dryRunMode: false,
                     delay: 1000,
-                    drySocketMode: false,
+                    drySocketMode: true,
                 },
-                resourceMap: {
-                    anchor: {
-                        path: `${prefix}2025-01-01T00:00:00.000Z/candidate.smi`,
-                        value: null,
-                    },
-                    target: {
-                        path: `${prefix}target.pdb`,
-                        value: null,
-                    },
-                    box: {
-                        path: `${prefix}box.pdb`,
-                        value: null,
-                    },
-                },
+                resourceMap,
             }, {
                 configurable: { thread_id: thread.thread_id },
                 signal: controller.signal,

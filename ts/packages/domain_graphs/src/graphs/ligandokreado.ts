@@ -9,7 +9,7 @@ import { StateGraph, START, END } from '@langchain/langgraph';
 
 const edgeShouldRetry = (state: GraphState) => {
     // console.log('state :', state);
-    if (state.resourceMap.shouldRetry.value) {
+    if (state.resourceMap.shouldRetry && state.resourceMap.shouldRetry.value) {
         console.log('edgeShouldRetry: shouldRetry is true');
         return 'nodeBeta';
     } else {
@@ -57,7 +57,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                     intraMorphisms: ['doNothing'],
                 },
             ] as const,
-            interMorphism: interMorphismRegistry.generateCandidate2('candidate'),
+            interMorphism: interMorphismRegistry.generateCandidate,
         })
     )
     .addNode(
@@ -109,7 +109,7 @@ const stateGraph = new StateGraph(GraphStateAnnotationRoot)
                     key: 'shouldRetry',
                     intraMorphisms: ['doNothing'],
                 }] as const,
-            interMorphism: interMorphismRegistry.evaluateDockingResults('shouldRetry'),
+            interMorphism: interMorphismRegistry.evaluateDockingResults,
         })
     )
     .addEdge(START, 'nodeAlpha')

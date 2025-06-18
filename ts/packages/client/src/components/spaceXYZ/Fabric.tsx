@@ -24,7 +24,7 @@ export default function Fabric({ space, message }: FabricProps) {
             }
 
             hack.cameraPosition(
-                { x: 0, y: 0, z: 400 }, // Move the camera farther away from the center
+                { x: 100, y: 100, z: 100 }, // Move the camera farther away from the center
                 undefined,              // Look at center (default: {x: 0, y: 0, z: 0})
                 0                      // Transition time (0 = immediate)
             );

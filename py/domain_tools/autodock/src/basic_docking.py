@@ -74,7 +74,7 @@ def prepare_receptor(receptor, box):
     # Step 4: Prepare receptor for docking
     run_command(f"micromamba run -n ad_env mk_prepare_receptor.py --read_pdb {receptor_cryst1FH} -o {intermediate_path} -p -v --box_enveloping {box} --padding 5")
     print("Receptor preparation complete.")
-    return output_path
+    return receptor_cryst1FH, output_path
 
 
 def extract_receptor_atoms(receptor):
@@ -184,7 +184,7 @@ def run_simulation(ligand, receptor, box, dirname):
         
         ligand_prepared = prepare_ligand(ligand_local)
         
-        receptor_prepared = prepare_receptor(receptor_local, box_local)
+        target, receptor_prepared = prepare_receptor(receptor_local, box_local)
         
         docking = run_docking(ligand_prepared, receptor_prepared)
         
@@ -195,6 +195,7 @@ def run_simulation(ligand, receptor, box, dirname):
         files_to_upload = [
             (docking, os.path.basename(docking)),
             (pose, os.path.basename(pose)),
+            (target, os.path.basename(target)), # Used for visualization
         ]
         
         success_files = []

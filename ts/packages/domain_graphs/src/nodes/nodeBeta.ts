@@ -9,7 +9,7 @@ interface TSpec<Outputs extends readonly OutputSpec[] = OutputSpec[]> {
     inputs: string[];
     outputs: Outputs;
     interMorphism: (...args: any[]) => {
-        [K in Outputs[number]as K['key']]: any;
+        [K in Outputs[number] as K['key']]: any;
     };
 }
 
