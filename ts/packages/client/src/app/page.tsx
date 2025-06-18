@@ -1,19 +1,29 @@
-'use client'
+'use client';
+import { Ligand } from '@/xr/worlds/ligand/Ligand';
+import { useEffect, useRef } from 'react';
 
-import dynamic from 'next/dynamic';
-import { useAppDispatch } from '@/redux/hooks';
-import { useEffect } from 'react';
-import { setShowSideBar } from '@/redux/features/configSlice';
-
-// Dynamically import the component that triggers use of THREE / ForceGraph3D
-const SpaceXYZ = dynamic(() => import('@/components/spaceXYZ/SpaceXYZ'), { ssr: false });
 
 export default function Home() {
-  const dispatch = useAppDispatch();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(setShowSideBar(true));
-  }, [dispatch]);
 
-  return <SpaceXYZ />;
+    const asyncWrapper = async () => {
+      if (!containerRef.current) return;
+
+      const ligand = new Ligand(containerRef.current);
+      ligand.init();
+
+      // Cleanup on unmount
+      return () => {
+      };
+    }
+
+    asyncWrapper();
+
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ width: '100vw', height: '100vh', backgroundColor: 'orange' }}></div>
+  );
 }
